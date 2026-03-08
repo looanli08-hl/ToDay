@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>盘纪 Pro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="ambient ambient-a"></div>
+    <div class="ambient ambient-b"></div>
+    <main class="experience">
+      <section class="strategy-panel">
+        <div class="brand-lockup">
+          <span class="brand-badge">THS Style / Trade Journal</span>
+          <h1>盘纪 Pro</h1>
+          <p class="brand-copy">
+            面向A股短线交易者的高端复盘与记录工具。核心不是喊单，而是把你的做T、格局、纪律执行和最终收益沉淀成可复用的个人交易系统。
+          </p>
+        </div>
+
+        <div class="insight-stack">
+          <article class="insight-card">
+            <p class="eyebrow">产品定位</p>
+            <h2>像同花顺一样高密度，但更聚焦交易结果管理</h2>
+            <p>
+              行情感知、仓位决策、复盘沉淀、会员服务四段闭环放进一个移动端工作流，避免“只会看盘，不会沉淀”。
+            </p>
+          </article>
+
+          <article class="insight-card">
+            <p class="eyebrow">变现结构</p>
+            <div class="monetize-grid">
+              <div>
+                <span class="metric-label">会员订阅</span>
+                <strong>Pro 版</strong>
+                <small>高级统计 / 云同步 / 模板库</small>
+              </div>
+              <div>
+                <span class="metric-label">知识服务</span>
+                <strong>陪跑营</strong>
+                <small>周报点评 / 交易纪律诊断</small>
+              </div>
+              <div>
+                <span class="metric-label">数字商品</span>
+                <strong>策略模板</strong>
+                <small>做T剧本 / 格局清单 / 复盘看板</small>
+              </div>
+            </div>
+          </article>
+
+          <article class="insight-card compact">
+            <p class="eyebrow">核心场景</p>
+            <div class="pill-row">
+              <span>冲高减仓</span>
+              <span>回踩接回</span>
+              <span>龙头格局</span>
+              <span>情绪冰点</span>
+              <span>纪律复盘</span>
+              <span>收益归因</span>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="device-shell" aria-label="盘纪 Pro 应用界面">
+        <div class="device-bezel">
+          <div class="device-status">
+            <span>16:32</span>
+            <div class="status-icons">
+              <span>5G</span>
+              <span>86%</span>
+            </div>
+          </div>
+
+          <header class="app-topbar">
+            <div>
+              <p class="eyebrow">盘中日记 / Premium Journal</p>
+              <h2>盘纪 Pro</h2>
+            </div>
+            <button class="ghost-button" type="button">同步云端</button>
+          </header>
+
+          <div class="ticker-wrap" aria-hidden="true">
+            <div class="ticker-track">
+              <span class="ticker rise">上证 +0.86%</span>
+              <span class="ticker fall">深成 -0.22%</span>
+              <span class="ticker rise">创业板 +1.14%</span>
+              <span class="ticker neutral">北向 +18.6亿</span>
+              <span class="ticker rise">盘纪胜率 68%</span>
+              <span class="ticker fall">纪律滑点 2 次</span>
+              <span class="ticker rise">上证 +0.86%</span>
+              <span class="ticker fall">深成 -0.22%</span>
+              <span class="ticker rise">创业板 +1.14%</span>
+              <span class="ticker neutral">北向 +18.6亿</span>
+              <span class="ticker rise">盘纪胜率 68%</span>
+              <span class="ticker fall">纪律滑点 2 次</span>
+            </div>
+          </div>
+
+          <section class="screen is-active" data-screen="overview">
+            <article class="hero-card">
+              <div class="hero-copy">
+                <p class="eyebrow">今日交易体温</p>
+                <h3>把每一次做T和格局，变成下一次更稳的决策</h3>
+                <p class="hero-text">
+                  以真实收益、纪律分和执行偏差为核心指标，而不是只记录买卖点。
+                </p>
+              </div>
+              <div class="hero-actions">
+                <button class="primary-button quick-nav" data-target="record" type="button">
+                  立即记一笔
+                </button>
+                <button class="secondary-button quick-nav" data-target="monetize" type="button">
+                  查看会员权益
+                </button>
+              </div>
+              <div class="hero-metrics">
+                <div>
+                  <span>今日净结果</span>
+                  <strong id="todayResult">+12,680</strong>
+                </div>
+                <div>
+                  <span>做T成功率</span>
+                  <strong id="tradeRate">68%</strong>
+                </div>
+                <div>
+                  <span>纪律分</span>
+                  <strong id="disciplineScore">89</strong>
+                </div>
+              </div>
+            </article>
+
+            <div class="dual-card-row">
+              <article class="mini-panel">
+                <div class="panel-head">
+                  <span class="eyebrow">模式拆解</span>
+                  <span class="panel-tag">T / Hold</span>
+                </div>
+                <div class="mode-grid">
+                  <div class="mode-card mode-card-rise">
+                    <span>做T累计</span>
+                    <strong id="swingPnl">+6,920</strong>
+                    <small>高抛低吸 12 笔</small>
+                  </div>
+                  <div class="mode-card mode-card-gold">
+                    <span>格局累计</span>
+                    <strong id="holdPnl">+18,450</strong>
+                    <small>趋势持仓 7 笔</small>
+                  </div>
+                </div>
+              </article>
+
+              <article class="mini-panel">
+                <div class="panel-head">
+                  <span class="eyebrow">交易状态</span>
+                  <span class="live-chip">LIVE</span>
+                </div>
+                <div class="status-grid">
+                  <div>
+                    <span>最佳时段</span>
+                    <strong id="bestSession">早盘</strong>
+                  </div>
+                  <div>
+                    <span>连续正收益</span>
+                    <strong id="streakCount">4 天</strong>
+                  </div>
+                  <div>
+                    <span>复盘完成率</span>
+                    <strong>92%</strong>
+                  </div>
+                  <div>
+                    <span>模板复用率</span>
+                    <strong>74%</strong>
+                  </div>
+                </div>
+              </article>
+            </div>
+
+            <article class="chart-panel">
+              <div class="panel-head">
+                <div>
+                  <span class="eyebrow">七日曲线</span>
+                  <h4>收益与纪律同步看</h4>
+                </div>
+                <span class="ghost-chip">机构风格面板</span>
+              </div>
+              <div class="chart-meta">
+                <div>
+                  <span>本周累计</span>
+                  <strong id="weeklyResult">+25,370</strong>
+                </div>
+                <div>
+                  <span>最大回撤</span>
+                  <strong class="fall">-2,360</strong>
+                </div>
+                <div>
+                  <span>平均单笔</span>
+                  <strong id="avgTrade">+1,268</strong>
+                </div>
+              </div>
+              <svg class="profit-chart" viewBox="0 0 320 180" role="img" aria-label="七日收益图">
+                <defs>
+                  <linearGradient id="lineGradient" x1="0%" x2="100%" y1="0%" y2="0%">
+                    <stop offset="0%" stop-color="#ff575d" />
+                    <stop offset="100%" stop-color="#ffcf75" />
+                  </linearGradient>
+                  <linearGradient id="fillGradient" x1="0%" x2="0%" y1="0%" y2="100%">
+                    <stop offset="0%" stop-color="#ff6b6b" stop-opacity="0.38" />
+                    <stop offset="100%" stop-color="#ff6b6b" stop-opacity="0" />
+                  </linearGradient>
+                </defs>
+                <g class="chart-grid">
+                  <line x1="0" y1="30" x2="320" y2="30"></line>
+                  <line x1="0" y1="75" x2="320" y2="75"></line>
+                  <line x1="0" y1="120" x2="320" y2="120"></line>
+                  <line x1="0" y1="165" x2="320" y2="165"></line>
+                </g>
+                <path id="chartArea" class="chart-area"></path>
+                <path id="chartLine" class="chart-line"></path>
+                <g id="chartDots"></g>
+              </svg>
+              <div class="chart-labels" id="chartLabels"></div>
+            </article>
+
+            <article class="records-panel">
+              <div class="panel-head">
+                <div>
+                  <span class="eyebrow">最近记录</span>
+                  <h4>执行结果与复盘摘要</h4>
+                </div>
+                <button class="ghost-button quick-nav" data-target="record" type="button">
+                  继续记录
+                </button>
+              </div>
+              <div class="record-list" id="recentRecords"></div>
+            </article>
+          </section>
+
+          <section class="screen" data-screen="record">
+            <article class="entry-panel">
+              <div class="panel-head">
+                <div>
+                  <span class="eyebrow">新建记录</span>
+                  <h4>做T / 格局结果录入</h4>
+                </div>
+                <span class="ghost-chip">本地自动保存</span>
+              </div>
+
+              <form id="recordForm" class="record-form">
+                <div class="segmented" role="tablist" aria-label="模式选择">
+                  <button class="segment is-selected" data-mode="做T" type="button">做T</button>
+                  <button class="segment" data-mode="格局" type="button">格局</button>
+                </div>
+
+                <input id="modeInput" name="mode" type="hidden" value="做T" />
+
+                <label>
+                  <span>股票代码 / 名称</span>
+                  <div class="inline-field">
+                    <input
+                      id="symbolInput"
+                      name="symbol"
+                      maxlength="6"
+                      inputmode="numeric"
+                      placeholder="300750"
+                      required
+                    />
+                    <input id="nameInput" name="name" placeholder="宁德时代" required />
+                  </div>
+                </label>
+
+                <label>
+                  <span>交易时段</span>
+                  <select id="sessionInput" name="session">
+                    <option>早盘</option>
+                    <option>午后</option>
+                    <option>尾盘</option>
+                    <option>波段</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>操作逻辑</span>
+                  <textarea
+                    id="planInput"
+                    name="plan"
+                    rows="3"
+                    placeholder="例如：冲高减仓后回踩 5 日线接回，验证主线强度"
+                    required
+                  ></textarea>
+                </label>
+
+                <div class="inline-field">
+                  <label>
+                    <span>实际结果（元）</span>
+                    <input
+                      id="pnlInput"
+                      name="pnl"
+                      type="number"
+                      step="0.01"
+                      inputmode="decimal"
+                      placeholder="1260"
+                      required
+                    />
+                  </label>
+                  <label>
+                    <span>纪律分</span>
+                    <input
+                      id="disciplineInput"
+                      max="100"
+                      min="1"
+                      name="discipline"
+                      type="number"
+                      value="90"
+                      required
+                    />
+                  </label>
+                </div>
+
+                <label>
+                  <span>复盘备注</span>
+                  <textarea
+                    id="noteInput"
+                    name="note"
+                    rows="3"
+                    placeholder="例如：卖点没问题，回补略快，明天应等量价确认"
+                  ></textarea>
+                </label>
+
+                <div class="template-strip">
+                  <button class="template-pill" data-template="冲高减仓，回踩均线接回" type="button">
+                    冲高减仓
+                  </button>
+                  <button class="template-pill" data-template="情绪冰点分歧低吸，次日只看兑现" type="button">
+                    分歧低吸
+                  </button>
+                  <button class="template-pill" data-template="趋势未坏，继续格局，直到放量跌破关键位" type="button">
+                    龙头格局
+                  </button>
+                </div>
+
+                <button class="primary-button submit-button" type="submit">保存本次记录</button>
+              </form>
+            </article>
+
+            <article class="mini-panel review-preview">
+              <div class="panel-head">
+                <div>
+                  <span class="eyebrow">记录价值</span>
+                  <h4>不是流水账，是可训练的数据资产</h4>
+                </div>
+              </div>
+              <div class="value-grid">
+                <div>
+                  <strong>01</strong>
+                  <p>自动沉淀你最赚钱的做T剧本</p>
+                </div>
+                <div>
+                  <strong>02</strong>
+                  <p>识别“明明盈利却不守纪律”的问题</p>
+                </div>
+                <div>
+                  <strong>03</strong>
+                  <p>给会员版陪跑和诊断服务提供数据基础</p>
+                </div>
+              </div>
+            </article>
+          </section>
+
+          <section class="screen" data-screen="review">
+            <article class="review-hero">
+              <div>
+                <p class="eyebrow">复盘驾驶舱</p>
+                <h3>用结果筛选交易习惯，而不是凭感觉</h3>
+              </div>
+              <div class="review-micro">
+                <span class="rise">本周有效正收益策略 3 个</span>
+                <span class="neutral">需淘汰模板 1 个</span>
+              </div>
+            </article>
+
+            <div class="analytics-grid">
+              <article class="analytics-card">
+                <p class="eyebrow">模式表现</p>
+                <div class="big-number" id="reviewTradeCount">19</div>
+                <p>累计样本数</p>
+              </article>
+              <article class="analytics-card">
+                <p class="eyebrow">正收益占比</p>
+                <div class="big-number rise" id="reviewWinRate">68%</div>
+                <p>按真实记录自动更新</p>
+              </article>
+              <article class="analytics-card">
+                <p class="eyebrow">平均纪律分</p>
+                <div class="big-number" id="reviewDiscipline">89</div>
+                <p>高于 85 说明执行稳定</p>
+              </article>
+            </div>
+
+            <article class="mini-panel">
+              <div class="panel-head">
+                <div>
+                  <span class="eyebrow">策略热区</span>
+                  <h4>你的优势更多出现在什么场景</h4>
+                </div>
+              </div>
+              <div class="heat-map" id="heatMap"></div>
+            </article>
+
+            <article class="mini-panel">
+              <div class="panel-head">
+                <div>
+                  <span class="eyebrow">AI 风格复盘</span>
+                  <h4>数据洞察摘要</h4>
+                </div>
+                <span class="ghost-chip">可作为会员功能卖点</span>
+              </div>
+              <div class="insight-list" id="insightList"></div>
+            </article>
+          </section>
+
+          <section class="screen" data-screen="monetize">
+            <article class="premium-hero">
+              <div class="premium-copy">
+                <p class="eyebrow">Monetization Layer</p>
+                <h3>高净值交易者愿意为效率、复盘和陪跑付费</h3>
+                <p>
+                  产品层卖工具，服务层卖结果。这样既能做订阅，也能承接更高客单价的策略训练营和一对一诊断。
+                </p>
+              </div>
+              <div class="premium-price">
+                <span>Pro 会员</span>
+                <strong>¥199<span>/月</span></strong>
+                <small>或 ¥1,488 / 年</small>
+              </div>
+            </article>
+
+            <div class="membership-grid">
+              <article class="membership-card featured">
+                <p class="eyebrow">核心权益</p>
+                <h4>Pro 版订阅</h4>
+                <ul>
+                  <li>高级收益归因</li>
+                  <li>云同步 + 多端记录</li>
+                  <li>模板库与一键复盘</li>
+                  <li>自动生成周报 PDF</li>
+                </ul>
+                <button class="primary-button" type="button">开通 Pro</button>
+              </article>
+
+              <article class="membership-card">
+                <p class="eyebrow">高客单价</p>
+                <h4>交易纪律诊断</h4>
+                <ul>
+                  <li>导出 30 天行为样本</li>
+                  <li>生成问题清单与改进路线</li>
+                  <li>适合训练营 / 陪跑班交付</li>
+                </ul>
+                <button class="secondary-button" type="button">预约诊断</button>
+              </article>
+
+              <article class="membership-card">
+                <p class="eyebrow">数字商品</p>
+                <h4>策略模板市场</h4>
+                <ul>
+                  <li>做T剧本模板</li>
+                  <li>格局风格标签包</li>
+                  <li>交易计划看板主题</li>
+                </ul>
+                <button class="secondary-button" type="button">进入市场</button>
+              </article>
+            </div>
+
+            <article class="mini-panel roi-panel">
+              <div class="panel-head">
+                <div>
+                  <span class="eyebrow">商业模型</span>
+                  <h4>工具订阅 + 服务升级 + 模板分销</h4>
+                </div>
+              </div>
+              <div class="roi-grid">
+                <div>
+                  <span>基础版</span>
+                  <strong>免费</strong>
+                  <small>3 个记录模板 / 本地保存</small>
+                </div>
+                <div>
+                  <span>Pro 版</span>
+                  <strong>¥199/月</strong>
+                  <small>深度分析 / 云端复盘 / 周报</small>
+                </div>
+                <div>
+                  <span>训练营</span>
+                  <strong>¥1,999+</strong>
+                  <small>按月诊断 / 交易习惯改造</small>
+                </div>
+              </div>
+            </article>
+          </section>
+
+          <nav class="bottom-nav" aria-label="主导航">
+            <button class="nav-item is-active" data-target="overview" type="button">
+              <span>总览</span>
+            </button>
+            <button class="nav-item" data-target="record" type="button">
+              <span>记录</span>
+            </button>
+            <button class="nav-item" data-target="review" type="button">
+              <span>复盘</span>
+            </button>
+            <button class="nav-item" data-target="monetize" type="button">
+              <span>会员</span>
+            </button>
+          </nav>
+
+          <div class="toast" id="toast">记录已保存，统计已更新</div>
+        </div>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
