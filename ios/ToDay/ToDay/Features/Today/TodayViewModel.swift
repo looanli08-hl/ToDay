@@ -6,11 +6,19 @@ struct TodayInsightSummary {
     let badges: [String]
 }
 
+struct WeeklyInsightSummary {
+    let headline: String
+    let narrative: String
+    let badges: [String]
+}
+
 struct RecentDayDigest: Identifiable {
     let date: Date
     let title: String
     let detail: String
     let mood: MoodRecord.Mood?
+    let notePreview: String?
+    let recordCount: Int
 
     var id: Date { date }
 }
@@ -19,7 +27,9 @@ struct RecentDayDigest: Identifiable {
 final class TodayViewModel: ObservableObject {
     @Published private(set) var timeline: DayTimeline?
     @Published private(set) var insightSummary: TodayInsightSummary?
+    @Published private(set) var weeklyInsight: WeeklyInsightSummary?
     @Published private(set) var recentDigests: [RecentDayDigest] = []
+    @Published private(set) var historyDigests: [RecentDayDigest] = []
     @Published private(set) var isLoading = false
     @Published private(set) var errorMessage: String?
     @Published var showQuickRecord = false
@@ -82,11 +92,9 @@ final class TodayViewModel: ObservableObject {
     }
 
     private func mergedTimeline(base: DayTimeline) -> DayTimeline {
-        let recordsForDay = manualRecords
-            .filter { calendar.isDate($0.createdAt, inSameDayAs: base.date) }
-            .sorted { $0.createdAt > $1.createdAt }
+        let recordsForDay = records(on: base.date)
         let manualEntries = recordsForDay.map { $0.toTimelineEntry() }
-        let notesCount = recordsForDay.filter { !$0.note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }.count
+        let notesCount = recordsForDay.filter(hasNote).count
 
         var mergedStats = base.stats
         mergedStats.append(TimelineStat(title: "记录", value: "\(recordsForDay.count)"))
@@ -105,17 +113,17 @@ final class TodayViewModel: ObservableObject {
     }
 
     private func refreshDerivedState(referenceDate: Date) {
-        recentDigests = buildRecentDigests()
+        historyDigests = buildHistoryDigests(limit: 21)
+        recentDigests = Array(historyDigests.prefix(7))
         insightSummary = buildInsightSummary(referenceDate: referenceDate)
+        weeklyInsight = buildWeeklyInsight(referenceDate: referenceDate)
     }
 
     private func buildInsightSummary(referenceDate: Date) -> TodayInsightSummary {
-        let recordsForDay = manualRecords
-            .filter { calendar.isDate($0.createdAt, inSameDayAs: referenceDate) }
-            .sorted { $0.createdAt > $1.createdAt }
+        let recordsForDay = records(on: referenceDate)
         let dominantMood = dominantMood(in: recordsForDay)
-        let noteCount = recordsForDay.filter { !$0.note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }.count
-        let latestNote = recordsForDay.first { !$0.note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+        let noteCount = recordsForDay.filter(hasNote).count
+        let latestNote = recordsForDay.first(where: hasNote)
         let timelineEntryCount = timeline?.entries.count ?? 0
 
         if recordsForDay.isEmpty {
@@ -168,30 +176,99 @@ final class TodayViewModel: ObservableObject {
         )
     }
 
-    private func buildRecentDigests() -> [RecentDayDigest] {
+    private func buildWeeklyInsight(referenceDate: Date) -> WeeklyInsightSummary {
+        let referenceDay = calendar.startOfDay(for: referenceDate)
+        let startDay = calendar.date(byAdding: .day, value: -6, to: referenceDay) ?? referenceDay
+        let records = manualRecords.filter { $0.createdAt >= startDay }
+        let grouped = Dictionary(grouping: records) { calendar.startOfDay(for: $0.createdAt) }
+        let activeDays = grouped.count
+        let totalRecords = records.count
+        let dominantMood = dominantMood(in: records)
+        let streak = currentStreak(referenceDay: referenceDay, groupedDays: Set(grouped.keys))
+        let dominantPeriod = dominantRecordingPeriod(in: records)
+
+        if totalRecords == 0 {
+            return WeeklyInsightSummary(
+                headline: "连续洞察会从最近 7 天开始长出来",
+                narrative: "当你开始持续记录，ToDay 会逐渐告诉你最近一周更像在恢复、推进、拉扯还是漂浮。",
+                badges: ["0/7 活跃天", "等待记录", "Pro 适合长期回看"]
+            )
+        }
+
+        var badges = ["\(activeDays)/7 活跃天", "\(totalRecords) 条记录"]
+        if streak > 0 {
+            badges.append("连续 \(streak) 天")
+        }
+        if let dominantMood {
+            badges.append("主情绪 \(dominantMood.rawValue)")
+        }
+        if let dominantPeriod {
+            badges.append("高峰在\(dominantPeriod)")
+        }
+
+        let headline: String
+        switch dominantMood {
+        case .happy:
+            headline = "最近 7 天更像在往上抬"
+        case .calm:
+            headline = "最近 7 天偏平稳推进"
+        case .tired:
+            headline = "最近 7 天更需要恢复"
+        case .irritated:
+            headline = "最近 7 天有些拉扯感"
+        case .focused:
+            headline = "最近 7 天存在明显推进段"
+        case .zoning:
+            headline = "最近 7 天像在缓慢漂浮"
+        case .none:
+            headline = "最近 7 天已经开始形成自己的节奏"
+        }
+
+        let periodText = dominantPeriod.map { "记录更多发生在\($0)。" } ?? "记录时间还没有形成稳定偏好。"
+        let streakText = streak > 1 ? "你已经连续 \(streak) 天留下痕迹。" : "当前还处在轻量记录阶段。"
+        let activityText = "最近 7 天里有 \(activeDays) 天留下记录，总共 \(totalRecords) 条。"
+
+        return WeeklyInsightSummary(
+            headline: headline,
+            narrative: [activityText, streakText, periodText].joined(separator: " "),
+            badges: badges
+        )
+    }
+
+    private func buildHistoryDigests(limit: Int) -> [RecentDayDigest] {
         let grouped = Dictionary(grouping: manualRecords) { calendar.startOfDay(for: $0.createdAt) }
 
         return grouped.keys
             .sorted(by: >)
-            .prefix(7)
+            .prefix(limit)
             .compactMap { date in
                 guard let records = grouped[date] else { return nil }
-                let dominantMood = dominantMood(in: records)
-                let notesCount = records.filter { !$0.note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }.count
+                let sortedRecords = records.sorted { $0.createdAt > $1.createdAt }
+                let dominantMood = dominantMood(in: sortedRecords)
+                let notesCount = sortedRecords.filter(hasNote).count
                 let title = dominantMood?.rawValue ?? "记录日"
                 let detailParts = [
-                    "\(records.count) 条记录",
+                    "\(sortedRecords.count) 条记录",
                     notesCount > 0 ? "\(notesCount) 条备注" : nil,
                     dominantMood.map { "主情绪 \($0.rawValue)" }
                 ].compactMap { $0 }
+                let notePreview = sortedRecords.first(where: hasNote)?.note
 
                 return RecentDayDigest(
                     date: date,
                     title: title,
                     detail: detailParts.joined(separator: " · "),
-                    mood: dominantMood
+                    mood: dominantMood,
+                    notePreview: notePreview,
+                    recordCount: sortedRecords.count
                 )
             }
+    }
+
+    private func records(on date: Date) -> [MoodRecord] {
+        manualRecords
+            .filter { calendar.isDate($0.createdAt, inSameDayAs: date) }
+            .sorted { $0.createdAt > $1.createdAt }
     }
 
     private func dominantMood(in records: [MoodRecord]) -> MoodRecord.Mood? {
@@ -203,8 +280,42 @@ final class TodayViewModel: ObservableObject {
             if lhs.value == rhs.value {
                 return lhs.key.rawValue > rhs.key.rawValue
             }
+
             return lhs.value < rhs.value
         }?.key
+    }
+
+    private func dominantRecordingPeriod(in records: [MoodRecord]) -> String? {
+        let counts = records.reduce(into: [String: Int]()) { partialResult, record in
+            let hour = calendar.component(.hour, from: record.createdAt)
+            let label: String
+
+            switch hour {
+            case 5..<12:
+                label = "上午"
+            case 12..<18:
+                label = "白天"
+            default:
+                label = "晚上"
+            }
+
+            partialResult[label, default: 0] += 1
+        }
+
+        return counts.max(by: { $0.value < $1.value })?.key
+    }
+
+    private func currentStreak(referenceDay: Date, groupedDays: Set<Date>) -> Int {
+        var streak = 0
+        var cursor = referenceDay
+
+        while groupedDays.contains(cursor) {
+            streak += 1
+            guard let previous = calendar.date(byAdding: .day, value: -1, to: cursor) else { break }
+            cursor = previous
+        }
+
+        return streak
     }
 
     private func moodNarrative(for mood: MoodRecord.Mood?) -> String {
@@ -224,6 +335,10 @@ final class TodayViewModel: ObservableObject {
         case .none:
             return "今天已经开始积累一些片段，但还没有形成明确主情绪。"
         }
+    }
+
+    private func hasNote(_ record: MoodRecord) -> Bool {
+        !record.note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
     private func persistRecords() {

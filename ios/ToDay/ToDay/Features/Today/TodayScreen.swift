@@ -1,13 +1,13 @@
 import SwiftUI
 
 struct TodayScreen: View {
-    @StateObject private var viewModel: TodayViewModel
-    @State private var showProPreview = false
-    private let chineseLocale = Locale(identifier: "zh_CN")
+    @ObservedObject var viewModel: TodayViewModel
+    @ObservedObject var monetizationViewModel: MonetizationViewModel
 
-    init(viewModel: TodayViewModel) {
-        _viewModel = StateObject(wrappedValue: viewModel)
-    }
+    let onOpenHistory: () -> Void
+    let onOpenPro: () -> Void
+
+    private let chineseLocale = Locale(identifier: "zh_CN")
 
     var body: some View {
         NavigationStack {
@@ -15,6 +15,7 @@ struct TodayScreen: View {
                 VStack(alignment: .leading, spacing: 20) {
                     heroCard
                     summarySection
+                    weeklySpotlightSection
 
                     if viewModel.isLoading && viewModel.timeline == nil {
                         loadingCard
@@ -25,9 +26,9 @@ struct TodayScreen: View {
                     }
 
                     recentDaysSection
-                    proPreviewCard
                 }
                 .padding(.vertical, 20)
+                .padding(.bottom, 140)
             }
             .background(Color(uiColor: .systemGroupedBackground))
             .navigationTitle("ToDay")
@@ -40,28 +41,15 @@ struct TodayScreen: View {
                     }
                 }
             }
-            .safeAreaInset(edge: .bottom) {
-                Button {
-                    viewModel.showQuickRecord = true
-                } label: {
-                    Label("快速记录", systemImage: "plus.circle.fill")
-                        .font(.headline)
-                        .foregroundStyle(.white)
-                        .padding(.vertical, 14)
-                        .frame(maxWidth: .infinity)
-                        .background(Color(red: 0.35, green: 0.63, blue: 0.54))
-                        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-                }
-                .padding(.horizontal, 20)
-                .padding(.bottom, 8)
+            .overlay(alignment: .bottom) {
+                quickRecordButton
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 84)
             }
             .sheet(isPresented: $viewModel.showQuickRecord) {
                 QuickRecordSheet { record in
                     viewModel.addMoodRecord(record)
                 }
-            }
-            .sheet(isPresented: $showProPreview) {
-                ProPreviewSheet()
             }
             .task {
                 await viewModel.loadIfNeeded()
@@ -154,6 +142,57 @@ struct TodayScreen: View {
     }
 
     @ViewBuilder
+    private var weeklySpotlightSection: some View {
+        if monetizationViewModel.isProUnlocked, let weeklyInsight = viewModel.weeklyInsight {
+            VStack(alignment: .leading, spacing: 12) {
+                Text("最近 7 天")
+                    .font(.title3.weight(.semibold))
+
+                Text(weeklyInsight.headline)
+                    .font(.headline)
+
+                Text(weeklyInsight.narrative)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+
+                FlexibleBadgeRow(items: weeklyInsight.badges)
+            }
+            .padding(20)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color(uiColor: .secondarySystemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+            .padding(.horizontal, 20)
+        } else {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    Text("Pro 连续洞察")
+                        .font(.title3.weight(.semibold))
+                    Spacer()
+                    Text("会员")
+                        .font(.caption.weight(.bold))
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(Color(red: 0.94, green: 0.88, blue: 0.78))
+                        .clipShape(Capsule())
+                }
+
+                Text("下一步不是让你填更多表单，而是把最近 7 天自动整理成趋势、节奏和回看价值。")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+
+                Button("前往会员页", action: onOpenPro)
+                    .buttonStyle(.borderedProminent)
+                    .tint(Color(red: 0.35, green: 0.63, blue: 0.54))
+            }
+            .padding(20)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color(uiColor: .secondarySystemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+            .padding(.horizontal, 20)
+        }
+    }
+
+    @ViewBuilder
     private func timelineSection(_ timeline: DayTimeline) -> some View {
         Text("今日时间线")
             .font(.title3.weight(.semibold))
@@ -171,13 +210,20 @@ struct TodayScreen: View {
     private var recentDaysSection: some View {
         if !viewModel.recentDigests.isEmpty {
             VStack(alignment: .leading, spacing: 12) {
-                Text("最近 7 天")
-                    .font(.title3.weight(.semibold))
-                    .padding(.horizontal, 20)
+                HStack {
+                    Text("最近记录")
+                        .font(.title3.weight(.semibold))
+                    Spacer()
+                    Button(action: onOpenHistory) {
+                        Text("查看全部")
+                            .font(.subheadline.weight(.medium))
+                    }
+                }
+                .padding(.horizontal, 20)
 
                 VStack(spacing: 12) {
-                    ForEach(viewModel.recentDigests) { digest in
-                        RecentDayCard(digest: digest)
+                    ForEach(viewModel.recentDigests.prefix(3)) { digest in
+                        RecentDayCard(digest: digest, locale: chineseLocale)
                     }
                 }
                 .padding(.horizontal, 20)
@@ -185,39 +231,19 @@ struct TodayScreen: View {
         }
     }
 
-    private var proPreviewCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Text("Pro 连续洞察")
-                    .font(.title3.weight(.semibold))
-                Spacer()
-                Text("即将开放")
-                    .font(.caption.weight(.semibold))
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 6)
-                    .background(Color(red: 0.94, green: 0.88, blue: 0.78))
-                    .clipShape(Capsule())
-            }
-
-            Text("下一步的重点不是让你填更多表单，而是把最近 7 天的记录自动整理成趋势、节奏和状态变化。")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-
-            Button {
-                showProPreview = true
-            } label: {
-                Label("查看 Pro 预告", systemImage: "sparkles")
-                    .font(.headline)
-                    .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.borderedProminent)
-            .tint(Color(red: 0.35, green: 0.63, blue: 0.54))
+    private var quickRecordButton: some View {
+        Button {
+            viewModel.showQuickRecord = true
+        } label: {
+            Label("快速记录", systemImage: "plus.circle.fill")
+                .font(.headline)
+                .foregroundStyle(.white)
+                .padding(.vertical, 14)
+                .frame(maxWidth: .infinity)
+                .background(Color(red: 0.35, green: 0.63, blue: 0.54))
+                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                .shadow(color: Color.black.opacity(0.08), radius: 18, x: 0, y: 8)
         }
-        .padding(20)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(uiColor: .secondarySystemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-        .padding(.horizontal, 20)
     }
 
     private var loadingCard: some View {
@@ -312,6 +338,7 @@ private struct TimelineCard: View {
 
 private struct RecentDayCard: View {
     let digest: RecentDayDigest
+    let locale: Locale
 
     var body: some View {
         HStack(alignment: .top, spacing: 14) {
@@ -327,7 +354,7 @@ private struct RecentDayCard: View {
 
                     Spacer()
 
-                    Text(digest.date.formatted(.dateTime.month(.abbreviated).day().locale(Locale(identifier: "zh_CN"))))
+                    Text(digest.date.formatted(.dateTime.month(.abbreviated).day().locale(locale)))
                         .font(.caption.weight(.medium))
                         .foregroundStyle(.secondary)
                 }
@@ -335,6 +362,13 @@ private struct RecentDayCard: View {
                 Text(digest.detail)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
+
+                if let notePreview = digest.notePreview {
+                    Text(notePreview)
+                        .font(.caption)
+                        .foregroundStyle(.primary)
+                        .lineLimit(1)
+                }
             }
         }
         .padding(16)
@@ -411,77 +445,18 @@ private struct FlexibleBadgeRow: View {
     }
 }
 
-private struct ProPreviewSheet: View {
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("连续洞察 Pro")
-                            .font(.title2.weight(.bold))
-
-                        Text("ToDay 后续会把最近 7 天的记录整理成更像产品价值本身的结果，而不只是把更多输入动作堆给你。")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                    }
-
-                    ProFeatureRow(
-                        title: "7 天生活节奏",
-                        detail: "把情绪、停顿、专注和活动放到一条连续曲线上看。"
-                    )
-                    ProFeatureRow(
-                        title: "自动趋势总结",
-                        detail: "告诉你这周更像在恢复、拉扯、推进还是飘着过。"
-                    )
-                    ProFeatureRow(
-                        title: "更长历史回看",
-                        detail: "不只看今天，还能回看最近一段时间的变化轨迹。"
-                    )
-                }
-                .padding(20)
-            }
-            .navigationTitle("Pro 预告")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("完成") {
-                        dismiss()
-                    }
-                }
-            }
-        }
-    }
-}
-
-private struct ProFeatureRow: View {
-    let title: String
-    let detail: String
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text(title)
-                .font(.headline)
-            Text(detail)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-        }
-        .padding(16)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(uiColor: .secondarySystemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-    }
-}
-
 #Preview {
-    TodayScreen(
-        viewModel: TodayViewModel(
+    AppRootScreen(
+        todayViewModel: TodayViewModel(
             provider: MockTimelineDataProvider(),
             recordStore: UserDefaultsMoodRecordStore(
                 defaults: UserDefaults(suiteName: "ToDayPreviewStore") ?? .standard,
                 key: "preview.manualRecords"
             )
+        ),
+        monetizationViewModel: MonetizationViewModel(
+            defaults: UserDefaults(suiteName: "ToDayPreviewStore") ?? .standard,
+            key: "preview.pro"
         )
     )
 }

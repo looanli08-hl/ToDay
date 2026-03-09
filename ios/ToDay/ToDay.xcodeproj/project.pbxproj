@@ -7,9 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0DAC5BEFCDEF75F998B00E5C /* AppRootScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A80390E769238F81D933506 /* AppRootScreen.swift */; };
+		26846615AF8CA2F05F11D9B0 /* ProScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B46AF3B810BFFEE6F069410 /* ProScreen.swift */; };
 		3167A5A7F4562369CA4F54B4 /* HealthKitTimelineDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 248EB0D5C59CF49B72179706 /* HealthKitTimelineDataProvider.swift */; };
 		3EDD590CF25E429FB8186758 /* ToDayApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCCD453022FB7D3DE28EDE60 /* ToDayApp.swift */; };
+		44823975A98302AEB5069E00 /* HistoryScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = E41D5FDB97C97E39345EF797 /* HistoryScreen.swift */; };
 		4FE7ED6B910849760A8ED1BE /* QuickRecordSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90DD0AA794ABBBE1F95F1B7 /* QuickRecordSheet.swift */; };
+		5F154D8DB1E79ED9B6747A94 /* MonetizationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29FDC86F425DD463F32D7EC2 /* MonetizationViewModel.swift */; };
 		64CBD5CDDABBA47E698BE49E /* TimelineEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91944CCE08B997C8CAA13BBD /* TimelineEntry.swift */; };
 		7BC51B7352E2968F185CB750 /* MoodRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0773EC8EC7B7EA41E6CE3914 /* MoodRecord.swift */; };
 		93C3B96072D6ECD7AB82943B /* MockTimelineDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FE2EF155E1C18E24C5D11D1 /* MockTimelineDataProvider.swift */; };
@@ -25,10 +29,13 @@
 
 /* Begin PBXFileReference section */
 		0773EC8EC7B7EA41E6CE3914 /* MoodRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodRecord.swift; sourceTree = "<group>"; };
+		0A80390E769238F81D933506 /* AppRootScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRootScreen.swift; sourceTree = "<group>"; };
 		0C96E2DCDAC54DA106C2D81A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0FE2EF155E1C18E24C5D11D1 /* MockTimelineDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockTimelineDataProvider.swift; sourceTree = "<group>"; };
 		16EB598659DDD263739D3136 /* TodayViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayViewModel.swift; sourceTree = "<group>"; };
 		248EB0D5C59CF49B72179706 /* HealthKitTimelineDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitTimelineDataProvider.swift; sourceTree = "<group>"; };
+		29FDC86F425DD463F32D7EC2 /* MonetizationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonetizationViewModel.swift; sourceTree = "<group>"; };
+		2B46AF3B810BFFEE6F069410 /* ProScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProScreen.swift; sourceTree = "<group>"; };
 		377615C5249C10E358F73636 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		3E53E00BCF5527A4FE8FD775 /* MoodRecordStoring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodRecordStoring.swift; sourceTree = "<group>"; };
 		5C98792FCC517E2B96173407 /* DayTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayTimeline.swift; sourceTree = "<group>"; };
@@ -37,6 +44,7 @@
 		AD8F9694BC13B76959CA8639 /* ToDay.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ToDay.entitlements; sourceTree = "<group>"; };
 		CCCD453022FB7D3DE28EDE60 /* ToDayApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDayApp.swift; sourceTree = "<group>"; };
 		D273A8E459B1BBB83027539B /* ToDay.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = ToDay.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E41D5FDB97C97E39345EF797 /* HistoryScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryScreen.swift; sourceTree = "<group>"; };
 		E7BB74516D89AD97D04F81B3 /* AppContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppContainer.swift; sourceTree = "<group>"; };
 		E90DD0AA794ABBBE1F95F1B7 /* QuickRecordSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickRecordSheet.swift; sourceTree = "<group>"; };
 		F728CBFA275E061CC33D4193 /* TodayScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayScreen.swift; sourceTree = "<group>"; };
@@ -73,6 +81,15 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
+		63E5F29E461F52D8D2446FCA /* Monetization */ = {
+			isa = PBXGroup;
+			children = (
+				29FDC86F425DD463F32D7EC2 /* MonetizationViewModel.swift */,
+				2B46AF3B810BFFEE6F069410 /* ProScreen.swift */,
+			);
+			path = Monetization;
+			sourceTree = "<group>";
+		};
 		78D735726A6B403CB84BFC41 /* Preview Content */ = {
 			isa = PBXGroup;
 			children = (
@@ -84,6 +101,8 @@
 		95EBEDFD5034E1C9DD03ED72 /* Features */ = {
 			isa = PBXGroup;
 			children = (
+				FA5F7307AB8CE7799D63CA0E /* History */,
+				63E5F29E461F52D8D2446FCA /* Monetization */,
 				FF51E490980F90F9A6AEEBED /* Today */,
 			);
 			path = Features;
@@ -93,6 +112,7 @@
 			isa = PBXGroup;
 			children = (
 				E7BB74516D89AD97D04F81B3 /* AppContainer.swift */,
+				0A80390E769238F81D933506 /* AppRootScreen.swift */,
 				CCCD453022FB7D3DE28EDE60 /* ToDayApp.swift */,
 			);
 			path = App;
@@ -117,6 +137,14 @@
 				91944CCE08B997C8CAA13BBD /* TimelineEntry.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		FA5F7307AB8CE7799D63CA0E /* History */ = {
+			isa = PBXGroup;
+			children = (
+				E41D5FDB97C97E39345EF797 /* HistoryScreen.swift */,
+			);
+			path = History;
 			sourceTree = "<group>";
 		};
 		FB6C6E7EC73BA6A0A179A73B = {
@@ -210,11 +238,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				DD042D446979BF714A91C923 /* AppContainer.swift in Sources */,
+				0DAC5BEFCDEF75F998B00E5C /* AppRootScreen.swift in Sources */,
 				AED24B3EF148016906D995F8 /* DayTimeline.swift in Sources */,
 				3167A5A7F4562369CA4F54B4 /* HealthKitTimelineDataProvider.swift in Sources */,
+				44823975A98302AEB5069E00 /* HistoryScreen.swift in Sources */,
 				93C3B96072D6ECD7AB82943B /* MockTimelineDataProvider.swift in Sources */,
+				5F154D8DB1E79ED9B6747A94 /* MonetizationViewModel.swift in Sources */,
 				7BC51B7352E2968F185CB750 /* MoodRecord.swift in Sources */,
 				AFB0264365F2546579D2F53A /* MoodRecordStoring.swift in Sources */,
+				26846615AF8CA2F05F11D9B0 /* ProScreen.swift in Sources */,
 				4FE7ED6B910849760A8ED1BE /* QuickRecordSheet.swift in Sources */,
 				D7DF86B1EC7D5D82B3201C1C /* TimelineDataProviding.swift in Sources */,
 				64CBD5CDDABBA47E698BE49E /* TimelineEntry.swift in Sources */,
