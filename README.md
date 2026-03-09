@@ -1,22 +1,27 @@
-# 盘纪 Pro
+# ToDay
 
-一个从空仓库直接搭建的高保真移动端原型，定位为面向 A 股交易者的做T / 格局记录与复盘工具。
+`ToDay` 是一个以生活记录与回看为核心的 iPhone 应用原型。
 
-## 包含内容
+当前仓库以 `SwiftUI` iOS 工程为主，目标是先验证这条产品路径：
 
-- 同花顺风格的信息密度与行情氛围
-- 做T / 格局记录表单，支持本地持久化
-- 总览、记录、复盘、会员四个主界面
-- 可变现入口：Pro 订阅、纪律诊断、策略模板市场
+- 把生活片段、状态变化和关键记录整理成一条私人时间线
+- 先做本地优先体验，再逐步扩展到账号、同步和网页端
+- 先做中文版本，再预留国际化能力
+- 通过 Pro 订阅验证“自动总结与连续洞察”的付费价值
 
-## 运行方式
+## 项目结构
 
-直接打开 `/Users/looanli/Documents/New project/index.html` 即可预览。
+- `ios/ToDay`：主 iOS 工程
+- `docs/today-commercialization-brief.md`：商业化与产品方向草案
 
-如果你想用本地服务打开，也可以在当前目录执行：
+## 本地运行
+
+在当前目录执行：
 
 ```bash
-python3 -m http.server 8080
+cd ios/ToDay
+xcodegen generate
+open ToDay.xcodeproj
 ```
 
-然后访问 `http://localhost:8080`。
+然后在 Xcode 里选择一个 iPhone 模拟器直接运行。
