@@ -85,7 +85,16 @@ struct HistoryScreen: View {
 
                 VStack(spacing: 12) {
                     ForEach(visibleDigests) { digest in
-                        HistoryDayCard(digest: digest, locale: chineseLocale)
+                        if let detail = viewModel.historyDetail(for: digest.date) {
+                            NavigationLink {
+                                HistoryDayDetailScreen(detail: detail)
+                            } label: {
+                                HistoryDayCard(digest: digest, locale: chineseLocale)
+                            }
+                            .buttonStyle(.plain)
+                        } else {
+                            HistoryDayCard(digest: digest, locale: chineseLocale)
+                        }
                     }
                 }
                 .padding(.horizontal, 20)
@@ -156,6 +165,12 @@ private struct HistoryDayCard: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(uiColor: .secondarySystemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .overlay(alignment: .topTrailing) {
+            Image(systemName: "chevron.right")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.secondary)
+                .padding(18)
+        }
     }
 
     private var color: Color {
@@ -214,7 +229,7 @@ private struct LockedInsightCard: View {
     }
 }
 
-private struct HistoryBadgeRow: View {
+struct HistoryBadgeRow: View {
     let items: [String]
 
     var body: some View {

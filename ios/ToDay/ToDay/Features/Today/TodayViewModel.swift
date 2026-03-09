@@ -23,6 +23,14 @@ struct RecentDayDigest: Identifiable {
     var id: Date { date }
 }
 
+struct HistoryDayDetail {
+    let date: Date
+    let title: String
+    let narrative: String
+    let badges: [String]
+    let records: [MoodRecord]
+}
+
 @MainActor
 final class TodayViewModel: ObservableObject {
     @Published private(set) var timeline: DayTimeline?
@@ -89,6 +97,39 @@ final class TodayViewModel: ObservableObject {
         } else {
             refreshDerivedState(referenceDate: Date())
         }
+    }
+
+    func historyDetail(for date: Date) -> HistoryDayDetail? {
+        let recordsForDay = records(on: date)
+        guard !recordsForDay.isEmpty else { return nil }
+
+        let dominantMood = dominantMood(in: recordsForDay)
+        let noteCount = recordsForDay.filter(hasNote).count
+        let firstRecord = recordsForDay.last
+        let lastRecord = recordsForDay.first
+
+        var badges = [
+            "\(recordsForDay.count) 条记录",
+            noteCount > 0 ? "\(noteCount) 条备注" : nil,
+            dominantMood.map { "主情绪 \($0.rawValue)" }
+        ].compactMap { $0 }
+
+        if let firstRecord, let lastRecord, firstRecord.createdAt != lastRecord.createdAt {
+            let start = firstRecord.createdAt.formatted(.dateTime.hour(.twoDigits(amPM: .omitted)).minute())
+            let end = lastRecord.createdAt.formatted(.dateTime.hour(.twoDigits(amPM: .omitted)).minute())
+            badges.append("\(start) - \(end)")
+        }
+
+        let title = dominantMood?.rawValue ?? "记录日"
+        let narrative = buildHistoryNarrative(recordsForDay, dominantMood: dominantMood)
+
+        return HistoryDayDetail(
+            date: date,
+            title: title,
+            narrative: narrative,
+            badges: badges,
+            records: recordsForDay.sorted { $0.createdAt > $1.createdAt }
+        )
     }
 
     private func mergedTimeline(base: DayTimeline) -> DayTimeline {
@@ -316,6 +357,29 @@ final class TodayViewModel: ObservableObject {
         }
 
         return streak
+    }
+
+    private func buildHistoryNarrative(_ records: [MoodRecord], dominantMood: MoodRecord.Mood?) -> String {
+        let noteCount = records.filter(hasNote).count
+        let period = dominantRecordingPeriod(in: records)
+        let firstNote = records.first(where: hasNote)?.note
+
+        var parts = [moodNarrative(for: dominantMood)]
+        parts.append("这一天留下了 \(records.count) 条记录。")
+
+        if let period {
+            parts.append("记录主要集中在\(period)。")
+        }
+
+        if noteCount > 0 {
+            parts.append("其中 \(noteCount) 条带有备注，说明这一天已经开始从“打点”走向“留痕”。")
+        }
+
+        if let firstNote {
+            parts.append("最近一条备注是“\(firstNote)”。")
+        }
+
+        return parts.joined(separator: " ")
     }
 
     private func moodNarrative(for mood: MoodRecord.Mood?) -> String {
