@@ -102,11 +102,22 @@ const refs = {
   chartLine: document.getElementById("chartLine"),
   chartArea: document.getElementById("chartArea"),
   chartDots: document.getElementById("chartDots"),
-  chartLabels: document.getElementById("chartLabels")
+  chartLabels: document.getElementById("chartLabels"),
+  agentConfidence: document.getElementById("agentConfidence"),
+  agentDirective: document.getElementById("agentDirective"),
+  agentPrimaryRole: document.getElementById("agentPrimaryRole"),
+  agentRoleHint: document.getElementById("agentRoleHint"),
+  agentRiskLevel: document.getElementById("agentRiskLevel"),
+  agentRiskHint: document.getElementById("agentRiskHint"),
+  agentActionCount: document.getElementById("agentActionCount"),
+  agentCardGrid: document.getElementById("agentCardGrid"),
+  agentDecisionList: document.getElementById("agentDecisionList"),
+  agentChecklist: document.getElementById("agentChecklist")
 };
 
 const modeInput = document.getElementById("modeInput");
 const planInput = document.getElementById("planInput");
+const agentRefreshButton = document.getElementById("agentRefreshButton");
 
 let records = loadRecords();
 
@@ -197,6 +208,126 @@ function getStats() {
     today,
     bestSession,
     streak
+  };
+}
+
+function getAgentReport() {
+  const stats = getStats();
+  const latest = records[0];
+  const recent = records.slice(0, 3);
+  const lowDisciplineCount = records.filter((item) => item.discipline < 80).length;
+  const lossCount = records.filter((item) => item.pnl < 0).length;
+  const executionGap = records.filter((item) => item.pnl > 0 && item.discipline < 85).length;
+  const recentLosses = recent.filter((item) => item.pnl < 0).length;
+  const confidence = Math.max(
+    56,
+    Math.min(96, Math.round(stats.winRate * 0.45 + stats.avgDiscipline * 0.55 - recentLosses * 6))
+  );
+
+  let riskLevel = "低";
+  let riskHint = "当前样本显示节奏稳定，可保持原有框架。";
+
+  if (stats.avgDiscipline < 82 || recentLosses >= 2 || lossCount >= Math.ceil(records.length / 3)) {
+    riskLevel = "高";
+    riskHint = "连续性或执行质量偏弱，下一阶段应先收缩出手频率。";
+  } else if (stats.avgDiscipline < 88 || recentLosses === 1 || lowDisciplineCount >= 2) {
+    riskLevel = "中";
+    riskHint = "收益还在，但执行波动已经出现，需要控节奏。";
+  }
+
+  const primaryRole =
+    stats.avgDiscipline < 85 ? "执行官" : stats.winRate < 60 ? "风控官" : "策略官";
+  const roleHintMap = {
+    "执行官": "优先修复临盘动作变形，先把计划执行完整。",
+    "风控官": "先处理回撤和错单，少做无把握出手。",
+    "策略官": "优势场景已经浮现，下一步是把模式标准化。"
+  };
+
+  const bestMode =
+    stats.tPnl >= stats.holdPnl
+      ? { name: "做T", value: stats.tPnl, hint: "日内节奏更适合你当前风格。" }
+      : { name: "格局", value: stats.holdPnl, hint: "趋势持有比频繁切换更有优势。" };
+
+  const weakest =
+    [...records].sort((a, b) => a.discipline - b.discipline)[0] || defaultRecords[0];
+
+  const agents = [
+    {
+      title: "策略 Agent",
+      badge: "Pattern",
+      summary: `当前最优模式是${bestMode.name}，累计 ${formatCurrency(bestMode.value)}。${bestMode.hint}`
+    },
+    {
+      title: "执行 Agent",
+      badge: "Execution",
+      summary:
+        executionGap > 0
+          ? `你有 ${executionGap} 笔“赚钱但不标准”的交易，说明收益覆盖了缺陷，问题还没真正解决。`
+          : "当前赚钱交易和执行质量基本一致，可以开始把流程固化为模板。"
+    },
+    {
+      title: "风控 Agent",
+      badge: "Risk",
+      summary:
+        riskLevel === "高"
+          ? "系统建议下一阶段缩仓、减少追高，并把单日错单次数控制在 1 次以内。"
+          : `最佳出手时段在${stats.bestSession}，非优势时段要更严格过滤信号。`
+    },
+    {
+      title: "教练 Agent",
+      badge: "Coach",
+      summary: `最近最该复盘的是 ${weakest.name}，纪律分 ${weakest.discipline}，要回看“计划和动作为什么脱节”。`
+    }
+  ];
+
+  const decisions = [
+    {
+      title: "主攻优势场景",
+      body: `未来 3 个交易日内，把 ${bestMode.name} 作为主模式，非优势模式只有在计划充分时才允许出手。`
+    },
+    {
+      title: "限制非优势时段",
+      body: `${stats.bestSession} 之外的交易要先过一遍计划检查，尤其避免情绪波动后的追单。`
+    },
+    {
+      title: "复盘最低纪律样本",
+      body: `${weakest.date} 的 ${weakest.name} 是当前最明显的偏差样本，先复盘这笔，比盲目多看行情更有效。`
+    }
+  ];
+
+  const checklist = [
+    {
+      phase: "开盘前",
+      text: `只保留 1 到 2 个主交易剧本，优先 ${bestMode.name}，并写出触发条件与取消条件。`
+    },
+    {
+      phase: "盘中",
+      text:
+        riskLevel === "高"
+          ? "若连续两次动作不在计划内，立即停止新增仓位，转为观察模式。"
+          : `把主要注意力放在 ${stats.bestSession}，其余时段不主动追击。`
+    },
+    {
+      phase: "收盘后",
+      text: `重点复盘 ${latest.name} 和 ${weakest.name} 两笔，分别回答“为什么赚”和“为什么变形”。`
+    }
+  ];
+
+  return {
+    confidence,
+    riskLevel,
+    riskHint,
+    primaryRole,
+    roleHint: roleHintMap[primaryRole],
+    directive:
+      riskLevel === "高"
+        ? "先降噪，再求收益"
+        : bestMode.name === "做T"
+          ? "把优势做T模板化"
+          : "把趋势格局标准化",
+    agents,
+    decisions,
+    checklist
   };
 }
 
@@ -305,6 +436,55 @@ function renderReview() {
     .join("");
 }
 
+function renderAgent() {
+  const report = getAgentReport();
+
+  refs.agentConfidence.textContent = `置信度 ${report.confidence}%`;
+  refs.agentDirective.textContent = report.directive;
+  refs.agentPrimaryRole.textContent = report.primaryRole;
+  refs.agentRoleHint.textContent = report.roleHint;
+  refs.agentRiskLevel.textContent = report.riskLevel;
+  refs.agentRiskHint.textContent = report.riskHint;
+  refs.agentActionCount.textContent = String(report.checklist.length);
+
+  refs.agentCardGrid.innerHTML = report.agents
+    .map(
+      (item) => `
+        <article class="agent-card">
+          <span class="agent-badge">${item.badge}</span>
+          <strong>${item.title}</strong>
+          <p>${item.summary}</p>
+        </article>
+      `
+    )
+    .join("");
+
+  refs.agentDecisionList.innerHTML = report.decisions
+    .map(
+      (item) => `
+        <article class="insight">
+          <strong>${item.title}</strong>
+          <p>${item.body}</p>
+        </article>
+      `
+    )
+    .join("");
+
+  refs.agentChecklist.innerHTML = report.checklist
+    .map(
+      (item, index) => `
+        <article class="checklist-item">
+          <span class="checklist-index">${index + 1}</span>
+          <div>
+            <span class="eyebrow">${item.phase}</span>
+            <strong>${item.text}</strong>
+          </div>
+        </article>
+      `
+    )
+    .join("");
+}
+
 function renderChart() {
   const chartData = [...records]
     .slice(0, 7)
@@ -342,6 +522,7 @@ function renderChart() {
 function renderAll() {
   renderOverview();
   renderReview();
+  renderAgent();
   renderChart();
 }
 
@@ -399,6 +580,11 @@ recordForm.addEventListener("submit", (event) => {
   setMode("做T");
   document.getElementById("disciplineInput").value = 90;
   showToast("记录已保存，收益与复盘统计已刷新");
+});
+
+agentRefreshButton?.addEventListener("click", () => {
+  renderAgent();
+  showToast("Agent 已基于最新记录重新诊断");
 });
 
 setMode("做T");

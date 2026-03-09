@@ -426,6 +426,68 @@
             </article>
           </section>
 
+          <section class="screen" data-screen="agent">
+            <article class="review-hero agent-hero">
+              <div>
+                <p class="eyebrow">Agent System</p>
+                <h3>把记录变成可执行的交易改进引擎</h3>
+              </div>
+              <div class="review-micro">
+                <span class="rise" id="agentConfidence">置信度 82%</span>
+                <span class="neutral" id="agentDirective">系统已生成今日指令</span>
+              </div>
+            </article>
+
+            <div class="analytics-grid agent-grid">
+              <article class="analytics-card">
+                <p class="eyebrow">当前角色</p>
+                <div class="big-number" id="agentPrimaryRole">执行官</div>
+                <p id="agentRoleHint">优先修复执行偏差</p>
+              </article>
+              <article class="analytics-card">
+                <p class="eyebrow">风险等级</p>
+                <div class="big-number" id="agentRiskLevel">中</div>
+                <p id="agentRiskHint">根据连续性与纪律综合判断</p>
+              </article>
+              <article class="analytics-card">
+                <p class="eyebrow">明日动作</p>
+                <div class="big-number" id="agentActionCount">3</div>
+                <p>开盘前必须完成的动作数</p>
+              </article>
+            </div>
+
+            <article class="mini-panel">
+              <div class="panel-head">
+                <div>
+                  <span class="eyebrow">多 Agent 协同</span>
+                  <h4>四个角色同时读取你的交易数据</h4>
+                </div>
+                <button class="secondary-button" id="agentRefreshButton" type="button">重新诊断</button>
+              </div>
+              <div class="agent-card-grid" id="agentCardGrid"></div>
+            </article>
+
+            <article class="mini-panel">
+              <div class="panel-head">
+                <div>
+                  <span class="eyebrow">系统结论</span>
+                  <h4>今日最值得执行的决策</h4>
+                </div>
+              </div>
+              <div class="insight-list" id="agentDecisionList"></div>
+            </article>
+
+            <article class="mini-panel">
+              <div class="panel-head">
+                <div>
+                  <span class="eyebrow">明日清单</span>
+                  <h4>开盘前、中、后分别做什么</h4>
+                </div>
+              </div>
+              <div class="agent-checklist" id="agentChecklist"></div>
+            </article>
+          </section>
+
           <section class="screen" data-screen="monetize">
             <article class="premium-hero">
               <div class="premium-copy">
@@ -514,6 +576,9 @@
             </button>
             <button class="nav-item" data-target="review" type="button">
               <span>复盘</span>
+            </button>
+            <button class="nav-item" data-target="agent" type="button">
+              <span>Agent</span>
             </button>
             <button class="nav-item" data-target="monetize" type="button">
               <span>会员</span>

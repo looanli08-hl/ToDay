@@ -755,6 +755,10 @@ body::before {
   margin-top: 1rem;
 }
 
+.agent-grid {
+  margin-top: 1rem;
+}
+
 .analytics-card {
   text-align: center;
 }
@@ -789,6 +793,75 @@ body::before {
   display: grid;
   gap: 0.75rem;
   margin-top: 1rem;
+}
+
+.agent-card-grid,
+.agent-checklist {
+  display: grid;
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
+
+.agent-card-grid {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.agent-card {
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  background:
+    radial-gradient(circle at top right, rgba(255, 207, 117, 0.12), transparent 42%),
+    rgba(255, 255, 255, 0.045);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.agent-card strong,
+.checklist-item strong {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 1.05rem;
+}
+
+.agent-card p,
+.checklist-item p {
+  margin: 0.55rem 0 0;
+  color: rgba(244, 247, 251, 0.76);
+  line-height: 1.65;
+}
+
+.agent-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.34rem 0.62rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--muted);
+  font-size: 0.74rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.checklist-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.9rem;
+  align-items: start;
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.checklist-index {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(255, 90, 99, 0.22), rgba(255, 161, 72, 0.18));
+  color: var(--text);
+  font-family: var(--number-font);
 }
 
 .insight p {
@@ -879,7 +952,7 @@ body::before {
   right: 1rem;
   bottom: 1rem;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 0.7rem;
   padding: 0.65rem;
   border-radius: 22px;
@@ -1011,7 +1084,8 @@ body::before {
 
   .mode-grid,
   .status-grid,
-  .heat-map {
+  .heat-map,
+  .agent-card-grid {
     grid-template-columns: 1fr 1fr;
   }
 
@@ -1053,7 +1127,8 @@ body::before {
   .mode-grid,
   .status-grid,
   .heat-map,
-  .value-grid {
+  .value-grid,
+  .agent-card-grid {
     grid-template-columns: 1fr;
   }
 
