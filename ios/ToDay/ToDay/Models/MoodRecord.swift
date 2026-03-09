@@ -1,7 +1,7 @@
 import Foundation
 
-struct MoodRecord: Identifiable {
-    enum Mood: String, CaseIterable, Identifiable {
+struct MoodRecord: Identifiable, Codable {
+    enum Mood: String, CaseIterable, Identifiable, Codable {
         case happy = "开心"
         case calm = "平静"
         case tired = "疲惫"
@@ -47,7 +47,7 @@ struct MoodRecord: Identifiable {
     func toTimelineEntry() -> TimelineEntry {
         let detail = note.isEmpty
             ? "\(mood.emoji) \(mood.rawValue)"
-            : "\(mood.emoji) \(mood.rawValue) — \(note)"
+            : "\(mood.emoji) \(mood.rawValue) · \(note)"
 
         let timeString = createdAt.formatted(.dateTime.hour(.twoDigits(amPM: .omitted)).minute())
 

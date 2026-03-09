@@ -4,6 +4,7 @@ struct QuickRecordSheet: View {
     @Environment(\.dismiss) private var dismiss
     @State private var selectedMood: MoodRecord.Mood?
     @State private var note: String = ""
+    @State private var createdAt: Date = Date()
 
     let onSave: (MoodRecord) -> Void
 
@@ -27,6 +28,24 @@ struct QuickRecordSheet: View {
                         .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                 }
 
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("记录时间")
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(.secondary)
+
+                    DatePicker(
+                        "记录时间",
+                        selection: $createdAt,
+                        displayedComponents: [.date, .hourAndMinute]
+                    )
+                    .labelsHidden()
+                    .datePickerStyle(.compact)
+                    .padding(14)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Color(uiColor: .secondarySystemBackground))
+                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                }
+
                 Spacer()
             }
             .padding(20)
@@ -39,7 +58,7 @@ struct QuickRecordSheet: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("保存") {
                         guard let mood = selectedMood else { return }
-                        let record = MoodRecord(mood: mood, note: note)
+                        let record = MoodRecord(mood: mood, note: note, createdAt: createdAt)
                         onSave(record)
                         dismiss()
                     }

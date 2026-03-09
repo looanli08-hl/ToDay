@@ -15,7 +15,7 @@ enum TimelineSource: String {
     var badgeTitle: String {
         switch self {
         case .mock:
-            return "Mock"
+            return "模拟"
         case .healthKit:
             return "HealthKit"
         }
@@ -24,9 +24,9 @@ enum TimelineSource: String {
     var helperText: String {
         switch self {
         case .mock:
-            return "You are in simulator-safe mode. Build the product flow first, then swap to HealthKit on a real iPhone."
+            return "当前是模拟模式，适合先把记录、回看和付费路径做顺。"
         case .healthKit:
-            return "Reading from HealthKit on this device."
+            return "正在读取这台设备上的 HealthKit 数据。"
         }
     }
 }

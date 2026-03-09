@@ -3,7 +3,10 @@ import Foundation
 enum AppContainer {
     @MainActor
     static func makeTodayViewModel() -> TodayViewModel {
-        TodayViewModel(provider: makeTimelineProvider())
+        TodayViewModel(
+            provider: makeTimelineProvider(),
+            recordStore: makeMoodRecordStore()
+        )
     }
 
     static func makeTimelineProvider() -> any TimelineDataProviding {
@@ -14,5 +17,9 @@ enum AppContainer {
         }
 
         return MockTimelineDataProvider()
+    }
+
+    static func makeMoodRecordStore() -> any MoodRecordStoring {
+        UserDefaultsMoodRecordStore()
     }
 }

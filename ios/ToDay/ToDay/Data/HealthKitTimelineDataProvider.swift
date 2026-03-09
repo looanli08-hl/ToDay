@@ -45,12 +45,12 @@ struct HealthKitTimelineDataProvider: TimelineDataProviding {
 
         return DayTimeline(
             date: date,
-            summary: "Built from today's HealthKit samples on this device.",
+            summary: "这条时间线来自今天这台设备里的 HealthKit 数据。",
             source: source,
             stats: [
-                TimelineStat(title: "Steps", value: formatWholeNumber(steps)),
-                TimelineStat(title: "Energy", value: "\(formatWholeNumber(energy)) kcal"),
-                TimelineStat(title: "Workouts", value: "\(workoutSamples.count)")
+                TimelineStat(title: "步数", value: formatWholeNumber(steps)),
+                TimelineStat(title: "能量", value: "\(formatWholeNumber(energy)) kcal"),
+                TimelineStat(title: "训练", value: "\(workoutSamples.count)")
             ],
             entries: entries
         )
@@ -180,9 +180,9 @@ struct HealthKitTimelineDataProvider: TimelineDataProviding {
         if sleepHours > 0 {
             entries.append(
                 TimelineEntry(
-                    title: "Sleep",
-                    detail: String(format: "%.1f hours of recorded sleep before today began.", sleepHours),
-                    timeRange: "Overnight",
+                    title: "睡眠",
+                    detail: String(format: "今天开始前大约记录了 %.1f 小时睡眠。", sleepHours),
+                    timeRange: "昨夜",
                     kind: .sleep
                 )
             )
@@ -191,9 +191,9 @@ struct HealthKitTimelineDataProvider: TimelineDataProviding {
         if steps > 0 || activeEnergy > 0 {
             entries.append(
                 TimelineEntry(
-                    title: "Activity",
-                    detail: "\(formatWholeNumber(steps)) steps and \(formatWholeNumber(activeEnergy)) kcal so far today.",
-                    timeRange: "Today",
+                    title: "活动",
+                    detail: "今天目前累计 \(formatWholeNumber(steps)) 步，消耗 \(formatWholeNumber(activeEnergy)) kcal。",
+                    timeRange: "今天",
                     kind: .move
                 )
             )
@@ -207,7 +207,7 @@ struct HealthKitTimelineDataProvider: TimelineDataProviding {
             entries.append(
                 TimelineEntry(
                     title: activity,
-                    detail: "\(minutes) min workout recorded in HealthKit.",
+                    detail: "HealthKit 记录了 \(minutes) 分钟训练。",
                     timeRange: timeRange,
                     kind: .move
                 )
@@ -217,9 +217,9 @@ struct HealthKitTimelineDataProvider: TimelineDataProviding {
         if entries.isEmpty && calendar.isDate(referenceDate, inSameDayAs: Date()) {
             entries.append(
                 TimelineEntry(
-                    title: "Waiting for data",
-                    detail: "HealthKit is connected, but there are no visible samples for this day yet.",
-                    timeRange: "Today",
+                    title: "等待数据",
+                    detail: "HealthKit 已连接，但今天还没有可见样本。",
+                    timeRange: "今天",
                     kind: .pause
                 )
             )
@@ -244,23 +244,23 @@ private extension HKWorkoutActivityType {
     var displayName: String {
         switch self {
         case .walking:
-            return "Walk"
+            return "步行"
         case .running:
-            return "Run"
+            return "跑步"
         case .cycling:
-            return "Cycle"
+            return "骑行"
         case .traditionalStrengthTraining:
-            return "Strength"
+            return "力量"
         case .functionalStrengthTraining:
-            return "Functional Strength"
+            return "功能力量"
         case .mindAndBody:
-            return "Mind and Body"
+            return "身心"
         case .yoga:
-            return "Yoga"
+            return "瑜伽"
         case .hiking:
-            return "Hike"
+            return "徒步"
         default:
-            return "Workout"
+            return "训练"
         }
     }
 }

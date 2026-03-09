@@ -15,6 +15,7 @@
 		93C3B96072D6ECD7AB82943B /* MockTimelineDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FE2EF155E1C18E24C5D11D1 /* MockTimelineDataProvider.swift */; };
 		9C701A7285E2666EFC829AEF /* TodayViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16EB598659DDD263739D3136 /* TodayViewModel.swift */; };
 		AED24B3EF148016906D995F8 /* DayTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C98792FCC517E2B96173407 /* DayTimeline.swift */; };
+		AFB0264365F2546579D2F53A /* MoodRecordStoring.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E53E00BCF5527A4FE8FD775 /* MoodRecordStoring.swift */; };
 		C5767BB39D601ADD6EA3AFE5 /* TodayScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = F728CBFA275E061CC33D4193 /* TodayScreen.swift */; };
 		C8D4B957327922E04DBD7578 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 377615C5249C10E358F73636 /* Preview Assets.xcassets */; };
 		D7DF86B1EC7D5D82B3201C1C /* TimelineDataProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D72C488C5C21014C1FAB59A /* TimelineDataProviding.swift */; };
@@ -29,6 +30,7 @@
 		16EB598659DDD263739D3136 /* TodayViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayViewModel.swift; sourceTree = "<group>"; };
 		248EB0D5C59CF49B72179706 /* HealthKitTimelineDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitTimelineDataProvider.swift; sourceTree = "<group>"; };
 		377615C5249C10E358F73636 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		3E53E00BCF5527A4FE8FD775 /* MoodRecordStoring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodRecordStoring.swift; sourceTree = "<group>"; };
 		5C98792FCC517E2B96173407 /* DayTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayTimeline.swift; sourceTree = "<group>"; };
 		7D72C488C5C21014C1FAB59A /* TimelineDataProviding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineDataProviding.swift; sourceTree = "<group>"; };
 		91944CCE08B997C8CAA13BBD /* TimelineEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineEntry.swift; sourceTree = "<group>"; };
@@ -101,6 +103,7 @@
 			children = (
 				248EB0D5C59CF49B72179706 /* HealthKitTimelineDataProvider.swift */,
 				0FE2EF155E1C18E24C5D11D1 /* MockTimelineDataProvider.swift */,
+				3E53E00BCF5527A4FE8FD775 /* MoodRecordStoring.swift */,
 				7D72C488C5C21014C1FAB59A /* TimelineDataProviding.swift */,
 			);
 			path = Data;
@@ -211,6 +214,7 @@
 				3167A5A7F4562369CA4F54B4 /* HealthKitTimelineDataProvider.swift in Sources */,
 				93C3B96072D6ECD7AB82943B /* MockTimelineDataProvider.swift in Sources */,
 				7BC51B7352E2968F185CB750 /* MoodRecord.swift in Sources */,
+				AFB0264365F2546579D2F53A /* MoodRecordStoring.swift in Sources */,
 				4FE7ED6B910849760A8ED1BE /* QuickRecordSheet.swift in Sources */,
 				D7DF86B1EC7D5D82B3201C1C /* TimelineDataProviding.swift in Sources */,
 				64CBD5CDDABBA47E698BE49E /* TimelineEntry.swift in Sources */,

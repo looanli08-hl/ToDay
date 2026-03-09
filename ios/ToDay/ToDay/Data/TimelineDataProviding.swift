@@ -14,13 +14,13 @@ enum TimelineDataError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .healthDataUnavailable:
-            return "Health data is not available on this device. Keep using mock mode until you can test on a real iPhone."
+            return "这台设备暂时无法使用健康数据，先继续用模拟模式把产品打磨顺。"
         case .authorizationDenied:
-            return "Health data access was denied. You can still continue building with mock data."
+            return "健康数据授权被拒绝了，但你仍然可以继续用本地记录和模拟数据。"
         case .noDataForToday:
-            return "No health samples were found for today yet."
+            return "今天还没有可见的健康数据样本。"
         case let .queryFailed(message):
-            return "HealthKit query failed: \(message)"
+            return "HealthKit 查询失败：\(message)"
         }
     }
 }
