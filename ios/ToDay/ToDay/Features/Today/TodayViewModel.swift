@@ -17,6 +17,7 @@ final class TodayViewModel: ObservableObject {
     private let insightComposer: TodayInsightComposer
     private let calendar: Calendar
     private var hasLoadedOnce = false
+    private var timelineCache: [Date: DayTimeline] = [:]
     private(set) var manualRecords: [MoodRecord] = []
 
     init(
@@ -51,6 +52,7 @@ final class TodayViewModel: ObservableObject {
 
         do {
             let base = try await provider.loadTimeline(for: Date())
+            timelineCache[calendar.startOfDay(for: base.date)] = base
             let merged = mergedTimeline(base: base)
             timeline = merged
             refreshDerivedState(referenceDate: merged.date)
@@ -170,7 +172,11 @@ final class TodayViewModel: ObservableObject {
     private func refreshDerivedState(referenceDate: Date) {
         let recordsForDay = records(on: referenceDate)
         activeRecord = manualRecords.first(where: \.isOngoing)
-        historyDigests = insightComposer.buildHistoryDigests(from: manualRecords, limit: 21)
+        historyDigests = insightComposer.buildHistoryDigests(
+            from: manualRecords,
+            timelines: timelineCache,
+            limit: 21
+        )
         recentDigests = Array(historyDigests.prefix(7))
         insightSummary = insightComposer.buildTodaySummary(
             referenceDate: referenceDate,

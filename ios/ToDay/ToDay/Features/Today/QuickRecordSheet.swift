@@ -40,6 +40,7 @@ struct QuickRecordSheet: View {
                     DatePicker(
                         "记录时间",
                         selection: $createdAt,
+                        in: ...Date(),
                         displayedComponents: [.date, .hourAndMinute]
                     )
                     .labelsHidden()
@@ -59,7 +60,21 @@ struct QuickRecordSheet: View {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("取消") { dismiss() }
                 }
-                ToolbarItem(placement: .confirmationAction) {
+                ToolbarItemGroup(placement: .confirmationAction) {
+                    Button("打点") {
+                        guard let mood = selectedMood else { return }
+                        let record = MoodRecord(
+                            mood: mood,
+                            note: note,
+                            createdAt: createdAt,
+                            isTracking: false
+                        )
+                        onSave(record)
+                        dismiss()
+                    }
+                    .fontWeight(.medium)
+                    .disabled(selectedMood == nil)
+
                     Button("开始") {
                         guard let mood = selectedMood else { return }
                         let record = MoodRecord.active(mood: mood, note: note, createdAt: createdAt)

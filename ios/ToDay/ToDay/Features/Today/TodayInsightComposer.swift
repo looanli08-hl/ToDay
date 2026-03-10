@@ -165,30 +165,46 @@ struct TodayInsightComposer {
         )
     }
 
-    func buildHistoryDigests(from manualRecords: [MoodRecord], limit: Int) -> [RecentDayDigest] {
+    func buildHistoryDigests(
+        from manualRecords: [MoodRecord],
+        timelines: [Date: DayTimeline],
+        limit: Int
+    ) -> [RecentDayDigest] {
         let grouped = Dictionary(grouping: manualRecords) { calendar.startOfDay(for: $0.createdAt) }
+        let allDates = Set(grouped.keys).union(timelines.keys)
 
-        return grouped.keys
+        return allDates
             .sorted(by: >)
             .prefix(limit)
             .compactMap { date in
-                guard let records = grouped[date] else { return nil }
+                let records = grouped[date] ?? []
+                let timeline = timelines[date]
                 let sortedRecords = records.sorted { $0.createdAt > $1.createdAt }
                 let dominantMood = dominantMood(in: sortedRecords)
                 let notesCount = sortedRecords.filter(hasNote).count
-                let title = dominantMood?.rawValue ?? "记录日"
+                let title = dominantMood?.rawValue ?? {
+                    guard let timeline else { return "记录日" }
+                    switch timeline.source {
+                    case .mock:
+                        return "模拟轨迹"
+                    case .healthKit:
+                        return "生活轨迹"
+                    }
+                }()
                 let detailParts = [
-                    "\(sortedRecords.count) 条记录",
+                    !sortedRecords.isEmpty ? "\(sortedRecords.count) 条记录" : nil,
                     notesCount > 0 ? "\(notesCount) 条备注" : nil,
                     sortedRecords.contains(where: \.isOngoing) ? "1 条进行中" : nil,
-                    dominantMood.map { "主情绪 \($0.rawValue)" }
+                    dominantMood.map { "主情绪 \($0.rawValue)" },
+                    timeline.map { "\($0.entries.count) 个片段" },
+                    timeline.map { $0.source.badgeTitle }
                 ].compactMap { $0 }
                 let notePreview = sortedRecords.first(where: hasNote)?.note
 
                 return RecentDayDigest(
                     date: date,
                     title: title,
-                    detail: detailParts.joined(separator: " · "),
+                    detail: detailParts.isEmpty ? "等待新记录" : detailParts.joined(separator: " · "),
                     mood: dominantMood,
                     notePreview: notePreview,
                     recordCount: sortedRecords.count

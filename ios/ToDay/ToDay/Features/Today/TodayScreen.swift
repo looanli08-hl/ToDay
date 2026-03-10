@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct TodayScreen: View {
     @ObservedObject var viewModel: TodayViewModel
@@ -10,6 +11,12 @@ struct TodayScreen: View {
     @State private var expandedEntryID: String?
 
     private let chineseLocale = Locale(identifier: "zh_CN")
+    private static let dateHeaderFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "zh_CN")
+        formatter.dateFormat = "yyyy · MM · dd EEE"
+        return formatter
+    }()
 
     var body: some View {
         NavigationStack {
@@ -34,6 +41,11 @@ struct TodayScreen: View {
                 .padding(.horizontal, 20)
                 .padding(.top, 12)
                 .padding(.bottom, 28)
+            }
+            .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+                Task {
+                    await viewModel.load(forceReload: true)
+                }
             }
             .background(TodayTheme.background)
             .toolbar(.hidden, for: .navigationBar)
@@ -330,7 +342,9 @@ struct TodayScreen: View {
     }
 
     private func errorCard(message: String) -> some View {
-        ContentCard {
+        let showsSettingsButton = message.contains("授权")
+
+        return ContentCard {
             EyebrowLabel("UNAVAILABLE")
             Text("时间线暂时不可用")
                 .font(.system(size: 24, weight: .regular, design: .serif))
@@ -341,13 +355,24 @@ struct TodayScreen: View {
                 .font(.system(size: 14))
                 .foregroundStyle(TodayTheme.inkMuted)
 
-            Button("重新整理") {
-                Task {
-                    await viewModel.load(forceReload: true)
+            HStack(spacing: 12) {
+                Button("重新整理") {
+                    Task {
+                        await viewModel.load(forceReload: true)
+                    }
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(TodayTheme.teal)
+
+                if showsSettingsButton {
+                    Button("前往设置") {
+                        guard let settingsURL = URL(string: UIApplication.openSettingsURLString) else { return }
+                        UIApplication.shared.open(settingsURL)
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(TodayTheme.inkSoft)
                 }
             }
-            .buttonStyle(.borderedProminent)
-            .tint(TodayTheme.teal)
         }
     }
 
@@ -364,10 +389,7 @@ struct TodayScreen: View {
     }
 
     private var dateHeader: String {
-        let formatter = DateFormatter()
-        formatter.locale = chineseLocale
-        formatter.dateFormat = "yyyy · MM · dd EEE"
-        return formatter.string(from: viewModel.timeline?.date ?? Date())
+        Self.dateHeaderFormatter.string(from: viewModel.timeline?.date ?? Date())
     }
 }
 

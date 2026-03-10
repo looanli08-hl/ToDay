@@ -1,11 +1,12 @@
 import SwiftUI
 
 struct OverviewStat: Identifiable {
-    let id = UUID()
     let label: String
     let value: String
     let tint: Color
     let background: Color
+
+    var id: String { label }
 }
 
 private struct RiverPoint: Identifiable {
@@ -39,12 +40,15 @@ struct OverviewStatCard: View {
         .padding(.horizontal, 14)
         .padding(.vertical, 16)
         .frame(width: 92, alignment: .leading)
-        .background(stat.background)
-        .overlay(
+        .background(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(TodayTheme.border, lineWidth: 1)
+                .fill(stat.background)
         )
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .strokeBorder(TodayTheme.border, lineWidth: 1)
+        )
     }
 }
 
