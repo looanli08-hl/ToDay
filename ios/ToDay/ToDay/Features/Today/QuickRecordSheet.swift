@@ -1,5 +1,10 @@
 import SwiftUI
 
+enum QuickRecordSheetMode {
+    case flexible
+    case pointOnly
+}
+
 struct QuickRecordSheet: View {
     @Environment(\.dismiss) private var dismiss
     @State private var selectedMood: MoodRecord.Mood?
@@ -7,15 +12,16 @@ struct QuickRecordSheet: View {
     @State private var createdAt: Date = Date()
     @State private var isSubmitting = false
 
+    let mode: QuickRecordSheetMode
     let onSave: (MoodRecord) -> Void
 
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 24) {
-                Text("开始一段状态")
+                Text(sheetTitle)
                     .font(.title2.weight(.bold))
 
-                Text("保存后会先在时间线上显示“正在做”，下一次点底部按钮会结束这段状态。")
+                Text(sheetSubtitle)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
 
@@ -34,7 +40,7 @@ struct QuickRecordSheet: View {
                 }
 
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("开始时间")
+                    Text(timeFieldTitle)
                         .font(.subheadline.weight(.medium))
                         .foregroundStyle(.secondary)
 
@@ -55,14 +61,14 @@ struct QuickRecordSheet: View {
                 Spacer()
             }
             .padding(20)
-            .navigationTitle("快速记录")
+            .navigationTitle(mode == .pointOnly ? "补充打点" : "快速记录")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("取消") { dismiss() }
                 }
                 ToolbarItemGroup(placement: .confirmationAction) {
-                    Button("打点") {
+                    Button(mode == .pointOnly ? "保存" : "打点") {
                         guard let mood = selectedMood else { return }
                         let record = MoodRecord(
                             mood: mood,
@@ -75,13 +81,15 @@ struct QuickRecordSheet: View {
                     .fontWeight(.medium)
                     .disabled(selectedMood == nil || isSubmitting)
 
-                    Button("开始") {
-                        guard let mood = selectedMood else { return }
-                        let record = MoodRecord.active(mood: mood, note: note, createdAt: createdAt)
-                        submit(record)
+                    if mode == .flexible {
+                        Button("开始") {
+                            guard let mood = selectedMood else { return }
+                            let record = MoodRecord.active(mood: mood, note: note, createdAt: createdAt)
+                            submit(record)
+                        }
+                        .fontWeight(.semibold)
+                        .disabled(selectedMood == nil || isSubmitting)
                     }
-                    .fontWeight(.semibold)
-                    .disabled(selectedMood == nil || isSubmitting)
                 }
             }
         }
@@ -93,6 +101,33 @@ struct QuickRecordSheet: View {
         isSubmitting = true
         onSave(record)
         dismiss()
+    }
+
+    private var sheetTitle: String {
+        switch mode {
+        case .flexible:
+            return "记录此刻"
+        case .pointOnly:
+            return "补一个打点"
+        }
+    }
+
+    private var sheetSubtitle: String {
+        switch mode {
+        case .flexible:
+            return "可以直接打一个瞬时片段，也可以开始一段持续状态。"
+        case .pointOnly:
+            return "当前有一段状态正在进行，这里补充一个瞬时片段，不会打断它。"
+        }
+    }
+
+    private var timeFieldTitle: String {
+        switch mode {
+        case .flexible:
+            return "发生时间"
+        case .pointOnly:
+            return "打点时间"
+        }
     }
 
     private var moodGrid: some View {

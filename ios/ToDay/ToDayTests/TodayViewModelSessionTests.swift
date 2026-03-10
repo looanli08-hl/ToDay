@@ -34,6 +34,21 @@ final class TodayViewModelSessionTests: XCTestCase {
         XCTAssertTrue(finalizedEntry?.moment.label.contains(" - ") == true)
     }
 
+    func testCompletedShortSessionStillUsesRangeMoment() {
+        let record = MoodRecord.active(
+            id: UUID(uuidString: "00000000-0000-0000-0000-000000000101")!,
+            mood: .focused,
+            note: "短时推进",
+            createdAt: sameDay(hour: 11, minute: 20)
+        )
+        let completed = record.completed(at: sameDay(hour: 11, minute: 20).addingTimeInterval(20))
+        let entry = completed.toTimelineEntry(referenceDate: sameDay(hour: 11, minute: 21))
+
+        XCTAssertNotNil(entry.moment.endMinuteOfDay)
+        XCTAssertTrue(entry.moment.label.contains(" - "))
+        XCTAssertEqual(entry.durationMinutes, 1)
+    }
+
     func testStartMoodRecordIgnoresDuplicateSubmission() async {
         let provider = StubTimelineProvider()
         let store = InMemoryMoodRecordStore()
@@ -141,6 +156,36 @@ final class TodayViewModelSessionTests: XCTestCase {
 
         XCTAssertEqual(viewModel.todayManualRecordCount, 1)
         XCTAssertEqual(store.records.count, 1)
+    }
+
+    func testPointRecordCanBeAddedWhileSessionIsActive() async {
+        let provider = StubTimelineProvider()
+        let store = InMemoryMoodRecordStore()
+        let viewModel = TodayViewModel(provider: provider, recordStore: store)
+
+        await viewModel.load(forceReload: true)
+
+        let activeRecord = MoodRecord.active(
+            id: UUID(uuidString: "00000000-0000-0000-0000-000000000511")!,
+            mood: .calm,
+            note: "旅行中",
+            createdAt: sameDay(hour: 14, minute: 0)
+        )
+        let pointRecord = MoodRecord(
+            id: UUID(uuidString: "00000000-0000-0000-0000-000000000512")!,
+            mood: .happy,
+            note: "拍到一处风景",
+            createdAt: sameDay(hour: 14, minute: 25),
+            isTracking: false
+        )
+
+        viewModel.startMoodRecord(activeRecord)
+        viewModel.startMoodRecord(pointRecord)
+
+        XCTAssertEqual(viewModel.activeRecord?.id, activeRecord.id)
+        XCTAssertEqual(viewModel.todayManualRecordCount, 2)
+        XCTAssertEqual(viewModel.timeline?.entries.filter { $0.id == activeRecord.id.uuidString }.count, 1)
+        XCTAssertEqual(viewModel.timeline?.entries.filter { $0.id == pointRecord.id.uuidString }.count, 1)
     }
 }
 

@@ -50,14 +50,14 @@ struct TodayScreen: View {
             .background(TodayTheme.background)
             .toolbar(.hidden, for: .navigationBar)
             .safeAreaInset(edge: .bottom) {
-                quickRecordButton
+                bottomActionBar
                     .padding(.horizontal, 20)
                     .padding(.top, 8)
                     .padding(.bottom, 8)
                     .background(TodayTheme.background.opacity(0.92))
             }
             .sheet(isPresented: $viewModel.showQuickRecord) {
-                QuickRecordSheet { record in
+                QuickRecordSheet(mode: viewModel.quickRecordMode) { record in
                     viewModel.startMoodRecord(record)
                 }
             }
@@ -299,33 +299,95 @@ struct TodayScreen: View {
         }
     }
 
-    private var quickRecordButton: some View {
-        Button {
-            viewModel.handleQuickRecordTap()
-        } label: {
-            VStack(spacing: 4) {
-                Label(viewModel.quickRecordButtonTitle, systemImage: viewModel.quickRecordButtonSystemImage)
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(.white)
+    private var bottomActionBar: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            if let activeSessionTitle = viewModel.activeSessionTitle,
+               let activeSessionDetail = viewModel.activeSessionDetail {
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack(spacing: 8) {
+                        Text("进行中")
+                            .font(.system(size: 11, weight: .bold, design: .monospaced))
+                            .foregroundStyle(TodayTheme.teal)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 5)
+                            .background(TodayTheme.tealSoft)
+                            .clipShape(Capsule())
 
-                if let caption = viewModel.quickRecordButtonCaption {
-                    Text(caption)
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundStyle(.white.opacity(0.84))
+                        Text(activeSessionTitle)
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundStyle(TodayTheme.inkSoft)
+                    }
+
+                    Text(activeSessionDetail)
+                        .font(.system(size: 13))
+                        .foregroundStyle(TodayTheme.inkMuted)
+                        .lineLimit(2)
                 }
             }
-            .padding(.vertical, 15)
-            .frame(maxWidth: .infinity)
-            .background(viewModel.activeRecord == nil ? TodayTheme.accent : TodayTheme.teal)
-            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-            .shadow(
-                color: (viewModel.activeRecord == nil ? TodayTheme.accent : TodayTheme.teal).opacity(0.22),
-                radius: 18,
-                x: 0,
-                y: 10
-            )
+
+            if viewModel.activeRecord == nil {
+                Button {
+                    viewModel.openQuickRecordComposer()
+                } label: {
+                    VStack(spacing: 4) {
+                        Label(viewModel.quickRecordButtonTitle, systemImage: viewModel.quickRecordButtonSystemImage)
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundStyle(.white)
+
+                        if let caption = viewModel.quickRecordButtonCaption {
+                            Text(caption)
+                                .font(.system(size: 12, weight: .medium))
+                                .foregroundStyle(.white.opacity(0.84))
+                        }
+                    }
+                    .padding(.vertical, 15)
+                    .frame(maxWidth: .infinity)
+                    .background(TodayTheme.accent)
+                    .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                }
+                .buttonStyle(.plain)
+            } else {
+                HStack(spacing: 10) {
+                    Button {
+                        viewModel.openPointComposer()
+                    } label: {
+                        Label("补一个打点", systemImage: "plus.circle")
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundStyle(TodayTheme.inkSoft)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 14)
+                            .background(TodayTheme.card)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                    .stroke(TodayTheme.border, lineWidth: 1)
+                            )
+                            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    }
+                    .buttonStyle(.plain)
+
+                    Button {
+                        viewModel.finishActiveMoodRecord()
+                    } label: {
+                        Label("结束这段状态", systemImage: "stop.fill")
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundStyle(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 14)
+                            .background(TodayTheme.teal)
+                            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
         }
-        .buttonStyle(.plain)
+        .padding(14)
+        .background(TodayTheme.elevatedCard.opacity(0.94))
+        .overlay(
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .stroke(TodayTheme.border, lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .shadow(color: TodayTheme.ink.opacity(0.06), radius: 18, x: 0, y: 8)
     }
 
     private var loadingCard: some View {

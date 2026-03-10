@@ -8,6 +8,12 @@ struct MoodRecord: Identifiable, Codable {
         case createdAt
         case endedAt
         case isTracking
+        case captureMode
+    }
+
+    enum CaptureMode: String, Codable {
+        case point
+        case session
     }
 
     enum Mood: String, CaseIterable, Identifiable, Codable {
@@ -47,6 +53,7 @@ struct MoodRecord: Identifiable, Codable {
     let createdAt: Date
     let endedAt: Date?
     let isTracking: Bool
+    let captureMode: CaptureMode
 
     init(
         id: UUID = UUID(),
@@ -54,14 +61,22 @@ struct MoodRecord: Identifiable, Codable {
         note: String = "",
         createdAt: Date = Date(),
         endedAt: Date? = nil,
-        isTracking: Bool = false
+        isTracking: Bool = false,
+        captureMode: CaptureMode? = nil
     ) {
+        let resolvedCaptureMode = captureMode ?? {
+            if isTracking { return .session }
+            if let endedAt, endedAt > createdAt { return .session }
+            return .point
+        }()
+
         self.id = id
         self.mood = mood
         self.note = note
         self.createdAt = createdAt
-        self.endedAt = endedAt ?? (isTracking ? nil : createdAt)
-        self.isTracking = isTracking
+        self.captureMode = resolvedCaptureMode
+        self.endedAt = endedAt ?? (resolvedCaptureMode == .session ? (isTracking ? nil : createdAt) : createdAt)
+        self.isTracking = resolvedCaptureMode == .session ? isTracking : false
     }
 
     static func active(
@@ -76,12 +91,13 @@ struct MoodRecord: Identifiable, Codable {
             note: note,
             createdAt: createdAt,
             endedAt: nil,
-            isTracking: true
+            isTracking: true,
+            captureMode: .session
         )
     }
 
     var isOngoing: Bool {
-        isTracking && endedAt == nil
+        captureMode == .session && isTracking && endedAt == nil
     }
 
     func completed(at date: Date) -> MoodRecord {
@@ -91,7 +107,8 @@ struct MoodRecord: Identifiable, Codable {
             note: note,
             createdAt: createdAt,
             endedAt: max(date, createdAt),
-            isTracking: false
+            isTracking: false,
+            captureMode: .session
         )
     }
 
@@ -117,7 +134,7 @@ struct MoodRecord: Identifiable, Codable {
         let detail: String
         if isOngoing {
             detail = "\(detailPrefix) · 正在进行，已持续 \(durationDescription(minutes: durationMinutes))"
-        } else if durationMinutes > 1 {
+        } else if captureMode == .session {
             detail = "\(detailPrefix) · 持续 \(durationDescription(minutes: durationMinutes))"
         } else {
             detail = detailPrefix
@@ -130,7 +147,7 @@ struct MoodRecord: Identifiable, Codable {
 
         if isOngoing {
             moment = .active(startMinuteOfDay: startMinute, currentMinuteOfDay: boundedEndMinute)
-        } else if durationMinutes > 1 {
+        } else if captureMode == .session {
             moment = .range(startMinuteOfDay: startMinute, endMinuteOfDay: boundedEndMinute)
         } else {
             moment = .point(at: startMinute)
@@ -142,7 +159,7 @@ struct MoodRecord: Identifiable, Codable {
             detail: detail,
             moment: moment,
             kind: mood.timelineKind,
-            durationMinutes: durationMinutes > 1 || isOngoing ? durationMinutes : nil,
+            durationMinutes: captureMode == .session || isOngoing ? durationMinutes : nil,
             isLive: isOngoing
         )
     }
@@ -155,6 +172,16 @@ struct MoodRecord: Identifiable, Codable {
         createdAt = try container.decode(Date.self, forKey: .createdAt)
         endedAt = try container.decodeIfPresent(Date.self, forKey: .endedAt)
         isTracking = try container.decodeIfPresent(Bool.self, forKey: .isTracking) ?? false
+        let decodedCaptureMode = try container.decodeIfPresent(CaptureMode.self, forKey: .captureMode)
+        if let decodedCaptureMode {
+            captureMode = decodedCaptureMode
+        } else if isTracking {
+            captureMode = .session
+        } else if let endedAt, endedAt > createdAt {
+            captureMode = .session
+        } else {
+            captureMode = .point
+        }
     }
 
     func encode(to encoder: any Encoder) throws {
@@ -165,6 +192,7 @@ struct MoodRecord: Identifiable, Codable {
         try container.encode(createdAt, forKey: .createdAt)
         try container.encodeIfPresent(endedAt, forKey: .endedAt)
         try container.encode(isTracking, forKey: .isTracking)
+        try container.encode(captureMode, forKey: .captureMode)
     }
 
     private func minuteOfDay(for date: Date, calendar: Calendar) -> Int {

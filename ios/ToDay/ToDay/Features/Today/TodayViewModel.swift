@@ -11,6 +11,7 @@ final class TodayViewModel: ObservableObject {
     @Published private(set) var errorMessage: String?
     @Published private(set) var activeRecord: MoodRecord?
     @Published var showQuickRecord = false
+    @Published private(set) var quickRecordMode: QuickRecordSheetMode = .flexible
 
     private let provider: any TimelineDataProviding
     private let recordStore: any MoodRecordStoring
@@ -68,14 +69,17 @@ final class TodayViewModel: ObservableObject {
             return
         }
 
-        if activeRecord != nil {
+        if activeRecord != nil && record.captureMode == .session {
             errorMessage = "先结束当前状态，再开始新的一段。"
             return
         }
 
         manualRecords.insert(record, at: 0)
         manualRecords.sort { $0.createdAt > $1.createdAt }
-        activeRecord = record.isOngoing ? record : nil
+        if record.isOngoing {
+            activeRecord = record
+        }
+        showQuickRecord = false
         persistRecords()
         rebuildTimeline(referenceDate: currentBaseTimeline?.date ?? Date())
     }
@@ -93,11 +97,17 @@ final class TodayViewModel: ObservableObject {
     }
 
     func handleQuickRecordTap() {
-        if activeRecord != nil {
-            finishActiveMoodRecord()
-        } else {
-            showQuickRecord = true
-        }
+        openQuickRecordComposer()
+    }
+
+    func openQuickRecordComposer() {
+        quickRecordMode = activeRecord == nil ? .flexible : .pointOnly
+        showQuickRecord = true
+    }
+
+    func openPointComposer() {
+        quickRecordMode = .pointOnly
+        showQuickRecord = true
     }
 
     var todayManualRecordCount: Int {
@@ -109,16 +119,32 @@ final class TodayViewModel: ObservableObject {
     }
 
     var quickRecordButtonTitle: String {
-        activeRecord == nil ? "记录此刻" : "完成这段状态"
+        "记录此刻"
     }
 
     var quickRecordButtonSystemImage: String {
-        activeRecord == nil ? "plus.circle.fill" : "stop.circle.fill"
+        "plus.circle.fill"
     }
 
     var quickRecordButtonCaption: String? {
+        activeRecord == nil ? "打点或开始一段状态" : "当前已有进行中的状态"
+    }
+
+    var activeSessionTitle: String? {
         guard let activeRecord else { return nil }
         return "\(activeRecord.mood.rawValue) 正在进行"
+    }
+
+    var activeSessionDetail: String? {
+        guard let activeRecord else { return nil }
+        let startTime = Self.clockFormatter.string(from: activeRecord.createdAt)
+        let note = activeRecord.note.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        if note.isEmpty {
+            return "开始于 \(startTime)，你可以继续补打点，最后再结束这段状态。"
+        }
+
+        return "开始于 \(startTime) · \(note)"
     }
 
     func historyDetail(for date: Date) -> HistoryDayDetail? {
@@ -228,6 +254,13 @@ final class TodayViewModel: ObservableObject {
                 seen.insert(ManualRecordSignature(record: record)).inserted
             }
     }
+
+    private static let clockFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "zh_CN")
+        formatter.dateFormat = "HH:mm"
+        return formatter
+    }()
 }
 
 private struct ManualRecordSignature: Hashable {
@@ -236,6 +269,7 @@ private struct ManualRecordSignature: Hashable {
     let createdAt: Date
     let endedAt: Date?
     let isTracking: Bool
+    let captureMode: MoodRecord.CaptureMode
 
     init(record: MoodRecord) {
         mood = record.mood
@@ -243,5 +277,6 @@ private struct ManualRecordSignature: Hashable {
         createdAt = record.createdAt
         endedAt = record.endedAt
         isTracking = record.isTracking
+        captureMode = record.captureMode
     }
 }
