@@ -17,83 +17,42 @@ struct QuickRecordSheet: View {
 
     var body: some View {
         NavigationStack {
-            VStack(alignment: .leading, spacing: 24) {
-                Text(sheetTitle)
-                    .font(.title2.weight(.bold))
-
-                Text(sheetSubtitle)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-
-                moodGrid
-
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("备注")
-                        .font(.subheadline.weight(.medium))
-                        .foregroundStyle(.secondary)
-
-                    TextField("写一句话记录当下…", text: $note)
-                        .textFieldStyle(.plain)
-                        .padding(14)
-                        .background(Color(uiColor: .secondarySystemBackground))
-                        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+            ScrollView {
+                VStack(alignment: .leading, spacing: 24) {
+                    headerSection
+                    moodGrid
+                    noteSection
+                    timeSection
                 }
-
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(timeFieldTitle)
-                        .font(.subheadline.weight(.medium))
-                        .foregroundStyle(.secondary)
-
-                    DatePicker(
-                        "记录时间",
-                        selection: $createdAt,
-                        in: ...Date(),
-                        displayedComponents: [.date, .hourAndMinute]
-                    )
-                    .labelsHidden()
-                    .datePickerStyle(.compact)
-                    .padding(14)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Color(uiColor: .secondarySystemBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-                }
-
-                Spacer()
+                .padding(.horizontal, 20)
+                .padding(.top, 20)
+                .padding(.bottom, 120)
             }
-            .padding(20)
-            .navigationTitle(mode == .pointOnly ? "补充打点" : "快速记录")
-            .navigationBarTitleDisplayMode(.inline)
+            .background(TodayTheme.background)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("取消") { dismiss() }
-                }
-                ToolbarItemGroup(placement: .confirmationAction) {
-                    Button(mode == .pointOnly ? "保存" : "打点") {
-                        guard let mood = selectedMood else { return }
-                        let record = MoodRecord(
-                            mood: mood,
-                            note: note,
-                            createdAt: createdAt,
-                            isTracking: false
-                        )
-                        submit(record)
-                    }
-                    .fontWeight(.medium)
-                    .disabled(selectedMood == nil || isSubmitting)
-
-                    if mode == .flexible {
-                        Button("开始") {
-                            guard let mood = selectedMood else { return }
-                            let record = MoodRecord.active(mood: mood, note: note, createdAt: createdAt)
-                            submit(record)
-                        }
-                        .fontWeight(.semibold)
-                        .disabled(selectedMood == nil || isSubmitting)
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 13, weight: .bold))
+                            .foregroundStyle(TodayTheme.inkSoft)
+                            .frame(width: 32, height: 32)
+                            .background(TodayTheme.card)
+                            .clipShape(Circle())
                     }
                 }
             }
+            .safeAreaInset(edge: .bottom) {
+                actionBar
+                    .padding(.horizontal, 20)
+                    .padding(.top, 8)
+                    .padding(.bottom, 12)
+                    .background(TodayTheme.background.opacity(0.96))
+            }
         }
-        .presentationDetents([.medium])
+        .presentationDetents([.medium, .large])
+        .presentationDragIndicator(.visible)
     }
 
     private func submit(_ record: MoodRecord) {
@@ -101,6 +60,120 @@ struct QuickRecordSheet: View {
         isSubmitting = true
         onSave(record)
         dismiss()
+    }
+
+    private var headerSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(sheetTitle)
+                        .font(.system(size: 28, weight: .regular, design: .serif))
+                        .italic()
+                        .foregroundStyle(TodayTheme.ink)
+
+                    Text(sheetSubtitle)
+                        .font(.system(size: 14))
+                        .foregroundStyle(TodayTheme.inkMuted)
+                        .lineSpacing(3)
+                }
+
+                Spacer()
+
+                Text(modeBadgeTitle)
+                    .font(.system(size: 11, weight: .bold, design: .monospaced))
+                    .foregroundStyle(modeBadgeTint)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(modeBadgeBackground)
+                    .clipShape(Capsule())
+            }
+        }
+    }
+
+    private var noteSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("备注")
+                .font(.subheadline.weight(.medium))
+                .foregroundStyle(TodayTheme.inkMuted)
+
+            TextField("写一句话记录当下…", text: $note)
+                .textFieldStyle(.plain)
+                .padding(14)
+                .background(TodayTheme.card)
+                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .stroke(TodayTheme.border, lineWidth: 1)
+                )
+        }
+    }
+
+    private var timeSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(timeFieldTitle)
+                .font(.subheadline.weight(.medium))
+                .foregroundStyle(TodayTheme.inkMuted)
+
+            DatePicker(
+                "记录时间",
+                selection: $createdAt,
+                in: ...Date(),
+                displayedComponents: [.date, .hourAndMinute]
+            )
+            .labelsHidden()
+            .datePickerStyle(.compact)
+            .padding(14)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(TodayTheme.card)
+            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .stroke(TodayTheme.border, lineWidth: 1)
+            )
+        }
+    }
+
+    private var actionBar: some View {
+        HStack(spacing: 10) {
+            Button(mode == .pointOnly ? "保存打点" : "打点") {
+                guard let mood = selectedMood else { return }
+                let record = MoodRecord(
+                    mood: mood,
+                    note: note,
+                    createdAt: createdAt,
+                    isTracking: false
+                )
+                submit(record)
+            }
+            .font(.system(size: 15, weight: .semibold))
+            .foregroundStyle(mode == .pointOnly ? .white : TodayTheme.inkSoft)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 14)
+            .background(mode == .pointOnly ? TodayTheme.teal : TodayTheme.card)
+            .overlay(
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .stroke(mode == .pointOnly ? Color.clear : TodayTheme.border, lineWidth: 1)
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .disabled(selectedMood == nil || isSubmitting)
+            .opacity(selectedMood == nil || isSubmitting ? 0.45 : 1)
+
+            if mode == .flexible {
+                Button("开始一段") {
+                    guard let mood = selectedMood else { return }
+                    let record = MoodRecord.active(mood: mood, note: note, createdAt: createdAt)
+                    submit(record)
+                }
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 14)
+                .background(TodayTheme.accent)
+                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                .disabled(selectedMood == nil || isSubmitting)
+                .opacity(selectedMood == nil || isSubmitting ? 0.45 : 1)
+            }
+        }
     }
 
     private var sheetTitle: String {
@@ -127,6 +200,33 @@ struct QuickRecordSheet: View {
             return "发生时间"
         case .pointOnly:
             return "打点时间"
+        }
+    }
+
+    private var modeBadgeTitle: String {
+        switch mode {
+        case .flexible:
+            return "POINT / SESSION"
+        case .pointOnly:
+            return "POINT ONLY"
+        }
+    }
+
+    private var modeBadgeTint: Color {
+        switch mode {
+        case .flexible:
+            return TodayTheme.accent
+        case .pointOnly:
+            return TodayTheme.teal
+        }
+    }
+
+    private var modeBadgeBackground: Color {
+        switch mode {
+        case .flexible:
+            return TodayTheme.accentSoft
+        case .pointOnly:
+            return TodayTheme.tealSoft
         }
     }
 
