@@ -99,6 +99,14 @@ final class TodayViewModel: ObservableObject {
         }
     }
 
+    var todayManualRecordCount: Int {
+        records(on: timeline?.date ?? Date()).count
+    }
+
+    var todayNoteCount: Int {
+        records(on: timeline?.date ?? Date()).filter(hasNote).count
+    }
+
     func historyDetail(for date: Date) -> HistoryDayDetail? {
         let recordsForDay = records(on: date)
         guard !recordsForDay.isEmpty else { return nil }
@@ -144,12 +152,20 @@ final class TodayViewModel: ObservableObject {
             mergedStats.append(TimelineStat(title: "备注", value: "\(notesCount)"))
         }
 
+        let mergedEntries = (manualEntries + base.entries).sorted { lhs, rhs in
+            if lhs.startMinuteOfDay == rhs.startMinuteOfDay {
+                return lhs.title < rhs.title
+            }
+
+            return lhs.startMinuteOfDay < rhs.startMinuteOfDay
+        }
+
         return DayTimeline(
             date: base.date,
             summary: base.summary,
             source: base.source,
             stats: mergedStats,
-            entries: manualEntries + base.entries
+            entries: mergedEntries
         )
     }
 

@@ -17,6 +17,21 @@ struct TimelineEntry: Identifiable {
 }
 
 extension TimelineEntry {
+    var startMinuteOfDay: Int {
+        if let minute = Self.firstMinuteMatch(in: timeRange) {
+            return minute
+        }
+
+        switch timeRange {
+        case let value where value.contains("昨夜"):
+            return 0
+        case let value where value.contains("今天"):
+            return 12 * 60
+        default:
+            return 12 * 60
+        }
+    }
+
     static let previewData: [TimelineEntry] = [
         TimelineEntry(
             title: "睡眠",
@@ -43,4 +58,21 @@ extension TimelineEntry {
             kind: .pause
         )
     ]
+
+    private static func firstMinuteMatch(in text: String) -> Int? {
+        let candidates = text.split(whereSeparator: { !$0.isNumber && $0 != ":" })
+
+        for candidate in candidates {
+            let pieces = candidate.split(separator: ":")
+            guard pieces.count == 2,
+                  let hour = Int(pieces[0]),
+                  let minute = Int(pieces[1]) else {
+                continue
+            }
+
+            return (hour * 60) + minute
+        }
+
+        return nil
+    }
 }
