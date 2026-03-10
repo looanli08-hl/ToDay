@@ -5,6 +5,7 @@ struct QuickRecordSheet: View {
     @State private var selectedMood: MoodRecord.Mood?
     @State private var note: String = ""
     @State private var createdAt: Date = Date()
+    @State private var isSubmitting = false
 
     let onSave: (MoodRecord) -> Void
 
@@ -69,24 +70,29 @@ struct QuickRecordSheet: View {
                             createdAt: createdAt,
                             isTracking: false
                         )
-                        onSave(record)
-                        dismiss()
+                        submit(record)
                     }
                     .fontWeight(.medium)
-                    .disabled(selectedMood == nil)
+                    .disabled(selectedMood == nil || isSubmitting)
 
                     Button("开始") {
                         guard let mood = selectedMood else { return }
                         let record = MoodRecord.active(mood: mood, note: note, createdAt: createdAt)
-                        onSave(record)
-                        dismiss()
+                        submit(record)
                     }
                     .fontWeight(.semibold)
-                    .disabled(selectedMood == nil)
+                    .disabled(selectedMood == nil || isSubmitting)
                 }
             }
         }
         .presentationDetents([.medium])
+    }
+
+    private func submit(_ record: MoodRecord) {
+        guard !isSubmitting else { return }
+        isSubmitting = true
+        onSave(record)
+        dismiss()
     }
 
     private var moodGrid: some View {

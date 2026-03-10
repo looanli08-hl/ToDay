@@ -65,6 +65,11 @@ final class TodayViewModel: ObservableObject {
     }
 
     func startMoodRecord(_ record: MoodRecord) {
+        guard !containsDuplicateRecord(record) else {
+            showQuickRecord = false
+            return
+        }
+
         if activeRecord != nil {
             errorMessage = "先结束当前状态，再开始新的一段。"
             return
@@ -201,6 +206,16 @@ final class TodayViewModel: ObservableObject {
             try recordStore.saveRecords(manualRecords)
         } catch {
             errorMessage = "本地记录保存失败：\(error.localizedDescription)"
+        }
+    }
+
+    private func containsDuplicateRecord(_ candidate: MoodRecord) -> Bool {
+        manualRecords.contains { record in
+            record.mood == candidate.mood &&
+            record.note == candidate.note &&
+            record.createdAt == candidate.createdAt &&
+            record.endedAt == candidate.endedAt &&
+            record.isTracking == candidate.isTracking
         }
     }
 }

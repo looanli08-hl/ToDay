@@ -33,6 +33,38 @@ final class TodayViewModelSessionTests: XCTestCase {
         XCTAssertEqual(finalizedEntry?.isLive, false)
         XCTAssertTrue(finalizedEntry?.moment.label.contains(" - ") == true)
     }
+
+    func testStartMoodRecordIgnoresDuplicateSubmission() async {
+        let provider = StubTimelineProvider()
+        let store = InMemoryMoodRecordStore()
+        let viewModel = TodayViewModel(provider: provider, recordStore: store)
+
+        await viewModel.load(forceReload: true)
+
+        let createdAt = Date()
+        let record = MoodRecord(
+            mood: .calm,
+            note: "喝咖啡",
+            createdAt: createdAt,
+            isTracking: false
+        )
+
+        viewModel.startMoodRecord(record)
+        viewModel.startMoodRecord(
+            MoodRecord(
+                mood: .calm,
+                note: "喝咖啡",
+                createdAt: createdAt,
+                isTracking: false
+            )
+        )
+
+        XCTAssertEqual(viewModel.todayManualRecordCount, 1)
+        XCTAssertEqual(
+            viewModel.timeline?.entries.filter { $0.title == "平静" && $0.detail.contains("喝咖啡") }.count,
+            1
+        )
+    }
 }
 
 private struct StubTimelineProvider: TimelineDataProviding {
