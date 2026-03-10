@@ -37,8 +37,8 @@ struct MoodRecord: Identifiable, Codable {
     let note: String
     let createdAt: Date
 
-    init(mood: Mood, note: String = "", createdAt: Date = Date()) {
-        self.id = UUID()
+    init(id: UUID = UUID(), mood: Mood, note: String = "", createdAt: Date = Date()) {
+        self.id = id
         self.mood = mood
         self.note = note
         self.createdAt = createdAt
@@ -49,12 +49,15 @@ struct MoodRecord: Identifiable, Codable {
             ? "\(mood.emoji) \(mood.rawValue)"
             : "\(mood.emoji) \(mood.rawValue) · \(note)"
 
-        let timeString = createdAt.formatted(.dateTime.hour(.twoDigits(amPM: .omitted)).minute())
+        let hour = Calendar.current.component(.hour, from: createdAt)
+        let minute = Calendar.current.component(.minute, from: createdAt)
+        let moment = TimelineMoment.point(at: (hour * 60) + minute)
 
         return TimelineEntry(
+            id: id.uuidString,
             title: mood.rawValue,
             detail: detail,
-            timeRange: timeString,
+            moment: moment,
             kind: mood.timelineKind
         )
     }

@@ -18,8 +18,11 @@
 		64CBD5CDDABBA47E698BE49E /* TimelineEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91944CCE08B997C8CAA13BBD /* TimelineEntry.swift */; };
 		7BC51B7352E2968F185CB750 /* MoodRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0773EC8EC7B7EA41E6CE3914 /* MoodRecord.swift */; };
 		83EB550A345BE349E6AD5403 /* HistoryDayDetailScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C363F97E5D7CD67BB2D715B /* HistoryDayDetailScreen.swift */; };
+		88D47212DD537145F4F5E730 /* TodayTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A7313E34ABE1036CAEC076F /* TodayTheme.swift */; };
 		93C3B96072D6ECD7AB82943B /* MockTimelineDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FE2EF155E1C18E24C5D11D1 /* MockTimelineDataProvider.swift */; };
 		9C701A7285E2666EFC829AEF /* TodayViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16EB598659DDD263739D3136 /* TodayViewModel.swift */; };
+		A05D3D71F23108D27807DA94 /* TodayInsightComposerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5E3EC90284C88262A943A15 /* TodayInsightComposerTests.swift */; };
+		A2F668A004169259C19C90A3 /* TodayInsightComposer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D40EA4B5DE92A1C04FEF877 /* TodayInsightComposer.swift */; };
 		AED24B3EF148016906D995F8 /* DayTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C98792FCC517E2B96173407 /* DayTimeline.swift */; };
 		AFB0264365F2546579D2F53A /* MoodRecordStoring.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E53E00BCF5527A4FE8FD775 /* MoodRecordStoring.swift */; };
 		C5767BB39D601ADD6EA3AFE5 /* TodayScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = F728CBFA275E061CC33D4193 /* TodayScreen.swift */; };
@@ -27,27 +30,43 @@
 		D7DF86B1EC7D5D82B3201C1C /* TimelineDataProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D72C488C5C21014C1FAB59A /* TimelineDataProviding.swift */; };
 		DD042D446979BF714A91C923 /* AppContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7BB74516D89AD97D04F81B3 /* AppContainer.swift */; };
 		DE297B083A85A47DD13DE450 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C96E2DCDAC54DA106C2D81A /* Assets.xcassets */; };
+		FBF90F06A0B49EDD24C7F79C /* TodayFlowViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C77065335DE754680A34C99 /* TodayFlowViews.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		0B8C66CE96BFBD6584B0159B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2C29361A382315565B1DE7BF /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1FB5617C31BE25701E8C7ACD;
+			remoteInfo = ToDay;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		037508DDAD551D2D5F74DE83 /* ToDayTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = ToDayTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		0773EC8EC7B7EA41E6CE3914 /* MoodRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodRecord.swift; sourceTree = "<group>"; };
 		0A80390E769238F81D933506 /* AppRootScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRootScreen.swift; sourceTree = "<group>"; };
 		0C96E2DCDAC54DA106C2D81A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0FE2EF155E1C18E24C5D11D1 /* MockTimelineDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockTimelineDataProvider.swift; sourceTree = "<group>"; };
 		16EB598659DDD263739D3136 /* TodayViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayViewModel.swift; sourceTree = "<group>"; };
+		1A7313E34ABE1036CAEC076F /* TodayTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayTheme.swift; sourceTree = "<group>"; };
 		248EB0D5C59CF49B72179706 /* HealthKitTimelineDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitTimelineDataProvider.swift; sourceTree = "<group>"; };
 		29FDC86F425DD463F32D7EC2 /* MonetizationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonetizationViewModel.swift; sourceTree = "<group>"; };
 		2B46AF3B810BFFEE6F069410 /* ProScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProScreen.swift; sourceTree = "<group>"; };
 		2C363F97E5D7CD67BB2D715B /* HistoryDayDetailScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryDayDetailScreen.swift; sourceTree = "<group>"; };
 		377615C5249C10E358F73636 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		3C77065335DE754680A34C99 /* TodayFlowViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayFlowViews.swift; sourceTree = "<group>"; };
 		3E53E00BCF5527A4FE8FD775 /* MoodRecordStoring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodRecordStoring.swift; sourceTree = "<group>"; };
 		5C98792FCC517E2B96173407 /* DayTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayTimeline.swift; sourceTree = "<group>"; };
+		6D40EA4B5DE92A1C04FEF877 /* TodayInsightComposer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayInsightComposer.swift; sourceTree = "<group>"; };
 		7D72C488C5C21014C1FAB59A /* TimelineDataProviding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineDataProviding.swift; sourceTree = "<group>"; };
 		91944CCE08B997C8CAA13BBD /* TimelineEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineEntry.swift; sourceTree = "<group>"; };
 		AD8F9694BC13B76959CA8639 /* ToDay.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ToDay.entitlements; sourceTree = "<group>"; };
 		CB09FC4279F21A281C6D8DC2 /* AppConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfiguration.swift; sourceTree = "<group>"; };
 		CCCD453022FB7D3DE28EDE60 /* ToDayApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDayApp.swift; sourceTree = "<group>"; };
 		D273A8E459B1BBB83027539B /* ToDay.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = ToDay.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D5E3EC90284C88262A943A15 /* TodayInsightComposerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayInsightComposerTests.swift; sourceTree = "<group>"; };
 		E41D5FDB97C97E39345EF797 /* HistoryScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryScreen.swift; sourceTree = "<group>"; };
 		E7BB74516D89AD97D04F81B3 /* AppContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppContainer.swift; sourceTree = "<group>"; };
 		E90DD0AA794ABBBE1F95F1B7 /* QuickRecordSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickRecordSheet.swift; sourceTree = "<group>"; };
@@ -59,6 +78,7 @@
 			isa = PBXGroup;
 			children = (
 				D273A8E459B1BBB83027539B /* ToDay.app */,
+				037508DDAD551D2D5F74DE83 /* ToDayTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -123,6 +143,14 @@
 			path = App;
 			sourceTree = "<group>";
 		};
+		BDF9E53E8979EE3E9CB77A86 /* ToDayTests */ = {
+			isa = PBXGroup;
+			children = (
+				D5E3EC90284C88262A943A15 /* TodayInsightComposerTests.swift */,
+			);
+			path = ToDayTests;
+			sourceTree = "<group>";
+		};
 		C98DBEA5ECE85D64479FEE31 /* Data */ = {
 			isa = PBXGroup;
 			children = (
@@ -157,6 +185,7 @@
 			isa = PBXGroup;
 			children = (
 				4558B47175ED68C428686870 /* ToDay */,
+				BDF9E53E8979EE3E9CB77A86 /* ToDayTests */,
 				01BAB423F888B3D328A14A31 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -165,7 +194,10 @@
 			isa = PBXGroup;
 			children = (
 				E90DD0AA794ABBBE1F95F1B7 /* QuickRecordSheet.swift */,
+				3C77065335DE754680A34C99 /* TodayFlowViews.swift */,
+				6D40EA4B5DE92A1C04FEF877 /* TodayInsightComposer.swift */,
 				F728CBFA275E061CC33D4193 /* TodayScreen.swift */,
+				1A7313E34ABE1036CAEC076F /* TodayTheme.swift */,
 				16EB598659DDD263739D3136 /* TodayViewModel.swift */,
 			);
 			path = Today;
@@ -192,6 +224,24 @@
 			productReference = D273A8E459B1BBB83027539B /* ToDay.app */;
 			productType = "com.apple.product-type.application";
 		};
+		94E86223F7A3FEAECFA25695 /* ToDayTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8728FF9039559910B467D8C3 /* Build configuration list for PBXNativeTarget "ToDayTests" */;
+			buildPhases = (
+				5E0BB6B11E524E4D75D04154 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				120D701047729D019B9FF7E2 /* PBXTargetDependency */,
+			);
+			name = ToDayTests;
+			packageProductDependencies = (
+			);
+			productName = ToDayTests;
+			productReference = 037508DDAD551D2D5F74DE83 /* ToDayTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -202,6 +252,10 @@
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					1FB5617C31BE25701E8C7ACD = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+					94E86223F7A3FEAECFA25695 = {
 						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
 					};
@@ -222,6 +276,7 @@
 			projectRoot = "";
 			targets = (
 				1FB5617C31BE25701E8C7ACD /* ToDay */,
+				94E86223F7A3FEAECFA25695 /* ToDayTests */,
 			);
 		};
 /* End PBXProject section */
@@ -259,12 +314,31 @@
 				D7DF86B1EC7D5D82B3201C1C /* TimelineDataProviding.swift in Sources */,
 				64CBD5CDDABBA47E698BE49E /* TimelineEntry.swift in Sources */,
 				3EDD590CF25E429FB8186758 /* ToDayApp.swift in Sources */,
+				FBF90F06A0B49EDD24C7F79C /* TodayFlowViews.swift in Sources */,
+				A2F668A004169259C19C90A3 /* TodayInsightComposer.swift in Sources */,
 				C5767BB39D601ADD6EA3AFE5 /* TodayScreen.swift in Sources */,
+				88D47212DD537145F4F5E730 /* TodayTheme.swift in Sources */,
 				9C701A7285E2666EFC829AEF /* TodayViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		5E0BB6B11E524E4D75D04154 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A05D3D71F23108D27807DA94 /* TodayInsightComposerTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		120D701047729D019B9FF7E2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1FB5617C31BE25701E8C7ACD /* ToDay */;
+			targetProxy = 0B8C66CE96BFBD6584B0159B /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		3A23333C80BAD0A186C9634F /* Release */ = {
@@ -284,6 +358,44 @@
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
+		};
+		4E7FF80832C20A2DDAADCA46 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.looanli.today.tests;
+				PRODUCT_NAME = ToDayTests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ToDay.app/ToDay";
+			};
+			name = Release;
+		};
+		75B542BB223BF07D88D0E640 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.looanli.today.tests;
+				PRODUCT_NAME = ToDayTests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ToDay.app/ToDay";
+			};
+			name = Debug;
 		};
 		961A999475419741D0389615 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -463,6 +575,15 @@
 			buildConfigurations = (
 				961A999475419741D0389615 /* Debug */,
 				3A23333C80BAD0A186C9634F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		8728FF9039559910B467D8C3 /* Build configuration list for PBXNativeTarget "ToDayTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				75B542BB223BF07D88D0E640 /* Debug */,
+				4E7FF80832C20A2DDAADCA46 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

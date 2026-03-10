@@ -32,7 +32,13 @@ enum TimelineSource: String {
 }
 
 struct TimelineStat: Identifiable {
-    let id = UUID()
+    let id: String
     let title: String
     let value: String
+
+    init(id: String? = nil, title: String, value: String) {
+        self.id = id ?? title
+        self.title = title
+        self.value = value
+    }
 }

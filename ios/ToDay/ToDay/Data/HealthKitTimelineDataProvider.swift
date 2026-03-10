@@ -6,18 +6,13 @@ struct HealthKitTimelineDataProvider: TimelineDataProviding {
 
     private let healthStore = HKHealthStore()
     private let calendar = Calendar.current
-    private let timeFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "HH:mm"
-        return formatter
-    }()
 
     func loadTimeline(for date: Date) async throws -> DayTimeline {
         guard HKHealthStore.isHealthDataAvailable() else {
             throw TimelineDataError.healthDataUnavailable
         }
 
-        try await requestAuthorization()
+        try await requestAuthorizationIfNeeded()
 
         let startOfDay = calendar.startOfDay(for: date)
 
@@ -56,7 +51,11 @@ struct HealthKitTimelineDataProvider: TimelineDataProviding {
         )
     }
 
-    private func requestAuthorization() async throws {
+    private func requestAuthorizationIfNeeded() async throws {
+        if Self.hasRequestedAuthorization {
+            return
+        }
+
         let readTypes = Set([
             HKObjectType.quantityType(forIdentifier: .stepCount),
             HKObjectType.quantityType(forIdentifier: .activeEnergyBurned),
@@ -72,6 +71,7 @@ struct HealthKitTimelineDataProvider: TimelineDataProviding {
                 }
 
                 if success {
+                    Self.hasRequestedAuthorization = true
                     continuation.resume(returning: ())
                 } else {
                     continuation.resume(throwing: TimelineDataError.authorizationDenied)
@@ -176,13 +176,15 @@ struct HealthKitTimelineDataProvider: TimelineDataProviding {
         workouts: [HKWorkout]
     ) -> [TimelineEntry] {
         var entries: [TimelineEntry] = []
+        let dayStamp = Int(calendar.startOfDay(for: referenceDate).timeIntervalSince1970)
 
         if sleepHours > 0 {
             entries.append(
                 TimelineEntry(
+                    id: "healthkit-sleep-\(dayStamp)",
                     title: "睡眠",
                     detail: String(format: "今天开始前大约记录了 %.1f 小时睡眠。", sleepHours),
-                    timeRange: "昨夜",
+                    moment: .overnight,
                     kind: .sleep
                 )
             )
@@ -191,9 +193,10 @@ struct HealthKitTimelineDataProvider: TimelineDataProviding {
         if steps > 0 || activeEnergy > 0 {
             entries.append(
                 TimelineEntry(
+                    id: "healthkit-activity-\(dayStamp)",
                     title: "活动",
                     detail: "今天目前累计 \(formatWholeNumber(steps)) 步，消耗 \(formatWholeNumber(activeEnergy)) kcal。",
-                    timeRange: "今天",
+                    moment: .daytime,
                     kind: .move
                 )
             )
@@ -202,13 +205,15 @@ struct HealthKitTimelineDataProvider: TimelineDataProviding {
         for workout in workouts {
             let minutes = Int(workout.duration / 60)
             let activity = workout.workoutActivityType.displayName
-            let timeRange = "\(timeFormatter.string(from: workout.startDate)) - \(timeFormatter.string(from: workout.endDate))"
+            let startMinute = minuteOfDay(for: workout.startDate)
+            let endMinute = minuteOfDay(for: workout.endDate)
 
             entries.append(
                 TimelineEntry(
+                    id: "healthkit-workout-\(Int(workout.startDate.timeIntervalSince1970))-\(Int(workout.endDate.timeIntervalSince1970))-\(activity)",
                     title: activity,
                     detail: "HealthKit 记录了 \(minutes) 分钟训练。",
-                    timeRange: timeRange,
+                    moment: .range(startMinuteOfDay: startMinute, endMinuteOfDay: endMinute),
                     kind: .move
                 )
             )
@@ -217,9 +222,10 @@ struct HealthKitTimelineDataProvider: TimelineDataProviding {
         if entries.isEmpty && calendar.isDate(referenceDate, inSameDayAs: Date()) {
             entries.append(
                 TimelineEntry(
+                    id: "healthkit-empty-\(dayStamp)",
                     title: "等待数据",
                     detail: "HealthKit 已连接，但今天还没有可见样本。",
-                    timeRange: "今天",
+                    moment: .daytime,
                     kind: .pause
                 )
             )
@@ -232,12 +238,19 @@ struct HealthKitTimelineDataProvider: TimelineDataProviding {
         value.formatted(.number.precision(.fractionLength(0)))
     }
 
+    private func minuteOfDay(for date: Date) -> Int {
+        let hour = calendar.component(.hour, from: date)
+        let minute = calendar.component(.minute, from: date)
+        return (hour * 60) + minute
+    }
+
     private static let sleepValues: Set<Int> = [
         HKCategoryValueSleepAnalysis.asleepUnspecified.rawValue,
         HKCategoryValueSleepAnalysis.asleepCore.rawValue,
         HKCategoryValueSleepAnalysis.asleepDeep.rawValue,
         HKCategoryValueSleepAnalysis.asleepREM.rawValue
     ]
+    private static var hasRequestedAuthorization = false
 }
 
 private extension HKWorkoutActivityType {

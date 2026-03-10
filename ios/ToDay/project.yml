@@ -31,11 +31,28 @@ targets:
         CODE_SIGN_ENTITLEMENTS: ToDay/ToDay.entitlements
         DEVELOPMENT_ASSET_PATHS: "\"ToDay/Preview Content\""
         ENABLE_PREVIEWS: YES
+  ToDayTests:
+    type: bundle.unit-test
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: ToDayTests
+    settings:
+      base:
+        PRODUCT_NAME: ToDayTests
+        PRODUCT_BUNDLE_IDENTIFIER: com.looanli.today.tests
+        GENERATE_INFOPLIST_FILE: YES
+    dependencies:
+      - target: ToDay
 schemes:
   ToDay:
     build:
       targets:
         ToDay: all
+    test:
+      config: Debug
+      targets:
+        - ToDayTests
     run:
       config: Debug
     archive:
