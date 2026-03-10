@@ -17,7 +17,7 @@ struct HistoryScreen: View {
                 }
                 .padding(.vertical, 20)
             }
-            .background(Color(uiColor: .systemGroupedBackground))
+            .background(TodayTheme.background)
             .navigationTitle("回看")
         }
     }
@@ -26,29 +26,25 @@ struct HistoryScreen: View {
     private var weeklyInsightSection: some View {
         if let insight = viewModel.weeklyInsight {
             if monetizationViewModel.isProUnlocked {
-                VStack(alignment: .leading, spacing: 12) {
+                ContentCard(background: TodayTheme.tealSoft.opacity(0.72)) {
+                    EyebrowLabel("WEEKLY RHYTHM")
+
                     Text("最近 7 天连续洞察")
-                        .font(.title3.weight(.semibold))
+                        .font(.system(size: 23, weight: .regular, design: .serif))
+                        .italic()
+                        .foregroundStyle(TodayTheme.ink)
 
                     Text(insight.headline)
                         .font(.headline)
+                        .foregroundStyle(TodayTheme.inkSoft)
 
                     Text(insight.narrative)
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(TodayTheme.inkMuted)
+                        .lineSpacing(4)
 
                     HistoryBadgeRow(items: insight.badges)
                 }
-                .padding(20)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .background(
-                    LinearGradient(
-                        colors: [Color(red: 0.92, green: 0.96, blue: 0.92), Color(red: 0.84, green: 0.92, blue: 0.88)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
                 .padding(.horizontal, 20)
             } else {
                 LockedInsightCard(
@@ -64,23 +60,26 @@ struct HistoryScreen: View {
     @ViewBuilder
     private var historySection: some View {
         if viewModel.historyDigests.isEmpty {
-            VStack(alignment: .leading, spacing: 10) {
+            ContentCard {
+                EyebrowLabel("EMPTY")
+
                 Text("还没有可回看的历史")
-                    .font(.title3.weight(.semibold))
+                    .font(.system(size: 23, weight: .regular, design: .serif))
+                    .italic()
+                    .foregroundStyle(TodayTheme.ink)
 
                 Text("先在“今天”页留下几条记录，回看页才会开始长出真正的连续感。")
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(TodayTheme.inkMuted)
+                    .lineSpacing(4)
             }
-            .padding(20)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color(uiColor: .secondarySystemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
             .padding(.horizontal, 20)
         } else {
             VStack(alignment: .leading, spacing: 12) {
                 Text("历史记录")
-                    .font(.title3.weight(.semibold))
+                    .font(.system(size: 23, weight: .regular, design: .serif))
+                    .italic()
+                    .foregroundStyle(TodayTheme.ink)
                     .padding(.horizontal, 20)
 
                 VStack(spacing: 12) {
@@ -144,31 +143,35 @@ private struct HistoryDayCard: View {
 
                 Text(digest.date.formatted(.dateTime.month(.abbreviated).day().weekday(.abbreviated).locale(locale)))
                     .font(.caption.weight(.medium))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(TodayTheme.inkMuted)
             }
 
             Text(digest.detail)
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(TodayTheme.inkMuted)
 
             if let notePreview = digest.notePreview {
                 Text("“\(notePreview)”")
                     .font(.subheadline)
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(TodayTheme.inkSoft)
                     .padding(12)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Color.white.opacity(0.78))
+                    .background(TodayTheme.elevatedCard.opacity(0.72))
                     .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
             }
         }
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(uiColor: .secondarySystemBackground))
+        .background(TodayTheme.card)
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .stroke(TodayTheme.border, lineWidth: 1)
+        )
         .overlay(alignment: .topTrailing) {
             Image(systemName: "chevron.right")
                 .font(.caption.weight(.semibold))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(TodayTheme.inkMuted)
                 .padding(18)
         }
     }
@@ -176,19 +179,19 @@ private struct HistoryDayCard: View {
     private var color: Color {
         switch digest.mood {
         case .happy:
-            return Color(red: 0.96, green: 0.77, blue: 0.39)
+            return TodayTheme.accent
         case .calm:
-            return Color(red: 0.35, green: 0.63, blue: 0.54)
+            return TodayTheme.teal
         case .tired:
-            return Color(red: 0.43, green: 0.54, blue: 0.80)
+            return TodayTheme.blue
         case .irritated:
-            return Color(red: 0.84, green: 0.49, blue: 0.43)
+            return TodayTheme.rose
         case .focused:
-            return Color(red: 0.28, green: 0.54, blue: 0.47)
+            return TodayTheme.teal
         case .zoning:
-            return Color(red: 0.74, green: 0.66, blue: 0.57)
+            return TodayTheme.inkFaint
         case .none:
-            return Color(red: 0.74, green: 0.66, blue: 0.57)
+            return TodayTheme.inkFaint
         }
     }
 }
@@ -200,31 +203,39 @@ private struct LockedInsightCard: View {
     let action: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        ContentCard {
+            EyebrowLabel("PRO")
+
             HStack {
                 Text(title)
-                    .font(.title3.weight(.semibold))
+                    .font(.system(size: 23, weight: .regular, design: .serif))
+                    .italic()
+                    .foregroundStyle(TodayTheme.ink)
                 Spacer()
                 Text("Pro")
                     .font(.caption.weight(.bold))
                     .padding(.horizontal, 10)
                     .padding(.vertical, 6)
-                    .background(Color(red: 0.94, green: 0.88, blue: 0.78))
+                    .foregroundStyle(TodayTheme.accent)
+                    .background(TodayTheme.accentSoft)
                     .clipShape(Capsule())
             }
 
             Text(detail)
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(TodayTheme.inkMuted)
 
-            Button(buttonTitle, action: action)
-                .buttonStyle(.borderedProminent)
-                .tint(Color(red: 0.35, green: 0.63, blue: 0.54))
+            Button(action: action) {
+                Text(buttonTitle)
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 14)
+                    .background(TodayTheme.teal)
+                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+            }
+            .buttonStyle(.plain)
         }
-        .padding(20)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(uiColor: .secondarySystemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
         .padding(.horizontal, 20)
     }
 }
@@ -251,9 +262,10 @@ struct HistoryBadgeRow: View {
     private func badge(_ text: String) -> some View {
         Text(text)
             .font(.caption.weight(.medium))
+            .foregroundStyle(TodayTheme.inkSoft)
             .padding(.horizontal, 10)
             .padding(.vertical, 8)
-            .background(Color.white.opacity(0.8))
+            .background(TodayTheme.elevatedCard.opacity(0.8))
             .clipShape(Capsule())
     }
 }

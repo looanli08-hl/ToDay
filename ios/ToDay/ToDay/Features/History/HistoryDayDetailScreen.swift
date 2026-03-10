@@ -13,39 +13,36 @@ struct HistoryDayDetailScreen: View {
             }
             .padding(.vertical, 20)
         }
-        .background(Color(uiColor: .systemGroupedBackground))
+        .background(TodayTheme.background)
         .navigationTitle(detail.date.formatted(.dateTime.month(.abbreviated).day().locale(chineseLocale)))
         .navigationBarTitleDisplayMode(.inline)
     }
 
     private var summaryCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        ContentCard(background: TodayTheme.accentSoft.opacity(0.72)) {
+            EyebrowLabel("DAY DETAIL")
+
             Text(detail.title)
-                .font(.title3.weight(.semibold))
+                .font(.system(size: 23, weight: .regular, design: .serif))
+                .italic()
+                .foregroundStyle(TodayTheme.ink)
 
             Text(detail.narrative)
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(TodayTheme.inkMuted)
+                .lineSpacing(4)
 
             HistoryBadgeRow(items: detail.badges)
         }
-        .padding(20)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(
-            LinearGradient(
-                colors: [Color(red: 0.95, green: 0.93, blue: 0.86), Color(red: 0.89, green: 0.94, blue: 0.90)],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-        )
-        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
         .padding(.horizontal, 20)
     }
 
     private var recordSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("当天片段")
-                .font(.title3.weight(.semibold))
+                .font(.system(size: 23, weight: .regular, design: .serif))
+                .italic()
+                .foregroundStyle(TodayTheme.ink)
                 .padding(.horizontal, 20)
 
             VStack(spacing: 12) {
@@ -70,7 +67,7 @@ private struct HistoryMomentCard: View {
 
                     Text(record.createdAt.formatted(.dateTime.hour(.twoDigits(amPM: .omitted)).minute()))
                         .font(.caption.weight(.medium))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(TodayTheme.inkMuted)
                 }
 
                 Spacer()
@@ -79,20 +76,24 @@ private struct HistoryMomentCard: View {
             if record.note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 Text("这条记录还没有备注，后续可以继续补充当天发生了什么。")
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(TodayTheme.inkMuted)
             } else {
                 Text(record.note)
                     .font(.subheadline)
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(TodayTheme.inkSoft)
                     .padding(12)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Color.white.opacity(0.8))
+                    .background(TodayTheme.elevatedCard.opacity(0.72))
                     .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
             }
         }
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(uiColor: .secondarySystemBackground))
+        .background(TodayTheme.card)
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .stroke(TodayTheme.border, lineWidth: 1)
+        )
     }
 }

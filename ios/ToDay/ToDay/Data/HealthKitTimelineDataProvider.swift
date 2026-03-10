@@ -1,11 +1,12 @@
 import Foundation
 import HealthKit
 
-struct HealthKitTimelineDataProvider: TimelineDataProviding {
+final class HealthKitTimelineDataProvider: TimelineDataProviding {
     let source: TimelineSource = .healthKit
 
     private let healthStore = HKHealthStore()
     private let calendar = Calendar.current
+    private let authorizationGate = HealthAuthorizationGate()
 
     func loadTimeline(for date: Date) async throws -> DayTimeline {
         guard HKHealthStore.isHealthDataAvailable() else {
@@ -52,10 +53,6 @@ struct HealthKitTimelineDataProvider: TimelineDataProviding {
     }
 
     private func requestAuthorizationIfNeeded() async throws {
-        if Self.hasRequestedAuthorization {
-            return
-        }
-
         let readTypes = Set([
             HKObjectType.quantityType(forIdentifier: .stepCount),
             HKObjectType.quantityType(forIdentifier: .activeEnergyBurned),
@@ -63,18 +60,19 @@ struct HealthKitTimelineDataProvider: TimelineDataProviding {
             HKObjectType.workoutType()
         ].compactMap { $0 })
 
-        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            healthStore.requestAuthorization(toShare: [], read: readTypes) { success, error in
-                if let error {
-                    continuation.resume(throwing: error)
-                    return
-                }
+        try await authorizationGate.authorizeIfNeeded { [healthStore] in
+            try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+                healthStore.requestAuthorization(toShare: [], read: readTypes) { success, error in
+                    if let error {
+                        continuation.resume(throwing: error)
+                        return
+                    }
 
-                if success {
-                    Self.hasRequestedAuthorization = true
-                    continuation.resume(returning: ())
-                } else {
-                    continuation.resume(throwing: TimelineDataError.authorizationDenied)
+                    if success {
+                        continuation.resume(returning: ())
+                    } else {
+                        continuation.resume(throwing: TimelineDataError.authorizationDenied)
+                    }
                 }
             }
         }
@@ -250,7 +248,38 @@ struct HealthKitTimelineDataProvider: TimelineDataProviding {
         HKCategoryValueSleepAnalysis.asleepDeep.rawValue,
         HKCategoryValueSleepAnalysis.asleepREM.rawValue
     ]
-    private static var hasRequestedAuthorization = false
+}
+
+private actor HealthAuthorizationGate {
+    private enum State {
+        case idle
+        case inFlight(Task<Void, Error>)
+        case authorized
+    }
+
+    private var state: State = .idle
+
+    func authorizeIfNeeded(_ operation: @escaping @Sendable () async throws -> Void) async throws {
+        switch state {
+        case .authorized:
+            return
+        case let .inFlight(task):
+            try await task.value
+        case .idle:
+            let task = Task {
+                try await operation()
+            }
+            state = .inFlight(task)
+
+            do {
+                try await task.value
+                state = .authorized
+            } catch {
+                state = .idle
+                throw error
+            }
+        }
+    }
 }
 
 private extension HKWorkoutActivityType {

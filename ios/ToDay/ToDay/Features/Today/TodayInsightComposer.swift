@@ -317,11 +317,16 @@ struct TodayInsightComposer {
     }
 
     private func formatClockTime(_ date: Date) -> String {
-        let formatter = DateFormatter()
+        let formatter = Self.clockFormatter
         formatter.calendar = calendar
         formatter.timeZone = calendar.timeZone
-        formatter.locale = Locale(identifier: "zh_CN")
-        formatter.dateFormat = "HH:mm"
         return formatter.string(from: date)
     }
+
+    private static let clockFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "zh_CN")
+        formatter.dateFormat = "HH:mm"
+        return formatter
+    }()
 }

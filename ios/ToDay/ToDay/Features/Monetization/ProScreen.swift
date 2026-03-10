@@ -16,7 +16,7 @@ struct ProScreen: View {
                 }
                 .padding(.vertical, 20)
             }
-            .background(Color(uiColor: .systemGroupedBackground))
+            .background(TodayTheme.background)
             .navigationTitle("会员")
         }
         .task {
@@ -25,10 +25,14 @@ struct ProScreen: View {
     }
 
     private var heroCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        ContentCard(background: TodayTheme.accentSoft.opacity(0.72)) {
+            EyebrowLabel("MEMBERSHIP")
+
             HStack {
                 Text(heroTitle)
-                    .font(.title2.weight(.bold))
+                    .font(.system(size: 24, weight: .regular, design: .serif))
+                    .italic()
+                    .foregroundStyle(TodayTheme.ink)
 
                 Spacer()
 
@@ -36,32 +40,28 @@ struct ProScreen: View {
                     .font(.caption.weight(.bold))
                     .padding(.horizontal, 10)
                     .padding(.vertical, 6)
-                    .background(Color.white.opacity(0.75))
+                    .foregroundStyle(TodayTheme.accent)
+                    .background(TodayTheme.card.opacity(0.82))
                     .clipShape(Capsule())
             }
 
             Text(heroDetail)
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(TodayTheme.inkMuted)
+                .lineSpacing(4)
         }
-        .padding(20)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(
-            LinearGradient(
-                colors: [Color(red: 0.95, green: 0.90, blue: 0.82), Color(red: 0.87, green: 0.93, blue: 0.89)],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-        )
-        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
         .padding(.horizontal, 20)
     }
 
     private var storeStatusSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        ContentCard {
+            EyebrowLabel("STORE STATUS")
+
             HStack {
                 Text("当前状态")
-                    .font(.title3.weight(.semibold))
+                    .font(.system(size: 23, weight: .regular, design: .serif))
+                    .italic()
+                    .foregroundStyle(TodayTheme.ink)
 
                 Spacer()
 
@@ -72,7 +72,7 @@ struct ProScreen: View {
 
             Text(storeSummaryText)
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(TodayTheme.inkMuted)
 
             if let storeMessage = monetizationViewModel.storeMessage {
                 statusPill(text: storeMessage)
@@ -82,17 +82,15 @@ struct ProScreen: View {
                 statusPill(text: purchaseMessage)
             }
         }
-        .padding(20)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(uiColor: .secondarySystemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
         .padding(.horizontal, 20)
     }
 
     private var planSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("订阅方案")
-                .font(.title3.weight(.semibold))
+                .font(.system(size: 23, weight: .regular, design: .serif))
+                .italic()
+                .foregroundStyle(TodayTheme.ink)
                 .padding(.horizontal, 20)
 
             VStack(spacing: 12) {
@@ -111,17 +109,19 @@ struct ProScreen: View {
                                             .font(.caption.weight(.bold))
                                             .padding(.horizontal, 8)
                                             .padding(.vertical, 4)
-                                            .background(Color(red: 0.95, green: 0.90, blue: 0.82))
+                                            .foregroundStyle(TodayTheme.accent)
+                                            .background(TodayTheme.accentSoft)
                                             .clipShape(Capsule())
                                     }
                                 }
 
                                 Text(monetizationViewModel.priceLabel(for: plan))
                                     .font(.title3.weight(.bold))
+                                    .foregroundStyle(TodayTheme.ink)
 
                                 Text(plan.helperText)
                                     .font(.subheadline)
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(TodayTheme.inkMuted)
                             }
 
                             Spacer()
@@ -130,20 +130,20 @@ struct ProScreen: View {
                                 .font(.title3)
                                 .foregroundStyle(
                                     monetizationViewModel.selectedPlan == plan
-                                        ? Color(red: 0.35, green: 0.63, blue: 0.54)
-                                        : .secondary
+                                        ? TodayTheme.teal
+                                        : TodayTheme.inkMuted
                                 )
                         }
                         .padding(16)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(Color(uiColor: .secondarySystemBackground))
+                        .background(TodayTheme.card)
                         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
                         .overlay(
                             RoundedRectangle(cornerRadius: 20, style: .continuous)
                                 .stroke(
                                     monetizationViewModel.selectedPlan == plan
-                                        ? Color(red: 0.35, green: 0.63, blue: 0.54)
-                                        : Color.clear,
+                                        ? TodayTheme.teal
+                                        : TodayTheme.border,
                                     lineWidth: 2
                                 )
                         )
@@ -159,11 +159,14 @@ struct ProScreen: View {
                 }
             } label: {
                 Text(monetizationViewModel.purchaseButtonTitle)
-                    .font(.headline)
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
+                    .padding(.vertical, 15)
+                    .background(TodayTheme.teal)
+                    .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
             }
-            .buttonStyle(.borderedProminent)
-            .tint(Color(red: 0.35, green: 0.63, blue: 0.54))
+            .buttonStyle(.plain)
             .disabled(monetizationViewModel.selectedPlanProduct == nil || monetizationViewModel.isPurchasing)
             .padding(.horizontal, 20)
 
@@ -174,9 +177,17 @@ struct ProScreen: View {
             } label: {
                 Text(monetizationViewModel.isRestoring ? "正在恢复购买..." : "恢复购买")
                     .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(TodayTheme.inkSoft)
                     .frame(maxWidth: .infinity)
+                    .padding(.vertical, 14)
+                    .background(TodayTheme.card)
+                    .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 18, style: .continuous)
+                            .stroke(TodayTheme.border, lineWidth: 1)
+                    )
             }
-            .buttonStyle(.bordered)
+            .buttonStyle(.plain)
             .disabled(monetizationViewModel.isRestoring)
             .padding(.horizontal, 20)
 
@@ -186,9 +197,17 @@ struct ProScreen: View {
                 } label: {
                     Text(monetizationViewModel.isPreviewUnlocked ? "保持当前预览版已解锁" : "解锁 Pro 预览版")
                         .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(TodayTheme.inkSoft)
                         .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                        .background(TodayTheme.card)
+                        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                                .stroke(TodayTheme.border, lineWidth: 1)
+                        )
                 }
-                .buttonStyle(.bordered)
+                .buttonStyle(.plain)
                 .padding(.horizontal, 20)
 
                 if monetizationViewModel.isPreviewUnlocked {
@@ -196,6 +215,7 @@ struct ProScreen: View {
                         monetizationViewModel.resetPreviewPro()
                     }
                     .font(.subheadline.weight(.medium))
+                    .foregroundStyle(TodayTheme.inkMuted)
                     .padding(.horizontal, 20)
                 }
             }
@@ -205,7 +225,9 @@ struct ProScreen: View {
     private var featureSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Pro 能力")
-                .font(.title3.weight(.semibold))
+                .font(.system(size: 23, weight: .regular, design: .serif))
+                .italic()
+                .foregroundStyle(TodayTheme.ink)
                 .padding(.horizontal, 20)
 
             VStack(spacing: 12) {
@@ -229,7 +251,9 @@ struct ProScreen: View {
     private var supportSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("上线前配置")
-                .font(.title3.weight(.semibold))
+                .font(.system(size: 23, weight: .regular, design: .serif))
+                .italic()
+                .foregroundStyle(TodayTheme.ink)
                 .padding(.horizontal, 20)
 
             VStack(spacing: 12) {
@@ -262,29 +286,30 @@ struct ProScreen: View {
     }
 
     private var footerSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        ContentCard {
+            EyebrowLabel("NOTES")
+
             Text("说明")
-                .font(.headline)
+                .font(.system(size: 23, weight: .regular, design: .serif))
+                .italic()
+                .foregroundStyle(TodayTheme.ink)
 
             Text("当前版本已经接入真实的 StoreKit 2 购买与恢复骨架，但正式订阅还需要你在 App Store Connect 创建对应商品。商品 ID 已预留为 com.looanli.today.pro.monthly 和 com.looanli.today.pro.yearly。")
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(TodayTheme.inkMuted)
+                .lineSpacing(4)
         }
-        .padding(20)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(uiColor: .secondarySystemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
         .padding(.horizontal, 20)
     }
 
     private func statusPill(text: String) -> some View {
         Text(text)
             .font(.footnote)
-            .foregroundStyle(.secondary)
+            .foregroundStyle(TodayTheme.inkMuted)
             .padding(.horizontal, 12)
             .padding(.vertical, 10)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color.white.opacity(0.78))
+            .background(TodayTheme.elevatedCard.opacity(0.82))
             .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
     }
 
@@ -349,15 +374,20 @@ private struct ProFeatureCard: View {
         VStack(alignment: .leading, spacing: 6) {
             Text(title)
                 .font(.headline)
+                .foregroundStyle(TodayTheme.ink)
 
             Text(detail)
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(TodayTheme.inkMuted)
         }
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(uiColor: .secondarySystemBackground))
+        .background(TodayTheme.card)
         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(TodayTheme.border, lineWidth: 1)
+        )
     }
 }
 
@@ -370,17 +400,23 @@ private struct LaunchReadinessCard: View {
         VStack(alignment: .leading, spacing: 8) {
             Text(title)
                 .font(.headline)
+                .foregroundStyle(TodayTheme.ink)
 
             Text(value)
                 .font(.subheadline.weight(.medium))
+                .foregroundStyle(TodayTheme.inkSoft)
 
             Text(detail)
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(TodayTheme.inkMuted)
         }
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(uiColor: .secondarySystemBackground))
+        .background(TodayTheme.card)
         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(TodayTheme.border, lineWidth: 1)
+        )
     }
 }
