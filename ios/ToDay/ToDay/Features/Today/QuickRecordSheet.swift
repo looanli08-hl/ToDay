@@ -11,8 +11,12 @@ struct QuickRecordSheet: View {
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 24) {
-                Text("此刻感受")
+                Text("开始一段状态")
                     .font(.title2.weight(.bold))
+
+                Text("保存后会先在时间线上显示“正在做”，下一次点底部按钮会结束这段状态。")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
 
                 moodGrid
 
@@ -29,7 +33,7 @@ struct QuickRecordSheet: View {
                 }
 
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("记录时间")
+                    Text("开始时间")
                         .font(.subheadline.weight(.medium))
                         .foregroundStyle(.secondary)
 
@@ -56,9 +60,9 @@ struct QuickRecordSheet: View {
                     Button("取消") { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("保存") {
+                    Button("开始") {
                         guard let mood = selectedMood else { return }
-                        let record = MoodRecord(mood: mood, note: note, createdAt: createdAt)
+                        let record = MoodRecord.active(mood: mood, note: note, createdAt: createdAt)
                         onSave(record)
                         dismiss()
                     }

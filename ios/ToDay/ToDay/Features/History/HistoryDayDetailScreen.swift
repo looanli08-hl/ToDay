@@ -65,7 +65,7 @@ private struct HistoryMomentCard: View {
                     Text("\(record.mood.emoji) \(record.mood.rawValue)")
                         .font(.headline)
 
-                    Text(record.createdAt.formatted(.dateTime.hour(.twoDigits(amPM: .omitted)).minute()))
+                    Text(record.displayTimeLabel())
                         .font(.caption.weight(.medium))
                         .foregroundStyle(TodayTheme.inkMuted)
                 }

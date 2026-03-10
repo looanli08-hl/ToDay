@@ -21,6 +21,14 @@ struct TimelineMoment: Hashable {
         )
     }
 
+    static func active(startMinuteOfDay: Int, currentMinuteOfDay: Int) -> TimelineMoment {
+        TimelineMoment(
+            label: "\(Self.format(minute: startMinuteOfDay)) - 现在",
+            startMinuteOfDay: startMinuteOfDay,
+            endMinuteOfDay: currentMinuteOfDay
+        )
+    }
+
     static let overnight = TimelineMoment(
         label: "昨夜",
         startMinuteOfDay: 0,
@@ -55,6 +63,26 @@ struct TimelineEntry: Identifiable, Hashable {
     let detail: String
     let moment: TimelineMoment
     let kind: Kind
+    let durationMinutes: Int?
+    let isLive: Bool
+
+    init(
+        id: String,
+        title: String,
+        detail: String,
+        moment: TimelineMoment,
+        kind: Kind,
+        durationMinutes: Int? = nil,
+        isLive: Bool = false
+    ) {
+        self.id = id
+        self.title = title
+        self.detail = detail
+        self.moment = moment
+        self.kind = kind
+        self.durationMinutes = durationMinutes
+        self.isLive = isLive
+    }
 }
 
 extension TimelineEntry {
@@ -64,28 +92,32 @@ extension TimelineEntry {
             title: "睡眠",
             detail: "昨晚大约睡了 7 小时 18 分，醒来后的状态比较平稳。",
             moment: .range(startMinuteOfDay: 12, endMinuteOfDay: 450),
-            kind: .sleep
+            kind: .sleep,
+            durationMinutes: 438
         ),
         TimelineEntry(
             id: "preview-move",
             title: "移动",
             detail: "早上通勤走了不少路，整段出门节奏比较流动。",
             moment: .range(startMinuteOfDay: 490, endMinuteOfDay: 545),
-            kind: .move
+            kind: .move,
+            durationMinutes: 55
         ),
         TimelineEntry(
             id: "preview-focus",
             title: "专注",
             detail: "上午有一段较完整的专注时间，干扰明显变少。",
             moment: .range(startMinuteOfDay: 600, endMinuteOfDay: 700),
-            kind: .focus
+            kind: .focus,
+            durationMinutes: 100
         ),
         TimelineEntry(
             id: "preview-pause",
             title: "停顿",
             detail: "下午整体动作不多，还没有补手动记录。",
             moment: .range(startMinuteOfDay: 1000, endMinuteOfDay: 1090),
-            kind: .pause
+            kind: .pause,
+            durationMinutes: 90
         )
     ]
 }

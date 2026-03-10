@@ -47,6 +47,7 @@ struct TodayInsightComposer {
         let noteCount = recordsForDay.filter(hasNote).count
         let latestNote = recordsForDay.first(where: hasNote)
         let timelineEntryCount = timeline?.entries.count ?? 0
+        let liveCount = recordsForDay.filter(\.isOngoing).count
 
         if recordsForDay.isEmpty {
             let badges = [
@@ -69,6 +70,9 @@ struct TodayInsightComposer {
         if let dominantMood {
             badges.append("主情绪 \(dominantMood.rawValue)")
         }
+        if liveCount > 0 {
+            badges.append("\(liveCount) 条进行中")
+        }
         if timelineEntryCount > 0 {
             badges.append("\(timelineEntryCount) 个片段")
         }
@@ -79,6 +83,10 @@ struct TodayInsightComposer {
 
         if let latestNote {
             narrativeParts.append("你最近记下了“\(latestNote.note)”。")
+        }
+
+        if liveCount > 0 {
+            narrativeParts.append("当前还有一段状态正在继续，它会在你下一次点击底部按钮后落成完整片段。")
         }
 
         if recordsForDay.count >= 3 {
@@ -172,6 +180,7 @@ struct TodayInsightComposer {
                 let detailParts = [
                     "\(sortedRecords.count) 条记录",
                     notesCount > 0 ? "\(notesCount) 条备注" : nil,
+                    sortedRecords.contains(where: \.isOngoing) ? "1 条进行中" : nil,
                     dominantMood.map { "主情绪 \($0.rawValue)" }
                 ].compactMap { $0 }
                 let notePreview = sortedRecords.first(where: hasNote)?.note
@@ -197,7 +206,9 @@ struct TodayInsightComposer {
         let dominantMood = dominantMood(in: recordsForDay)
         let noteCount = recordsForDay.filter(hasNote).count
         let firstRecord = recordsForDay.last
-        let lastRecord = recordsForDay.first
+        let rangeEnd = recordsForDay
+            .map { $0.displayEndDate(referenceDate: Date(), calendar: calendar) }
+            .max()
 
         var badges = [
             "\(recordsForDay.count) 条记录",
@@ -205,9 +216,9 @@ struct TodayInsightComposer {
             dominantMood.map { "主情绪 \($0.rawValue)" }
         ].compactMap { $0 }
 
-        if let firstRecord, let lastRecord, firstRecord.createdAt != lastRecord.createdAt {
+        if let firstRecord, let rangeEnd, firstRecord.createdAt != rangeEnd {
             let start = formatClockTime(firstRecord.createdAt)
-            let end = formatClockTime(lastRecord.createdAt)
+            let end = formatClockTime(rangeEnd)
             badges.append("\(start) - \(end)")
         }
 
@@ -284,6 +295,10 @@ struct TodayInsightComposer {
 
         if noteCount > 0 {
             parts.append("其中 \(noteCount) 条带有备注，说明这一天已经开始从“打点”走向“留痕”。")
+        }
+
+        if records.contains(where: \.isOngoing) {
+            parts.append("当前还有一条状态仍在进行中。")
         }
 
         if let firstNote {

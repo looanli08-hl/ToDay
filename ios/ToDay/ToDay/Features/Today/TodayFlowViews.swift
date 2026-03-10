@@ -188,8 +188,22 @@ struct TimelineStreamRow: View {
                         .foregroundStyle(TodayTheme.inkSoft)
                         .frame(maxWidth: .infinity, alignment: .leading)
 
-                    IntensityBar(progress: entry.kind.flowIntensity, color: entry.kind.flowColor)
-                        .frame(width: 48)
+                    if entry.isLive {
+                        Text("进行中")
+                            .font(.system(size: 10, weight: .bold, design: .monospaced))
+                            .foregroundStyle(TodayTheme.teal)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 5)
+                            .background(TodayTheme.tealSoft)
+                            .clipShape(Capsule())
+                    }
+
+                    IntensityBar(
+                        durationMinutes: entry.durationMinutes,
+                        fallbackProgress: entry.kind.flowIntensity,
+                        color: entry.kind.flowColor
+                    )
+                    .frame(width: 56)
 
                     Image(systemName: "chevron.down")
                         .font(.system(size: 11, weight: .semibold))
@@ -216,7 +230,8 @@ struct TimelineStreamRow: View {
 }
 
 struct IntensityBar: View {
-    let progress: CGFloat
+    let durationMinutes: Int?
+    let fallbackProgress: CGFloat
     let color: Color
 
     var body: some View {
@@ -227,8 +242,15 @@ struct IntensityBar: View {
 
             Capsule()
                 .fill(color)
-                .frame(width: max(10, 48 * progress), height: 3)
+                .frame(width: max(10, 56 * visualProgress), height: 3)
         }
+    }
+
+    private var visualProgress: CGFloat {
+        guard let durationMinutes else { return max(0.18, fallbackProgress) }
+        let cappedMinutes = min(max(CGFloat(durationMinutes), 5), 240)
+        let normalized = sqrt(cappedMinutes / 240)
+        return max(0.18, normalized)
     }
 }
 

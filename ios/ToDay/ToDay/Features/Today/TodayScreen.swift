@@ -46,7 +46,7 @@ struct TodayScreen: View {
             }
             .sheet(isPresented: $viewModel.showQuickRecord) {
                 QuickRecordSheet { record in
-                    viewModel.addMoodRecord(record)
+                    viewModel.startMoodRecord(record)
                 }
             }
             .task {
@@ -289,17 +289,31 @@ struct TodayScreen: View {
 
     private var quickRecordButton: some View {
         Button {
-            viewModel.showQuickRecord = true
+            viewModel.handleQuickRecordTap()
         } label: {
-            Label("记录此刻", systemImage: "plus.circle.fill")
-                .font(.system(size: 16, weight: .semibold))
-                .foregroundStyle(.white)
-                .padding(.vertical, 15)
-                .frame(maxWidth: .infinity)
-                .background(TodayTheme.accent)
-                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-                .shadow(color: TodayTheme.accent.opacity(0.22), radius: 18, x: 0, y: 10)
+            VStack(spacing: 4) {
+                Label(viewModel.quickRecordButtonTitle, systemImage: viewModel.quickRecordButtonSystemImage)
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(.white)
+
+                if let caption = viewModel.quickRecordButtonCaption {
+                    Text(caption)
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(.white.opacity(0.84))
+                }
+            }
+            .padding(.vertical, 15)
+            .frame(maxWidth: .infinity)
+            .background(viewModel.activeRecord == nil ? TodayTheme.accent : TodayTheme.teal)
+            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .shadow(
+                color: (viewModel.activeRecord == nil ? TodayTheme.accent : TodayTheme.teal).opacity(0.22),
+                radius: 18,
+                x: 0,
+                y: 10
+            )
         }
+        .buttonStyle(.plain)
     }
 
     private var loadingCard: some View {

@@ -183,7 +183,8 @@ final class HealthKitTimelineDataProvider: TimelineDataProviding {
                     title: "睡眠",
                     detail: String(format: "今天开始前大约记录了 %.1f 小时睡眠。", sleepHours),
                     moment: .overnight,
-                    kind: .sleep
+                    kind: .sleep,
+                    durationMinutes: Int(sleepHours * 60)
                 )
             )
         }
@@ -212,7 +213,8 @@ final class HealthKitTimelineDataProvider: TimelineDataProviding {
                     title: activity,
                     detail: "HealthKit 记录了 \(minutes) 分钟训练。",
                     moment: .range(startMinuteOfDay: startMinute, endMinuteOfDay: endMinute),
-                    kind: .move
+                    kind: .move,
+                    durationMinutes: minutes
                 )
             )
         }
