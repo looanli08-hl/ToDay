@@ -17,6 +17,7 @@ final class TodayViewModel: ObservableObject {
     private let insightComposer: TodayInsightComposer
     private let calendar: Calendar
     private var hasLoadedOnce = false
+    private var currentBaseTimeline: DayTimeline?
     private var timelineCache: [Date: DayTimeline] = [:]
     private(set) var manualRecords: [MoodRecord] = []
 
@@ -30,8 +31,7 @@ final class TodayViewModel: ObservableObject {
         self.recordStore = recordStore
         self.insightComposer = insightComposer
         self.calendar = calendar
-        self.manualRecords = recordStore.loadRecords()
-        self.activeRecord = manualRecords.first(where: \.isOngoing)
+        reloadManualRecords()
         refreshDerivedState(referenceDate: Date())
     }
 
@@ -46,16 +46,14 @@ final class TodayViewModel: ObservableObject {
 
         isLoading = true
         errorMessage = nil
-        manualRecords = recordStore.loadRecords()
-        activeRecord = manualRecords.first(where: \.isOngoing)
-        refreshDerivedState(referenceDate: Date())
+        reloadManualRecords()
+        rebuildTimeline(referenceDate: currentBaseTimeline?.date ?? Date())
 
         do {
             let base = try await provider.loadTimeline(for: Date())
+            currentBaseTimeline = base
             timelineCache[calendar.startOfDay(for: base.date)] = base
-            let merged = mergedTimeline(base: base)
-            timeline = merged
-            refreshDerivedState(referenceDate: merged.date)
+            rebuildTimeline(referenceDate: base.date)
             hasLoadedOnce = true
         } catch {
             errorMessage = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
@@ -79,14 +77,7 @@ final class TodayViewModel: ObservableObject {
         manualRecords.sort { $0.createdAt > $1.createdAt }
         activeRecord = record.isOngoing ? record : nil
         persistRecords()
-
-        if let base = timeline {
-            let merged = mergedTimeline(base: base)
-            timeline = merged
-            refreshDerivedState(referenceDate: merged.date)
-        } else {
-            refreshDerivedState(referenceDate: Date())
-        }
+        rebuildTimeline(referenceDate: currentBaseTimeline?.date ?? Date())
     }
 
     func finishActiveMoodRecord(at date: Date = Date()) {
@@ -98,14 +89,7 @@ final class TodayViewModel: ObservableObject {
         manualRecords.sort { $0.createdAt > $1.createdAt }
         self.activeRecord = nil
         persistRecords()
-
-        if let base = timeline {
-            let merged = mergedTimeline(base: base)
-            timeline = merged
-            refreshDerivedState(referenceDate: merged.date)
-        } else {
-            refreshDerivedState(referenceDate: date)
-        }
+        rebuildTimeline(referenceDate: currentBaseTimeline?.date ?? date)
     }
 
     func handleQuickRecordTap() {
@@ -174,6 +158,16 @@ final class TodayViewModel: ObservableObject {
         )
     }
 
+    private func rebuildTimeline(referenceDate: Date) {
+        if let currentBaseTimeline {
+            timeline = mergedTimeline(base: currentBaseTimeline)
+            refreshDerivedState(referenceDate: currentBaseTimeline.date)
+        } else {
+            timeline = nil
+            refreshDerivedState(referenceDate: referenceDate)
+        }
+    }
+
     private func refreshDerivedState(referenceDate: Date) {
         let recordsForDay = records(on: referenceDate)
         activeRecord = manualRecords.first(where: \.isOngoing)
@@ -189,6 +183,17 @@ final class TodayViewModel: ObservableObject {
             recordsForDay: recordsForDay
         )
         weeklyInsight = insightComposer.buildWeeklyInsight(referenceDate: referenceDate, manualRecords: manualRecords)
+    }
+
+    private func reloadManualRecords() {
+        let loadedRecords = recordStore.loadRecords()
+        let sanitizedRecords = sanitizeRecords(loadedRecords)
+        manualRecords = sanitizedRecords
+        activeRecord = sanitizedRecords.first(where: \.isOngoing)
+
+        if sanitizedRecords.count != loadedRecords.count {
+            persistRecords()
+        }
     }
 
     private func records(on date: Date) -> [MoodRecord] {
@@ -210,12 +215,33 @@ final class TodayViewModel: ObservableObject {
     }
 
     private func containsDuplicateRecord(_ candidate: MoodRecord) -> Bool {
-        manualRecords.contains { record in
-            record.mood == candidate.mood &&
-            record.note == candidate.note &&
-            record.createdAt == candidate.createdAt &&
-            record.endedAt == candidate.endedAt &&
-            record.isTracking == candidate.isTracking
-        }
+        let candidateSignature = ManualRecordSignature(record: candidate)
+        return manualRecords.contains { ManualRecordSignature(record: $0) == candidateSignature }
+    }
+
+    private func sanitizeRecords(_ records: [MoodRecord]) -> [MoodRecord] {
+        var seen = Set<ManualRecordSignature>()
+
+        return records
+            .sorted { $0.createdAt > $1.createdAt }
+            .filter { record in
+                seen.insert(ManualRecordSignature(record: record)).inserted
+            }
+    }
+}
+
+private struct ManualRecordSignature: Hashable {
+    let mood: MoodRecord.Mood
+    let note: String
+    let createdAt: Date
+    let endedAt: Date?
+    let isTracking: Bool
+
+    init(record: MoodRecord) {
+        mood = record.mood
+        note = record.note
+        createdAt = record.createdAt
+        endedAt = record.endedAt
+        isTracking = record.isTracking
     }
 }
