@@ -187,6 +187,51 @@ final class TodayViewModelSessionTests: XCTestCase {
         XCTAssertEqual(viewModel.timeline?.entries.filter { $0.id == activeRecord.id.uuidString }.count, 1)
         XCTAssertEqual(viewModel.timeline?.entries.filter { $0.id == pointRecord.id.uuidString }.count, 1)
     }
+
+    func testTimelineEntryPreservesPhotoAttachments() {
+        let attachments = [
+            MoodPhotoAttachment(
+                id: UUID(uuidString: "00000000-0000-0000-0000-000000000611")!,
+                filename: "sample-1.jpg"
+            ),
+            MoodPhotoAttachment(
+                id: UUID(uuidString: "00000000-0000-0000-0000-000000000612")!,
+                filename: "sample-2.jpg"
+            )
+        ]
+        let record = MoodRecord(
+            id: UUID(uuidString: "00000000-0000-0000-0000-000000000613")!,
+            mood: .happy,
+            note: "路过海边",
+            createdAt: sameDay(hour: 16, minute: 30),
+            isTracking: false,
+            photoAttachments: attachments
+        )
+
+        let entry = record.toTimelineEntry(referenceDate: sameDay(hour: 16, minute: 40))
+
+        XCTAssertEqual(entry.photoAttachments, attachments)
+    }
+
+    func testCompletingSessionPreservesPhotoAttachments() {
+        let attachments = [
+            MoodPhotoAttachment(
+                id: UUID(uuidString: "00000000-0000-0000-0000-000000000621")!,
+                filename: "session.jpg"
+            )
+        ]
+        let record = MoodRecord.active(
+            id: UUID(uuidString: "00000000-0000-0000-0000-000000000622")!,
+            mood: .focused,
+            note: "旅行中",
+            createdAt: sameDay(hour: 17, minute: 0),
+            photoAttachments: attachments
+        )
+
+        let completed = record.completed(at: sameDay(hour: 18, minute: 0))
+
+        XCTAssertEqual(completed.photoAttachments, attachments)
+    }
 }
 
 private struct StubTimelineProvider: TimelineDataProviding {

@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		0DAC5BEFCDEF75F998B00E5C /* AppRootScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A80390E769238F81D933506 /* AppRootScreen.swift */; };
 		26846615AF8CA2F05F11D9B0 /* ProScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B46AF3B810BFFEE6F069410 /* ProScreen.swift */; };
+		30FE580FCC3DB158481A5ABC /* MoodPhotoLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF6D780665E1477D9E1362E /* MoodPhotoLibrary.swift */; };
 		3167A5A7F4562369CA4F54B4 /* HealthKitTimelineDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 248EB0D5C59CF49B72179706 /* HealthKitTimelineDataProvider.swift */; };
 		3EDD590CF25E429FB8186758 /* ToDayApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCCD453022FB7D3DE28EDE60 /* ToDayApp.swift */; };
 		44823975A98302AEB5069E00 /* HistoryScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = E41D5FDB97C97E39345EF797 /* HistoryScreen.swift */; };
@@ -23,6 +24,7 @@
 		9C701A7285E2666EFC829AEF /* TodayViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16EB598659DDD263739D3136 /* TodayViewModel.swift */; };
 		A05D3D71F23108D27807DA94 /* TodayInsightComposerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5E3EC90284C88262A943A15 /* TodayInsightComposerTests.swift */; };
 		A2F668A004169259C19C90A3 /* TodayInsightComposer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D40EA4B5DE92A1C04FEF877 /* TodayInsightComposer.swift */; };
+		A4C27F4493A8C6F163EDDF6B /* MoodPhotoAttachment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82FB3A1A3C390FC79F826B94 /* MoodPhotoAttachment.swift */; };
 		AED24B3EF148016906D995F8 /* DayTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C98792FCC517E2B96173407 /* DayTimeline.swift */; };
 		AFB0264365F2546579D2F53A /* MoodRecordStoring.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E53E00BCF5527A4FE8FD775 /* MoodRecordStoring.swift */; };
 		C5767BB39D601ADD6EA3AFE5 /* TodayScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = F728CBFA275E061CC33D4193 /* TodayScreen.swift */; };
@@ -62,10 +64,12 @@
 		5C98792FCC517E2B96173407 /* DayTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayTimeline.swift; sourceTree = "<group>"; };
 		6D40EA4B5DE92A1C04FEF877 /* TodayInsightComposer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayInsightComposer.swift; sourceTree = "<group>"; };
 		7D72C488C5C21014C1FAB59A /* TimelineDataProviding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineDataProviding.swift; sourceTree = "<group>"; };
+		82FB3A1A3C390FC79F826B94 /* MoodPhotoAttachment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodPhotoAttachment.swift; sourceTree = "<group>"; };
 		91944CCE08B997C8CAA13BBD /* TimelineEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineEntry.swift; sourceTree = "<group>"; };
 		AD8F9694BC13B76959CA8639 /* ToDay.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ToDay.entitlements; sourceTree = "<group>"; };
 		CB09FC4279F21A281C6D8DC2 /* AppConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfiguration.swift; sourceTree = "<group>"; };
 		CCCD453022FB7D3DE28EDE60 /* ToDayApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDayApp.swift; sourceTree = "<group>"; };
+		CDF6D780665E1477D9E1362E /* MoodPhotoLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodPhotoLibrary.swift; sourceTree = "<group>"; };
 		D273A8E459B1BBB83027539B /* ToDay.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = ToDay.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D5E3EC90284C88262A943A15 /* TodayInsightComposerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayInsightComposerTests.swift; sourceTree = "<group>"; };
 		E41D5FDB97C97E39345EF797 /* HistoryScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryScreen.swift; sourceTree = "<group>"; };
@@ -159,6 +163,7 @@
 			children = (
 				248EB0D5C59CF49B72179706 /* HealthKitTimelineDataProvider.swift */,
 				0FE2EF155E1C18E24C5D11D1 /* MockTimelineDataProvider.swift */,
+				CDF6D780665E1477D9E1362E /* MoodPhotoLibrary.swift */,
 				3E53E00BCF5527A4FE8FD775 /* MoodRecordStoring.swift */,
 				7D72C488C5C21014C1FAB59A /* TimelineDataProviding.swift */,
 			);
@@ -169,6 +174,7 @@
 			isa = PBXGroup;
 			children = (
 				5C98792FCC517E2B96173407 /* DayTimeline.swift */,
+				82FB3A1A3C390FC79F826B94 /* MoodPhotoAttachment.swift */,
 				0773EC8EC7B7EA41E6CE3914 /* MoodRecord.swift */,
 				91944CCE08B997C8CAA13BBD /* TimelineEntry.swift */,
 			);
@@ -310,6 +316,8 @@
 				44823975A98302AEB5069E00 /* HistoryScreen.swift in Sources */,
 				93C3B96072D6ECD7AB82943B /* MockTimelineDataProvider.swift in Sources */,
 				5F154D8DB1E79ED9B6747A94 /* MonetizationViewModel.swift in Sources */,
+				A4C27F4493A8C6F163EDDF6B /* MoodPhotoAttachment.swift in Sources */,
+				30FE580FCC3DB158481A5ABC /* MoodPhotoLibrary.swift in Sources */,
 				7BC51B7352E2968F185CB750 /* MoodRecord.swift in Sources */,
 				AFB0264365F2546579D2F53A /* MoodRecordStoring.swift in Sources */,
 				26846615AF8CA2F05F11D9B0 /* ProScreen.swift in Sources */,
@@ -478,6 +486,7 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "ToDay reads your health data to build a private daily timeline.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "ToDay may save user-confirmed sessions in the future.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "ToDay 需要读取你的照片，以便把生活片段附在对应记录里。";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				MARKETING_VERSION = 0.1.0;
@@ -547,6 +556,7 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "ToDay reads your health data to build a private daily timeline.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "ToDay may save user-confirmed sessions in the future.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "ToDay 需要读取你的照片，以便把生活片段附在对应记录里。";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				MARKETING_VERSION = 0.1.0;

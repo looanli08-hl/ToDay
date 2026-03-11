@@ -1,4 +1,6 @@
+import PhotosUI
 import SwiftUI
+import UIKit
 
 enum QuickRecordSheetMode {
     case flexible
@@ -11,6 +13,10 @@ struct QuickRecordSheet: View {
     @State private var note: String = ""
     @State private var createdAt: Date = Date()
     @State private var isSubmitting = false
+    @State private var pickerItems: [PhotosPickerItem] = []
+    @State private var draftPhotos: [DraftPhoto] = []
+    @State private var selectedDetent: PresentationDetent = .large
+    @State private var photoErrorMessage: String?
 
     let mode: QuickRecordSheetMode
     let onSave: (MoodRecord) -> Void
@@ -22,6 +28,7 @@ struct QuickRecordSheet: View {
                     headerSection
                     moodGrid
                     noteSection
+                    photoSection
                     timeSection
                 }
                 .padding(.horizontal, 20)
@@ -29,6 +36,11 @@ struct QuickRecordSheet: View {
                 .padding(.bottom, 120)
             }
             .background(TodayTheme.background)
+            .onChange(of: pickerItems) { _, newItems in
+                Task {
+                    await importPhotos(from: newItems)
+                }
+            }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button {
@@ -51,7 +63,7 @@ struct QuickRecordSheet: View {
                     .background(TodayTheme.background.opacity(0.96))
             }
         }
-        .presentationDetents([.medium, .large])
+        .presentationDetents([.medium, .large], selection: $selectedDetent)
         .presentationDragIndicator(.visible)
     }
 
@@ -60,6 +72,33 @@ struct QuickRecordSheet: View {
         isSubmitting = true
         onSave(record)
         dismiss()
+    }
+
+    private func createRecord(isSession: Bool) -> MoodRecord? {
+        guard let mood = selectedMood else { return nil }
+
+        do {
+            let attachments = try draftPhotos.map { try MoodPhotoLibrary.storeImageData($0.data) }
+            if isSession {
+                return MoodRecord.active(
+                    mood: mood,
+                    note: note,
+                    createdAt: createdAt,
+                    photoAttachments: attachments
+                )
+            }
+
+            return MoodRecord(
+                mood: mood,
+                note: note,
+                createdAt: createdAt,
+                isTracking: false,
+                photoAttachments: attachments
+            )
+        } catch {
+            photoErrorMessage = (error as? LocalizedError)?.errorDescription ?? "照片保存失败，请重试。"
+            return nil
+        }
     }
 
     private var headerSection: some View {
@@ -86,6 +125,83 @@ struct QuickRecordSheet: View {
                     .padding(.vertical, 6)
                     .background(modeBadgeBackground)
                     .clipShape(Capsule())
+            }
+        }
+    }
+
+    private var photoSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("照片")
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(TodayTheme.inkMuted)
+
+                    Text(photoSectionCaption)
+                        .font(.system(size: 12))
+                        .foregroundStyle(TodayTheme.inkFaint)
+                }
+
+                Spacer()
+
+                PhotosPicker(
+                    selection: $pickerItems,
+                    maxSelectionCount: max(0, 4 - draftPhotos.count),
+                    matching: .images,
+                    photoLibrary: .shared()
+                ) {
+                    Label(draftPhotos.isEmpty ? "添加照片" : "继续添加", systemImage: "photo.on.rectangle.angled")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(TodayTheme.inkSoft)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 10)
+                        .background(TodayTheme.card)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                .stroke(TodayTheme.border, lineWidth: 1)
+                        )
+                        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                }
+                .disabled(draftPhotos.count >= 4 || isSubmitting)
+            }
+
+            if !draftPhotos.isEmpty {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 12) {
+                        ForEach(draftPhotos) { photo in
+                            ZStack(alignment: .topTrailing) {
+                                Image(uiImage: photo.image)
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 88, height: 88)
+                                    .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 18, style: .continuous)
+                                            .stroke(TodayTheme.border, lineWidth: 1)
+                                    )
+
+                                Button {
+                                    draftPhotos.removeAll { $0.id == photo.id }
+                                } label: {
+                                    Image(systemName: "xmark")
+                                        .font(.system(size: 10, weight: .bold))
+                                        .foregroundStyle(.white)
+                                        .frame(width: 22, height: 22)
+                                        .background(TodayTheme.ink.opacity(0.7))
+                                        .clipShape(Circle())
+                                }
+                                .buttonStyle(.plain)
+                                .padding(6)
+                            }
+                        }
+                    }
+                }
+            }
+
+            if let photoErrorMessage {
+                Text(photoErrorMessage)
+                    .font(.system(size: 12))
+                    .foregroundStyle(TodayTheme.rose)
             }
         }
     }
@@ -136,13 +252,7 @@ struct QuickRecordSheet: View {
     private var actionBar: some View {
         HStack(spacing: 10) {
             Button(mode == .pointOnly ? "保存打点" : "打点") {
-                guard let mood = selectedMood else { return }
-                let record = MoodRecord(
-                    mood: mood,
-                    note: note,
-                    createdAt: createdAt,
-                    isTracking: false
-                )
+                guard let record = createRecord(isSession: false) else { return }
                 submit(record)
             }
             .font(.system(size: 15, weight: .semibold))
@@ -160,8 +270,7 @@ struct QuickRecordSheet: View {
 
             if mode == .flexible {
                 Button("开始一段") {
-                    guard let mood = selectedMood else { return }
-                    let record = MoodRecord.active(mood: mood, note: note, createdAt: createdAt)
+                    guard let record = createRecord(isSession: true) else { return }
                     submit(record)
                 }
                 .font(.system(size: 15, weight: .semibold))
@@ -266,4 +375,40 @@ struct QuickRecordSheet: View {
             }
         }
     }
+
+    private var photoSectionCaption: String {
+        if draftPhotos.isEmpty {
+            return "最多添加 4 张，会跟着这条记录一起保存。"
+        }
+
+        return "已选 \(draftPhotos.count) / 4 张，保存后可在时间线里点开查看。"
+    }
+
+    private func importPhotos(from items: [PhotosPickerItem]) async {
+        guard !items.isEmpty else { return }
+
+        var importedPhotos: [DraftPhoto] = []
+        let remainingSlots = max(0, 4 - draftPhotos.count)
+
+        for item in items.prefix(remainingSlots) {
+            guard let data = try? await item.loadTransferable(type: Data.self),
+                  let image = UIImage(data: data) else {
+                continue
+            }
+
+            importedPhotos.append(DraftPhoto(data: data, image: image))
+        }
+
+        await MainActor.run {
+            photoErrorMessage = importedPhotos.isEmpty ? "照片读取失败，请重新选择。" : nil
+            draftPhotos.append(contentsOf: importedPhotos)
+            pickerItems = []
+        }
+    }
+}
+
+private struct DraftPhoto: Identifiable {
+    let id = UUID()
+    let data: Data
+    let image: UIImage
 }

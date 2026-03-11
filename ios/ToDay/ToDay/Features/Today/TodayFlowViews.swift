@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct OverviewStat: Identifiable {
     let label: String
@@ -165,71 +166,152 @@ struct TimelineStreamRow: View {
     let entry: TimelineEntry
     let isExpanded: Bool
     let action: () -> Void
+    let onPhotoTap: ([MoodPhotoAttachment], Int) -> Void
 
     var body: some View {
-        Button(action: action) {
-            VStack(alignment: .leading, spacing: 12) {
-                HStack(alignment: .center, spacing: 10) {
-                    Text(entry.moment.label)
-                        .font(.system(size: 12, weight: .medium, design: .monospaced))
-                        .foregroundStyle(TodayTheme.inkMuted)
-                        .frame(width: 74, alignment: .leading)
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .center, spacing: 10) {
+                Text(entry.moment.label)
+                    .font(.system(size: 12, weight: .medium, design: .monospaced))
+                    .foregroundStyle(TodayTheme.inkMuted)
+                    .frame(width: 74, alignment: .leading)
 
-                    RoundedRectangle(cornerRadius: 9, style: .continuous)
-                        .fill(entry.kind.flowBackground)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 9, style: .continuous)
-                                .stroke(entry.kind.flowColor.opacity(isExpanded ? 0.24 : 0), lineWidth: 1.4)
-                        )
-                        .frame(width: 30, height: 30)
-                        .overlay {
-                            Text(entry.kind.icon)
-                                .font(.system(size: 14))
-                        }
-
-                    Text(entry.title)
-                        .font(.system(size: 15, weight: isExpanded ? .semibold : .regular))
-                        .foregroundStyle(TodayTheme.inkSoft)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-
-                    if entry.isLive {
-                        Text("进行中")
-                            .font(.system(size: 10, weight: .bold, design: .monospaced))
-                            .foregroundStyle(TodayTheme.teal)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 5)
-                            .background(TodayTheme.tealSoft)
-                            .clipShape(Capsule())
+                RoundedRectangle(cornerRadius: 9, style: .continuous)
+                    .fill(entry.kind.flowBackground)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 9, style: .continuous)
+                            .stroke(entry.kind.flowColor.opacity(isExpanded ? 0.24 : 0), lineWidth: 1.4)
+                    )
+                    .frame(width: 30, height: 30)
+                    .overlay {
+                        Text(entry.kind.icon)
+                            .font(.system(size: 14))
                     }
 
-                    IntensityBar(
-                        durationMinutes: entry.durationMinutes,
-                        fallbackProgress: entry.kind.flowIntensity,
-                        color: entry.kind.flowColor
-                    )
-                    .frame(width: 56)
+                Text(entry.title)
+                    .font(.system(size: 15, weight: isExpanded ? .semibold : .regular))
+                    .foregroundStyle(TodayTheme.inkSoft)
+                    .frame(maxWidth: .infinity, alignment: .leading)
 
-                    Image(systemName: "chevron.down")
-                        .font(.system(size: 11, weight: .semibold))
-                        .foregroundStyle(TodayTheme.inkMuted)
-                        .rotationEffect(.degrees(isExpanded ? 180 : 0))
+                if !entry.photoAttachments.isEmpty {
+                    HStack(spacing: 4) {
+                        Image(systemName: "photo")
+                        Text("\(entry.photoAttachments.count)")
+                    }
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(TodayTheme.inkMuted)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 5)
+                    .background(TodayTheme.card)
+                    .clipShape(Capsule())
                 }
 
-                if isExpanded {
+                if entry.isLive {
+                    Text("进行中")
+                        .font(.system(size: 10, weight: .bold, design: .monospaced))
+                        .foregroundStyle(TodayTheme.teal)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 5)
+                        .background(TodayTheme.tealSoft)
+                        .clipShape(Capsule())
+                }
+
+                IntensityBar(
+                    durationMinutes: entry.durationMinutes,
+                    fallbackProgress: entry.kind.flowIntensity,
+                    color: entry.kind.flowColor
+                )
+                .frame(width: 56)
+
+                Image(systemName: "chevron.down")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(TodayTheme.inkMuted)
+                    .rotationEffect(.degrees(isExpanded ? 180 : 0))
+            }
+
+            if isExpanded {
+                VStack(alignment: .leading, spacing: 12) {
                     Text(entry.detail)
                         .font(.system(size: 14))
                         .foregroundStyle(TodayTheme.inkMuted)
                         .lineSpacing(4)
-                        .padding(.leading, 84)
-                        .transition(.opacity.combined(with: .move(edge: .top)))
+
+                    if !entry.photoAttachments.isEmpty {
+                        TimelinePhotoStrip(attachments: entry.photoAttachments, onPhotoTap: onPhotoTap)
+                    }
+                }
+                .padding(.leading, 84)
+                .transition(.opacity.combined(with: .move(edge: .top)))
+            }
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 12)
+        .background(isExpanded ? entry.kind.flowBackground : Color.clear)
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .contentShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .onTapGesture(perform: action)
+    }
+}
+
+private struct TimelinePhotoStrip: View {
+    let attachments: [MoodPhotoAttachment]
+    let onPhotoTap: ([MoodPhotoAttachment], Int) -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("记录照片")
+                .font(.system(size: 12, weight: .medium))
+                .foregroundStyle(TodayTheme.inkMuted)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 10) {
+                    ForEach(Array(attachments.enumerated()), id: \.element.id) { index, attachment in
+                        Button {
+                            onPhotoTap(attachments, index)
+                        } label: {
+                            TimelinePhotoThumbnail(attachment: attachment)
+                        }
+                        .buttonStyle(.plain)
+                    }
                 }
             }
-            .padding(.horizontal, 10)
-            .padding(.vertical, 12)
-            .background(isExpanded ? entry.kind.flowBackground : Color.clear)
-            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
         }
-        .buttonStyle(.plain)
+    }
+}
+
+private struct TimelinePhotoThumbnail: View {
+    let attachment: MoodPhotoAttachment
+
+    @State private var image: UIImage?
+
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(TodayTheme.card)
+
+            if let image {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFill()
+            } else {
+                VStack(spacing: 6) {
+                    Image(systemName: "photo")
+                        .font(.system(size: 18, weight: .medium))
+                    Text("查看")
+                        .font(.system(size: 11, weight: .semibold))
+                }
+                .foregroundStyle(TodayTheme.inkMuted)
+            }
+        }
+        .frame(width: 88, height: 88)
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(TodayTheme.border, lineWidth: 1)
+        )
+        .task(id: attachment.id) {
+            image = MoodPhotoLibrary.image(for: attachment)
+        }
     }
 }
 

@@ -9,6 +9,7 @@ struct MoodRecord: Identifiable, Codable {
         case endedAt
         case isTracking
         case captureMode
+        case photoAttachments
     }
 
     enum CaptureMode: String, Codable {
@@ -54,6 +55,7 @@ struct MoodRecord: Identifiable, Codable {
     let endedAt: Date?
     let isTracking: Bool
     let captureMode: CaptureMode
+    let photoAttachments: [MoodPhotoAttachment]
 
     init(
         id: UUID = UUID(),
@@ -62,7 +64,8 @@ struct MoodRecord: Identifiable, Codable {
         createdAt: Date = Date(),
         endedAt: Date? = nil,
         isTracking: Bool = false,
-        captureMode: CaptureMode? = nil
+        captureMode: CaptureMode? = nil,
+        photoAttachments: [MoodPhotoAttachment] = []
     ) {
         let resolvedCaptureMode = captureMode ?? {
             if isTracking { return .session }
@@ -77,13 +80,15 @@ struct MoodRecord: Identifiable, Codable {
         self.captureMode = resolvedCaptureMode
         self.endedAt = endedAt ?? (resolvedCaptureMode == .session ? (isTracking ? nil : createdAt) : createdAt)
         self.isTracking = resolvedCaptureMode == .session ? isTracking : false
+        self.photoAttachments = photoAttachments
     }
 
     static func active(
         id: UUID = UUID(),
         mood: Mood,
         note: String = "",
-        createdAt: Date = Date()
+        createdAt: Date = Date(),
+        photoAttachments: [MoodPhotoAttachment] = []
     ) -> MoodRecord {
         MoodRecord(
             id: id,
@@ -92,7 +97,8 @@ struct MoodRecord: Identifiable, Codable {
             createdAt: createdAt,
             endedAt: nil,
             isTracking: true,
-            captureMode: .session
+            captureMode: .session,
+            photoAttachments: photoAttachments
         )
     }
 
@@ -108,7 +114,8 @@ struct MoodRecord: Identifiable, Codable {
             createdAt: createdAt,
             endedAt: max(date, createdAt),
             isTracking: false,
-            captureMode: .session
+            captureMode: .session,
+            photoAttachments: photoAttachments
         )
     }
 
@@ -160,7 +167,8 @@ struct MoodRecord: Identifiable, Codable {
             moment: moment,
             kind: mood.timelineKind,
             durationMinutes: captureMode == .session || isOngoing ? durationMinutes : nil,
-            isLive: isOngoing
+            isLive: isOngoing,
+            photoAttachments: photoAttachments
         )
     }
 
@@ -172,6 +180,7 @@ struct MoodRecord: Identifiable, Codable {
         createdAt = try container.decode(Date.self, forKey: .createdAt)
         endedAt = try container.decodeIfPresent(Date.self, forKey: .endedAt)
         isTracking = try container.decodeIfPresent(Bool.self, forKey: .isTracking) ?? false
+        photoAttachments = try container.decodeIfPresent([MoodPhotoAttachment].self, forKey: .photoAttachments) ?? []
         let decodedCaptureMode = try container.decodeIfPresent(CaptureMode.self, forKey: .captureMode)
         if let decodedCaptureMode {
             captureMode = decodedCaptureMode
@@ -193,6 +202,7 @@ struct MoodRecord: Identifiable, Codable {
         try container.encodeIfPresent(endedAt, forKey: .endedAt)
         try container.encode(isTracking, forKey: .isTracking)
         try container.encode(captureMode, forKey: .captureMode)
+        try container.encode(photoAttachments, forKey: .photoAttachments)
     }
 
     private func minuteOfDay(for date: Date, calendar: Calendar) -> Int {

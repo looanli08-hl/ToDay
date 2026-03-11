@@ -65,6 +65,7 @@ struct TimelineEntry: Identifiable, Hashable {
     let kind: Kind
     let durationMinutes: Int?
     let isLive: Bool
+    let photoAttachments: [MoodPhotoAttachment]
 
     init(
         id: String,
@@ -73,7 +74,8 @@ struct TimelineEntry: Identifiable, Hashable {
         moment: TimelineMoment,
         kind: Kind,
         durationMinutes: Int? = nil,
-        isLive: Bool = false
+        isLive: Bool = false,
+        photoAttachments: [MoodPhotoAttachment] = []
     ) {
         self.id = id
         self.title = title
@@ -82,6 +84,7 @@ struct TimelineEntry: Identifiable, Hashable {
         self.kind = kind
         self.durationMinutes = durationMinutes
         self.isLive = isLive
+        self.photoAttachments = photoAttachments
     }
 }
 

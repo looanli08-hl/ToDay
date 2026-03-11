@@ -9,6 +9,7 @@ struct TodayScreen: View {
     let onOpenPro: () -> Void
 
     @State private var expandedEntryID: String?
+    @State private var selectedPhotoGallery: TimelinePhotoGallery?
 
     private let chineseLocale = Locale(identifier: "zh_CN")
     private static let dateHeaderFormatter: DateFormatter = {
@@ -60,6 +61,9 @@ struct TodayScreen: View {
                 QuickRecordSheet(mode: viewModel.quickRecordMode) { record in
                     viewModel.startMoodRecord(record)
                 }
+            }
+            .sheet(item: $selectedPhotoGallery) { gallery in
+                TimelinePhotoGallerySheet(gallery: gallery)
             }
             .task {
                 await viewModel.loadIfNeeded()
@@ -169,6 +173,8 @@ struct TodayScreen: View {
                         withAnimation(.spring(response: 0.28, dampingFraction: 0.84)) {
                             expandedEntryID = expandedEntryID == entry.id ? nil : entry.id
                         }
+                    } onPhotoTap: { attachments, startIndex in
+                        selectedPhotoGallery = TimelinePhotoGallery(attachments: attachments, startIndex: startIndex)
                     }
                 }
             }
@@ -452,6 +458,96 @@ struct TodayScreen: View {
 
     private var dateHeader: String {
         Self.dateHeaderFormatter.string(from: viewModel.timeline?.date ?? Date())
+    }
+}
+
+private struct TimelinePhotoGallery: Identifiable {
+    let id = UUID()
+    let attachments: [MoodPhotoAttachment]
+    let startIndex: Int
+}
+
+private struct TimelinePhotoGallerySheet: View {
+    @Environment(\.dismiss) private var dismiss
+    @State private var selectedIndex: Int
+
+    let gallery: TimelinePhotoGallery
+
+    init(gallery: TimelinePhotoGallery) {
+        self.gallery = gallery
+        _selectedIndex = State(initialValue: gallery.startIndex)
+    }
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                TodayTheme.background.ignoresSafeArea()
+
+                TabView(selection: $selectedIndex) {
+                    ForEach(Array(gallery.attachments.enumerated()), id: \.element.id) { index, attachment in
+                        TimelineGalleryImagePage(attachment: attachment)
+                            .tag(index)
+                            .padding(.horizontal, 20)
+                            .padding(.vertical, 28)
+                    }
+                }
+                .tabViewStyle(.page(indexDisplayMode: .always))
+            }
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 13, weight: .bold))
+                            .foregroundStyle(TodayTheme.inkSoft)
+                            .frame(width: 32, height: 32)
+                            .background(TodayTheme.card)
+                            .clipShape(Circle())
+                    }
+                }
+
+                ToolbarItem(placement: .principal) {
+                    Text("照片 \(selectedIndex + 1) / \(gallery.attachments.count)")
+                        .font(.system(size: 13, weight: .medium, design: .monospaced))
+                        .foregroundStyle(TodayTheme.inkMuted)
+                }
+            }
+        }
+    }
+}
+
+private struct TimelineGalleryImagePage: View {
+    let attachment: MoodPhotoAttachment
+
+    @State private var image: UIImage?
+
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 28, style: .continuous)
+                .fill(TodayTheme.card)
+
+            if let image {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFit()
+                    .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+            } else {
+                VStack(spacing: 10) {
+                    ProgressView()
+                    Text("正在载入照片")
+                        .font(.system(size: 13))
+                        .foregroundStyle(TodayTheme.inkMuted)
+                }
+            }
+        }
+        .overlay(
+            RoundedRectangle(cornerRadius: 28, style: .continuous)
+                .stroke(TodayTheme.border, lineWidth: 1)
+        )
+        .task(id: attachment.id) {
+            image = MoodPhotoLibrary.image(for: attachment)
+        }
     }
 }
 
