@@ -11,6 +11,7 @@
 		0DAC5BEFCDEF75F998B00E5C /* AppRootScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A80390E769238F81D933506 /* AppRootScreen.swift */; };
 		26846615AF8CA2F05F11D9B0 /* ProScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B46AF3B810BFFEE6F069410 /* ProScreen.swift */; };
 		289858661ACDE5B4E2046978 /* ConnectivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88ECC52BFECC7DC8A36A235E /* ConnectivityManager.swift */; };
+		2D67F7F7DFE7F572BC3AE07A /* ToDayWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 69C007DCC3F49E4F2969B1D7 /* ToDayWatch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		30FE580FCC3DB158481A5ABC /* MoodPhotoLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF6D780665E1477D9E1362E /* MoodPhotoLibrary.swift */; };
 		3167A5A7F4562369CA4F54B4 /* HealthKitTimelineDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 248EB0D5C59CF49B72179706 /* HealthKitTimelineDataProvider.swift */; };
 		366F7C8E30E432042B253F16 /* ConnectivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88ECC52BFECC7DC8A36A235E /* ConnectivityManager.swift */; };
@@ -43,7 +44,6 @@
 		DE297B083A85A47DD13DE450 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C96E2DCDAC54DA106C2D81A /* Assets.xcassets */; };
 		EAAD572985D8CFF5B456DA14 /* WatchHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 404E8EA06CD9AA4AF4D9231A /* WatchHomeView.swift */; };
 		EC421489F126891847F7CEFB /* MoodRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = D796A8133E65C0F7E468E8AB /* MoodRecord.swift */; };
-		EF20444212B5571CD54CF7C7 /* ToDay.app in Resources */ = {isa = PBXBuildFile; fileRef = D273A8E459B1BBB83027539B /* ToDay.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		F15785C5CD541E8A984C1FEB /* TodayViewModelSessionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCFF1F5F9574B84A9B5B3ED9 /* TodayViewModelSessionTests.swift */; };
 		FBF90F06A0B49EDD24C7F79C /* TodayFlowViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C77065335DE754680A34C99 /* TodayFlowViews.swift */; };
 		FF5E4FB20D0B535F07B92382 /* MoodRecord+Timeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B917ECDF78E99FB0636A58B /* MoodRecord+Timeline.swift */; };
@@ -57,14 +57,28 @@
 			remoteGlobalIDString = 1FB5617C31BE25701E8C7ACD;
 			remoteInfo = ToDay;
 		};
-		AB2665B8F40B55A4C6F0883F /* PBXContainerItemProxy */ = {
+		AC773249BA574C6C94EA5468 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 2C29361A382315565B1DE7BF /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 1FB5617C31BE25701E8C7ACD;
-			remoteInfo = ToDay;
+			remoteGlobalIDString = 79EAFC5ABCB9582EABD64851;
+			remoteInfo = ToDayWatch;
 		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		0384B93F04010C4AB16BDC73 /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				2D67F7F7DFE7F572BC3AE07A /* ToDayWatch.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		037508DDAD551D2D5F74DE83 /* ToDayTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = ToDayTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -275,10 +289,12 @@
 			buildPhases = (
 				0E45D6EFA7FAF1A88A38ED52 /* Sources */,
 				DECA2DB299C974DCCF9A25AD /* Resources */,
+				0384B93F04010C4AB16BDC73 /* Embed Watch Content */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				0F8EBDCEE31E4693641EB3C0 /* PBXTargetDependency */,
 			);
 			name = ToDay;
 			packageProductDependencies = (
@@ -292,12 +308,10 @@
 			buildConfigurationList = B784DB36CF7AD773CFC26AD2 /* Build configuration list for PBXNativeTarget "ToDayWatch" */;
 			buildPhases = (
 				99F413FBBA74B34F89359172 /* Sources */,
-				E014E9BB579D823A18372C65 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				26A39FA7DA7F5D69DCAF5542 /* PBXTargetDependency */,
 			);
 			name = ToDayWatch;
 			packageProductDependencies = (
@@ -378,14 +392,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		E014E9BB579D823A18372C65 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				EF20444212B5571CD54CF7C7 /* ToDay.app in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -450,15 +456,15 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		0F8EBDCEE31E4693641EB3C0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 79EAFC5ABCB9582EABD64851 /* ToDayWatch */;
+			targetProxy = AC773249BA574C6C94EA5468 /* PBXContainerItemProxy */;
+		};
 		120D701047729D019B9FF7E2 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 1FB5617C31BE25701E8C7ACD /* ToDay */;
 			targetProxy = 0B8C66CE96BFBD6584B0159B /* PBXContainerItemProxy */;
-		};
-		26A39FA7DA7F5D69DCAF5542 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 1FB5617C31BE25701E8C7ACD /* ToDay */;
-			targetProxy = AB2665B8F40B55A4C6F0883F /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 

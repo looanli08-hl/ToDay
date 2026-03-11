@@ -10,24 +10,33 @@ struct WatchHomeView: View {
 
     @StateObject private var connectivityManager = WatchConnectivityManager.shared
     @State private var entryMode: EntryMode = .point
+    @State private var showSuccess = false
+    @State private var successMood: MoodRecord.Mood?
 
     var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 12) {
-                    if let activeSession = connectivityManager.activeSession {
-                        activeSessionSection(activeSession)
-                    } else {
-                        modePickerSection
-                    }
+        ZStack {
+            NavigationStack {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 12) {
+                        if let activeSession = connectivityManager.activeSession {
+                            activeSessionSection(activeSession)
+                        } else {
+                            modePickerSection
+                        }
 
-                    moodGridSection
+                        moodGridSection
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 8)
                 }
-                .padding(.horizontal, 10)
-                .padding(.vertical, 8)
+                .background(WatchTheme.background)
+                .navigationTitle("ToDay")
             }
-            .background(WatchTheme.background)
-            .navigationTitle("ToDay")
+
+            if showSuccess, let successMood {
+                successOverlay(for: successMood)
+                    .transition(.scale.combined(with: .opacity))
+            }
         }
     }
 
@@ -41,6 +50,12 @@ struct WatchHomeView: View {
                 Text("\(activeSession.mood.emoji) \(activeSession.mood.rawValue)")
                     .font(.headline)
                     .foregroundStyle(WatchTheme.text)
+
+                TimelineView(.periodic(from: Date(), by: 60)) { context in
+                    Text(durationText(since: activeSession.createdAt, now: context.date))
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(WatchTheme.textMuted)
+                }
 
                 Text("开始于 \(Self.timeFormatter.string(from: activeSession.createdAt))")
                     .font(.caption2)
@@ -123,11 +138,31 @@ struct WatchHomeView: View {
         }
     }
 
+    private func successOverlay(for mood: MoodRecord.Mood) -> some View {
+        VStack(spacing: 6) {
+            Image(systemName: "checkmark.circle.fill")
+                .font(.system(size: 34, weight: .semibold))
+                .foregroundStyle(WatchTheme.teal)
+
+            Text(mood.emoji)
+                .font(.system(size: 30))
+        }
+        .frame(maxWidth: 110, minHeight: 110)
+        .background(.ultraThinMaterial)
+        .overlay(
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .stroke(WatchTheme.border, lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .shadow(color: .black.opacity(0.18), radius: 12, y: 6)
+    }
+
     private func handleMoodTap(_ mood: MoodRecord.Mood) {
         if connectivityManager.activeSession != nil {
             connectivityManager.sendPointRecord(
                 MoodRecord(mood: mood, createdAt: Date(), isTracking: false)
             )
+            showPointSuccess(for: mood)
             return
         }
 
@@ -136,11 +171,47 @@ struct WatchHomeView: View {
             connectivityManager.sendPointRecord(
                 MoodRecord(mood: mood, createdAt: Date(), isTracking: false)
             )
+            showPointSuccess(for: mood)
         case .session:
             connectivityManager.startSession(
                 MoodRecord.active(mood: mood, createdAt: Date())
             )
         }
+    }
+
+    private func showPointSuccess(for mood: MoodRecord.Mood) {
+        successMood = mood
+        withAnimation(.spring(response: 0.28, dampingFraction: 0.88)) {
+            showSuccess = true
+        }
+
+        Task {
+            try? await Task.sleep(for: .seconds(0.8))
+            await MainActor.run {
+                withAnimation(.easeOut(duration: 0.2)) {
+                    showSuccess = false
+                }
+            }
+        }
+    }
+
+    private func durationText(since startDate: Date, now: Date) -> String {
+        let seconds = max(0, Int(now.timeIntervalSince(startDate)))
+        let hours = seconds / 3600
+        let minutes = (seconds % 3600) / 60
+
+        if hours > 0 {
+            if minutes > 0 {
+                return "已持续 \(hours) 小时 \(minutes) 分钟"
+            }
+            return "已持续 \(hours) 小时"
+        }
+
+        if minutes > 0 {
+            return "已持续 \(minutes) 分钟"
+        }
+
+        return "刚刚开始"
     }
 
     private static let timeFormatter: DateFormatter = {
