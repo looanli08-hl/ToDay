@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 import UIKit
 
 @main
@@ -18,5 +19,6 @@ struct ToDayApp: App {
                 }
             }
         }
+        .modelContainer(AppContainer.modelContainer)
     }
 }
