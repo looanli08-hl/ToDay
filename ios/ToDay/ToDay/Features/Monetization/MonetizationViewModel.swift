@@ -136,7 +136,7 @@ final class MonetizationViewModel: ObservableObject {
 
     func prepareStore() async {
         startObservingTransactionsIfNeeded()
-        await refreshEntitlementState()
+        await revalidateEntitlement()
 
         guard !hasPreparedStore else { return }
 
@@ -181,7 +181,7 @@ final class MonetizationViewModel: ObservableObject {
             case .success(let verification):
                 let transaction = try verify(verification)
                 await transaction.finish()
-                await refreshEntitlementState()
+                await revalidateEntitlement()
                 purchaseMessage = "购买成功，Pro 已启用。"
             case .pending:
                 purchaseMessage = "购买正在等待系统确认。"
@@ -202,7 +202,7 @@ final class MonetizationViewModel: ObservableObject {
 
         do {
             try await AppStore.sync()
-            await refreshEntitlementState()
+            await revalidateEntitlement()
             purchaseMessage = hasActiveSubscription ? "已恢复你现有的会员资格。" : "没有发现可恢复的有效会员。"
         } catch {
             purchaseMessage = "恢复购买失败：\(error.localizedDescription)"
@@ -236,7 +236,7 @@ final class MonetizationViewModel: ObservableObject {
                     let transaction = try self.verify(update)
                     guard Plan(productID: transaction.productID) != nil else { continue }
                     await transaction.finish()
-                    await self.refreshEntitlementState()
+                    await self.revalidateEntitlement()
                     await MainActor.run {
                         self.purchaseMessage = "会员状态已自动更新。"
                     }
@@ -249,12 +249,12 @@ final class MonetizationViewModel: ObservableObject {
         }
     }
 
-    private func refreshEntitlementState() async {
+    func revalidateEntitlement() async {
         var unlocked = false
 
-        for await entitlement in Transaction.currentEntitlements {
+        for plan in Plan.allCases {
+            guard let entitlement = await Transaction.currentEntitlement(for: plan.productID) else { continue }
             guard case .verified(let transaction) = entitlement else { continue }
-            guard Plan(productID: transaction.productID) != nil else { continue }
             guard transaction.revocationDate == nil else { continue }
 
             if let expirationDate = transaction.expirationDate, expirationDate < Date() {

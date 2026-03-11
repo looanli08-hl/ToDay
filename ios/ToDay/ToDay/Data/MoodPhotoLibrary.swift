@@ -26,6 +26,15 @@ enum MoodPhotoLibrary {
         return UIImage(data: data)
     }
 
+    static func deletePhotos(for attachments: [MoodPhotoAttachment]) {
+        for attachment in attachments {
+            let fileURL = url(for: attachment)
+
+            guard FileManager.default.fileExists(atPath: fileURL.path) else { continue }
+            try? FileManager.default.removeItem(at: fileURL)
+        }
+    }
+
     static func url(for attachment: MoodPhotoAttachment) -> URL {
         directoryURL.appendingPathComponent(attachment.filename, isDirectory: false)
     }

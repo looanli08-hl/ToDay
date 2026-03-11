@@ -53,16 +53,26 @@ final class HealthKitTimelineDataProvider: TimelineDataProviding {
     }
 
     private func requestAuthorizationIfNeeded() async throws {
-        let readTypes = Set([
+        let readTypes = [
             HKObjectType.quantityType(forIdentifier: .stepCount),
             HKObjectType.quantityType(forIdentifier: .activeEnergyBurned),
             HKObjectType.categoryType(forIdentifier: .sleepAnalysis),
             HKObjectType.workoutType()
-        ].compactMap { $0 })
+        ].compactMap { $0 }
+
+        let authorizationStatuses = readTypes.map { healthStore.authorizationStatus(for: $0) }
+
+        if authorizationStatuses.contains(.sharingDenied) {
+            throw TimelineDataError.healthDataUnavailable
+        }
+
+        guard authorizationStatuses.contains(.notDetermined) else {
+            return
+        }
 
         try await authorizationGate.authorizeIfNeeded { [healthStore] in
             try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-                healthStore.requestAuthorization(toShare: [], read: readTypes) { success, error in
+                healthStore.requestAuthorization(toShare: [], read: Set(readTypes)) { success, error in
                     if let error {
                         continuation.resume(throwing: error)
                         return

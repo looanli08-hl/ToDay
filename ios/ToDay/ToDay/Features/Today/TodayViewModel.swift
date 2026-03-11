@@ -2,6 +2,11 @@ import Foundation
 
 @MainActor
 final class TodayViewModel: ObservableObject {
+    enum RecordingState {
+        case idle
+        case recording(MoodRecord)
+    }
+
     @Published private(set) var timeline: DayTimeline?
     @Published private(set) var insightSummary: TodayInsightSummary?
     @Published private(set) var weeklyInsight: WeeklyInsightSummary?
@@ -9,7 +14,7 @@ final class TodayViewModel: ObservableObject {
     @Published private(set) var historyDigests: [RecentDayDigest] = []
     @Published private(set) var isLoading = false
     @Published private(set) var errorMessage: String?
-    @Published private(set) var activeRecord: MoodRecord?
+    @Published private(set) var recordingState: RecordingState = .idle
     @Published var showQuickRecord = false
     @Published private(set) var quickRecordMode: QuickRecordSheetMode = .flexible
 
@@ -20,6 +25,7 @@ final class TodayViewModel: ObservableObject {
     private var hasLoadedOnce = false
     private var currentBaseTimeline: DayTimeline?
     private var timelineCache: [Date: DayTimeline] = [:]
+    private var lastSubmittedFingerprint: DuplicateSubmissionFingerprint?
     private(set) var manualRecords: [MoodRecord] = []
 
     init(
@@ -53,7 +59,7 @@ final class TodayViewModel: ObservableObject {
         do {
             let base = try await provider.loadTimeline(for: Date())
             currentBaseTimeline = base
-            timelineCache[calendar.startOfDay(for: base.date)] = base
+            cacheTimeline(base)
             rebuildTimeline(referenceDate: base.date)
             hasLoadedOnce = true
         } catch {
@@ -69,15 +75,16 @@ final class TodayViewModel: ObservableObject {
             return
         }
 
-        if activeRecord != nil && record.captureMode == .session {
+        if case .recording = recordingState, record.captureMode == .session {
             errorMessage = "先结束当前状态，再开始新的一段。"
             return
         }
 
         manualRecords.insert(record, at: 0)
         manualRecords.sort { $0.createdAt > $1.createdAt }
+        lastSubmittedFingerprint = DuplicateSubmissionFingerprint(record: record)
         if record.isOngoing {
-            activeRecord = record
+            recordingState = .recording(record)
         }
         showQuickRecord = false
         persistRecords()
@@ -85,29 +92,62 @@ final class TodayViewModel: ObservableObject {
     }
 
     func finishActiveMoodRecord(at date: Date = Date()) {
-        guard let activeRecord,
+        guard case let .recording(activeRecord) = recordingState,
               let index = manualRecords.firstIndex(where: { $0.id == activeRecord.id }) else { return }
 
         let completedRecord = activeRecord.completed(at: date)
         manualRecords[index] = completedRecord
         manualRecords.sort { $0.createdAt > $1.createdAt }
-        self.activeRecord = nil
+        recordingState = .idle
         persistRecords()
         rebuildTimeline(referenceDate: currentBaseTimeline?.date ?? date)
     }
 
     func handleQuickRecordTap() {
-        openQuickRecordComposer()
+        switch recordingState {
+        case .idle:
+            openQuickRecordComposer()
+        case .recording:
+            openPointComposer()
+        }
     }
 
     func openQuickRecordComposer() {
-        quickRecordMode = activeRecord == nil ? .flexible : .pointOnly
+        switch recordingState {
+        case .idle:
+            quickRecordMode = .flexible
+        case .recording:
+            quickRecordMode = .pointOnly
+        }
         showQuickRecord = true
     }
 
     func openPointComposer() {
         quickRecordMode = .pointOnly
         showQuickRecord = true
+    }
+
+    func removeMoodRecord(id: UUID) {
+        guard let index = manualRecords.firstIndex(where: { $0.id == id }) else { return }
+
+        let removedRecord = manualRecords.remove(at: index)
+        deleteOrphanedPhotos(for: removedRecord.photoAttachments, remainingRecords: manualRecords)
+
+        if case let .recording(activeRecord) = recordingState, activeRecord.id == id {
+            recordingState = .idle
+        }
+
+        persistRecords()
+        rebuildTimeline(referenceDate: currentBaseTimeline?.date ?? Date())
+    }
+
+    var activeRecord: MoodRecord? {
+        switch recordingState {
+        case .idle:
+            return nil
+        case let .recording(record):
+            return record
+        }
     }
 
     var todayManualRecordCount: Int {
@@ -127,16 +167,21 @@ final class TodayViewModel: ObservableObject {
     }
 
     var quickRecordButtonCaption: String? {
-        activeRecord == nil ? "打点或开始一段状态" : "当前已有进行中的状态"
+        switch recordingState {
+        case .idle:
+            return "打点或开始一段状态"
+        case .recording:
+            return "当前已有进行中的状态"
+        }
     }
 
     var activeSessionTitle: String? {
-        guard let activeRecord else { return nil }
+        guard case let .recording(activeRecord) = recordingState else { return nil }
         return "\(activeRecord.mood.rawValue) 正在进行"
     }
 
     var activeSessionDetail: String? {
-        guard let activeRecord else { return nil }
+        guard case let .recording(activeRecord) = recordingState else { return nil }
         let startTime = Self.clockFormatter.string(from: activeRecord.createdAt)
         let note = activeRecord.note.trimmingCharacters(in: .whitespacesAndNewlines)
 
@@ -196,7 +241,7 @@ final class TodayViewModel: ObservableObject {
 
     private func refreshDerivedState(referenceDate: Date) {
         let recordsForDay = records(on: referenceDate)
-        activeRecord = manualRecords.first(where: \.isOngoing)
+        setRecordingState(from: manualRecords.first(where: \.isOngoing))
         historyDigests = insightComposer.buildHistoryDigests(
             from: manualRecords,
             timelines: timelineCache,
@@ -214,8 +259,16 @@ final class TodayViewModel: ObservableObject {
     private func reloadManualRecords() {
         let loadedRecords = recordStore.loadRecords()
         let sanitizedRecords = sanitizeRecords(loadedRecords)
+        let removedRecords = removedRecords(from: loadedRecords, keeping: sanitizedRecords)
         manualRecords = sanitizedRecords
-        activeRecord = sanitizedRecords.first(where: \.isOngoing)
+        setRecordingState(from: sanitizedRecords.first(where: \.isOngoing))
+
+        if !removedRecords.isEmpty {
+            deleteOrphanedPhotos(
+                for: removedRecords.flatMap(\.photoAttachments),
+                remainingRecords: sanitizedRecords
+            )
+        }
 
         if sanitizedRecords.count != loadedRecords.count {
             persistRecords()
@@ -242,7 +295,11 @@ final class TodayViewModel: ObservableObject {
 
     private func containsDuplicateRecord(_ candidate: MoodRecord) -> Bool {
         let candidateSignature = ManualRecordSignature(record: candidate)
-        return manualRecords.contains { ManualRecordSignature(record: $0) == candidateSignature }
+        if manualRecords.contains(where: { ManualRecordSignature(record: $0) == candidateSignature }) {
+            return true
+        }
+
+        return lastSubmittedFingerprint == DuplicateSubmissionFingerprint(record: candidate)
     }
 
     private func sanitizeRecords(_ records: [MoodRecord]) -> [MoodRecord] {
@@ -255,15 +312,52 @@ final class TodayViewModel: ObservableObject {
             }
     }
 
+    private func cacheTimeline(_ timeline: DayTimeline) {
+        timelineCache[calendar.startOfDay(for: timeline.date)] = timeline
+
+        let sortedKeys = timelineCache.keys.sorted()
+        let overflow = max(0, sortedKeys.count - Self.maxCachedTimelines)
+
+        if overflow > 0 {
+            for key in sortedKeys.prefix(overflow) {
+                timelineCache.removeValue(forKey: key)
+            }
+        }
+    }
+
+    private func setRecordingState(from record: MoodRecord?) {
+        if let record {
+            recordingState = .recording(record)
+        } else {
+            recordingState = .idle
+        }
+    }
+
+    private func removedRecords(from original: [MoodRecord], keeping sanitized: [MoodRecord]) -> [MoodRecord] {
+        let keptIDs = Set(sanitized.map(\.id))
+        return original.filter { !keptIDs.contains($0.id) }
+    }
+
+    private func deleteOrphanedPhotos(for attachments: [MoodPhotoAttachment], remainingRecords: [MoodRecord]) {
+        let remainingAttachments = Set(remainingRecords.flatMap(\.photoAttachments))
+        let orphanedAttachments = attachments.filter { !remainingAttachments.contains($0) }
+
+        guard !orphanedAttachments.isEmpty else { return }
+        MoodPhotoLibrary.deletePhotos(for: orphanedAttachments)
+    }
+
     private static let clockFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "zh_CN")
         formatter.dateFormat = "HH:mm"
         return formatter
     }()
+
+    private static let maxCachedTimelines = 30
 }
 
 private struct ManualRecordSignature: Hashable {
+    let id: UUID
     let mood: MoodRecord.Mood
     let note: String
     let createdAt: Date
@@ -272,11 +366,32 @@ private struct ManualRecordSignature: Hashable {
     let captureMode: MoodRecord.CaptureMode
 
     init(record: MoodRecord) {
+        id = record.id
         mood = record.mood
         note = record.note
         createdAt = record.createdAt
         endedAt = record.endedAt
         isTracking = record.isTracking
         captureMode = record.captureMode
+    }
+}
+
+private struct DuplicateSubmissionFingerprint: Hashable {
+    let mood: MoodRecord.Mood
+    let note: String
+    let createdAt: Date
+    let endedAt: Date?
+    let isTracking: Bool
+    let captureMode: MoodRecord.CaptureMode
+    let photoAttachments: [MoodPhotoAttachment]
+
+    init(record: MoodRecord) {
+        mood = record.mood
+        note = record.note
+        createdAt = record.createdAt
+        endedAt = record.endedAt
+        isTracking = record.isTracking
+        captureMode = record.captureMode
+        photoAttachments = record.photoAttachments
     }
 }

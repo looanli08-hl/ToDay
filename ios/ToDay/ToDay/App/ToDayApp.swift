@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 @main
 struct ToDayApp: App {
@@ -11,6 +12,11 @@ struct ToDayApp: App {
                 todayViewModel: viewModel,
                 monetizationViewModel: monetizationViewModel
             )
+            .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
+                Task {
+                    await monetizationViewModel.revalidateEntitlement()
+                }
+            }
         }
     }
 }

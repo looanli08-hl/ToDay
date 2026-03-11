@@ -2,6 +2,7 @@ import Foundation
 
 struct MoodRecord: Identifiable, Codable {
     enum CodingKeys: String, CodingKey {
+        case schemaVersion
         case id
         case mood
         case note
@@ -11,6 +12,8 @@ struct MoodRecord: Identifiable, Codable {
         case captureMode
         case photoAttachments
     }
+
+    static let schemaVersion = 1
 
     enum CaptureMode: String, Codable {
         case point
@@ -174,27 +177,48 @@ struct MoodRecord: Identifiable, Codable {
 
     init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        id = try container.decode(UUID.self, forKey: .id)
-        mood = try container.decode(Mood.self, forKey: .mood)
-        note = try container.decode(String.self, forKey: .note)
-        createdAt = try container.decode(Date.self, forKey: .createdAt)
-        endedAt = try container.decodeIfPresent(Date.self, forKey: .endedAt)
-        isTracking = try container.decodeIfPresent(Bool.self, forKey: .isTracking) ?? false
-        photoAttachments = try container.decodeIfPresent([MoodPhotoAttachment].self, forKey: .photoAttachments) ?? []
-        let decodedCaptureMode = try container.decodeIfPresent(CaptureMode.self, forKey: .captureMode)
-        if let decodedCaptureMode {
-            captureMode = decodedCaptureMode
-        } else if isTracking {
-            captureMode = .session
-        } else if let endedAt, endedAt > createdAt {
-            captureMode = .session
-        } else {
-            captureMode = .point
+        let version = try container.decodeIfPresent(Int.self, forKey: .schemaVersion) ?? 0
+
+        switch version {
+        case 0:
+            id = try container.decode(UUID.self, forKey: .id)
+            mood = try container.decode(Mood.self, forKey: .mood)
+            note = try container.decode(String.self, forKey: .note)
+            createdAt = try container.decode(Date.self, forKey: .createdAt)
+            endedAt = try container.decodeIfPresent(Date.self, forKey: .endedAt)
+            isTracking = try container.decodeIfPresent(Bool.self, forKey: .isTracking) ?? false
+            photoAttachments = try container.decodeIfPresent([MoodPhotoAttachment].self, forKey: .photoAttachments) ?? []
+
+            if let decodedCaptureMode = try container.decodeIfPresent(CaptureMode.self, forKey: .captureMode) {
+                captureMode = decodedCaptureMode
+            } else if isTracking {
+                captureMode = .session
+            } else if let endedAt, endedAt > createdAt {
+                captureMode = .session
+            } else {
+                captureMode = .point
+            }
+        case Self.schemaVersion:
+            id = try container.decode(UUID.self, forKey: .id)
+            mood = try container.decode(Mood.self, forKey: .mood)
+            note = try container.decode(String.self, forKey: .note)
+            createdAt = try container.decode(Date.self, forKey: .createdAt)
+            endedAt = try container.decodeIfPresent(Date.self, forKey: .endedAt)
+            isTracking = try container.decode(Bool.self, forKey: .isTracking)
+            captureMode = try container.decode(CaptureMode.self, forKey: .captureMode)
+            photoAttachments = try container.decodeIfPresent([MoodPhotoAttachment].self, forKey: .photoAttachments) ?? []
+        default:
+            throw DecodingError.dataCorruptedError(
+                forKey: .schemaVersion,
+                in: container,
+                debugDescription: "不支持的 MoodRecord 数据版本：\(version)"
+            )
         }
     }
 
     func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(Self.schemaVersion, forKey: .schemaVersion)
         try container.encode(id, forKey: .id)
         try container.encode(mood, forKey: .mood)
         try container.encode(note, forKey: .note)

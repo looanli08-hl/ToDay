@@ -1,5 +1,6 @@
 import XCTest
 @testable import ToDay
+import UIKit
 
 @MainActor
 final class TodayViewModelSessionTests: XCTestCase {
@@ -133,7 +134,7 @@ final class TodayViewModelSessionTests: XCTestCase {
         XCTAssertEqual(viewModel.todayManualRecordCount, 1)
     }
 
-    func testInitializerDeduplicatesPersistedRecords() {
+    func testInitializerPreservesRecordsWithDifferentIDs() {
         let provider = StubTimelineProvider()
         let createdAt = sameDay(hour: 18, minute: 0)
         let duplicateA = MoodRecord(
@@ -154,8 +155,8 @@ final class TodayViewModelSessionTests: XCTestCase {
 
         let viewModel = TodayViewModel(provider: provider, recordStore: store)
 
-        XCTAssertEqual(viewModel.todayManualRecordCount, 1)
-        XCTAssertEqual(store.records.count, 1)
+        XCTAssertEqual(viewModel.todayManualRecordCount, 2)
+        XCTAssertEqual(store.records.count, 2)
     }
 
     func testPointRecordCanBeAddedWhileSessionIsActive() async {
@@ -232,6 +233,44 @@ final class TodayViewModelSessionTests: XCTestCase {
 
         XCTAssertEqual(completed.photoAttachments, attachments)
     }
+
+    func testMoodRecordEncodingIncludesSchemaVersion() throws {
+        let record = MoodRecord(
+            id: UUID(uuidString: "00000000-0000-0000-0000-000000000631")!,
+            mood: .happy,
+            note: "傍晚散步",
+            createdAt: sameDay(hour: 19, minute: 0),
+            isTracking: false
+        )
+
+        let data = try JSONEncoder().encode(record)
+        let payload = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+
+        XCTAssertEqual(payload["schemaVersion"] as? Int, MoodRecord.schemaVersion)
+    }
+
+    func testRemovingRecordDeletesOrphanedPhotos() throws {
+        let provider = StubTimelineProvider()
+        let store = InMemoryMoodRecordStore()
+        let viewModel = TodayViewModel(provider: provider, recordStore: store)
+        let attachment = try MoodPhotoLibrary.storeImageData(sampleJPEGData())
+        let fileURL = MoodPhotoLibrary.url(for: attachment)
+        let record = MoodRecord(
+            id: UUID(uuidString: "00000000-0000-0000-0000-000000000632")!,
+            mood: .happy,
+            note: "拍了一张晚霞",
+            createdAt: sameDay(hour: 19, minute: 20),
+            isTracking: false,
+            photoAttachments: [attachment]
+        )
+
+        viewModel.startMoodRecord(record)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: fileURL.path))
+
+        viewModel.removeMoodRecord(id: record.id)
+
+        XCTAssertFalse(FileManager.default.fileExists(atPath: fileURL.path))
+    }
 }
 
 private struct StubTimelineProvider: TimelineDataProviding {
@@ -272,4 +311,14 @@ private func sameDay(hour: Int, minute: Int) -> Date {
         second: 0,
         of: Date()
     ) ?? Date()
+}
+
+private func sampleJPEGData() -> Data {
+    let renderer = UIGraphicsImageRenderer(size: CGSize(width: 16, height: 16))
+    let image = renderer.image { context in
+        UIColor.systemTeal.setFill()
+        context.fill(CGRect(x: 0, y: 0, width: 16, height: 16))
+    }
+
+    return image.jpegData(compressionQuality: 0.9) ?? Data()
 }
