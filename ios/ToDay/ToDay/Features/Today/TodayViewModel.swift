@@ -1,3 +1,4 @@
+import Combine
 import Foundation
 
 @MainActor
@@ -22,24 +23,34 @@ final class TodayViewModel: ObservableObject {
     private let recordStore: any MoodRecordStoring
     private let insightComposer: TodayInsightComposer
     private let calendar: Calendar
+    private let phoneConnectivityManager: PhoneConnectivityManager?
     private var hasLoadedOnce = false
     private var currentBaseTimeline: DayTimeline?
     private var timelineCache: [Date: DayTimeline] = [:]
     private var lastSubmittedFingerprint: DuplicateSubmissionFingerprint?
+    private var connectivityCancellable: AnyCancellable?
     private(set) var manualRecords: [MoodRecord] = []
 
     init(
         provider: any TimelineDataProviding,
         recordStore: any MoodRecordStoring,
         insightComposer: TodayInsightComposer = TodayInsightComposer(),
+        phoneConnectivityManager: PhoneConnectivityManager? = nil,
         calendar: Calendar = .current
     ) {
         self.provider = provider
         self.recordStore = recordStore
         self.insightComposer = insightComposer
+        self.phoneConnectivityManager = phoneConnectivityManager
         self.calendar = calendar
+        self.connectivityCancellable = phoneConnectivityManager?.recordsDidChange.sink { [weak self] in
+            Task { @MainActor in
+                self?.handleExternalRecordsUpdate()
+            }
+        }
         reloadManualRecords()
         refreshDerivedState(referenceDate: Date())
+        phoneConnectivityManager?.updatePhoneContext(activeSession: activeRecord)
     }
 
     func loadIfNeeded() async {
@@ -84,7 +95,7 @@ final class TodayViewModel: ObservableObject {
         manualRecords.sort { $0.createdAt > $1.createdAt }
         lastSubmittedFingerprint = DuplicateSubmissionFingerprint(record: record)
         if record.isOngoing {
-            recordingState = .recording(record)
+            setRecordingState(from: record)
         }
         showQuickRecord = false
         persistRecords()
@@ -98,7 +109,7 @@ final class TodayViewModel: ObservableObject {
         let completedRecord = activeRecord.completed(at: date)
         manualRecords[index] = completedRecord
         manualRecords.sort { $0.createdAt > $1.createdAt }
-        recordingState = .idle
+        setRecordingState(from: nil)
         persistRecords()
         rebuildTimeline(referenceDate: currentBaseTimeline?.date ?? date)
     }
@@ -134,7 +145,7 @@ final class TodayViewModel: ObservableObject {
         deleteOrphanedPhotos(for: removedRecord.photoAttachments, remainingRecords: manualRecords)
 
         if case let .recording(activeRecord) = recordingState, activeRecord.id == id {
-            recordingState = .idle
+            setRecordingState(from: nil)
         }
 
         persistRecords()
@@ -331,6 +342,8 @@ final class TodayViewModel: ObservableObject {
         } else {
             recordingState = .idle
         }
+
+        phoneConnectivityManager?.updatePhoneContext(activeSession: activeRecord)
     }
 
     private func removedRecords(from original: [MoodRecord], keeping sanitized: [MoodRecord]) -> [MoodRecord] {
@@ -354,6 +367,11 @@ final class TodayViewModel: ObservableObject {
     }()
 
     private static let maxCachedTimelines = 30
+
+    private func handleExternalRecordsUpdate() {
+        reloadManualRecords()
+        rebuildTimeline(referenceDate: currentBaseTimeline?.date ?? Date())
+    }
 }
 
 private struct ManualRecordSignature: Hashable {

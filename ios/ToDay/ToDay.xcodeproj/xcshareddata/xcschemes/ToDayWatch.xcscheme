@@ -15,20 +15,6 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "1FB5617C31BE25701E8C7ACD"
-               BuildableName = "ToDay.app"
-               BlueprintName = "ToDay"
-               ReferencedContainer = "container:ToDay.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
                BlueprintIdentifier = "79EAFC5ABCB9582EABD64851"
                BuildableName = "ToDayWatch.app"
                BlueprintName = "ToDayWatch"
@@ -46,27 +32,14 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "1FB5617C31BE25701E8C7ACD"
-            BuildableName = "ToDay.app"
-            BlueprintName = "ToDay"
+            BlueprintIdentifier = "79EAFC5ABCB9582EABD64851"
+            BuildableName = "ToDayWatch.app"
+            BlueprintName = "ToDayWatch"
             ReferencedContainer = "container:ToDay.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <Testables>
-         <TestableReference
-            skipped = "NO"
-            parallelizable = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "94E86223F7A3FEAECFA25695"
-               BuildableName = "ToDayTests.xctest"
-               BlueprintName = "ToDayTests"
-               ReferencedContainer = "container:ToDay.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
-      <CommandLineArguments>
-      </CommandLineArguments>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"
@@ -82,9 +55,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "1FB5617C31BE25701E8C7ACD"
-            BuildableName = "ToDay.app"
-            BlueprintName = "ToDay"
+            BlueprintIdentifier = "79EAFC5ABCB9582EABD64851"
+            BuildableName = "ToDayWatch.app"
+            BlueprintName = "ToDayWatch"
             ReferencedContainer = "container:ToDay.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -101,9 +74,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "1FB5617C31BE25701E8C7ACD"
-            BuildableName = "ToDay.app"
-            BlueprintName = "ToDay"
+            BlueprintIdentifier = "79EAFC5ABCB9582EABD64851"
+            BuildableName = "ToDayWatch.app"
+            BlueprintName = "ToDayWatch"
             ReferencedContainer = "container:ToDay.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

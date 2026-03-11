@@ -1,15 +1,23 @@
 import Foundation
 import SwiftData
+#if os(iOS)
+import WatchConnectivity
+#endif
 
 enum AppContainer {
     static let modelContainer = makeModelContainer()
     private static let legacyMoodRecordStoreKey = "today.manualRecords"
+    private static let moodRecordStore = SwiftDataMoodRecordStore(container: modelContainer)
+#if os(iOS)
+    static let phoneConnectivityManager = makePhoneConnectivityManager()
+#endif
 
     @MainActor
     static func makeTodayViewModel() -> TodayViewModel {
         TodayViewModel(
             provider: makeTimelineProvider(),
-            recordStore: makeMoodRecordStore()
+            recordStore: makeMoodRecordStore(),
+            phoneConnectivityManager: phoneConnectivityManager
         )
     }
 
@@ -29,7 +37,7 @@ enum AppContainer {
     }
 
     static func makeMoodRecordStore() -> any MoodRecordStoring {
-        SwiftDataMoodRecordStore(container: modelContainer)
+        moodRecordStore
     }
 
     private static func makeModelContainer() -> ModelContainer {
@@ -61,4 +69,12 @@ enum AppContainer {
             assertionFailure("迁移旧版 MoodRecord 数据失败：\(error.localizedDescription)")
         }
     }
+
+#if os(iOS)
+    private static func makePhoneConnectivityManager() -> PhoneConnectivityManager {
+        let manager = PhoneConnectivityManager.shared
+        manager.configure(recordStore: moodRecordStore)
+        return manager
+    }
+#endif
 }

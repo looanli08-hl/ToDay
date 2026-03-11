@@ -10,32 +10,43 @@
 		098D78BFE47A6A0C393D07B5 /* SwiftDataMoodRecordStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FF1B505498DE678D74F9FB8 /* SwiftDataMoodRecordStoreTests.swift */; };
 		0DAC5BEFCDEF75F998B00E5C /* AppRootScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A80390E769238F81D933506 /* AppRootScreen.swift */; };
 		26846615AF8CA2F05F11D9B0 /* ProScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B46AF3B810BFFEE6F069410 /* ProScreen.swift */; };
+		289858661ACDE5B4E2046978 /* ConnectivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88ECC52BFECC7DC8A36A235E /* ConnectivityManager.swift */; };
 		30FE580FCC3DB158481A5ABC /* MoodPhotoLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF6D780665E1477D9E1362E /* MoodPhotoLibrary.swift */; };
 		3167A5A7F4562369CA4F54B4 /* HealthKitTimelineDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 248EB0D5C59CF49B72179706 /* HealthKitTimelineDataProvider.swift */; };
+		366F7C8E30E432042B253F16 /* ConnectivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88ECC52BFECC7DC8A36A235E /* ConnectivityManager.swift */; };
 		3EDD590CF25E429FB8186758 /* ToDayApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCCD453022FB7D3DE28EDE60 /* ToDayApp.swift */; };
 		44823975A98302AEB5069E00 /* HistoryScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = E41D5FDB97C97E39345EF797 /* HistoryScreen.swift */; };
+		4788852ACD6C662593EE18E6 /* WatchTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E06395E1BD9FE3C2B493042 /* WatchTheme.swift */; };
 		4E0E762B4D92B8C4703F24C0 /* MoodRecordEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 517D081EC92833825D6C1658 /* MoodRecordEntity.swift */; };
 		4FE7ED6B910849760A8ED1BE /* QuickRecordSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90DD0AA794ABBBE1F95F1B7 /* QuickRecordSheet.swift */; };
 		5F154D8DB1E79ED9B6747A94 /* MonetizationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29FDC86F425DD463F32D7EC2 /* MonetizationViewModel.swift */; };
 		6009F788A2DCD8E51F97E8D5 /* AppConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB09FC4279F21A281C6D8DC2 /* AppConfiguration.swift */; };
 		64CBD5CDDABBA47E698BE49E /* TimelineEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91944CCE08B997C8CAA13BBD /* TimelineEntry.swift */; };
-		7BC51B7352E2968F185CB750 /* MoodRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0773EC8EC7B7EA41E6CE3914 /* MoodRecord.swift */; };
+		70015EAB0824A09939C59B0C /* WatchMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24EB665732263021672AC442 /* WatchMessage.swift */; };
+		791903BA738523437BE8EE81 /* MoodPhotoAttachment.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDB4EF4DBF23B545C6736902 /* MoodPhotoAttachment.swift */; };
+		7C48F4DF83B6CE21C4BFB47A /* WatchMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24EB665732263021672AC442 /* WatchMessage.swift */; };
 		83EB550A345BE349E6AD5403 /* HistoryDayDetailScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C363F97E5D7CD67BB2D715B /* HistoryDayDetailScreen.swift */; };
 		88D47212DD537145F4F5E730 /* TodayTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A7313E34ABE1036CAEC076F /* TodayTheme.swift */; };
 		93C3B96072D6ECD7AB82943B /* MockTimelineDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FE2EF155E1C18E24C5D11D1 /* MockTimelineDataProvider.swift */; };
 		9C701A7285E2666EFC829AEF /* TodayViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16EB598659DDD263739D3136 /* TodayViewModel.swift */; };
 		A05D3D71F23108D27807DA94 /* TodayInsightComposerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5E3EC90284C88262A943A15 /* TodayInsightComposerTests.swift */; };
+		A2C3A2BAE1FB4EC9DA3094A6 /* MoodPhotoAttachment.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDB4EF4DBF23B545C6736902 /* MoodPhotoAttachment.swift */; };
 		A2F668A004169259C19C90A3 /* TodayInsightComposer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D40EA4B5DE92A1C04FEF877 /* TodayInsightComposer.swift */; };
-		A4C27F4493A8C6F163EDDF6B /* MoodPhotoAttachment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82FB3A1A3C390FC79F826B94 /* MoodPhotoAttachment.swift */; };
+		AA1395F7BDB54D44B1959AFC /* MoodRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = D796A8133E65C0F7E468E8AB /* MoodRecord.swift */; };
 		AED24B3EF148016906D995F8 /* DayTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C98792FCC517E2B96173407 /* DayTimeline.swift */; };
 		AFB0264365F2546579D2F53A /* MoodRecordStoring.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E53E00BCF5527A4FE8FD775 /* MoodRecordStoring.swift */; };
 		C5767BB39D601ADD6EA3AFE5 /* TodayScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = F728CBFA275E061CC33D4193 /* TodayScreen.swift */; };
 		C8D4B957327922E04DBD7578 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 377615C5249C10E358F73636 /* Preview Assets.xcassets */; };
+		D2A26BDCFACB65C571297A68 /* ToDayWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58552F8BAC9DB54DD43EC5B6 /* ToDayWatchApp.swift */; };
 		D7DF86B1EC7D5D82B3201C1C /* TimelineDataProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D72C488C5C21014C1FAB59A /* TimelineDataProviding.swift */; };
 		DD042D446979BF714A91C923 /* AppContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7BB74516D89AD97D04F81B3 /* AppContainer.swift */; };
 		DE297B083A85A47DD13DE450 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C96E2DCDAC54DA106C2D81A /* Assets.xcassets */; };
+		EAAD572985D8CFF5B456DA14 /* WatchHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 404E8EA06CD9AA4AF4D9231A /* WatchHomeView.swift */; };
+		EC421489F126891847F7CEFB /* MoodRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = D796A8133E65C0F7E468E8AB /* MoodRecord.swift */; };
+		EF20444212B5571CD54CF7C7 /* ToDay.app in Resources */ = {isa = PBXBuildFile; fileRef = D273A8E459B1BBB83027539B /* ToDay.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		F15785C5CD541E8A984C1FEB /* TodayViewModelSessionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCFF1F5F9574B84A9B5B3ED9 /* TodayViewModelSessionTests.swift */; };
 		FBF90F06A0B49EDD24C7F79C /* TodayFlowViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C77065335DE754680A34C99 /* TodayFlowViews.swift */; };
+		FF5E4FB20D0B535F07B92382 /* MoodRecord+Timeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B917ECDF78E99FB0636A58B /* MoodRecord+Timeline.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -46,29 +57,41 @@
 			remoteGlobalIDString = 1FB5617C31BE25701E8C7ACD;
 			remoteInfo = ToDay;
 		};
+		AB2665B8F40B55A4C6F0883F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2C29361A382315565B1DE7BF /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1FB5617C31BE25701E8C7ACD;
+			remoteInfo = ToDay;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		037508DDAD551D2D5F74DE83 /* ToDayTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = ToDayTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		0773EC8EC7B7EA41E6CE3914 /* MoodRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodRecord.swift; sourceTree = "<group>"; };
 		0A80390E769238F81D933506 /* AppRootScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRootScreen.swift; sourceTree = "<group>"; };
 		0C96E2DCDAC54DA106C2D81A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0FE2EF155E1C18E24C5D11D1 /* MockTimelineDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockTimelineDataProvider.swift; sourceTree = "<group>"; };
 		16EB598659DDD263739D3136 /* TodayViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayViewModel.swift; sourceTree = "<group>"; };
 		1A7313E34ABE1036CAEC076F /* TodayTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayTheme.swift; sourceTree = "<group>"; };
 		248EB0D5C59CF49B72179706 /* HealthKitTimelineDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitTimelineDataProvider.swift; sourceTree = "<group>"; };
+		24EB665732263021672AC442 /* WatchMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchMessage.swift; sourceTree = "<group>"; };
 		29FDC86F425DD463F32D7EC2 /* MonetizationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonetizationViewModel.swift; sourceTree = "<group>"; };
 		2B46AF3B810BFFEE6F069410 /* ProScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProScreen.swift; sourceTree = "<group>"; };
 		2C363F97E5D7CD67BB2D715B /* HistoryDayDetailScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryDayDetailScreen.swift; sourceTree = "<group>"; };
 		377615C5249C10E358F73636 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		3C77065335DE754680A34C99 /* TodayFlowViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayFlowViews.swift; sourceTree = "<group>"; };
 		3E53E00BCF5527A4FE8FD775 /* MoodRecordStoring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodRecordStoring.swift; sourceTree = "<group>"; };
+		404E8EA06CD9AA4AF4D9231A /* WatchHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchHomeView.swift; sourceTree = "<group>"; };
 		517D081EC92833825D6C1658 /* MoodRecordEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodRecordEntity.swift; sourceTree = "<group>"; };
+		58552F8BAC9DB54DD43EC5B6 /* ToDayWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDayWatchApp.swift; sourceTree = "<group>"; };
 		5C98792FCC517E2B96173407 /* DayTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayTimeline.swift; sourceTree = "<group>"; };
+		69C007DCC3F49E4F2969B1D7 /* ToDayWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ToDayWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6B917ECDF78E99FB0636A58B /* MoodRecord+Timeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MoodRecord+Timeline.swift"; sourceTree = "<group>"; };
 		6D40EA4B5DE92A1C04FEF877 /* TodayInsightComposer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayInsightComposer.swift; sourceTree = "<group>"; };
 		7D72C488C5C21014C1FAB59A /* TimelineDataProviding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineDataProviding.swift; sourceTree = "<group>"; };
+		7E06395E1BD9FE3C2B493042 /* WatchTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchTheme.swift; sourceTree = "<group>"; };
 		7FF1B505498DE678D74F9FB8 /* SwiftDataMoodRecordStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftDataMoodRecordStoreTests.swift; sourceTree = "<group>"; };
-		82FB3A1A3C390FC79F826B94 /* MoodPhotoAttachment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodPhotoAttachment.swift; sourceTree = "<group>"; };
+		88ECC52BFECC7DC8A36A235E /* ConnectivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectivityManager.swift; sourceTree = "<group>"; };
 		91944CCE08B997C8CAA13BBD /* TimelineEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineEntry.swift; sourceTree = "<group>"; };
 		AD8F9694BC13B76959CA8639 /* ToDay.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ToDay.entitlements; sourceTree = "<group>"; };
 		CB09FC4279F21A281C6D8DC2 /* AppConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfiguration.swift; sourceTree = "<group>"; };
@@ -76,11 +99,13 @@
 		CDF6D780665E1477D9E1362E /* MoodPhotoLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodPhotoLibrary.swift; sourceTree = "<group>"; };
 		D273A8E459B1BBB83027539B /* ToDay.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = ToDay.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D5E3EC90284C88262A943A15 /* TodayInsightComposerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayInsightComposerTests.swift; sourceTree = "<group>"; };
+		D796A8133E65C0F7E468E8AB /* MoodRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodRecord.swift; sourceTree = "<group>"; };
 		E41D5FDB97C97E39345EF797 /* HistoryScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryScreen.swift; sourceTree = "<group>"; };
 		E7BB74516D89AD97D04F81B3 /* AppContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppContainer.swift; sourceTree = "<group>"; };
 		E90DD0AA794ABBBE1F95F1B7 /* QuickRecordSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickRecordSheet.swift; sourceTree = "<group>"; };
 		F728CBFA275E061CC33D4193 /* TodayScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayScreen.swift; sourceTree = "<group>"; };
 		FCFF1F5F9574B84A9B5B3ED9 /* TodayViewModelSessionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayViewModelSessionTests.swift; sourceTree = "<group>"; };
+		FDB4EF4DBF23B545C6736902 /* MoodPhotoAttachment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodPhotoAttachment.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -89,8 +114,20 @@
 			children = (
 				D273A8E459B1BBB83027539B /* ToDay.app */,
 				037508DDAD551D2D5F74DE83 /* ToDayTests.xctest */,
+				69C007DCC3F49E4F2969B1D7 /* ToDayWatch.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		1E117752257DE6D299F5305B /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				88ECC52BFECC7DC8A36A235E /* ConnectivityManager.swift */,
+				FDB4EF4DBF23B545C6736902 /* MoodPhotoAttachment.swift */,
+				D796A8133E65C0F7E468E8AB /* MoodRecord.swift */,
+				24EB665732263021672AC442 /* WatchMessage.swift */,
+			);
+			path = Shared;
 			sourceTree = "<group>";
 		};
 		4558B47175ED68C428686870 /* ToDay */ = {
@@ -103,6 +140,7 @@
 				CF3F707E90609841F9C16A07 /* Models */,
 				78D735726A6B403CB84BFC41 /* Preview Content */,
 				45EF8CC0BF7044E6FC3A7ED5 /* Resources */,
+				1E117752257DE6D299F5305B /* Shared */,
 			);
 			path = ToDay;
 			sourceTree = "<group>";
@@ -153,6 +191,16 @@
 			path = App;
 			sourceTree = "<group>";
 		};
+		A81E7032AEC279593E8EFCDA /* ToDayWatch */ = {
+			isa = PBXGroup;
+			children = (
+				58552F8BAC9DB54DD43EC5B6 /* ToDayWatchApp.swift */,
+				404E8EA06CD9AA4AF4D9231A /* WatchHomeView.swift */,
+				7E06395E1BD9FE3C2B493042 /* WatchTheme.swift */,
+			);
+			path = ToDayWatch;
+			sourceTree = "<group>";
+		};
 		BDF9E53E8979EE3E9CB77A86 /* ToDayTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -180,8 +228,7 @@
 			isa = PBXGroup;
 			children = (
 				5C98792FCC517E2B96173407 /* DayTimeline.swift */,
-				82FB3A1A3C390FC79F826B94 /* MoodPhotoAttachment.swift */,
-				0773EC8EC7B7EA41E6CE3914 /* MoodRecord.swift */,
+				6B917ECDF78E99FB0636A58B /* MoodRecord+Timeline.swift */,
 				91944CCE08B997C8CAA13BBD /* TimelineEntry.swift */,
 			);
 			path = Models;
@@ -201,6 +248,7 @@
 			children = (
 				4558B47175ED68C428686870 /* ToDay */,
 				BDF9E53E8979EE3E9CB77A86 /* ToDayTests */,
+				A81E7032AEC279593E8EFCDA /* ToDayWatch */,
 				01BAB423F888B3D328A14A31 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -239,6 +287,25 @@
 			productReference = D273A8E459B1BBB83027539B /* ToDay.app */;
 			productType = "com.apple.product-type.application";
 		};
+		79EAFC5ABCB9582EABD64851 /* ToDayWatch */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B784DB36CF7AD773CFC26AD2 /* Build configuration list for PBXNativeTarget "ToDayWatch" */;
+			buildPhases = (
+				99F413FBBA74B34F89359172 /* Sources */,
+				E014E9BB579D823A18372C65 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				26A39FA7DA7F5D69DCAF5542 /* PBXTargetDependency */,
+			);
+			name = ToDayWatch;
+			packageProductDependencies = (
+			);
+			productName = ToDayWatch;
+			productReference = 69C007DCC3F49E4F2969B1D7 /* ToDayWatch.app */;
+			productType = "com.apple.product-type.application";
+		};
 		94E86223F7A3FEAECFA25695 /* ToDayTests */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 8728FF9039559910B467D8C3 /* Build configuration list for PBXNativeTarget "ToDayTests" */;
@@ -270,6 +337,10 @@
 						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
 					};
+					79EAFC5ABCB9582EABD64851 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
 					94E86223F7A3FEAECFA25695 = {
 						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
@@ -292,6 +363,7 @@
 			targets = (
 				1FB5617C31BE25701E8C7ACD /* ToDay */,
 				94E86223F7A3FEAECFA25695 /* ToDayTests */,
+				79EAFC5ABCB9582EABD64851 /* ToDayWatch */,
 			);
 		};
 /* End PBXProject section */
@@ -306,6 +378,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E014E9BB579D823A18372C65 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EF20444212B5571CD54CF7C7 /* ToDay.app in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -316,15 +396,17 @@
 				6009F788A2DCD8E51F97E8D5 /* AppConfiguration.swift in Sources */,
 				DD042D446979BF714A91C923 /* AppContainer.swift in Sources */,
 				0DAC5BEFCDEF75F998B00E5C /* AppRootScreen.swift in Sources */,
+				289858661ACDE5B4E2046978 /* ConnectivityManager.swift in Sources */,
 				AED24B3EF148016906D995F8 /* DayTimeline.swift in Sources */,
 				3167A5A7F4562369CA4F54B4 /* HealthKitTimelineDataProvider.swift in Sources */,
 				83EB550A345BE349E6AD5403 /* HistoryDayDetailScreen.swift in Sources */,
 				44823975A98302AEB5069E00 /* HistoryScreen.swift in Sources */,
 				93C3B96072D6ECD7AB82943B /* MockTimelineDataProvider.swift in Sources */,
 				5F154D8DB1E79ED9B6747A94 /* MonetizationViewModel.swift in Sources */,
-				A4C27F4493A8C6F163EDDF6B /* MoodPhotoAttachment.swift in Sources */,
+				791903BA738523437BE8EE81 /* MoodPhotoAttachment.swift in Sources */,
 				30FE580FCC3DB158481A5ABC /* MoodPhotoLibrary.swift in Sources */,
-				7BC51B7352E2968F185CB750 /* MoodRecord.swift in Sources */,
+				FF5E4FB20D0B535F07B92382 /* MoodRecord+Timeline.swift in Sources */,
+				EC421489F126891847F7CEFB /* MoodRecord.swift in Sources */,
 				4E0E762B4D92B8C4703F24C0 /* MoodRecordEntity.swift in Sources */,
 				AFB0264365F2546579D2F53A /* MoodRecordStoring.swift in Sources */,
 				26846615AF8CA2F05F11D9B0 /* ProScreen.swift in Sources */,
@@ -337,6 +419,7 @@
 				C5767BB39D601ADD6EA3AFE5 /* TodayScreen.swift in Sources */,
 				88D47212DD537145F4F5E730 /* TodayTheme.swift in Sources */,
 				9C701A7285E2666EFC829AEF /* TodayViewModel.swift in Sources */,
+				70015EAB0824A09939C59B0C /* WatchMessage.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -350,6 +433,20 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		99F413FBBA74B34F89359172 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				366F7C8E30E432042B253F16 /* ConnectivityManager.swift in Sources */,
+				A2C3A2BAE1FB4EC9DA3094A6 /* MoodPhotoAttachment.swift in Sources */,
+				AA1395F7BDB54D44B1959AFC /* MoodRecord.swift in Sources */,
+				D2A26BDCFACB65C571297A68 /* ToDayWatchApp.swift in Sources */,
+				EAAD572985D8CFF5B456DA14 /* WatchHomeView.swift in Sources */,
+				7C48F4DF83B6CE21C4BFB47A /* WatchMessage.swift in Sources */,
+				4788852ACD6C662593EE18E6 /* WatchTheme.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -358,9 +455,30 @@
 			target = 1FB5617C31BE25701E8C7ACD /* ToDay */;
 			targetProxy = 0B8C66CE96BFBD6584B0159B /* PBXContainerItemProxy */;
 		};
+		26A39FA7DA7F5D69DCAF5542 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1FB5617C31BE25701E8C7ACD /* ToDay */;
+			targetProxy = AB2665B8F40B55A4C6F0883F /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		28DBA607992EFF266ADE7C23 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_KEY_CFBundleDisplayName = "ToDay Watch";
+				INFOPLIST_KEY_WKApplication = YES;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.looanli.today;
+				PRODUCT_BUNDLE_IDENTIFIER = com.looanli.today.watchkitapp;
+				PRODUCT_NAME = ToDayWatch;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Debug;
+		};
 		3A23333C80BAD0A186C9634F /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -503,13 +621,28 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.looanli.today;
 				PRODUCT_NAME = ToDay;
-				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
+		};
+		EF600A4A59CDC392FF34E127 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_KEY_CFBundleDisplayName = "ToDay Watch";
+				INFOPLIST_KEY_WKApplication = YES;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.looanli.today;
+				PRODUCT_BUNDLE_IDENTIFIER = com.looanli.today.watchkitapp;
+				PRODUCT_NAME = ToDayWatch;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Release;
 		};
 		F5D49D0E54F332782B37B521 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -572,7 +705,6 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.looanli.today;
 				PRODUCT_NAME = ToDay;
-				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
@@ -606,6 +738,15 @@
 			buildConfigurations = (
 				75B542BB223BF07D88D0E640 /* Debug */,
 				4E7FF80832C20A2DDAADCA46 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		B784DB36CF7AD773CFC26AD2 /* Build configuration list for PBXNativeTarget "ToDayWatch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				28DBA607992EFF266ADE7C23 /* Debug */,
+				EF600A4A59CDC392FF34E127 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
