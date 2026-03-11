@@ -36,6 +36,7 @@
 		AA1395F7BDB54D44B1959AFC /* MoodRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = D796A8133E65C0F7E468E8AB /* MoodRecord.swift */; };
 		AED24B3EF148016906D995F8 /* DayTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C98792FCC517E2B96173407 /* DayTimeline.swift */; };
 		AFB0264365F2546579D2F53A /* MoodRecordStoring.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E53E00BCF5527A4FE8FD775 /* MoodRecordStoring.swift */; };
+		BDF5624B2E56476CB71857AF /* WatchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AAB5EA48FC1A363AF03230D /* WatchViewModel.swift */; };
 		C5767BB39D601ADD6EA3AFE5 /* TodayScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = F728CBFA275E061CC33D4193 /* TodayScreen.swift */; };
 		C8D4B957327922E04DBD7578 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 377615C5249C10E358F73636 /* Preview Assets.xcassets */; };
 		D2A26BDCFACB65C571297A68 /* ToDayWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58552F8BAC9DB54DD43EC5B6 /* ToDayWatchApp.swift */; };
@@ -100,6 +101,7 @@
 		58552F8BAC9DB54DD43EC5B6 /* ToDayWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDayWatchApp.swift; sourceTree = "<group>"; };
 		5C98792FCC517E2B96173407 /* DayTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayTimeline.swift; sourceTree = "<group>"; };
 		69C007DCC3F49E4F2969B1D7 /* ToDayWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ToDayWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6AAB5EA48FC1A363AF03230D /* WatchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchViewModel.swift; sourceTree = "<group>"; };
 		6B917ECDF78E99FB0636A58B /* MoodRecord+Timeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MoodRecord+Timeline.swift"; sourceTree = "<group>"; };
 		6D40EA4B5DE92A1C04FEF877 /* TodayInsightComposer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayInsightComposer.swift; sourceTree = "<group>"; };
 		7D72C488C5C21014C1FAB59A /* TimelineDataProviding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineDataProviding.swift; sourceTree = "<group>"; };
@@ -211,6 +213,7 @@
 				58552F8BAC9DB54DD43EC5B6 /* ToDayWatchApp.swift */,
 				404E8EA06CD9AA4AF4D9231A /* WatchHomeView.swift */,
 				7E06395E1BD9FE3C2B493042 /* WatchTheme.swift */,
+				6AAB5EA48FC1A363AF03230D /* WatchViewModel.swift */,
 			);
 			path = ToDayWatch;
 			sourceTree = "<group>";
@@ -450,6 +453,7 @@
 				EAAD572985D8CFF5B456DA14 /* WatchHomeView.swift in Sources */,
 				7C48F4DF83B6CE21C4BFB47A /* WatchMessage.swift in Sources */,
 				4788852ACD6C662593EE18E6 /* WatchTheme.swift in Sources */,
+				BDF5624B2E56476CB71857AF /* WatchViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
