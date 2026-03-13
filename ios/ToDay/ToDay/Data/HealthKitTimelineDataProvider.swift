@@ -71,19 +71,10 @@ final class HealthKitTimelineDataProvider: TimelineDataProviding {
         }
 
         try await authorizationGate.authorizeIfNeeded { [healthStore] in
-            try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-                healthStore.requestAuthorization(toShare: [], read: Set(readTypes)) { success, error in
-                    if let error {
-                        continuation.resume(throwing: error)
-                        return
-                    }
-
-                    if success {
-                        continuation.resume(returning: ())
-                    } else {
-                        continuation.resume(throwing: TimelineDataError.authorizationDenied)
-                    }
-                }
+            do {
+                try await healthStore.requestAuthorization(toShare: [], read: Set(readTypes))
+            } catch {
+                throw TimelineDataError.authorizationDenied
             }
         }
     }
@@ -98,24 +89,17 @@ final class HealthKitTimelineDataProvider: TimelineDataProviding {
             return 0
         }
 
-        let predicate = HKQuery.predicateForSamples(withStart: start, end: end)
+        let predicate = HKSamplePredicate.quantitySample(
+            type: quantityType,
+            predicate: HKQuery.predicateForSamples(withStart: start, end: end)
+        )
+        let descriptor = HKStatisticsQueryDescriptor(predicate: predicate, options: .cumulativeSum)
 
-        return try await withCheckedThrowingContinuation { continuation in
-            let query = HKStatisticsQuery(
-                quantityType: quantityType,
-                quantitySamplePredicate: predicate,
-                options: .cumulativeSum
-            ) { _, result, error in
-                if let error {
-                    continuation.resume(throwing: TimelineDataError.queryFailed(error.localizedDescription))
-                    return
-                }
-
-                let value = result?.sumQuantity()?.doubleValue(for: unit) ?? 0
-                continuation.resume(returning: value)
-            }
-
-            healthStore.execute(query)
+        do {
+            let result = try await descriptor.result(for: healthStore)
+            return result?.sumQuantity()?.doubleValue(for: unit) ?? 0
+        } catch {
+            throw TimelineDataError.queryFailed(error.localizedDescription)
         }
     }
 
@@ -126,53 +110,44 @@ final class HealthKitTimelineDataProvider: TimelineDataProviding {
 
         let startOfDay = calendar.startOfDay(for: referenceDate)
         let intervalStart = calendar.date(byAdding: .hour, value: -12, to: startOfDay) ?? startOfDay
-        let predicate = HKQuery.predicateForSamples(withStart: intervalStart, end: referenceDate)
+        let descriptor = HKSampleQueryDescriptor(
+            predicates: [
+                HKSamplePredicate.categorySample(
+                    type: sleepType,
+                    predicate: HKQuery.predicateForSamples(withStart: intervalStart, end: referenceDate)
+                )
+            ],
+            sortDescriptors: [],
+            limit: nil
+        )
 
-        return try await withCheckedThrowingContinuation { continuation in
-            let query = HKSampleQuery(
-                sampleType: sleepType,
-                predicate: predicate,
-                limit: HKObjectQueryNoLimit,
-                sortDescriptors: nil
-            ) { _, samples, error in
-                if let error {
-                    continuation.resume(throwing: TimelineDataError.queryFailed(error.localizedDescription))
-                    return
+        do {
+            let samples = try await descriptor.result(for: healthStore)
+            let totalSleep = samples
+                .filter { Self.sleepValues.contains($0.value) }
+                .reduce(0.0) { total, sample in
+                    total + sample.endDate.timeIntervalSince(sample.startDate)
                 }
-
-                let totalSleep = (samples as? [HKCategorySample] ?? [])
-                    .filter { Self.sleepValues.contains($0.value) }
-                    .reduce(0.0) { total, sample in
-                        total + sample.endDate.timeIntervalSince(sample.startDate)
-                    }
-
-                continuation.resume(returning: totalSleep / 3600)
-            }
-
-            healthStore.execute(query)
+            return totalSleep / 3600
+        } catch {
+            throw TimelineDataError.queryFailed(error.localizedDescription)
         }
     }
 
     private func fetchWorkouts(start: Date, end: Date) async throws -> [HKWorkout] {
-        let predicate = HKQuery.predicateForSamples(withStart: start, end: end)
-        let sortDescriptors = [NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: true)]
+        let descriptor = HKSampleQueryDescriptor(
+            predicates: [
+                HKSamplePredicate.workout(HKQuery.predicateForSamples(withStart: start, end: end))
+            ],
+            sortDescriptors: [],
+            limit: nil
+        )
 
-        return try await withCheckedThrowingContinuation { continuation in
-            let query = HKSampleQuery(
-                sampleType: .workoutType(),
-                predicate: predicate,
-                limit: HKObjectQueryNoLimit,
-                sortDescriptors: sortDescriptors
-            ) { _, samples, error in
-                if let error {
-                    continuation.resume(throwing: TimelineDataError.queryFailed(error.localizedDescription))
-                    return
-                }
-
-                continuation.resume(returning: samples as? [HKWorkout] ?? [])
-            }
-
-            healthStore.execute(query)
+        do {
+            return try await descriptor.result(for: healthStore)
+                .sorted { $0.startDate < $1.startDate }
+        } catch {
+            throw TimelineDataError.queryFailed(error.localizedDescription)
         }
     }
 
