@@ -33,6 +33,7 @@
 		7D67E87AFFB73352934F724E /* DayDataAggregator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D703F427121F57213803215D /* DayDataAggregator.swift */; };
 		83EB550A345BE349E6AD5403 /* HistoryDayDetailScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C363F97E5D7CD67BB2D715B /* HistoryDayDetailScreen.swift */; };
 		88D47212DD537145F4F5E730 /* TodayTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A7313E34ABE1036CAEC076F /* TodayTheme.swift */; };
+		935D009D01FC03332B46347B /* AnnotationSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FC1C309A6D38572AAE18677 /* AnnotationSheet.swift */; };
 		93C3B96072D6ECD7AB82943B /* MockTimelineDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FE2EF155E1C18E24C5D11D1 /* MockTimelineDataProvider.swift */; };
 		9C701A7285E2666EFC829AEF /* TodayViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16EB598659DDD263739D3136 /* TodayViewModel.swift */; };
 		A05D3D71F23108D27807DA94 /* TodayInsightComposerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5E3EC90284C88262A943A15 /* TodayInsightComposerTests.swift */; };
@@ -121,6 +122,7 @@
 		7977BB25ED5CBD3E034ED096 /* EventCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventCardView.swift; sourceTree = "<group>"; };
 		7D72C488C5C21014C1FAB59A /* TimelineDataProviding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineDataProviding.swift; sourceTree = "<group>"; };
 		7E06395E1BD9FE3C2B493042 /* WatchTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchTheme.swift; sourceTree = "<group>"; };
+		7FC1C309A6D38572AAE18677 /* AnnotationSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotationSheet.swift; sourceTree = "<group>"; };
 		7FF1B505498DE678D74F9FB8 /* SwiftDataMoodRecordStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftDataMoodRecordStoreTests.swift; sourceTree = "<group>"; };
 		83A5638C51B33BBE792F5AE6 /* MockEventInferenceEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockEventInferenceEngine.swift; sourceTree = "<group>"; };
 		83CAB597D8277AED207D5F76 /* EventDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventDetailView.swift; sourceTree = "<group>"; };
@@ -312,6 +314,7 @@
 		FF51E490980F90F9A6AEEBED /* Today */ = {
 			isa = PBXGroup;
 			children = (
+				7FC1C309A6D38572AAE18677 /* AnnotationSheet.swift */,
 				83CAB597D8277AED207D5F76 /* EventDetailView.swift */,
 				E90DD0AA794ABBBE1F95F1B7 /* QuickRecordSheet.swift */,
 				3C77065335DE754680A34C99 /* TodayFlowViews.swift */,
@@ -443,6 +446,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				935D009D01FC03332B46347B /* AnnotationSheet.swift in Sources */,
 				6009F788A2DCD8E51F97E8D5 /* AppConfiguration.swift in Sources */,
 				DD042D446979BF714A91C923 /* AppContainer.swift in Sources */,
 				0DAC5BEFCDEF75F998B00E5C /* AppRootScreen.swift in Sources */,

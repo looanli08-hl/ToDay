@@ -5,6 +5,7 @@ struct TodayScreen: View {
     @ObservedObject var viewModel: TodayViewModel
     @ObservedObject var monetizationViewModel: MonetizationViewModel
     @State private var selectedEvent: InferredEvent?
+    @State private var annotatingEvent: InferredEvent?
 
     let onOpenHistory: () -> Void
     let onOpenPro: () -> Void
@@ -61,7 +62,18 @@ struct TodayScreen: View {
                 }
             }
             .sheet(item: $selectedEvent) { event in
-                EventDetailView(event: event)
+                EventDetailView(event: event) {
+                    selectedEvent = nil
+                    Task { @MainActor in
+                        try? await Task.sleep(for: .milliseconds(150))
+                        annotatingEvent = event
+                    }
+                }
+            }
+            .sheet(item: $annotatingEvent) { event in
+                AnnotationSheet(event: event) { title in
+                    viewModel.annotateEvent(event, title: title)
+                }
             }
             .task {
                 await viewModel.loadIfNeeded()
@@ -173,7 +185,7 @@ struct TodayScreen: View {
                     selectedEvent = event
                 },
                 onBlankTap: { event in
-                    selectedEvent = event
+                    annotatingEvent = event
                 }
             )
         }

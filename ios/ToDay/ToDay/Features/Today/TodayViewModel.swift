@@ -27,6 +27,7 @@ final class TodayViewModel: ObservableObject {
     private var hasLoadedOnce = false
     private var currentBaseTimeline: DayTimeline?
     private var timelineCache: [Date: DayTimeline] = [:]
+    private var storedAnnotations: [UUID: StoredAnnotation] = [:]
     private var lastSubmittedFingerprint: DuplicateSubmissionFingerprint?
     private var connectivityCancellable: AnyCancellable?
     private(set) var manualRecords: [MoodRecord] = []
@@ -48,6 +49,7 @@ final class TodayViewModel: ObservableObject {
                 self?.handleExternalRecordsUpdate()
             }
         }
+        loadStoredAnnotations()
         reloadManualRecords()
         refreshDerivedState(referenceDate: Date())
         phoneConnectivityManager?.updatePhoneContext(activeSession: activeRecord)
@@ -207,13 +209,32 @@ final class TodayViewModel: ObservableObject {
         insightComposer.buildHistoryDetail(for: date, manualRecords: manualRecords)
     }
 
+    func annotateEvent(_ event: InferredEvent, title: String) {
+        let trimmedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedTitle.isEmpty else { return }
+
+        let annotation = StoredAnnotation(
+            id: event.id,
+            startDate: event.startDate,
+            endDate: event.endDate,
+            title: trimmedTitle
+        )
+        storedAnnotations[event.id] = annotation
+        persistStoredAnnotations()
+        rebuildTimeline(referenceDate: currentBaseTimeline?.date ?? event.startDate)
+    }
+
     private func mergedTimeline(base: DayTimeline) -> DayTimeline {
         let recordsForDay = records(on: base.date)
         let manualEntries = recordsForDay.map { $0.toInferredEvent(referenceDate: Date(), calendar: calendar) }
+        let annotationsForDay = annotations(on: base.date)
         let notesCount = recordsForDay.filter(hasNote).count
 
         var mergedStats = base.stats
         mergedStats.append(TimelineStat(title: "记录", value: "\(recordsForDay.count)"))
+        if !annotationsForDay.isEmpty {
+            mergedStats.append(TimelineStat(title: "标注", value: "\(annotationsForDay.count)"))
+        }
 
         if notesCount > 0 {
             mergedStats.append(TimelineStat(title: "备注", value: "\(notesCount)"))
@@ -223,7 +244,17 @@ final class TodayViewModel: ObservableObject {
             mergedStats.append(TimelineStat(title: "当前", value: activeRecord.mood.rawValue))
         }
 
-        let mergedEntries = (manualEntries + base.entries).sorted { lhs, rhs in
+        var matchedAnnotationIDs = Set<UUID>()
+        let annotatedBaseEntries = base.entries.map { event in
+            guard let annotation = storedAnnotations[event.id] else { return event }
+            matchedAnnotationIDs.insert(annotation.id)
+            return event.applyingAnnotation(annotation.title)
+        }
+        let syntheticAnnotationEntries = annotationsForDay
+            .filter { !matchedAnnotationIDs.contains($0.id) }
+            .map(\.asEvent)
+
+        let mergedEntries = (manualEntries + syntheticAnnotationEntries + annotatedBaseEntries).sorted { lhs, rhs in
             if lhs.startDate == rhs.startDate {
                 return lhs.id.uuidString < rhs.id.uuidString
             }
@@ -367,10 +398,40 @@ final class TodayViewModel: ObservableObject {
     }()
 
     private static let maxCachedTimelines = 30
+    private static let annotationStorageKey = "today.eventAnnotations"
 
     private func handleExternalRecordsUpdate() {
         reloadManualRecords()
         rebuildTimeline(referenceDate: currentBaseTimeline?.date ?? Date())
+    }
+
+    private func annotations(on date: Date) -> [StoredAnnotation] {
+        storedAnnotations.values
+            .filter { calendar.isDate($0.startDate, inSameDayAs: date) }
+            .sorted { $0.startDate < $1.startDate }
+    }
+
+    private func loadStoredAnnotations() {
+        guard let data = UserDefaults.standard.data(forKey: Self.annotationStorageKey) else {
+            storedAnnotations = [:]
+            return
+        }
+
+        do {
+            let annotations = try JSONDecoder().decode([StoredAnnotation].self, from: data)
+            storedAnnotations = Dictionary(uniqueKeysWithValues: annotations.map { ($0.id, $0) })
+        } catch {
+            storedAnnotations = [:]
+        }
+    }
+
+    private func persistStoredAnnotations() {
+        do {
+            let data = try JSONEncoder().encode(storedAnnotations.values.sorted { $0.startDate < $1.startDate })
+            UserDefaults.standard.set(data, forKey: Self.annotationStorageKey)
+        } catch {
+            errorMessage = "留白标注保存失败：\(error.localizedDescription)"
+        }
     }
 }
 
@@ -411,5 +472,25 @@ private struct DuplicateSubmissionFingerprint: Hashable {
         isTracking = record.isTracking
         captureMode = record.captureMode
         photoAttachments = record.photoAttachments
+    }
+}
+
+private struct StoredAnnotation: Codable, Hashable {
+    let id: UUID
+    let startDate: Date
+    let endDate: Date
+    let title: String
+
+    var asEvent: InferredEvent {
+        InferredEvent(
+            id: id,
+            kind: .userAnnotated,
+            startDate: startDate,
+            endDate: endDate,
+            confidence: .high,
+            displayName: title,
+            userAnnotation: title,
+            subtitle: "你补上了这段时间的名字。"
+        )
     }
 }

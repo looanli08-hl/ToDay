@@ -1,3 +1,4 @@
+import CryptoKit
 import Foundation
 
 /// 推理出的事件类型
@@ -58,7 +59,7 @@ struct InferredEvent: Codable, Identifiable, Hashable, Sendable {
     var photoAttachments: [MoodPhotoAttachment]
 
     init(
-        id: UUID = UUID(),
+        id: UUID? = nil,
         kind: EventKind,
         startDate: Date,
         endDate: Date,
@@ -70,7 +71,12 @@ struct InferredEvent: Codable, Identifiable, Hashable, Sendable {
         associatedMetrics: EventMetrics? = nil,
         photoAttachments: [MoodPhotoAttachment] = []
     ) {
-        self.id = id
+        self.id = id ?? Self.derivedID(
+            kind: kind,
+            startDate: startDate,
+            endDate: endDate,
+            displayName: displayName
+        )
         self.kind = kind
         self.startDate = startDate
         self.endDate = endDate
@@ -89,5 +95,44 @@ struct InferredEvent: Codable, Identifiable, Hashable, Sendable {
 
     var resolvedName: String {
         userAnnotation ?? displayName
+    }
+
+    func applyingAnnotation(_ annotation: String) -> InferredEvent {
+        InferredEvent(
+            id: id,
+            kind: .userAnnotated,
+            startDate: startDate,
+            endDate: endDate,
+            confidence: .high,
+            isLive: isLive,
+            displayName: displayName,
+            userAnnotation: annotation,
+            subtitle: subtitle,
+            associatedMetrics: associatedMetrics,
+            photoAttachments: photoAttachments
+        )
+    }
+
+    private static func derivedID(
+        kind: EventKind,
+        startDate: Date,
+        endDate: Date,
+        displayName: String
+    ) -> UUID {
+        let rawValue = [
+            kind.rawValue,
+            String(startDate.timeIntervalSince1970),
+            String(endDate.timeIntervalSince1970),
+            displayName
+        ].joined(separator: "|")
+        let digest = SHA256.hash(data: Data(rawValue.utf8))
+        let bytes = Array(digest.prefix(16))
+        let uuid = uuid_t(
+            bytes[0], bytes[1], bytes[2], bytes[3],
+            bytes[4], bytes[5], bytes[6], bytes[7],
+            bytes[8], bytes[9], bytes[10], bytes[11],
+            bytes[12], bytes[13], bytes[14], bytes[15]
+        )
+        return UUID(uuid: uuid)
     }
 }
