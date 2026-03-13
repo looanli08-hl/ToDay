@@ -79,6 +79,7 @@ struct InferredEvent: Identifiable, Hashable, Sendable {
     let startDate: Date
     let endDate: Date
     let confidence: EventConfidence
+    let isLive: Bool
     var displayName: String
     var userAnnotation: String?
     var subtitle: String?
@@ -91,6 +92,7 @@ struct InferredEvent: Identifiable, Hashable, Sendable {
         startDate: Date,
         endDate: Date,
         confidence: EventConfidence,
+        isLive: Bool = false,
         displayName: String,
         userAnnotation: String? = nil,
         subtitle: String? = nil,
@@ -102,6 +104,7 @@ struct InferredEvent: Identifiable, Hashable, Sendable {
         self.startDate = startDate
         self.endDate = endDate
         self.confidence = confidence
+        self.isLive = isLive
         self.displayName = displayName
         self.userAnnotation = userAnnotation
         self.subtitle = subtitle

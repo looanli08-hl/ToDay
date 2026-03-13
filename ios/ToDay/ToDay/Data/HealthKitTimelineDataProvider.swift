@@ -182,61 +182,59 @@ final class HealthKitTimelineDataProvider: TimelineDataProviding {
         activeEnergy: Double,
         sleepHours: Double,
         workouts: [HKWorkout]
-    ) -> [TimelineEntry] {
-        var entries: [TimelineEntry] = []
-        let dayStamp = Int(calendar.startOfDay(for: referenceDate).timeIntervalSince1970)
-
+    ) -> [InferredEvent] {
+        var entries: [InferredEvent] = []
+        let startOfDay = calendar.startOfDay(for: referenceDate)
         if sleepHours > 0 {
             entries.append(
-                TimelineEntry(
-                    id: "healthkit-sleep-\(dayStamp)",
-                    title: "睡眠",
-                    detail: String(format: "今天开始前大约记录了 %.1f 小时睡眠。", sleepHours),
-                    moment: .overnight,
+                InferredEvent(
                     kind: .sleep,
-                    durationMinutes: Int(sleepHours * 60)
+                    startDate: startOfDay,
+                    endDate: startOfDay.addingTimeInterval(sleepHours * 3600),
+                    confidence: .high,
+                    displayName: "睡眠",
+                    subtitle: String(format: "今天开始前大约记录了 %.1f 小时睡眠。", sleepHours)
                 )
             )
         }
 
         if steps > 0 || activeEnergy > 0 {
             entries.append(
-                TimelineEntry(
-                    id: "healthkit-activity-\(dayStamp)",
-                    title: "活动",
-                    detail: "今天目前累计 \(formatWholeNumber(steps)) 步，消耗 \(formatWholeNumber(activeEnergy)) kcal。",
-                    moment: .daytime,
-                    kind: .move
+                InferredEvent(
+                    kind: .activeWalk,
+                    startDate: startOfDay,
+                    endDate: referenceDate,
+                    confidence: .medium,
+                    displayName: "活动",
+                    subtitle: "今天目前累计 \(formatWholeNumber(steps)) 步，消耗 \(formatWholeNumber(activeEnergy)) kcal。"
                 )
             )
         }
 
         for workout in workouts {
-            let minutes = Int(workout.duration / 60)
             let activity = workout.workoutActivityType.displayName
-            let startMinute = minuteOfDay(for: workout.startDate)
-            let endMinute = minuteOfDay(for: workout.endDate)
 
             entries.append(
-                TimelineEntry(
-                    id: "healthkit-workout-\(Int(workout.startDate.timeIntervalSince1970))-\(Int(workout.endDate.timeIntervalSince1970))-\(activity)",
-                    title: activity,
-                    detail: "HealthKit 记录了 \(minutes) 分钟训练。",
-                    moment: .range(startMinuteOfDay: startMinute, endMinuteOfDay: endMinute),
-                    kind: .move,
-                    durationMinutes: minutes
+                InferredEvent(
+                    kind: .workout,
+                    startDate: workout.startDate,
+                    endDate: workout.endDate,
+                    confidence: .high,
+                    displayName: activity,
+                    subtitle: "HealthKit 记录了 \(Int(workout.duration / 60)) 分钟训练。"
                 )
             )
         }
 
         if entries.isEmpty && calendar.isDate(referenceDate, inSameDayAs: Date()) {
             entries.append(
-                TimelineEntry(
-                    id: "healthkit-empty-\(dayStamp)",
-                    title: "等待数据",
-                    detail: "HealthKit 已连接，但今天还没有可见样本。",
-                    moment: .daytime,
-                    kind: .pause
+                InferredEvent(
+                    kind: .quietTime,
+                    startDate: startOfDay,
+                    endDate: referenceDate,
+                    confidence: .low,
+                    displayName: "等待数据",
+                    subtitle: "HealthKit 已连接，但今天还没有可见样本。"
                 )
             )
         }
@@ -246,12 +244,6 @@ final class HealthKitTimelineDataProvider: TimelineDataProviding {
 
     private func formatWholeNumber(_ value: Double) -> String {
         value.formatted(.number.precision(.fractionLength(0)))
-    }
-
-    private func minuteOfDay(for date: Date) -> Int {
-        let hour = calendar.component(.hour, from: date)
-        let minute = calendar.component(.minute, from: date)
-        return (hour * 60) + minute
     }
 
     private static let sleepValues: Set<Int> = [

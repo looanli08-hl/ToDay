@@ -209,7 +209,7 @@ final class TodayViewModel: ObservableObject {
 
     private func mergedTimeline(base: DayTimeline) -> DayTimeline {
         let recordsForDay = records(on: base.date)
-        let manualEntries = recordsForDay.map { $0.toTimelineEntry(referenceDate: Date(), calendar: calendar) }
+        let manualEntries = recordsForDay.map { $0.toInferredEvent(referenceDate: Date(), calendar: calendar) }
         let notesCount = recordsForDay.filter(hasNote).count
 
         var mergedStats = base.stats
@@ -224,11 +224,11 @@ final class TodayViewModel: ObservableObject {
         }
 
         let mergedEntries = (manualEntries + base.entries).sorted { lhs, rhs in
-            if lhs.moment.startMinuteOfDay == rhs.moment.startMinuteOfDay {
-                return lhs.id < rhs.id
+            if lhs.startDate == rhs.startDate {
+                return lhs.id.uuidString < rhs.id.uuidString
             }
 
-            return lhs.moment.startMinuteOfDay < rhs.moment.startMinuteOfDay
+            return lhs.startDate < rhs.startDate
         }
 
         return DayTimeline(

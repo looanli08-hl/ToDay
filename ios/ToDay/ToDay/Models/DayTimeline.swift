@@ -5,7 +5,7 @@ struct DayTimeline {
     let summary: String
     let source: TimelineSource
     let stats: [TimelineStat]
-    let entries: [TimelineEntry]
+    let entries: [InferredEvent]
 }
 
 enum TimelineSource: String {

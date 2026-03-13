@@ -26,8 +26,24 @@ final class TodayInsightComposerTests: XCTestCase {
             source: .mock,
             stats: [TimelineStat(title: "模式", value: "本地")],
             entries: [
-                TimelineEntry(id: "sleep", title: "睡眠", detail: "昨夜 7 小时", moment: .overnight, kind: .sleep),
-                TimelineEntry(id: "focus", title: "专注", detail: "上午推进", moment: .range(startMinuteOfDay: 600, endMinuteOfDay: 690), kind: .focus)
+                InferredEvent(
+                    id: UUID(uuidString: "00000000-0000-0000-0000-000000000101")!,
+                    kind: .sleep,
+                    startDate: makeDate(year: 2026, month: 3, day: 10, hour: 0, minute: 0),
+                    endDate: makeDate(year: 2026, month: 3, day: 10, hour: 7, minute: 0),
+                    confidence: .high,
+                    displayName: "睡眠",
+                    subtitle: "昨夜 7 小时"
+                ),
+                InferredEvent(
+                    id: UUID(uuidString: "00000000-0000-0000-0000-000000000102")!,
+                    kind: .userAnnotated,
+                    startDate: makeDate(year: 2026, month: 3, day: 10, hour: 10, minute: 0),
+                    endDate: makeDate(year: 2026, month: 3, day: 10, hour: 11, minute: 30),
+                    confidence: .medium,
+                    displayName: "专注",
+                    subtitle: "上午推进"
+                )
             ]
         )
 
@@ -86,7 +102,7 @@ final class TodayInsightComposerTests: XCTestCase {
         XCTAssertTrue(detail?.narrative.contains("开会太久") == true)
     }
 
-    func testMoodRecordToTimelineEntryPreservesStableIdentity() {
+    func testMoodRecordToInferredEventPreservesStableIdentity() {
         let id = UUID(uuidString: "00000000-0000-0000-0000-000000000099")!
         let record = MoodRecord(
             id: id,
@@ -95,11 +111,12 @@ final class TodayInsightComposerTests: XCTestCase {
             createdAt: makeDate(year: 2026, month: 3, day: 10, hour: 18, minute: 32)
         )
 
-        let entry = record.toTimelineEntry()
+        let entry = record.toInferredEvent(referenceDate: makeDate(year: 2026, month: 3, day: 10, hour: 20, minute: 0))
 
-        XCTAssertEqual(entry.id, id.uuidString)
-        XCTAssertEqual(entry.moment.label, "18:32")
-        XCTAssertEqual(entry.moment.startMinuteOfDay, 18 * 60 + 32)
+        XCTAssertEqual(entry.id, id)
+        XCTAssertEqual(entry.startDate, makeDate(year: 2026, month: 3, day: 10, hour: 18, minute: 32))
+        XCTAssertEqual(entry.endDate, entry.startDate)
+        XCTAssertEqual(entry.displayName, "开心")
         XCTAssertEqual(entry.kind, .mood)
     }
 

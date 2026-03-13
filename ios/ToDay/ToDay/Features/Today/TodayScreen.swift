@@ -8,7 +8,7 @@ struct TodayScreen: View {
     let onOpenHistory: () -> Void
     let onOpenPro: () -> Void
 
-    @State private var expandedEntryID: String?
+    @State private var expandedEntryID: UUID?
     @State private var selectedPhotoGallery: TimelinePhotoGallery?
 
     private let chineseLocale = Locale(identifier: "zh_CN")

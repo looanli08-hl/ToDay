@@ -573,6 +573,7 @@ private extension InferredEvent {
             startDate: interval.start,
             endDate: interval.end,
             confidence: confidence,
+            isLive: isLive,
             displayName: displayName,
             userAnnotation: userAnnotation,
             subtitle: subtitle,

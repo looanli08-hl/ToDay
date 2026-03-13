@@ -4,7 +4,7 @@ import UIKit
 
 @MainActor
 final class TodayViewModelSessionTests: XCTestCase {
-    func testStartAndFinishMoodSessionUpdatesTimelineEntry() async {
+    func testStartAndFinishMoodSessionUpdatesTimelineEvent() async {
         let provider = StubTimelineProvider()
         let store = InMemoryMoodRecordStore()
         let viewModel = TodayViewModel(provider: provider, recordStore: store)
@@ -22,20 +22,21 @@ final class TodayViewModelSessionTests: XCTestCase {
         viewModel.startMoodRecord(activeRecord)
 
         XCTAssertEqual(viewModel.activeRecord?.id, activeRecord.id)
-        XCTAssertTrue(viewModel.timeline?.entries.contains(where: { $0.id == activeRecord.id.uuidString && $0.isLive }) == true)
+        XCTAssertTrue(viewModel.timeline?.entries.contains(where: { $0.id == activeRecord.id && $0.isLive }) == true)
 
         let finishDate = startDate.addingTimeInterval(45 * 60)
         viewModel.finishActiveMoodRecord(at: finishDate)
 
-        let finalizedEntry = viewModel.timeline?.entries.first(where: { $0.id == activeRecord.id.uuidString })
+        let finalizedEntry = viewModel.timeline?.entries.first(where: { $0.id == activeRecord.id })
 
         XCTAssertNil(viewModel.activeRecord)
-        XCTAssertEqual(finalizedEntry?.durationMinutes, 45)
+        XCTAssertEqual(finalizedEntry.map { max(Int($0.duration / 60), 1) }, 45)
         XCTAssertEqual(finalizedEntry?.isLive, false)
-        XCTAssertTrue(finalizedEntry?.moment.label.contains(" - ") == true)
+        XCTAssertEqual(finalizedEntry?.displayName, "专注")
+        XCTAssertGreaterThan(finalizedEntry?.endDate ?? .distantPast, finalizedEntry?.startDate ?? .distantFuture)
     }
 
-    func testCompletedShortSessionStillUsesRangeMoment() {
+    func testCompletedShortSessionStillUsesRangeEvent() {
         let record = MoodRecord.active(
             id: UUID(uuidString: "00000000-0000-0000-0000-000000000101")!,
             mood: .focused,
@@ -43,11 +44,10 @@ final class TodayViewModelSessionTests: XCTestCase {
             createdAt: sameDay(hour: 11, minute: 20)
         )
         let completed = record.completed(at: sameDay(hour: 11, minute: 20).addingTimeInterval(20))
-        let entry = completed.toTimelineEntry(referenceDate: sameDay(hour: 11, minute: 21))
+        let entry = completed.toInferredEvent(referenceDate: sameDay(hour: 11, minute: 21))
 
-        XCTAssertNotNil(entry.moment.endMinuteOfDay)
-        XCTAssertTrue(entry.moment.label.contains(" - "))
-        XCTAssertEqual(entry.durationMinutes, 1)
+        XCTAssertGreaterThan(entry.endDate, entry.startDate)
+        XCTAssertEqual(max(Int(entry.duration / 60), 1), 1)
     }
 
     func testStartMoodRecordIgnoresDuplicateSubmission() async {
@@ -77,7 +77,7 @@ final class TodayViewModelSessionTests: XCTestCase {
 
         XCTAssertEqual(viewModel.todayManualRecordCount, 1)
         XCTAssertEqual(
-            viewModel.timeline?.entries.filter { $0.title == "平静" && $0.detail.contains("喝咖啡") }.count,
+            viewModel.timeline?.entries.filter { $0.displayName == "平静" && $0.subtitle?.contains("喝咖啡") == true }.count,
             1
         )
     }
@@ -107,8 +107,8 @@ final class TodayViewModelSessionTests: XCTestCase {
         viewModel.startMoodRecord(firstRecord)
         viewModel.startMoodRecord(secondRecord)
 
-        XCTAssertEqual(viewModel.timeline?.entries.filter { $0.id == firstRecord.id.uuidString }.count, 1)
-        XCTAssertEqual(viewModel.timeline?.entries.filter { $0.id == secondRecord.id.uuidString }.count, 1)
+        XCTAssertEqual(viewModel.timeline?.entries.filter { $0.id == firstRecord.id }.count, 1)
+        XCTAssertEqual(viewModel.timeline?.entries.filter { $0.id == secondRecord.id }.count, 1)
         XCTAssertEqual(viewModel.todayManualRecordCount, 2)
     }
 
@@ -130,7 +130,7 @@ final class TodayViewModelSessionTests: XCTestCase {
         viewModel.startMoodRecord(record)
         await viewModel.load(forceReload: true)
 
-        XCTAssertEqual(viewModel.timeline?.entries.filter { $0.id == record.id.uuidString }.count, 1)
+        XCTAssertEqual(viewModel.timeline?.entries.filter { $0.id == record.id }.count, 1)
         XCTAssertEqual(viewModel.todayManualRecordCount, 1)
     }
 
@@ -185,11 +185,11 @@ final class TodayViewModelSessionTests: XCTestCase {
 
         XCTAssertEqual(viewModel.activeRecord?.id, activeRecord.id)
         XCTAssertEqual(viewModel.todayManualRecordCount, 2)
-        XCTAssertEqual(viewModel.timeline?.entries.filter { $0.id == activeRecord.id.uuidString }.count, 1)
-        XCTAssertEqual(viewModel.timeline?.entries.filter { $0.id == pointRecord.id.uuidString }.count, 1)
+        XCTAssertEqual(viewModel.timeline?.entries.filter { $0.id == activeRecord.id }.count, 1)
+        XCTAssertEqual(viewModel.timeline?.entries.filter { $0.id == pointRecord.id }.count, 1)
     }
 
-    func testTimelineEntryPreservesPhotoAttachments() {
+    func testInferredEventPreservesPhotoAttachments() {
         let attachments = [
             MoodPhotoAttachment(
                 id: UUID(uuidString: "00000000-0000-0000-0000-000000000611")!,
@@ -209,7 +209,7 @@ final class TodayViewModelSessionTests: XCTestCase {
             photoAttachments: attachments
         )
 
-        let entry = record.toTimelineEntry(referenceDate: sameDay(hour: 16, minute: 40))
+        let entry = record.toInferredEvent(referenceDate: sameDay(hour: 16, minute: 40))
 
         XCTAssertEqual(entry.photoAttachments, attachments)
     }

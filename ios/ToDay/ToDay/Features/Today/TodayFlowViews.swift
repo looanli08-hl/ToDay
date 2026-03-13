@@ -54,7 +54,7 @@ struct OverviewStatCard: View {
 }
 
 struct TodayFlowSignatureView: View {
-    let entries: [TimelineEntry]
+    let entries: [InferredEvent]
 
     var body: some View {
         GeometryReader { proxy in
@@ -85,7 +85,7 @@ struct TodayFlowSignatureView: View {
         let centerY = size.height / 2
 
         return entries.enumerated().map { index, entry in
-            let progress = Double(entry.moment.startMinuteOfDay) / Double(24 * 60)
+            let progress = Double(entry.timelineStartMinuteOfDay) / Double(24 * 60)
             let x = width * CGFloat(progress)
             let wave = CGFloat(sin(Double(index) * 0.65) * 3.5)
             let intensity = entry.kind.flowIntensity
@@ -163,7 +163,7 @@ struct TodayFlowSignatureView: View {
 }
 
 struct TimelineStreamRow: View {
-    let entry: TimelineEntry
+    let entry: InferredEvent
     let isExpanded: Bool
     let action: () -> Void
     let onPhotoTap: ([MoodPhotoAttachment], Int) -> Void
@@ -171,7 +171,7 @@ struct TimelineStreamRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .center, spacing: 10) {
-                Text(entry.moment.label)
+                Text(entry.timelineTimeLabel)
                     .font(.system(size: 12, weight: .medium, design: .monospaced))
                     .foregroundStyle(TodayTheme.inkMuted)
                     .frame(width: 74, alignment: .leading)
@@ -188,7 +188,7 @@ struct TimelineStreamRow: View {
                             .font(.system(size: 14))
                     }
 
-                Text(entry.title)
+                Text(entry.timelineTitle)
                     .font(.system(size: 15, weight: isExpanded ? .semibold : .regular))
                     .foregroundStyle(TodayTheme.inkSoft)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -217,7 +217,7 @@ struct TimelineStreamRow: View {
                 }
 
                 IntensityBar(
-                    durationMinutes: entry.durationMinutes,
+                    durationMinutes: entry.timelineDurationMinutes,
                     fallbackProgress: entry.kind.flowIntensity,
                     color: entry.kind.flowColor
                 )
@@ -231,7 +231,7 @@ struct TimelineStreamRow: View {
 
             if isExpanded {
                 VStack(alignment: .leading, spacing: 12) {
-                    Text(entry.detail)
+                    Text(entry.timelineDetail)
                         .font(.system(size: 14))
                         .foregroundStyle(TodayTheme.inkMuted)
                         .lineSpacing(4)
@@ -406,16 +406,16 @@ struct RecentDayCard: View {
     }
 }
 
-extension TimelineEntry.Kind {
+extension EventKind {
     var flowColor: Color {
         switch self {
         case .sleep:
             return TodayTheme.blue
-        case .move:
+        case .workout, .commute, .activeWalk:
             return TodayTheme.rose
-        case .focus:
+        case .userAnnotated:
             return TodayTheme.teal
-        case .pause:
+        case .quietTime:
             return TodayTheme.inkFaint
         case .mood:
             return TodayTheme.accent
@@ -426,11 +426,11 @@ extension TimelineEntry.Kind {
         switch self {
         case .sleep:
             return TodayTheme.blueSoft
-        case .move:
+        case .workout, .commute, .activeWalk:
             return TodayTheme.roseSoft
-        case .focus:
+        case .userAnnotated:
             return TodayTheme.tealSoft
-        case .pause:
+        case .quietTime:
             return TodayTheme.elevatedCard
         case .mood:
             return TodayTheme.accentSoft
@@ -441,11 +441,13 @@ extension TimelineEntry.Kind {
         switch self {
         case .sleep:
             return 0.24
-        case .move:
+        case .workout:
+            return 0.82
+        case .commute, .activeWalk:
             return 0.68
-        case .focus:
+        case .userAnnotated:
             return 0.90
-        case .pause:
+        case .quietTime:
             return 0.20
         case .mood:
             return 0.48
@@ -456,14 +458,123 @@ extension TimelineEntry.Kind {
         switch self {
         case .sleep:
             return "🌙"
-        case .move:
+        case .workout:
+            return "🏃"
+        case .commute:
             return "🚶"
-        case .focus:
+        case .activeWalk:
+            return "👟"
+        case .userAnnotated:
             return "⌘"
-        case .pause:
+        case .quietTime:
             return "☁️"
         case .mood:
             return "✦"
         }
     }
+}
+
+private extension InferredEvent {
+    var timelineTitle: String {
+        resolvedName
+    }
+
+    var timelineDetail: String {
+        let note = subtitle?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let hasNote = !(note?.isEmpty ?? true)
+
+        switch kind {
+        case .mood:
+            if isLive {
+                if let note, hasNote {
+                    return "\(note) · 正在进行，已持续 \(durationDescription)"
+                }
+                return "正在进行，已持续 \(durationDescription)"
+            }
+
+            if let durationMinutes = timelineDurationMinutes {
+                if let note, hasNote {
+                    return "\(note) · 持续 \(durationDescription(for: durationMinutes))"
+                }
+                return "持续 \(durationDescription(for: durationMinutes))"
+            }
+
+            if let note, hasNote {
+                return note
+            }
+            return "记录了这一刻的状态。"
+        case .sleep:
+            return note ?? "系统推断出一段睡眠。"
+        case .workout:
+            return note ?? "系统推断出一段训练。"
+        case .commute:
+            return note ?? "系统推断出一段通勤。"
+        case .activeWalk:
+            return note ?? "系统推断出一段活跃步行。"
+        case .quietTime:
+            return note ?? "这段时间相对平静。"
+        case .userAnnotated:
+            return note ?? "这是你主动标注的一段时间。"
+        }
+    }
+
+    var timelineTimeLabel: String {
+        if kind == .sleep && Calendar.current.component(.hour, from: startDate) == 0 && startDate != endDate {
+            return "昨夜"
+        }
+
+        let startLabel = Self.clockFormatter.string(from: startDate)
+
+        if isLive {
+            return "\(startLabel) - 现在"
+        }
+
+        guard let endDate = timelineEndDate else {
+            return startLabel
+        }
+
+        let endLabel = Self.clockFormatter.string(from: endDate)
+        return "\(startLabel) - \(endLabel)"
+    }
+
+    var timelineDurationMinutes: Int? {
+        guard isLive || endDate > startDate else { return nil }
+        return max(Int(endDate.timeIntervalSince(startDate) / 60), 1)
+    }
+
+    var timelineStartMinuteOfDay: Int {
+        let components = Calendar.current.dateComponents([.hour, .minute], from: startDate)
+        return ((components.hour ?? 0) * 60) + (components.minute ?? 0)
+    }
+
+    private var timelineEndDate: Date? {
+        guard endDate > startDate else { return nil }
+        return endDate
+    }
+
+    private var durationDescription: String {
+        durationDescription(for: timelineDurationMinutes ?? 1)
+    }
+
+    private func durationDescription(for minutes: Int) -> String {
+        if minutes >= 60 {
+            let hours = minutes / 60
+            let remainder = minutes % 60
+
+            if remainder == 0 {
+                return "\(hours) 小时"
+            }
+
+            return "\(hours) 小时 \(remainder) 分钟"
+        }
+
+        return "\(minutes) 分钟"
+    }
+
+    private static let clockFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "zh_CN")
+        formatter.dateFormat = "HH:mm"
+        return formatter
+    }()
 }
