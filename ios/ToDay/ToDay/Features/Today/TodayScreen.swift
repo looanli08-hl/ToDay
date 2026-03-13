@@ -202,15 +202,15 @@ struct TodayScreen: View {
     }
 
     private func scrollCanvasSection(_ timeline: DayTimeline) -> some View {
-        ContentCard {
-            EyebrowLabel("SCROLL CANVAS")
+        VStack(alignment: .leading, spacing: 14) {
+            EyebrowLabel("DAY TIMELINE")
 
-            Text("横向长卷")
+            Text("今日时间轴")
                 .font(.system(size: 23, weight: .regular, design: .serif))
                 .italic()
                 .foregroundStyle(TodayTheme.ink)
 
-            Text("把一天摊成一卷，从凌晨到夜里横向看清楚片段如何铺开。空白段落也会留出来，方便你之后再补标。")
+            Text("从凌晨到夜里，一天的起伏与留白。")
                 .font(.system(size: 14))
                 .foregroundStyle(TodayTheme.inkMuted)
                 .lineSpacing(4)

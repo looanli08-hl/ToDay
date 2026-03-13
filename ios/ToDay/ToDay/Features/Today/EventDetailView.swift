@@ -42,32 +42,32 @@ struct EventDetailView: View {
                     Text(event.resolvedName)
                         .font(.system(size: 28, weight: .regular, design: .serif))
                         .italic()
-                        .foregroundStyle(event.kind == .quietTime ? TodayTheme.ink : event.primaryTextColor)
+                        .foregroundStyle(headerPrimaryColor)
 
                     Text(timeRangeText)
                         .font(.system(size: 12, weight: .medium, design: .monospaced))
-                        .foregroundStyle(event.kind == .quietTime ? TodayTheme.inkMuted : event.secondaryTextColor)
+                        .foregroundStyle(headerSecondaryColor)
 
                     Text(event.scrollDurationText)
                         .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(event.kind == .quietTime ? TodayTheme.inkSoft : event.primaryTextColor)
+                        .foregroundStyle(headerPrimaryColor)
                 }
 
                 Spacer()
 
                 Text(event.kindBadgeTitle)
                     .font(.system(size: 11, weight: .bold, design: .monospaced))
-                    .foregroundStyle(event.kind == .quietTime ? TodayTheme.inkSoft : event.primaryTextColor)
+                    .foregroundStyle(headerPrimaryColor)
                     .padding(.horizontal, 10)
                     .padding(.vertical, 6)
-                    .background(event.badgeBackground)
+                    .background(headerBadgeBackground)
                     .clipShape(Capsule())
             }
 
             if let subtitle = event.subtitle, !subtitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 Text(subtitle)
                     .font(.system(size: 14))
-                    .foregroundStyle(event.kind == .quietTime ? TodayTheme.inkMuted : event.secondaryTextColor)
+                    .foregroundStyle(headerSecondaryColor)
                     .lineSpacing(4)
             }
 
@@ -285,6 +285,18 @@ struct EventDetailView: View {
             return String(format: "%.1f km", value / 1000)
         }
         return "\(Int(value.rounded())) m"
+    }
+
+    private var headerPrimaryColor: Color {
+        event.kind == .quietTime ? TodayTheme.ink : .white
+    }
+
+    private var headerSecondaryColor: Color {
+        event.kind == .quietTime ? TodayTheme.inkMuted : Color.white.opacity(0.78)
+    }
+
+    private var headerBadgeBackground: Color {
+        event.kind == .quietTime ? TodayTheme.card.opacity(0.7) : Color.white.opacity(0.14)
     }
 }
 

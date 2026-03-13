@@ -17,96 +17,67 @@ struct EventCardView: View {
     }
 
     private var eventCard: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(alignment: .top, spacing: 8) {
-                VStack(alignment: .leading, spacing: 6) {
-                    Text(event.kindBadgeTitle)
-                        .font(.system(size: 10, weight: .bold, design: .monospaced))
-                        .foregroundStyle(event.secondaryTextColor)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(event.badgeBackground)
-                        .clipShape(Capsule())
-
-                    Text(event.resolvedName)
-                        .font(.system(.headline, design: .rounded, weight: .semibold))
-                        .foregroundStyle(event.primaryTextColor)
-                        .lineLimit(2)
-                        .minimumScaleFactor(0.78)
-                }
-
-                Spacer(minLength: 4)
-
-                if let weather = event.associatedMetrics?.weather {
-                    VStack(alignment: .trailing, spacing: 4) {
-                        Image(systemName: weather.symbolName)
-                            .font(.system(size: 12, weight: .semibold))
-                            .foregroundStyle(event.primaryTextColor)
-
-                        Text("\(Int(weather.temperature.rounded()))°")
-                            .font(.system(size: 11, weight: .bold, design: .monospaced))
-                            .foregroundStyle(event.secondaryTextColor)
-                    }
-                }
-            }
-
-            if event.kind == .sleep,
-               let sleepStages = event.associatedMetrics?.sleepStages,
-               !sleepStages.isEmpty {
-                SleepStageRibbon(segments: sleepStages)
-                    .frame(height: 8)
-            }
-
-            Spacer(minLength: 0)
+        HStack(spacing: 0) {
+            RoundedRectangle(cornerRadius: 2, style: .continuous)
+                .fill(event.cardFill)
+                .frame(width: 4)
 
             VStack(alignment: .leading, spacing: 6) {
-                Text(event.scrollDurationText)
-                    .font(.system(size: 12, weight: .bold, design: .monospaced))
-                    .foregroundStyle(event.primaryTextColor)
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    Text(event.kindBadgeTitle)
+                        .font(.system(size: 10, weight: .bold, design: .monospaced))
+                        .foregroundStyle(event.cardFill)
 
-                if let subtitle = event.cardSubtitle {
-                    Text(subtitle)
-                        .font(.system(size: 12))
-                        .foregroundStyle(event.secondaryTextColor)
-                        .lineLimit(2)
+                    Text(event.resolvedName)
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(TodayTheme.ink)
+                        .lineLimit(1)
+
+                    Spacer(minLength: 8)
+
+                    Text(event.scrollDurationText)
+                        .font(.system(size: 13, weight: .bold, design: .monospaced))
+                        .foregroundStyle(TodayTheme.inkMuted)
                 }
 
-                if let locationName = event.associatedMetrics?.location?.placeName {
-                    Text(locationName)
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(event.secondaryTextColor)
+                if let detailLine = event.compactDetailLine {
+                    Text(detailLine)
+                        .font(.system(size: 13))
+                        .foregroundStyle(TodayTheme.inkMuted)
                         .lineLimit(1)
                 }
-            }
-        }
-        .padding(14)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .background(cardBackground)
-        .overlay(cardBorder)
-        .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
-    }
 
-    private var cardBackground: some View {
-        RoundedRectangle(cornerRadius: 22, style: .continuous)
-            .fill(event.cardFill)
-            .overlay {
-                if event.kind == .quietTime {
-                    RoundedRectangle(cornerRadius: 22, style: .continuous)
-                        .fill(.ultraThinMaterial)
+                if event.kind == .sleep,
+                   let sleepStages = event.associatedMetrics?.sleepStages,
+                   !sleepStages.isEmpty {
+                    SleepStageRibbon(segments: sleepStages)
+                        .frame(height: 6)
                 }
             }
+            .padding(.leading, 12)
+        }
+        .padding(.vertical, 12)
+        .padding(.trailing, 14)
+        .background(TodayTheme.card.opacity(event.isBlankCandidate ? 0.62 : 0.82))
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .overlay(cardBorder)
     }
 
     @ViewBuilder
     private var cardBorder: some View {
-        RoundedRectangle(cornerRadius: 22, style: .continuous)
-            .strokeBorder(
+        RoundedRectangle(cornerRadius: 14, style: .continuous)
+            .stroke(
                 style: StrokeStyle(
-                    lineWidth: event.isBlankCandidate ? 1.4 : 1,
+                    lineWidth: event.isBlankCandidate ? 1 : 0.5,
                     dash: event.isBlankCandidate ? [7, 5] : []
                 )
             )
-            .foregroundStyle(event.isBlankCandidate ? TodayTheme.inkFaint : event.cardStroke)
+            .foregroundStyle(
+                event.isBlankCandidate
+                    ? TodayTheme.border.opacity(0.35)
+                    : TodayTheme.border.opacity(0.5)
+            )
             .overlay(alignment: .bottomTrailing) {
                 if event.isBlankCandidate {
                     Text("点击记录")
@@ -122,30 +93,35 @@ struct EventCardView: View {
     }
 
     private var moodMarker: some View {
-        VStack(spacing: 6) {
+        HStack(spacing: 8) {
             Circle()
                 .fill(event.cardStroke)
-                .frame(width: 24, height: 24)
-                .overlay(
-                    Circle()
-                        .stroke(Color.white.opacity(0.8), lineWidth: 2)
-                )
+                .frame(width: 20, height: 20)
                 .overlay {
                     Text(event.moodEmoji)
-                        .font(.system(size: 13))
+                        .font(.system(size: 11))
                 }
 
-            if event.endDate > event.startDate {
-                Capsule()
-                    .fill(event.cardStroke.opacity(0.32))
-                    .frame(height: 8)
-                    .overlay(alignment: .leading) {
-                        Capsule()
-                            .fill(event.cardStroke)
-                            .frame(width: max(20, CGFloat(event.scrollCanvasDurationMinutes) * ScrollCanvasMetrics.moodPointsPerMinute))
-                    }
-            }
+            Text(event.resolvedName)
+                .font(.system(size: 14, weight: .medium))
+                .foregroundStyle(TodayTheme.ink)
+                .lineLimit(1)
+
+            Spacer(minLength: 8)
+
+            Text(event.moodTimeText)
+                .font(.system(size: 12, weight: .medium, design: .monospaced))
+                .foregroundStyle(TodayTheme.inkMuted)
         }
+        .padding(.vertical, 6)
+        .padding(.horizontal, 12)
+        .background(TodayTheme.card.opacity(0.6))
+        .background(.ultraThinMaterial)
+        .clipShape(Capsule())
+        .overlay(
+            Capsule()
+                .stroke(TodayTheme.border.opacity(0.5), lineWidth: 0.5)
+        )
     }
 }
 
@@ -206,31 +182,6 @@ extension InferredEvent {
         return "\(minutes)min"
     }
 
-    var cardHeight: CGFloat {
-        let baseHeight: CGFloat
-        switch kind {
-        case .workout:
-            baseHeight = 120
-        case .commute, .activeWalk:
-            baseHeight = 92
-        case .sleep:
-            baseHeight = 72
-        case .quietTime:
-            baseHeight = 64
-        case .userAnnotated:
-            baseHeight = 88
-        case .mood:
-            baseHeight = endDate > startDate ? 28 : 24
-        }
-
-        guard kind != .mood, let averageHeartRate = associatedMetrics?.averageHeartRate else {
-            return baseHeight
-        }
-
-        let adjustment = max(min((averageHeartRate - 72) * 0.6, 20), -12)
-        return max(56, baseHeight + adjustment)
-    }
-
     var cardFill: Color {
         switch kind {
         case .sleep:
@@ -279,39 +230,6 @@ extension InferredEvent {
 
     var isBlankCandidate: Bool {
         kind == .quietTime || confidence <= .low
-    }
-
-    var primaryTextColor: Color {
-        switch kind {
-        case .sleep, .workout, .commute, .activeWalk, .userAnnotated:
-            return Color.white
-        case .quietTime:
-            return TodayTheme.ink
-        case .mood:
-            return TodayTheme.ink
-        }
-    }
-
-    var secondaryTextColor: Color {
-        switch kind {
-        case .sleep, .workout, .commute, .activeWalk, .userAnnotated:
-            return Color.white.opacity(0.78)
-        case .quietTime:
-            return TodayTheme.inkMuted
-        case .mood:
-            return TodayTheme.inkMuted
-        }
-    }
-
-    var badgeBackground: Color {
-        switch kind {
-        case .sleep, .workout, .commute, .activeWalk, .userAnnotated:
-            return Color.white.opacity(0.14)
-        case .quietTime:
-            return TodayTheme.card.opacity(0.7)
-        case .mood:
-            return TodayTheme.accentSoft
-        }
     }
 
     var kindBadgeTitle: String {
@@ -373,5 +291,48 @@ extension InferredEvent {
         if resolvedName.contains("困倦") { return "😪" }
         if resolvedName.contains("满足") { return "☺️" }
         return "✦"
+    }
+
+    var compactDetailLine: String? {
+        let parts = [
+            cardSubtitle,
+            associatedMetrics?.location?.placeName,
+            associatedMetrics?.weather?.compactDetailText
+        ]
+        .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
+        .filter { !$0.isEmpty }
+
+        return parts.isEmpty ? nil : parts.joined(separator: " · ")
+    }
+
+    var moodTimeText: String {
+        startDate.formatted(.dateTime.hour().minute().locale(Locale(identifier: "zh_CN")))
+    }
+}
+
+private extension HourlyWeather {
+    var compactDetailText: String {
+        "\(Int(temperature.rounded()))° \(localizedConditionText)"
+    }
+
+    private var localizedConditionText: String {
+        switch condition {
+        case .clear:
+            return "晴"
+        case .cloudy:
+            return "多云"
+        case .rain:
+            return "雨"
+        case .snow:
+            return "雪"
+        case .fog:
+            return "雾"
+        case .wind:
+            return "风"
+        case .thunderstorm:
+            return "雷暴"
+        case .unknown:
+            return "未知"
+        }
     }
 }

@@ -4,9 +4,7 @@ import UIKit
 @MainActor
 enum ScrollShareService {
     static func renderScrollAsImage(timeline: DayTimeline) -> UIImage {
-        let maxWidth: CGFloat = 2400
-        let scaleFactor = min(1, maxWidth / ScrollCanvasMetrics.totalWidth)
-        let content = ScrollShareSnapshotView(timeline: timeline, scaleFactor: scaleFactor)
+        let content = ScrollShareSnapshotView(timeline: timeline, contentWidth: 920)
         let renderer = ImageRenderer(content: content)
         renderer.scale = UIScreen.main.scale
 
@@ -30,31 +28,25 @@ struct ScrollShareSheet: UIViewControllerRepresentable {
 
 private struct ScrollShareSnapshotView: View {
     let timeline: DayTimeline
-    let scaleFactor: CGFloat
+    let contentWidth: CGFloat
 
     var body: some View {
-        let contentHeight = ScrollCanvasMetrics.canvasHeight + 54
         VStack(alignment: .leading, spacing: 18) {
             Text("由 ToDay 生成 · \(watermarkDate)")
                 .font(.system(size: 11, weight: .medium))
                 .foregroundStyle(TodayTheme.inkMuted.opacity(0.78))
                 .frame(maxWidth: .infinity, alignment: .trailing)
 
-            DayScrollCanvasContent(
+            DayScrollView(
                 timeline: timeline,
                 onEventTap: { _ in },
                 onBlankTap: { _ in },
                 showsCurrentTimeNeedle: false
             )
-            .scaleEffect(scaleFactor, anchor: .topLeading)
-            .frame(
-                width: ScrollCanvasMetrics.totalWidth * scaleFactor,
-                height: contentHeight * scaleFactor,
-                alignment: .topLeading
-            )
+            .frame(width: contentWidth, alignment: .topLeading)
         }
         .padding(24)
-        .frame(width: (ScrollCanvasMetrics.totalWidth * scaleFactor) + 48, alignment: .topLeading)
+        .frame(width: contentWidth + 48, alignment: .topLeading)
         .background(TodayTheme.background)
     }
 
