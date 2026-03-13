@@ -21,11 +21,13 @@ final class HealthKitTimelineDataProvider: TimelineDataProviding {
         async let activeEnergy = fetchCumulativeQuantity(.activeEnergyBurned, unit: .kilocalorie(), start: startOfDay, end: date)
         async let sleepHours = fetchSleepHours(referenceDate: date)
         async let workouts = fetchWorkouts(start: startOfDay, end: date)
+        async let activitySummary = fetchActivitySummary(for: date)
 
         let steps = try await stepCount
         let energy = try await activeEnergy
         let sleep = try await sleepHours
         let workoutSamples = try await workouts
+        let rings = await activitySummary
 
         let entries = buildEntries(
             referenceDate: date,
@@ -43,17 +45,19 @@ final class HealthKitTimelineDataProvider: TimelineDataProviding {
             date: date,
             summary: "这条时间线来自今天这台设备里的 HealthKit 数据。",
             source: source,
-            stats: [
-                TimelineStat(title: "步数", value: formatWholeNumber(steps)),
-                TimelineStat(title: "能量", value: "\(formatWholeNumber(energy)) kcal"),
-                TimelineStat(title: "训练", value: "\(workoutSamples.count)")
-            ],
+            stats: makeStats(
+                activitySummary: rings,
+                steps: steps,
+                activeEnergy: energy,
+                workoutCount: workoutSamples.count
+            ),
             entries: entries
         )
     }
 
     private func requestAuthorizationIfNeeded() async throws {
         let readTypes = [
+            HKObjectType.activitySummaryType(),
             HKObjectType.quantityType(forIdentifier: .stepCount),
             HKObjectType.quantityType(forIdentifier: .activeEnergyBurned),
             HKObjectType.categoryType(forIdentifier: .sleepAnalysis),
@@ -151,6 +155,35 @@ final class HealthKitTimelineDataProvider: TimelineDataProviding {
         }
     }
 
+    private func fetchActivitySummary(for date: Date) async -> ActivitySummaryData? {
+        guard HKHealthStore.isHealthDataAvailable() else { return nil }
+
+        let dayComponents = calendar.dateComponents([.year, .month, .day], from: date)
+        let predicate = HKQuery.predicate(forActivitySummariesBetweenStart: dayComponents, end: dayComponents)
+
+        return await withCheckedContinuation { continuation in
+            let query = HKActivitySummaryQuery(predicate: predicate) { _, summaries, error in
+                guard error == nil, let summary = summaries?.first else {
+                    continuation.resume(returning: nil)
+                    return
+                }
+
+                continuation.resume(
+                    returning: ActivitySummaryData(
+                        activeEnergyBurned: summary.activeEnergyBurned.doubleValue(for: .kilocalorie()),
+                        activeEnergyGoal: summary.activeEnergyBurnedGoal.doubleValue(for: .kilocalorie()),
+                        exerciseMinutes: summary.appleExerciseTime.doubleValue(for: .minute()),
+                        exerciseGoal: summary.appleExerciseTimeGoal.doubleValue(for: .minute()),
+                        standHours: Int(summary.appleStandHours.doubleValue(for: .count()).rounded()),
+                        standGoal: Int(summary.appleStandHoursGoal.doubleValue(for: .count()).rounded())
+                    )
+                )
+            }
+
+            healthStore.execute(query)
+        }
+    }
+
     private func buildEntries(
         referenceDate: Date,
         steps: Double,
@@ -219,6 +252,36 @@ final class HealthKitTimelineDataProvider: TimelineDataProviding {
 
     private func formatWholeNumber(_ value: Double) -> String {
         value.formatted(.number.precision(.fractionLength(0)))
+    }
+
+    private func makeStats(
+        activitySummary: ActivitySummaryData?,
+        steps: Double,
+        activeEnergy: Double,
+        workoutCount: Int
+    ) -> [TimelineStat] {
+        if let activitySummary {
+            return [
+                TimelineStat(
+                    title: "活动",
+                    value: "\(formatWholeNumber(activitySummary.activeEnergyBurned))/\(formatWholeNumber(activitySummary.activeEnergyGoal)) kcal"
+                ),
+                TimelineStat(
+                    title: "锻炼",
+                    value: "\(formatWholeNumber(activitySummary.exerciseMinutes))/\(formatWholeNumber(activitySummary.exerciseGoal)) 分钟"
+                ),
+                TimelineStat(
+                    title: "站立",
+                    value: "\(activitySummary.standHours)/\(activitySummary.standGoal) 小时"
+                )
+            ]
+        }
+
+        return [
+            TimelineStat(title: "步数", value: formatWholeNumber(steps)),
+            TimelineStat(title: "能量", value: "\(formatWholeNumber(activeEnergy)) kcal"),
+            TimelineStat(title: "训练", value: "\(workoutCount)")
+        ]
     }
 
     private static let sleepValues: Set<Int> = [

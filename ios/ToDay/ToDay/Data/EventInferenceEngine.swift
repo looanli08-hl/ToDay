@@ -10,6 +10,7 @@ protocol EventInferring {
 /// 一天的原始 HealthKit 数据容器
 struct DayRawData: Sendable {
     let date: Date
+    let activitySummary: ActivitySummaryData?
     let heartRateSamples: [DateValueSample]
     let stepSamples: [DateValueSample]
     let sleepSamples: [SleepSample]
@@ -19,6 +20,7 @@ struct DayRawData: Sendable {
 
     init(
         date: Date,
+        activitySummary: ActivitySummaryData? = nil,
         heartRateSamples: [DateValueSample] = [],
         stepSamples: [DateValueSample] = [],
         sleepSamples: [SleepSample] = [],
@@ -27,6 +29,7 @@ struct DayRawData: Sendable {
         moodRecords: [MoodRecord] = []
     ) {
         self.date = date
+        self.activitySummary = activitySummary
         self.heartRateSamples = heartRateSamples
         self.stepSamples = stepSamples
         self.sleepSamples = sleepSamples
@@ -34,6 +37,15 @@ struct DayRawData: Sendable {
         self.activeEnergySamples = activeEnergySamples
         self.moodRecords = moodRecords
     }
+}
+
+struct ActivitySummaryData: Sendable {
+    let activeEnergyBurned: Double
+    let activeEnergyGoal: Double
+    let exerciseMinutes: Double
+    let exerciseGoal: Double
+    let standHours: Int
+    let standGoal: Int
 }
 
 /// 通用的 日期-数值 采样点
