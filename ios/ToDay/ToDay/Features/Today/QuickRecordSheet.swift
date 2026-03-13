@@ -359,15 +359,15 @@ struct QuickRecordSheet: View {
                     .padding(.vertical, 14)
                     .background(
                         selectedMood == mood
-                            ? Color(red: 0.95, green: 0.90, blue: 0.82)
-                            : Color(uiColor: .secondarySystemBackground)
+                            ? TodayTheme.accentSoft
+                            : TodayTheme.card
                     )
                     .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                     .overlay(
                         RoundedRectangle(cornerRadius: 16, style: .continuous)
                             .stroke(
                                 selectedMood == mood
-                                    ? Color(red: 0.74, green: 0.66, blue: 0.57)
+                                    ? TodayTheme.accent
                                     : Color.clear,
                                 lineWidth: 2
                             )
