@@ -27,6 +27,7 @@
 		4FE7ED6B910849760A8ED1BE /* QuickRecordSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90DD0AA794ABBBE1F95F1B7 /* QuickRecordSheet.swift */; };
 		5F154D8DB1E79ED9B6747A94 /* MonetizationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29FDC86F425DD463F32D7EC2 /* MonetizationViewModel.swift */; };
 		6009F788A2DCD8E51F97E8D5 /* AppConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB09FC4279F21A281C6D8DC2 /* AppConfiguration.swift */; };
+		6F5A4DD0ADB0320753D8C263 /* WeeklyInsightView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D394589F8B025A30D507181 /* WeeklyInsightView.swift */; };
 		70015EAB0824A09939C59B0C /* WatchMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24EB665732263021672AC442 /* WatchMessage.swift */; };
 		76D22AE6FF2D1C7E9B79AAB9 /* DayScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04A70AC6E3B59988B44AA384 /* DayScrollView.swift */; };
 		791903BA738523437BE8EE81 /* MoodPhotoAttachment.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDB4EF4DBF23B545C6736902 /* MoodPhotoAttachment.swift */; };
@@ -116,6 +117,7 @@
 		517D081EC92833825D6C1658 /* MoodRecordEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodRecordEntity.swift; sourceTree = "<group>"; };
 		58552F8BAC9DB54DD43EC5B6 /* ToDayWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDayWatchApp.swift; sourceTree = "<group>"; };
 		5C98792FCC517E2B96173407 /* DayTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayTimeline.swift; sourceTree = "<group>"; };
+		5D394589F8B025A30D507181 /* WeeklyInsightView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyInsightView.swift; sourceTree = "<group>"; };
 		5D612B7371CBAC2D72C59FB2 /* ScrollShareService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollShareService.swift; sourceTree = "<group>"; };
 		69C007DCC3F49E4F2969B1D7 /* ToDayWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ToDayWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6AAB5EA48FC1A363AF03230D /* WatchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchViewModel.swift; sourceTree = "<group>"; };
@@ -300,6 +302,7 @@
 			children = (
 				2C363F97E5D7CD67BB2D715B /* HistoryDayDetailScreen.swift */,
 				E41D5FDB97C97E39345EF797 /* HistoryScreen.swift */,
+				5D394589F8B025A30D507181 /* WeeklyInsightView.swift */,
 			);
 			path = History;
 			sourceTree = "<group>";
@@ -488,6 +491,7 @@
 				9C701A7285E2666EFC829AEF /* TodayViewModel.swift in Sources */,
 				70015EAB0824A09939C59B0C /* WatchMessage.swift in Sources */,
 				4250A250313DBA68A83F130E /* WeatherService.swift in Sources */,
+				6F5A4DD0ADB0320753D8C263 /* WeeklyInsightView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

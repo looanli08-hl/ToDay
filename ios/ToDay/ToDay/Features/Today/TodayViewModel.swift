@@ -209,6 +209,45 @@ final class TodayViewModel: ObservableObject {
         insightComposer.buildHistoryDetail(for: date, manualRecords: manualRecords)
     }
 
+    func cachedTimeline(for date: Date) -> DayTimeline? {
+        let day = calendar.startOfDay(for: date)
+
+        if let currentBaseTimeline, calendar.isDate(currentBaseTimeline.date, inSameDayAs: day) {
+            return mergedTimeline(base: currentBaseTimeline)
+        }
+
+        guard let cachedBaseTimeline = timelineCache[day] else { return nil }
+        return mergedTimeline(base: cachedBaseTimeline)
+    }
+
+    func loadTimeline(for date: Date, forceReload: Bool = false) async -> DayTimeline? {
+        let day = calendar.startOfDay(for: date)
+
+        if !forceReload, let cachedTimeline = cachedTimeline(for: day) {
+            return cachedTimeline
+        }
+
+        do {
+            let baseTimeline = try await provider.loadTimeline(for: day)
+            cacheTimeline(baseTimeline)
+            return mergedTimeline(base: baseTimeline)
+        } catch {
+            return nil
+        }
+    }
+
+    func loadTimelines(for dates: [Date], forceReload: Bool = false) async -> [DayTimeline] {
+        var timelines: [DayTimeline] = []
+
+        for date in dates {
+            if let timeline = await loadTimeline(for: date, forceReload: forceReload) {
+                timelines.append(timeline)
+            }
+        }
+
+        return timelines.sorted { $0.date < $1.date }
+    }
+
     func annotateEvent(_ event: InferredEvent, title: String) {
         let trimmedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedTitle.isEmpty else { return }
