@@ -675,6 +675,10 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				DEVELOPMENT_ASSET_PATHS = "\"ToDay/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "ToDay 读取你的运动、心率和睡眠数据，用来生成每日生活画卷。所有数据仅存储在本地。";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "ToDay 记录你到访过的地点，让画卷上的事件有地理上下文。位置数据仅存储在本地。";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "ToDay 读取你当天拍摄的照片，将它们匹配到画卷中对应的事件。照片不会上传。";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -750,6 +754,10 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				DEVELOPMENT_ASSET_PATHS = "\"ToDay/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "ToDay 读取你的运动、心率和睡眠数据，用来生成每日生活画卷。所有数据仅存储在本地。";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "ToDay 记录你到访过的地点，让画卷上的事件有地理上下文。位置数据仅存储在本地。";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "ToDay 读取你当天拍摄的照片，将它们匹配到画卷中对应的事件。照片不会上传。";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -816,11 +824,6 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = ToDay;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "ToDay reads your health data to build a private daily timeline.";
-				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "ToDay may save user-confirmed sessions in the future.";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "ToDay 使用位置信息来记录你去过的地方";
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "ToDay 会将你当天拍的照片匹配到对应事件中";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				MARKETING_VERSION = 0.1.0;
@@ -923,11 +926,6 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = ToDay;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "ToDay reads your health data to build a private daily timeline.";
-				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "ToDay may save user-confirmed sessions in the future.";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "ToDay 使用位置信息来记录你去过的地方";
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "ToDay 会将你当天拍的照片匹配到对应事件中";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				MARKETING_VERSION = 0.1.0;
