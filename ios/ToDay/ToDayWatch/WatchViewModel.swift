@@ -43,6 +43,15 @@ final class WatchViewModel: ObservableObject {
         connectivityManager.endSession(recordID: activeSession.id, endedAt: Date())
     }
 
+    var canAnnotate: Bool {
+        annotationTargetID != nil
+    }
+
+    func annotateCurrentEvent(title: String) {
+        guard let annotationTargetID else { return }
+        connectivityManager.sendAnnotation(eventID: annotationTargetID, title: title, timestamp: Date())
+    }
+
     private static func snapshot(from record: MoodRecord?) -> CurrentEventSnapshot? {
         guard let record else { return nil }
 
@@ -80,5 +89,9 @@ final class WatchViewModel: ObservableObject {
         case .satisfied:
             return "checkmark.seal.fill"
         }
+    }
+
+    private var annotationTargetID: UUID? {
+        activeSession?.id
     }
 }

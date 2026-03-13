@@ -20,6 +20,8 @@ struct WatchHomeView: View {
                 actionButton(title: "标注", systemImage: "pencil") {
                     isShowingAnnotation = true
                 }
+                .disabled(!viewModel.canAnnotate)
+                .opacity(viewModel.canAnnotate ? 1 : 0.45)
 
                 actionButton(title: "心情", systemImage: "face.smiling") {
                     isShowingMood = true
@@ -30,7 +32,9 @@ struct WatchHomeView: View {
         .padding(.vertical, 10)
         .background(WatchTheme.background.ignoresSafeArea())
         .sheet(isPresented: $isShowingAnnotation) {
-            pendingSheet(title: "快捷标注", description: "下一步会把常用活动预设放在这里。")
+            QuickAnnotationView { title in
+                viewModel.annotateCurrentEvent(title: title)
+            }
         }
         .sheet(isPresented: $isShowingMood) {
             pendingSheet(title: "快捷心情", description: "下一步会把极简心情记录放在这里。")

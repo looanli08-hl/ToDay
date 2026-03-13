@@ -70,6 +70,7 @@
 		EC421489F126891847F7CEFB /* MoodRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = D796A8133E65C0F7E468E8AB /* MoodRecord.swift */; };
 		F15785C5CD541E8A984C1FEB /* TodayViewModelSessionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCFF1F5F9574B84A9B5B3ED9 /* TodayViewModelSessionTests.swift */; };
 		F207BDA9340A4E488E75EE87 /* CurrentEventSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5747760BE406B15979C4D0D9 /* CurrentEventSnapshot.swift */; };
+		FBA3DE548250BD9652D6EFC9 /* QuickAnnotationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB56CA12B997184DA22194AB /* QuickAnnotationView.swift */; };
 		FBF90F06A0B49EDD24C7F79C /* TodayFlowViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C77065335DE754680A34C99 /* TodayFlowViews.swift */; };
 		FF5E4FB20D0B535F07B92382 /* MoodRecord+Timeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B917ECDF78E99FB0636A58B /* MoodRecord+Timeline.swift */; };
 /* End PBXBuildFile section */
@@ -181,6 +182,7 @@
 		E41D5FDB97C97E39345EF797 /* HistoryScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryScreen.swift; sourceTree = "<group>"; };
 		E7BB74516D89AD97D04F81B3 /* AppContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppContainer.swift; sourceTree = "<group>"; };
 		E90DD0AA794ABBBE1F95F1B7 /* QuickRecordSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickRecordSheet.swift; sourceTree = "<group>"; };
+		EB56CA12B997184DA22194AB /* QuickAnnotationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickAnnotationView.swift; sourceTree = "<group>"; };
 		F728CBFA275E061CC33D4193 /* TodayScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayScreen.swift; sourceTree = "<group>"; };
 		FA5142D51113944D91EB95B6 /* CurrentEventWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentEventWidget.swift; sourceTree = "<group>"; };
 		FCFF1F5F9574B84A9B5B3ED9 /* TodayViewModelSessionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayViewModelSessionTests.swift; sourceTree = "<group>"; };
@@ -285,6 +287,7 @@
 		A81E7032AEC279593E8EFCDA /* ToDayWatch */ = {
 			isa = PBXGroup;
 			children = (
+				EB56CA12B997184DA22194AB /* QuickAnnotationView.swift */,
 				6804ACA15DF00E193DD8A7C0 /* ToDayWatch.entitlements */,
 				58552F8BAC9DB54DD43EC5B6 /* ToDayWatchApp.swift */,
 				404E8EA06CD9AA4AF4D9231A /* WatchHomeView.swift */,
@@ -590,6 +593,7 @@
 				D195D80B9DBA623F37EE23E6 /* CurrentEventSnapshot.swift in Sources */,
 				A2C3A2BAE1FB4EC9DA3094A6 /* MoodPhotoAttachment.swift in Sources */,
 				AA1395F7BDB54D44B1959AFC /* MoodRecord.swift in Sources */,
+				FBA3DE548250BD9652D6EFC9 /* QuickAnnotationView.swift in Sources */,
 				D2A26BDCFACB65C571297A68 /* ToDayWatchApp.swift in Sources */,
 				EAAD572985D8CFF5B456DA14 /* WatchHomeView.swift in Sources */,
 				7C48F4DF83B6CE21C4BFB47A /* WatchMessage.swift in Sources */,

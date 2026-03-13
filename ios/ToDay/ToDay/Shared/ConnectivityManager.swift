@@ -129,6 +129,8 @@ final class PhoneConnectivityManager: NSObject, WCSessionDelegate {
         case let .endSession(recordID, endedAt):
             guard let index = records.firstIndex(where: { $0.id == recordID }) else { break }
             records[index] = records[index].completed(at: endedAt)
+        case .annotation:
+            break
         }
 
         records.sort { $0.createdAt > $1.createdAt }
@@ -186,6 +188,10 @@ final class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDeleg
     func endSession(recordID: UUID, endedAt: Date) {
         activeSession = nil
         sendMessageOrFallback(.endSession(recordID: recordID, endedAt: endedAt))
+    }
+
+    func sendAnnotation(eventID: UUID, title: String, timestamp: Date) {
+        sendMessageOrFallback(.annotation(eventID: eventID, title: title, timestamp: timestamp))
     }
 
     func session(
