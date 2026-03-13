@@ -4,6 +4,7 @@ import UIKit
 struct TodayScreen: View {
     @ObservedObject var viewModel: TodayViewModel
     @ObservedObject var monetizationViewModel: MonetizationViewModel
+    @State private var selectedEvent: InferredEvent?
 
     let onOpenHistory: () -> Void
     let onOpenPro: () -> Void
@@ -58,6 +59,9 @@ struct TodayScreen: View {
                 QuickRecordSheet(mode: viewModel.quickRecordMode) { record in
                     viewModel.startMoodRecord(record)
                 }
+            }
+            .sheet(item: $selectedEvent) { event in
+                EventDetailView(event: event)
             }
             .task {
                 await viewModel.loadIfNeeded()
@@ -165,8 +169,12 @@ struct TodayScreen: View {
 
             DayScrollView(
                 timeline: timeline,
-                onEventTap: { _ in },
-                onBlankTap: { _ in }
+                onEventTap: { event in
+                    selectedEvent = event
+                },
+                onBlankTap: { event in
+                    selectedEvent = event
+                }
             )
         }
     }

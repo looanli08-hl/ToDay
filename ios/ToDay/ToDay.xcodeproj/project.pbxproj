@@ -42,6 +42,7 @@
 		ACC24B7AB60E4669FC048B3D /* EventInferenceEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88EB8639525489FF8AD2D7C6 /* EventInferenceEngineTests.swift */; };
 		AED24B3EF148016906D995F8 /* DayTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C98792FCC517E2B96173407 /* DayTimeline.swift */; };
 		AFB0264365F2546579D2F53A /* MoodRecordStoring.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E53E00BCF5527A4FE8FD775 /* MoodRecordStoring.swift */; };
+		B2FE859DE89B5215AC30DE4E /* EventDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83CAB597D8277AED207D5F76 /* EventDetailView.swift */; };
 		BDF5624B2E56476CB71857AF /* WatchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AAB5EA48FC1A363AF03230D /* WatchViewModel.swift */; };
 		C5160315A71A23D4CD366E64 /* EventInferenceEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EE9F12F4A3F23F7790FEA25 /* EventInferenceEngine.swift */; };
 		C5767BB39D601ADD6EA3AFE5 /* TodayScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = F728CBFA275E061CC33D4193 /* TodayScreen.swift */; };
@@ -122,6 +123,7 @@
 		7E06395E1BD9FE3C2B493042 /* WatchTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchTheme.swift; sourceTree = "<group>"; };
 		7FF1B505498DE678D74F9FB8 /* SwiftDataMoodRecordStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftDataMoodRecordStoreTests.swift; sourceTree = "<group>"; };
 		83A5638C51B33BBE792F5AE6 /* MockEventInferenceEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockEventInferenceEngine.swift; sourceTree = "<group>"; };
+		83CAB597D8277AED207D5F76 /* EventDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventDetailView.swift; sourceTree = "<group>"; };
 		88EB8639525489FF8AD2D7C6 /* EventInferenceEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventInferenceEngineTests.swift; sourceTree = "<group>"; };
 		88ECC52BFECC7DC8A36A235E /* ConnectivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectivityManager.swift; sourceTree = "<group>"; };
 		A17D304A041BE90AA6BD31E0 /* HealthKitEventInferenceEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitEventInferenceEngine.swift; sourceTree = "<group>"; };
@@ -310,6 +312,7 @@
 		FF51E490980F90F9A6AEEBED /* Today */ = {
 			isa = PBXGroup;
 			children = (
+				83CAB597D8277AED207D5F76 /* EventDetailView.swift */,
 				E90DD0AA794ABBBE1F95F1B7 /* QuickRecordSheet.swift */,
 				3C77065335DE754680A34C99 /* TodayFlowViews.swift */,
 				6D40EA4B5DE92A1C04FEF877 /* TodayInsightComposer.swift */,
@@ -448,6 +451,7 @@
 				76D22AE6FF2D1C7E9B79AAB9 /* DayScrollView.swift in Sources */,
 				AED24B3EF148016906D995F8 /* DayTimeline.swift in Sources */,
 				D5F5F39A2A85BE70CF6C9C2C /* EventCardView.swift in Sources */,
+				B2FE859DE89B5215AC30DE4E /* EventDetailView.swift in Sources */,
 				C5160315A71A23D4CD366E64 /* EventInferenceEngine.swift in Sources */,
 				CC1CBC9167F7E45A9E0C282B /* HealthKitEventInferenceEngine.swift in Sources */,
 				3167A5A7F4562369CA4F54B4 /* HealthKitTimelineDataProvider.swift in Sources */,
