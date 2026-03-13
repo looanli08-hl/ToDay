@@ -19,18 +19,34 @@ struct EventCardView: View {
     private var eventCard: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .top, spacing: 8) {
-                Text(event.resolvedName)
-                    .font(.system(.headline, design: .rounded, weight: .semibold))
-                    .foregroundStyle(TodayTheme.ink)
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.78)
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(event.kindBadgeTitle)
+                        .font(.system(size: 10, weight: .bold, design: .monospaced))
+                        .foregroundStyle(event.secondaryTextColor)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(event.badgeBackground)
+                        .clipShape(Capsule())
+
+                    Text(event.resolvedName)
+                        .font(.system(.headline, design: .rounded, weight: .semibold))
+                        .foregroundStyle(event.primaryTextColor)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.78)
+                }
 
                 Spacer(minLength: 4)
 
-                if let symbolName = event.associatedMetrics?.weather?.symbolName {
-                    Image(systemName: symbolName)
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundStyle(TodayTheme.inkSoft)
+                if let weather = event.associatedMetrics?.weather {
+                    VStack(alignment: .trailing, spacing: 4) {
+                        Image(systemName: weather.symbolName)
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundStyle(event.primaryTextColor)
+
+                        Text("\(Int(weather.temperature.rounded()))°")
+                            .font(.system(size: 11, weight: .bold, design: .monospaced))
+                            .foregroundStyle(event.secondaryTextColor)
+                    }
                 }
             }
 
@@ -46,19 +62,19 @@ struct EventCardView: View {
             VStack(alignment: .leading, spacing: 6) {
                 Text(event.scrollDurationText)
                     .font(.system(size: 12, weight: .bold, design: .monospaced))
-                    .foregroundStyle(TodayTheme.inkSoft)
+                    .foregroundStyle(event.primaryTextColor)
 
                 if let subtitle = event.cardSubtitle {
                     Text(subtitle)
                         .font(.system(size: 12))
-                        .foregroundStyle(TodayTheme.inkMuted)
+                        .foregroundStyle(event.secondaryTextColor)
                         .lineLimit(2)
                 }
 
                 if let locationName = event.associatedMetrics?.location?.placeName {
                     Text(locationName)
                         .font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(TodayTheme.inkMuted)
+                        .foregroundStyle(event.secondaryTextColor)
                         .lineLimit(1)
                 }
             }
@@ -95,10 +111,10 @@ struct EventCardView: View {
                 if event.isBlankCandidate {
                     Text("点击记录")
                         .font(.system(size: 11, weight: .semibold))
-                        .foregroundStyle(TodayTheme.inkMuted)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 5)
-                        .background(TodayTheme.card.opacity(0.62))
+                        .foregroundStyle(TodayTheme.inkSoft)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(TodayTheme.card.opacity(0.76))
                         .clipShape(Capsule())
                         .padding(10)
                 }
@@ -263,6 +279,58 @@ extension InferredEvent {
 
     var isBlankCandidate: Bool {
         kind == .quietTime || confidence <= .low
+    }
+
+    var primaryTextColor: Color {
+        switch kind {
+        case .sleep, .workout, .commute, .activeWalk, .userAnnotated:
+            return Color.white
+        case .quietTime:
+            return TodayTheme.ink
+        case .mood:
+            return TodayTheme.ink
+        }
+    }
+
+    var secondaryTextColor: Color {
+        switch kind {
+        case .sleep, .workout, .commute, .activeWalk, .userAnnotated:
+            return Color.white.opacity(0.78)
+        case .quietTime:
+            return TodayTheme.inkMuted
+        case .mood:
+            return TodayTheme.inkMuted
+        }
+    }
+
+    var badgeBackground: Color {
+        switch kind {
+        case .sleep, .workout, .commute, .activeWalk, .userAnnotated:
+            return Color.white.opacity(0.14)
+        case .quietTime:
+            return TodayTheme.card.opacity(0.7)
+        case .mood:
+            return TodayTheme.accentSoft
+        }
+    }
+
+    var kindBadgeTitle: String {
+        switch kind {
+        case .sleep:
+            return "SLEEP"
+        case .workout:
+            return associatedMetrics?.workoutType?.uppercased() ?? "WORKOUT"
+        case .commute:
+            return "COMMUTE"
+        case .activeWalk:
+            return "WALK"
+        case .quietTime:
+            return "BLANK"
+        case .userAnnotated:
+            return "MARKED"
+        case .mood:
+            return "MOOD"
+        }
     }
 
     var cardSubtitle: String? {
