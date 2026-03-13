@@ -132,9 +132,13 @@ struct DayScrollCanvasContent: View {
                         .minimumScaleFactor(0.7)
                 }
                 .frame(width: ScrollCanvasMetrics.hourWidth, alignment: .leading)
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel("\(hour)点")
             }
         }
         .frame(width: ScrollCanvasMetrics.totalWidth, alignment: .leading)
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel("时间轴")
     }
 
     private var moodOverlay: some View {
@@ -165,6 +169,8 @@ struct DayScrollCanvasContent: View {
             .frame(width: 2, height: ScrollCanvasMetrics.canvasHeight)
             .offset(x: x)
             .allowsHitTesting(false)
+            .accessibilityLabel("当前时间")
+            .accessibilityHidden(!calendar.isDateInToday(timeline.date))
     }
 
     private var gradientStops: [Gradient.Stop] {
