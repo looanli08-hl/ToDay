@@ -16,6 +16,7 @@
 		30FE580FCC3DB158481A5ABC /* MoodPhotoLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF6D780665E1477D9E1362E /* MoodPhotoLibrary.swift */; };
 		3167A5A7F4562369CA4F54B4 /* HealthKitTimelineDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 248EB0D5C59CF49B72179706 /* HealthKitTimelineDataProvider.swift */; };
 		366F7C8E30E432042B253F16 /* ConnectivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88ECC52BFECC7DC8A36A235E /* ConnectivityManager.swift */; };
+		3DC3A0F098B8AD2236DD326B /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E312027119398AFA5F72886 /* LocationService.swift */; };
 		3EDD590CF25E429FB8186758 /* ToDayApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCCD453022FB7D3DE28EDE60 /* ToDayApp.swift */; };
 		4250A250313DBA68A83F130E /* WeatherService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE6AEF94FAE90C7F469449EE /* WeatherService.swift */; };
 		44823975A98302AEB5069E00 /* HistoryScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = E41D5FDB97C97E39345EF797 /* HistoryScreen.swift */; };
@@ -103,6 +104,7 @@
 		3E53E00BCF5527A4FE8FD775 /* MoodRecordStoring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodRecordStoring.swift; sourceTree = "<group>"; };
 		3EE9F12F4A3F23F7790FEA25 /* EventInferenceEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventInferenceEngine.swift; sourceTree = "<group>"; };
 		404E8EA06CD9AA4AF4D9231A /* WatchHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchHomeView.swift; sourceTree = "<group>"; };
+		4E312027119398AFA5F72886 /* LocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationService.swift; sourceTree = "<group>"; };
 		517D081EC92833825D6C1658 /* MoodRecordEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodRecordEntity.swift; sourceTree = "<group>"; };
 		58552F8BAC9DB54DD43EC5B6 /* ToDayWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDayWatchApp.swift; sourceTree = "<group>"; };
 		5C98792FCC517E2B96173407 /* DayTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayTimeline.swift; sourceTree = "<group>"; };
@@ -245,6 +247,7 @@
 				3EE9F12F4A3F23F7790FEA25 /* EventInferenceEngine.swift */,
 				A17D304A041BE90AA6BD31E0 /* HealthKitEventInferenceEngine.swift */,
 				248EB0D5C59CF49B72179706 /* HealthKitTimelineDataProvider.swift */,
+				4E312027119398AFA5F72886 /* LocationService.swift */,
 				83A5638C51B33BBE792F5AE6 /* MockEventInferenceEngine.swift */,
 				0FE2EF155E1C18E24C5D11D1 /* MockTimelineDataProvider.swift */,
 				CDF6D780665E1477D9E1362E /* MoodPhotoLibrary.swift */,
@@ -428,6 +431,7 @@
 				83EB550A345BE349E6AD5403 /* HistoryDayDetailScreen.swift in Sources */,
 				44823975A98302AEB5069E00 /* HistoryScreen.swift in Sources */,
 				2458E2C88B748314B30D54B8 /* InferredEvent.swift in Sources */,
+				3DC3A0F098B8AD2236DD326B /* LocationService.swift in Sources */,
 				DE64DC4615173FA2064D2929 /* MockEventInferenceEngine.swift in Sources */,
 				93C3B96072D6ECD7AB82943B /* MockTimelineDataProvider.swift in Sources */,
 				5F154D8DB1E79ED9B6747A94 /* MonetizationViewModel.swift in Sources */,
@@ -642,6 +646,7 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "ToDay reads your health data to build a private daily timeline.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "ToDay may save user-confirmed sessions in the future.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "ToDay 使用位置信息来记录你去过的地方";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "ToDay 需要读取你的照片，以便把生活片段附在对应记录里。";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -727,6 +732,7 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "ToDay reads your health data to build a private daily timeline.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "ToDay may save user-confirmed sessions in the future.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "ToDay 使用位置信息来记录你去过的地方";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "ToDay 需要读取你的照片，以便把生活片段附在对应记录里。";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

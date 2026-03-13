@@ -6,6 +6,7 @@ import UIKit
 struct ToDayApp: App {
     @StateObject private var viewModel = AppContainer.makeTodayViewModel()
     @StateObject private var monetizationViewModel = AppContainer.makeMonetizationViewModel()
+    private let locationService = LocationService.shared
 
     var body: some Scene {
         WindowGroup {
@@ -13,6 +14,9 @@ struct ToDayApp: App {
                 todayViewModel: viewModel,
                 monetizationViewModel: monetizationViewModel
             )
+            .task {
+                _ = locationService
+            }
             .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
                 Task {
                     await monetizationViewModel.revalidateEntitlement()

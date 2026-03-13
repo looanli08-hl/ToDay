@@ -355,6 +355,10 @@ struct HealthKitEventInferenceEngine: EventInferring {
             to: event.startDate,
             in: rawData.hourlyWeather
         )
+        metrics.location = overlappingLocationVisit(
+            for: candidateInterval(for: event),
+            in: rawData.locationVisits
+        )
 
         let stepCount = summedValue(of: rawData.stepSamples, over: candidateInterval(for: event))
         if stepCount > 0 {
@@ -387,6 +391,19 @@ struct HealthKitEventInferenceEngine: EventInferring {
         weather.min { lhs, rhs in
             abs(lhs.date.timeIntervalSince(date)) < abs(rhs.date.timeIntervalSince(date))
         }
+    }
+
+    private func overlappingLocationVisit(
+        for interval: DateInterval,
+        in visits: [LocationVisit]
+    ) -> LocationVisit? {
+        visits
+            .filter { visit in
+                DateInterval(start: visit.arrivalDate, end: visit.departureDate)
+                    .intersection(with: interval) != nil
+            }
+            .sorted { $0.arrivalDate < $1.arrivalDate }
+            .first
     }
 
     private func buildAllDayQuietEvent(in dayInterval: DateInterval, heartRateSamples: [DateValueSample]) -> InferredEvent {

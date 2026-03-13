@@ -34,6 +34,7 @@ struct EventMetrics: Codable, Hashable, Sendable {
     var minHeartRate: Double?
     var heartRateSamples: [HeartRateSample]?
     var weather: HourlyWeather?
+    var location: LocationVisit?
     var sleepStages: [SleepStageSegment]?
     var stepCount: Int?
     var activeEnergy: Double?

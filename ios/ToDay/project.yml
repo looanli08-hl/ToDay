@@ -15,6 +15,7 @@ settings:
     INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.lifestyle
     INFOPLIST_KEY_NSHealthShareUsageDescription: ToDay reads your health data to build a private daily timeline.
     INFOPLIST_KEY_NSHealthUpdateUsageDescription: ToDay may save user-confirmed sessions in the future.
+    INFOPLIST_KEY_NSLocationWhenInUseUsageDescription: ToDay 使用位置信息来记录你去过的地方
     INFOPLIST_KEY_NSPhotoLibraryUsageDescription: ToDay 需要读取你的照片，以便把生活片段附在对应记录里。
     INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
     INFOPLIST_KEY_UILaunchScreen_Generation: YES
