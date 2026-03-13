@@ -13,6 +13,7 @@ struct DayRawData: Sendable {
     let activitySummary: ActivitySummaryData?
     let hourlyWeather: [HourlyWeather]
     let locationVisits: [LocationVisit]
+    let photos: [PhotoReference]
     let heartRateSamples: [DateValueSample]
     let stepSamples: [DateValueSample]
     let sleepSamples: [SleepSample]
@@ -25,6 +26,7 @@ struct DayRawData: Sendable {
         activitySummary: ActivitySummaryData? = nil,
         hourlyWeather: [HourlyWeather] = [],
         locationVisits: [LocationVisit] = [],
+        photos: [PhotoReference] = [],
         heartRateSamples: [DateValueSample] = [],
         stepSamples: [DateValueSample] = [],
         sleepSamples: [SleepSample] = [],
@@ -36,6 +38,7 @@ struct DayRawData: Sendable {
         self.activitySummary = activitySummary
         self.hourlyWeather = hourlyWeather
         self.locationVisits = locationVisits
+        self.photos = photos
         self.heartRateSamples = heartRateSamples
         self.stepSamples = stepSamples
         self.sleepSamples = sleepSamples

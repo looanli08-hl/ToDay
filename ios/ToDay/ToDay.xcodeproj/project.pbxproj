@@ -18,6 +18,7 @@
 		366F7C8E30E432042B253F16 /* ConnectivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88ECC52BFECC7DC8A36A235E /* ConnectivityManager.swift */; };
 		3DC3A0F098B8AD2236DD326B /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E312027119398AFA5F72886 /* LocationService.swift */; };
 		3EDD590CF25E429FB8186758 /* ToDayApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCCD453022FB7D3DE28EDE60 /* ToDayApp.swift */; };
+		3FD248DEB5BDF808804ABA6C /* PhotoService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A50CAC68CF65C166C6C84DED /* PhotoService.swift */; };
 		4250A250313DBA68A83F130E /* WeatherService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE6AEF94FAE90C7F469449EE /* WeatherService.swift */; };
 		44823975A98302AEB5069E00 /* HistoryScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = E41D5FDB97C97E39345EF797 /* HistoryScreen.swift */; };
 		4788852ACD6C662593EE18E6 /* WatchTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E06395E1BD9FE3C2B493042 /* WatchTheme.swift */; };
@@ -119,6 +120,7 @@
 		88EB8639525489FF8AD2D7C6 /* EventInferenceEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventInferenceEngineTests.swift; sourceTree = "<group>"; };
 		88ECC52BFECC7DC8A36A235E /* ConnectivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectivityManager.swift; sourceTree = "<group>"; };
 		A17D304A041BE90AA6BD31E0 /* HealthKitEventInferenceEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitEventInferenceEngine.swift; sourceTree = "<group>"; };
+		A50CAC68CF65C166C6C84DED /* PhotoService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoService.swift; sourceTree = "<group>"; };
 		AD8F9694BC13B76959CA8639 /* ToDay.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ToDay.entitlements; sourceTree = "<group>"; };
 		AE6AEF94FAE90C7F469449EE /* WeatherService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherService.swift; sourceTree = "<group>"; };
 		C268A9DD9F2B26A8E72AA794 /* InferredEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InferredEvent.swift; sourceTree = "<group>"; };
@@ -253,6 +255,7 @@
 				CDF6D780665E1477D9E1362E /* MoodPhotoLibrary.swift */,
 				517D081EC92833825D6C1658 /* MoodRecordEntity.swift */,
 				3E53E00BCF5527A4FE8FD775 /* MoodRecordStoring.swift */,
+				A50CAC68CF65C166C6C84DED /* PhotoService.swift */,
 				7D72C488C5C21014C1FAB59A /* TimelineDataProviding.swift */,
 				AE6AEF94FAE90C7F469449EE /* WeatherService.swift */,
 			);
@@ -441,6 +444,7 @@
 				EC421489F126891847F7CEFB /* MoodRecord.swift in Sources */,
 				4E0E762B4D92B8C4703F24C0 /* MoodRecordEntity.swift in Sources */,
 				AFB0264365F2546579D2F53A /* MoodRecordStoring.swift in Sources */,
+				3FD248DEB5BDF808804ABA6C /* PhotoService.swift in Sources */,
 				26846615AF8CA2F05F11D9B0 /* ProScreen.swift in Sources */,
 				4FE7ED6B910849760A8ED1BE /* QuickRecordSheet.swift in Sources */,
 				D7DF86B1EC7D5D82B3201C1C /* TimelineDataProviding.swift in Sources */,
@@ -647,7 +651,7 @@
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "ToDay reads your health data to build a private daily timeline.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "ToDay may save user-confirmed sessions in the future.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "ToDay 使用位置信息来记录你去过的地方";
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "ToDay 需要读取你的照片，以便把生活片段附在对应记录里。";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "ToDay 会将你当天拍的照片匹配到对应事件中";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				MARKETING_VERSION = 0.1.0;
@@ -733,7 +737,7 @@
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "ToDay reads your health data to build a private daily timeline.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "ToDay may save user-confirmed sessions in the future.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "ToDay 使用位置信息来记录你去过的地方";
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "ToDay 需要读取你的照片，以便把生活片段附在对应记录里。";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "ToDay 会将你当天拍的照片匹配到对应事件中";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				MARKETING_VERSION = 0.1.0;

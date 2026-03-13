@@ -359,6 +359,13 @@ struct HealthKitEventInferenceEngine: EventInferring {
             for: candidateInterval(for: event),
             in: rawData.locationVisits
         )
+        let matchedPhotos = photos(
+            in: candidateInterval(for: event),
+            from: rawData.photos
+        )
+        if !matchedPhotos.isEmpty {
+            metrics.photos = matchedPhotos
+        }
 
         let stepCount = summedValue(of: rawData.stepSamples, over: candidateInterval(for: event))
         if stepCount > 0 {
@@ -404,6 +411,15 @@ struct HealthKitEventInferenceEngine: EventInferring {
             }
             .sorted { $0.arrivalDate < $1.arrivalDate }
             .first
+    }
+
+    private func photos(
+        in interval: DateInterval,
+        from photos: [PhotoReference]
+    ) -> [PhotoReference] {
+        photos
+            .filter { interval.contains($0.creationDate) }
+            .sorted { $0.creationDate < $1.creationDate }
     }
 
     private func buildAllDayQuietEvent(in dayInterval: DateInterval, heartRateSamples: [DateValueSample]) -> InferredEvent {
