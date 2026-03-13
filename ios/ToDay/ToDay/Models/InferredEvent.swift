@@ -52,11 +52,11 @@ struct InferredEvent: Codable, Identifiable, Hashable, Sendable {
     let endDate: Date
     let confidence: EventConfidence
     let isLive: Bool
-    var displayName: String
-    var userAnnotation: String?
-    var subtitle: String?
-    var associatedMetrics: EventMetrics?
-    var photoAttachments: [MoodPhotoAttachment]
+    let displayName: String
+    let userAnnotation: String?
+    let subtitle: String?
+    let associatedMetrics: EventMetrics?
+    let photoAttachments: [MoodPhotoAttachment]
 
     init(
         id: UUID? = nil,

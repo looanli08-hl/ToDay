@@ -308,12 +308,24 @@ struct HealthKitEventInferenceEngine: EventInferring {
 
         let merged = mergeQuietTimeEvents(segmented.sorted(by: eventSortOrder))
         return merged.map { event in
-            var updatedEvent = event
-            if updatedEvent.subtitle == nil,
-               let averageHeartRate = averageHeartRate(for: updatedEvent, heartRateSamples: heartRateSamples) {
-                updatedEvent.subtitle = "心率平稳 · \(Int(averageHeartRate.rounded())) bpm"
+            guard event.subtitle == nil,
+                  let averageHeartRate = averageHeartRate(for: event, heartRateSamples: heartRateSamples) else {
+                return event
             }
-            return updatedEvent
+
+            return InferredEvent(
+                id: event.id,
+                kind: event.kind,
+                startDate: event.startDate,
+                endDate: event.endDate,
+                confidence: event.confidence,
+                isLive: event.isLive,
+                displayName: event.displayName,
+                userAnnotation: event.userAnnotation,
+                subtitle: "心率平稳 · \(Int(averageHeartRate.rounded())) bpm",
+                associatedMetrics: event.associatedMetrics,
+                photoAttachments: event.photoAttachments
+            )
         }
     }
 
@@ -337,8 +349,7 @@ struct HealthKitEventInferenceEngine: EventInferring {
     private func attachMetrics(to event: InferredEvent, using rawData: DayRawData) -> InferredEvent {
         guard event.kind != .mood else { return event }
 
-        var updatedEvent = event
-        var metrics = updatedEvent.associatedMetrics ?? EventMetrics()
+        var metrics = event.associatedMetrics ?? EventMetrics()
 
         let heartSamples = heartRateSamples(overlapping: candidateInterval(for: event), samples: rawData.heartRateSamples)
         if !heartSamples.isEmpty {
@@ -390,8 +401,19 @@ struct HealthKitEventInferenceEngine: EventInferring {
             }
         }
 
-        updatedEvent.associatedMetrics = metrics
-        return updatedEvent
+        return InferredEvent(
+            id: event.id,
+            kind: event.kind,
+            startDate: event.startDate,
+            endDate: event.endDate,
+            confidence: event.confidence,
+            isLive: event.isLive,
+            displayName: event.displayName,
+            userAnnotation: event.userAnnotation,
+            subtitle: event.subtitle,
+            associatedMetrics: metrics,
+            photoAttachments: event.photoAttachments
+        )
     }
 
     private func closestWeather(to date: Date, in weather: [HourlyWeather]) -> HourlyWeather? {
@@ -423,7 +445,7 @@ struct HealthKitEventInferenceEngine: EventInferring {
     }
 
     private func buildAllDayQuietEvent(in dayInterval: DateInterval, heartRateSamples: [DateValueSample]) -> InferredEvent {
-        var quietEvent = InferredEvent(
+        let quietEvent = InferredEvent(
             kind: .quietTime,
             startDate: dayInterval.start,
             endDate: dayInterval.end,
@@ -432,7 +454,19 @@ struct HealthKitEventInferenceEngine: EventInferring {
         )
 
         if let averageHeartRate = averageHeartRate(for: quietEvent, heartRateSamples: heartRateSamples) {
-            quietEvent.subtitle = "心率平稳 · \(Int(averageHeartRate.rounded())) bpm"
+            return InferredEvent(
+                id: quietEvent.id,
+                kind: quietEvent.kind,
+                startDate: quietEvent.startDate,
+                endDate: quietEvent.endDate,
+                confidence: quietEvent.confidence,
+                isLive: quietEvent.isLive,
+                displayName: quietEvent.displayName,
+                userAnnotation: quietEvent.userAnnotation,
+                subtitle: "心率平稳 · \(Int(averageHeartRate.rounded())) bpm",
+                associatedMetrics: quietEvent.associatedMetrics,
+                photoAttachments: quietEvent.photoAttachments
+            )
         }
 
         return quietEvent
