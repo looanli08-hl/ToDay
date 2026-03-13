@@ -83,6 +83,12 @@ enum SleepStage: String, Codable, Hashable, Sendable {
     case unknown
 }
 
+struct SleepStageSegment: Codable, Hashable, Sendable {
+    let start: Date
+    let end: Date
+    let stage: SleepStage
+}
+
 /// 运动采样
 struct WorkoutSample: Identifiable, Hashable, Sendable {
     let id: UUID

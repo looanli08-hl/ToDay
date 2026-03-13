@@ -41,6 +41,40 @@ final class EventInferenceEngineTests: XCTestCase {
         XCTAssertTrue(events.contains(where: { $0.kind == .quietTime && $0.startDate >= sleepEvent.endDate }))
     }
 
+    func testSleepStagesArePreservedInAssociatedMetrics() async throws {
+        let rawData = DayRawData(
+            date: targetDate,
+            sleepSamples: [
+                SleepSample(
+                    startDate: makeDate(year: 2026, month: 3, day: 11, hour: 23, minute: 30),
+                    endDate: makeDate(year: 2026, month: 3, day: 12, hour: 1, minute: 0),
+                    stage: .light
+                ),
+                SleepSample(
+                    startDate: makeDate(year: 2026, month: 3, day: 12, hour: 1, minute: 0),
+                    endDate: makeDate(year: 2026, month: 3, day: 12, hour: 2, minute: 15),
+                    stage: .deep
+                ),
+                SleepSample(
+                    startDate: makeDate(year: 2026, month: 3, day: 12, hour: 2, minute: 15),
+                    endDate: makeDate(year: 2026, month: 3, day: 12, hour: 3, minute: 0),
+                    stage: .rem
+                )
+            ]
+        )
+
+        let events = try await infer(rawData)
+        let sleepEvent = try XCTUnwrap(events.first(where: { $0.kind == .sleep }))
+        let stages = try XCTUnwrap(sleepEvent.associatedMetrics?.sleepStages)
+
+        XCTAssertEqual(stages.count, 3)
+        XCTAssertEqual(stages[0].start, startOfDay)
+        XCTAssertEqual(stages[0].end, makeDate(year: 2026, month: 3, day: 12, hour: 1, minute: 0))
+        XCTAssertEqual(stages[0].stage, .light)
+        XCTAssertEqual(stages[1].stage, .deep)
+        XCTAssertEqual(stages[2].stage, .rem)
+    }
+
     func testSleepAndWorkoutStayOrderedWithQuietGaps() async throws {
         let rawData = DayRawData(
             date: targetDate,

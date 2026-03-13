@@ -28,6 +28,7 @@ struct EventMetrics: Equatable, Hashable, Sendable {
     var maxHeartRate: Double?
     var minHeartRate: Double?
     var heartRateSamples: [(date: Date, value: Double)]?
+    var sleepStages: [SleepStageSegment]?
     var stepCount: Int?
     var activeEnergy: Double?
     var distance: Double?
@@ -41,6 +42,7 @@ struct EventMetrics: Equatable, Hashable, Sendable {
         lhs.activeEnergy == rhs.activeEnergy &&
         lhs.distance == rhs.distance &&
         lhs.workoutType == rhs.workoutType &&
+        lhs.sleepStages == rhs.sleepStages &&
         heartRateSamplesEqual(lhs.heartRateSamples, rhs.heartRateSamples)
     }
 
@@ -52,6 +54,7 @@ struct EventMetrics: Equatable, Hashable, Sendable {
         hasher.combine(activeEnergy)
         hasher.combine(distance)
         hasher.combine(workoutType)
+        hasher.combine(sleepStages)
     }
 
     private static func heartRateSamplesEqual(

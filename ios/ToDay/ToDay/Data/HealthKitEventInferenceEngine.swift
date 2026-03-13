@@ -109,13 +109,21 @@ struct HealthKitEventInferenceEngine: EventInferring {
 
         return groups.compactMap { group in
             guard let first = group.first, let last = group.last else { return nil }
+            let sleepStages = group.map { sample in
+                SleepStageSegment(
+                    start: sample.interval.start,
+                    end: sample.interval.end,
+                    stage: sample.stage
+                )
+            }
             return InferredEvent(
                 kind: .sleep,
                 startDate: first.interval.start,
                 endDate: last.interval.end,
                 confidence: .high,
                 displayName: "睡眠",
-                subtitle: sleepSubtitle(for: group)
+                subtitle: sleepSubtitle(for: group),
+                associatedMetrics: EventMetrics(sleepStages: sleepStages)
             )
         }
     }
