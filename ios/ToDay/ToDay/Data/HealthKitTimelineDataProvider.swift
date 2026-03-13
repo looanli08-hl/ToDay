@@ -327,28 +327,3 @@ actor HealthAuthorizationGate {
         }
     }
 }
-
-private extension HKWorkoutActivityType {
-    var displayName: String {
-        switch self {
-        case .walking:
-            return "步行"
-        case .running:
-            return "跑步"
-        case .cycling:
-            return "骑行"
-        case .traditionalStrengthTraining:
-            return "力量"
-        case .functionalStrengthTraining:
-            return "功能力量"
-        case .mindAndBody:
-            return "身心"
-        case .yoga:
-            return "瑜伽"
-        case .hiking:
-            return "徒步"
-        default:
-            return "训练"
-        }
-    }
-}
