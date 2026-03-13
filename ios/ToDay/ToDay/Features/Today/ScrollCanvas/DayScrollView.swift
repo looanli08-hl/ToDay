@@ -15,45 +15,14 @@ struct DayScrollView: View {
     let onEventTap: (InferredEvent) -> Void
     let onBlankTap: (InferredEvent) -> Void
 
-    private let calendar = Calendar.current
-
     var body: some View {
         ScrollViewReader { proxy in
             ScrollView(.horizontal, showsIndicators: false) {
-                VStack(alignment: .leading, spacing: 10) {
-                    ZStack(alignment: .topLeading) {
-                        canvasBackground
-
-                        LazyHStack(alignment: .bottom, spacing: 0) {
-                            ForEach(canvasEvents) { event in
-                                Button {
-                                    if event.isBlankCandidate {
-                                        onBlankTap(event)
-                                    } else {
-                                        onEventTap(event)
-                                    }
-                                } label: {
-                                    EventCardView(event: event)
-                                        .frame(width: width(for: event), height: event.cardHeight, alignment: .bottomLeading)
-                                        .padding(.top, ScrollCanvasMetrics.canvasHeight - ScrollCanvasMetrics.cardLaneHeight + (ScrollCanvasMetrics.cardLaneHeight - event.cardHeight))
-                                }
-                                .buttonStyle(.plain)
-                            }
-                        }
-
-                        moodOverlay
-
-                        currentTimeNeedle
-                    }
-                    .frame(width: ScrollCanvasMetrics.totalWidth, height: ScrollCanvasMetrics.canvasHeight)
-                    .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 28, style: .continuous)
-                            .stroke(TodayTheme.border, lineWidth: 1)
-                    )
-
-                    timeAxis
-                }
+                DayScrollCanvasContent(
+                    timeline: timeline,
+                    onEventTap: onEventTap,
+                    onBlankTap: onBlankTap
+                )
                 .padding(.vertical, 8)
             }
             .task(id: timeline.date) {
@@ -62,6 +31,66 @@ struct DayScrollView: View {
                     proxy.scrollTo(currentHourAnchorID, anchor: .center)
                 }
             }
+        }
+    }
+
+    private var currentMinuteOfDay: Int {
+        let calendar = Calendar.current
+        guard calendar.isDateInToday(timeline.date) else { return 12 * 60 }
+        let components = calendar.dateComponents([.hour, .minute], from: Date())
+        return ((components.hour ?? 12) * 60) + (components.minute ?? 0)
+    }
+
+    private var currentHourAnchorID: String {
+        let currentHour = min(max(currentMinuteOfDay / 60, 0), 23)
+        return "hour-\(currentHour)"
+    }
+}
+
+struct DayScrollCanvasContent: View {
+    let timeline: DayTimeline
+    let onEventTap: (InferredEvent) -> Void
+    let onBlankTap: (InferredEvent) -> Void
+    var showsCurrentTimeNeedle: Bool = true
+
+    private let calendar = Calendar.current
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            ZStack(alignment: .topLeading) {
+                canvasBackground
+
+                LazyHStack(alignment: .bottom, spacing: 0) {
+                    ForEach(canvasEvents) { event in
+                        Button {
+                            if event.isBlankCandidate {
+                                onBlankTap(event)
+                            } else {
+                                onEventTap(event)
+                            }
+                        } label: {
+                            EventCardView(event: event)
+                                .frame(width: width(for: event), height: event.cardHeight, alignment: .bottomLeading)
+                                .padding(.top, ScrollCanvasMetrics.canvasHeight - ScrollCanvasMetrics.cardLaneHeight + (ScrollCanvasMetrics.cardLaneHeight - event.cardHeight))
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+
+                moodOverlay
+
+                if showsCurrentTimeNeedle {
+                    currentTimeNeedle
+                }
+            }
+            .frame(width: ScrollCanvasMetrics.totalWidth, height: ScrollCanvasMetrics.canvasHeight)
+            .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 28, style: .continuous)
+                    .stroke(TodayTheme.border, lineWidth: 1)
+            )
+
+            timeAxis
         }
     }
 
@@ -240,11 +269,6 @@ struct DayScrollView: View {
         guard calendar.isDateInToday(timeline.date) else { return 12 * 60 }
         let components = calendar.dateComponents([.hour, .minute], from: Date())
         return ((components.hour ?? 12) * 60) + (components.minute ?? 0)
-    }
-
-    private var currentHourAnchorID: String {
-        let currentHour = min(max(currentMinuteOfDay / 60, 0), 23)
-        return "hour-\(currentHour)"
     }
 }
 

@@ -6,6 +6,7 @@ struct TodayScreen: View {
     @ObservedObject var monetizationViewModel: MonetizationViewModel
     @State private var selectedEvent: InferredEvent?
     @State private var annotatingEvent: InferredEvent?
+    @State private var sharePayload: ScrollSharePayload?
 
     let onOpenHistory: () -> Void
     let onOpenPro: () -> Void
@@ -75,6 +76,9 @@ struct TodayScreen: View {
                     viewModel.annotateEvent(event, title: title)
                 }
             }
+            .sheet(item: $sharePayload) { payload in
+                ScrollShareSheet(image: payload.image)
+            }
             .task {
                 await viewModel.loadIfNeeded()
             }
@@ -113,6 +117,23 @@ struct TodayScreen: View {
                             )
                     }
                     .buttonStyle(.plain)
+
+                    Button {
+                        shareCurrentScroll()
+                    } label: {
+                        Image(systemName: "square.and.arrow.up")
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundStyle(TodayTheme.inkSoft)
+                            .frame(width: 42, height: 42)
+                            .background(TodayTheme.card)
+                            .overlay(
+                                Circle()
+                                    .stroke(TodayTheme.border, lineWidth: 1)
+                            )
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(viewModel.timeline == nil)
+                    .opacity(viewModel.timeline == nil ? 0.45 : 1)
 
                     Button {
                         Task {
@@ -486,6 +507,16 @@ struct TodayScreen: View {
     private var dateHeader: String {
         Self.dateHeaderFormatter.string(from: viewModel.timeline?.date ?? Date())
     }
+
+    private func shareCurrentScroll() {
+        guard let timeline = viewModel.timeline else { return }
+        sharePayload = ScrollSharePayload(image: ScrollShareService.renderScrollAsImage(timeline: timeline))
+    }
+}
+
+private struct ScrollSharePayload: Identifiable {
+    let id = UUID()
+    let image: UIImage
 }
 
 #Preview {
