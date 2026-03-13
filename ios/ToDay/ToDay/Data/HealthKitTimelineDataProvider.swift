@@ -8,6 +8,7 @@ final class HealthKitTimelineDataProvider: TimelineDataProviding {
     private let calendar: Calendar
     private let authorizationGate: HealthAuthorizationGate
     private let eventInferenceEngine: any EventInferring
+    private var cachedAggregator: DayDataAggregator?
 
     init(
         healthStore: HKHealthStore = HKHealthStore(),
@@ -28,7 +29,7 @@ final class HealthKitTimelineDataProvider: TimelineDataProviding {
 
         try await requestAuthorizationIfNeeded()
 
-        let rawData = await makeDayDataAggregator().loadRawData(for: date)
+        let rawData = await getAggregator().loadRawData(for: date)
         let entries = try await eventInferenceEngine.inferEvents(from: rawData, on: date)
 
         return DayTimeline(
@@ -269,17 +270,24 @@ final class HealthKitTimelineDataProvider: TimelineDataProviding {
         value.formatted(.number.precision(.fractionLength(0)))
     }
 
-    private func makeDayDataAggregator() async -> DayDataAggregator {
+    private func getAggregator() async -> DayDataAggregator {
+        if let cachedAggregator {
+            return cachedAggregator
+        }
+
         let locationService = await MainActor.run {
             LocationService.shared
         }
 
-        return DayDataAggregator(
+        let aggregator = DayDataAggregator(
             healthProvider: self,
             weatherService: ToDayWeatherService(),
             locationService: locationService,
             photoService: PhotoService()
         )
+
+        cachedAggregator = aggregator
+        return aggregator
     }
 
     private static func sleepStage(for value: Int) -> SleepStage {
