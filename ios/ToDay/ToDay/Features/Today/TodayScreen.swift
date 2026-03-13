@@ -8,9 +8,6 @@ struct TodayScreen: View {
     let onOpenHistory: () -> Void
     let onOpenPro: () -> Void
 
-    @State private var expandedEntryID: UUID?
-    @State private var selectedPhotoGallery: TimelinePhotoGallery?
-
     private let chineseLocale = Locale(identifier: "zh_CN")
     private static let dateHeaderFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -32,7 +29,7 @@ struct TodayScreen: View {
                         errorCard(message: message)
                     } else if let timeline = viewModel.timeline {
                         signatureSection(timeline)
-                        timelineSection(timeline)
+                        scrollCanvasSection(timeline)
                     }
 
                     summarySection
@@ -61,9 +58,6 @@ struct TodayScreen: View {
                 QuickRecordSheet(mode: viewModel.quickRecordMode) { record in
                     viewModel.startMoodRecord(record)
                 }
-            }
-            .sheet(item: $selectedPhotoGallery) { gallery in
-                TimelinePhotoGallerySheet(gallery: gallery)
             }
             .task {
                 await viewModel.loadIfNeeded()
@@ -155,29 +149,25 @@ struct TodayScreen: View {
         }
     }
 
-    private func timelineSection(_ timeline: DayTimeline) -> some View {
+    private func scrollCanvasSection(_ timeline: DayTimeline) -> some View {
         ContentCard {
-            EyebrowLabel("TIMELINE")
+            EyebrowLabel("SCROLL CANVAS")
 
-            Text("时间线")
+            Text("横向长卷")
                 .font(.system(size: 23, weight: .regular, design: .serif))
                 .italic()
                 .foregroundStyle(TodayTheme.ink)
 
-            VStack(spacing: 8) {
-                ForEach(timeline.entries) { entry in
-                    TimelineStreamRow(
-                        entry: entry,
-                        isExpanded: expandedEntryID == entry.id
-                    ) {
-                        withAnimation(.spring(response: 0.28, dampingFraction: 0.84)) {
-                            expandedEntryID = expandedEntryID == entry.id ? nil : entry.id
-                        }
-                    } onPhotoTap: { attachments, startIndex in
-                        selectedPhotoGallery = TimelinePhotoGallery(attachments: attachments, startIndex: startIndex)
-                    }
-                }
-            }
+            Text("把一天摊成一卷，从凌晨到夜里横向看清楚片段如何铺开。空白段落也会留出来，方便你之后再补标。")
+                .font(.system(size: 14))
+                .foregroundStyle(TodayTheme.inkMuted)
+                .lineSpacing(4)
+
+            DayScrollView(
+                timeline: timeline,
+                onEventTap: { _ in },
+                onBlankTap: { _ in }
+            )
         }
     }
 
@@ -458,96 +448,6 @@ struct TodayScreen: View {
 
     private var dateHeader: String {
         Self.dateHeaderFormatter.string(from: viewModel.timeline?.date ?? Date())
-    }
-}
-
-private struct TimelinePhotoGallery: Identifiable {
-    let id = UUID()
-    let attachments: [MoodPhotoAttachment]
-    let startIndex: Int
-}
-
-private struct TimelinePhotoGallerySheet: View {
-    @Environment(\.dismiss) private var dismiss
-    @State private var selectedIndex: Int
-
-    let gallery: TimelinePhotoGallery
-
-    init(gallery: TimelinePhotoGallery) {
-        self.gallery = gallery
-        _selectedIndex = State(initialValue: gallery.startIndex)
-    }
-
-    var body: some View {
-        NavigationStack {
-            ZStack {
-                TodayTheme.background.ignoresSafeArea()
-
-                TabView(selection: $selectedIndex) {
-                    ForEach(Array(gallery.attachments.enumerated()), id: \.element.id) { index, attachment in
-                        TimelineGalleryImagePage(attachment: attachment)
-                            .tag(index)
-                            .padding(.horizontal, 20)
-                            .padding(.vertical, 28)
-                    }
-                }
-                .tabViewStyle(.page(indexDisplayMode: .always))
-            }
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button {
-                        dismiss()
-                    } label: {
-                        Image(systemName: "xmark")
-                            .font(.system(size: 13, weight: .bold))
-                            .foregroundStyle(TodayTheme.inkSoft)
-                            .frame(width: 32, height: 32)
-                            .background(TodayTheme.card)
-                            .clipShape(Circle())
-                    }
-                }
-
-                ToolbarItem(placement: .principal) {
-                    Text("照片 \(selectedIndex + 1) / \(gallery.attachments.count)")
-                        .font(.system(size: 13, weight: .medium, design: .monospaced))
-                        .foregroundStyle(TodayTheme.inkMuted)
-                }
-            }
-        }
-    }
-}
-
-private struct TimelineGalleryImagePage: View {
-    let attachment: MoodPhotoAttachment
-
-    @State private var image: UIImage?
-
-    var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 28, style: .continuous)
-                .fill(TodayTheme.card)
-
-            if let image {
-                Image(uiImage: image)
-                    .resizable()
-                    .scaledToFit()
-                    .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
-            } else {
-                VStack(spacing: 10) {
-                    ProgressView()
-                    Text("正在载入照片")
-                        .font(.system(size: 13))
-                        .foregroundStyle(TodayTheme.inkMuted)
-                }
-            }
-        }
-        .overlay(
-            RoundedRectangle(cornerRadius: 28, style: .continuous)
-                .stroke(TodayTheme.border, lineWidth: 1)
-        )
-        .task(id: attachment.id) {
-            image = MoodPhotoLibrary.image(for: attachment)
-        }
     }
 }
 

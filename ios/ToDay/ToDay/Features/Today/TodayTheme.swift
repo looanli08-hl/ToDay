@@ -17,6 +17,16 @@ enum TodayTheme {
     static let roseSoft = dynamicColor(light: 0xF7E7E7, dark: 0x392526)
     static let blue = dynamicColor(light: 0x7B9CC9, dark: 0x9AB7DD)
     static let blueSoft = dynamicColor(light: 0xE8EFF9, dark: 0x223043)
+    static let scrollNight = dynamicColor(light: 0x202C57, dark: 0x17203F)
+    static let scrollSunrise = dynamicColor(light: 0xD28953, dark: 0xA6633A)
+    static let scrollGold = dynamicColor(light: 0xE9D18B, dark: 0xB39446)
+    static let scrollNoon = dynamicColor(light: 0xBFDDF3, dark: 0x385D7F)
+    static let scrollSunset = dynamicColor(light: 0xE0A16D, dark: 0xA16A44)
+    static let scrollViolet = dynamicColor(light: 0x5F4978, dark: 0x3A2B4C)
+    static let workoutOrange = dynamicColor(light: 0xD76F3D, dark: 0xF09B66)
+    static let walkGreen = dynamicColor(light: 0x5C9C70, dark: 0x7CC18D)
+    static let sleepIndigo = dynamicColor(light: 0x4A5FA9, dark: 0x788DDB)
+    static let glass = Color.white.opacity(0.18)
 }
 
 struct ContentCard<Content: View>: View {
