@@ -62,12 +62,12 @@ struct TodayFlowSignatureView: View {
 
             ZStack {
                 flowBody(points: points)
-                    .fill(flowGradient(points: points).opacity(0.45))
+                    .fill(flowGradient(points: points).opacity(0.35))
 
                 flowCenterLine(points: points)
                     .stroke(flowGradient(points: points), style: StrokeStyle(lineWidth: 2.4, lineCap: .round, lineJoin: .round))
 
-                ForEach(points.filter { $0.intensity >= 0.82 }) { point in
+                ForEach(points.filter(isPeakPoint)) { point in
                     Circle()
                         .fill(point.color)
                         .frame(width: 7, height: 7)
@@ -81,22 +81,59 @@ struct TodayFlowSignatureView: View {
     private func flowPoints(in size: CGSize) -> [RiverPoint] {
         guard !entries.isEmpty else { return [] }
 
-        let width = max(size.width, 1)
-        let centerY = size.height / 2
+        let allSamples = entries
+            .compactMap { $0.associatedMetrics?.heartRateSamples }
+            .flatMap { $0 }
+            .removingDuplicates()
+            .sorted { $0.date < $1.date }
 
-        return entries.enumerated().map { index, entry in
-            let progress = Double(entry.timelineStartMinuteOfDay) / Double(24 * 60)
+        guard allSamples.count >= 4 else {
+            return fallbackFlowPoints(in: size)
+        }
+
+        let width = max(size.width, 1)
+        let minHR = allSamples.map(\.value).min() ?? 40
+        let maxHR = allSamples.map(\.value).max() ?? 180
+        let hrRange = max(maxHR - minHR, 20)
+
+        return allSamples.enumerated().map { index, sample in
+            let progress = minuteProgress(for: sample.date)
             let x = width * CGFloat(progress)
-            let wave = CGFloat(sin(Double(index) * 0.65) * 3.5)
-            let intensity = entry.kind.flowIntensity
-            let amplitude = 10 + (intensity * 20)
+            let normalized = CGFloat((sample.value - minHR) / hrRange)
+            let intensity = normalized
+            let centerY = size.height * (1.0 - normalized * 0.7 - 0.15)
+            let amplitude = 3 + normalized * 8
+            let color = color(for: sample.date)
 
             return RiverPoint(
                 index: index,
                 x: x,
-                centerY: centerY - (intensity * 10) + wave,
-                topY: centerY - amplitude + wave,
-                bottomY: centerY + amplitude - (wave * 0.45),
+                centerY: centerY,
+                topY: centerY - amplitude,
+                bottomY: centerY + amplitude,
+                intensity: intensity,
+                color: color,
+                progress: progress
+            )
+        }
+    }
+
+    private func fallbackFlowPoints(in size: CGSize) -> [RiverPoint] {
+        let width = max(size.width, 1)
+
+        return entries.enumerated().map { index, entry in
+            let progress = Double(entry.timelineStartMinuteOfDay) / Double(24 * 60)
+            let x = width * CGFloat(progress)
+            let intensity = entry.kind.flowIntensity
+            let centerY = size.height * (0.84 - intensity * 0.5)
+            let amplitude = 8 + (intensity * 16)
+
+            return RiverPoint(
+                index: index,
+                x: x,
+                centerY: centerY,
+                topY: centerY - amplitude,
+                bottomY: centerY + amplitude,
                 intensity: intensity,
                 color: entry.kind.flowColor,
                 progress: progress
@@ -147,9 +184,9 @@ struct TodayFlowSignatureView: View {
     }
 
     private func flowGradient(points: [RiverPoint]) -> LinearGradient {
-        let stops = points.map { point in
+        let stops = points.isEmpty ? [Gradient.Stop(color: TodayTheme.inkFaint, location: 0)] : points.map { point in
             Gradient.Stop(
-                color: point.color.opacity(0.35 + (point.intensity * 0.45)),
+                color: point.color,
                 location: point.progress
             )
         }
@@ -159,6 +196,48 @@ struct TodayFlowSignatureView: View {
             startPoint: .leading,
             endPoint: .trailing
         )
+    }
+
+    private func isPeakPoint(_ point: RiverPoint) -> Bool {
+        guard point.intensity >= 0.75 else { return false }
+        guard let event = event(at: date(for: point.progress)) else { return false }
+        return event.kind == .workout || event.kind == .activeWalk
+    }
+
+    private func minuteProgress(for date: Date) -> Double {
+        let calendar = Calendar.current
+        let startOfDay = calendar.startOfDay(for: date)
+        let minute = min(max(date.timeIntervalSince(startOfDay) / 60, 0), Double(24 * 60))
+        return minute / Double(24 * 60)
+    }
+
+    private func date(for progress: Double) -> Date {
+        let calendar = Calendar.current
+        let startOfDay = calendar.startOfDay(for: entries.first?.startDate ?? Date())
+        return startOfDay.addingTimeInterval(progress * Double(24 * 60 * 60))
+    }
+
+    private func event(at date: Date) -> InferredEvent? {
+        entries.first { entry in
+            entry.startDate <= date && date < entry.endDate
+        }
+    }
+
+    private func color(for date: Date) -> Color {
+        event(at: date)?.kind.flowColor ?? TodayTheme.inkFaint
+    }
+}
+
+private extension Array where Element == HeartRateSample {
+    func removingDuplicates() -> [HeartRateSample] {
+        var seen = Set<HeartRateSample>()
+        var result: [HeartRateSample] = []
+
+        for sample in self where seen.insert(sample).inserted {
+            result.append(sample)
+        }
+
+        return result
     }
 }
 
