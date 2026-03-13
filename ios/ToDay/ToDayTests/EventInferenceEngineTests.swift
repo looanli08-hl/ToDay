@@ -100,6 +100,56 @@ final class EventInferenceEngineTests: XCTestCase {
         XCTAssertEqual(commuteEvent.displayName, "步行通勤")
     }
 
+    func testHighHeartRateWithLowCadenceBecomesQuietTime() async throws {
+        let rawData = DayRawData(
+            date: targetDate,
+            heartRateSamples: [
+                heartRateSample(hour: 6, minute: 0, durationMinutes: 10, bpm: 52),
+                heartRateSample(hour: 6, minute: 30, durationMinutes: 10, bpm: 54),
+                heartRateSample(hour: 11, minute: 0, durationMinutes: 15, bpm: 98),
+                heartRateSample(hour: 11, minute: 15, durationMinutes: 15, bpm: 104)
+            ],
+            stepSamples: [
+                stepSample(hour: 11, minute: 0, durationMinutes: 15, steps: 220),
+                stepSample(hour: 11, minute: 15, durationMinutes: 15, steps: 260)
+            ]
+        )
+
+        let events = try await infer(rawData)
+        let quietEvent = try XCTUnwrap(events.first(where: {
+            $0.kind == .quietTime &&
+            $0.startDate == makeDate(year: 2026, month: 3, day: 12, hour: 11, minute: 0)
+        }))
+
+        XCTAssertEqual(quietEvent.confidence, .medium)
+        XCTAssertTrue(quietEvent.subtitle?.contains("平均 101 bpm") == true)
+    }
+
+    func testLowHeartRateWithHighCadenceBecomesActiveWalk() async throws {
+        let rawData = DayRawData(
+            date: targetDate,
+            heartRateSamples: [
+                heartRateSample(hour: 6, minute: 0, durationMinutes: 10, bpm: 54),
+                heartRateSample(hour: 6, minute: 30, durationMinutes: 10, bpm: 56),
+                heartRateSample(hour: 10, minute: 0, durationMinutes: 15, bpm: 72),
+                heartRateSample(hour: 10, minute: 15, durationMinutes: 15, bpm: 76)
+            ],
+            stepSamples: [
+                stepSample(hour: 10, minute: 0, durationMinutes: 15, steps: 1180),
+                stepSample(hour: 10, minute: 15, durationMinutes: 15, steps: 1140)
+            ]
+        )
+
+        let events = try await infer(rawData)
+        let walkEvent = try XCTUnwrap(events.first(where: {
+            $0.kind == .activeWalk &&
+            $0.startDate == makeDate(year: 2026, month: 3, day: 12, hour: 10, minute: 0)
+        }))
+
+        XCTAssertEqual(walkEvent.confidence, .medium)
+        XCTAssertEqual(walkEvent.displayName, "活跃步行")
+    }
+
     func testMoodRecordsAreEmbeddedAsMoodEvents() async throws {
         let mood = MoodRecord(
             id: UUID(uuidString: "00000000-0000-0000-0000-000000000111")!,
@@ -227,6 +277,12 @@ final class EventInferenceEngineTests: XCTestCase {
         let start = makeDate(year: 2026, month: 3, day: 12, hour: hour, minute: minute)
         let end = calendar.date(byAdding: .minute, value: durationMinutes, to: start)!
         return DateValueSample(startDate: start, endDate: end, value: steps)
+    }
+
+    private func heartRateSample(hour: Int, minute: Int, durationMinutes: Int, bpm: Double) -> DateValueSample {
+        let start = makeDate(year: 2026, month: 3, day: 12, hour: hour, minute: minute)
+        let end = calendar.date(byAdding: .minute, value: durationMinutes, to: start)!
+        return DateValueSample(startDate: start, endDate: end, value: bpm)
     }
 
     private func makeDate(year: Int, month: Int, day: Int, hour: Int, minute: Int) -> Date {

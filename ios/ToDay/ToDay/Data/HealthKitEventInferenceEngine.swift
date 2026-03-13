@@ -36,6 +36,7 @@ struct HealthKitEventInferenceEngine: EventInferring {
 
         let mediumCandidates = buildMovementEvents(
             from: rawData.stepSamples,
+            heartRateSamples: rawData.heartRateSamples,
             in: dayInterval,
             excluding: occupied
         )
@@ -148,10 +149,12 @@ struct HealthKitEventInferenceEngine: EventInferring {
 
     private func buildMovementEvents(
         from stepSamples: [DateValueSample],
+        heartRateSamples samples: [DateValueSample],
         in dayInterval: DateInterval,
         excluding occupied: [DateInterval]
     ) -> [InferredEvent] {
-        let qualifiedSamples = stepSamples
+        let restingHeartRate = restingHeartRateBaseline(from: samples)
+        let adjustedSamples = stepSamples
             .flatMap { sample in
                 let interval = DateInterval(start: sample.startDate, end: sample.endDate)
                 guard let clipped = interval.intersection(with: dayInterval), clipped.duration > 0 else {
@@ -161,8 +164,7 @@ struct HealthKitEventInferenceEngine: EventInferring {
                 return subtract(clipped, by: occupied).compactMap { availableInterval -> DateValueSample? in
                     let fraction = availableInterval.duration / clipped.duration
                     let adjustedValue = sample.value * fraction
-                    let ratePerMinute = adjustedValue / max(availableInterval.duration / 60, 1)
-                    guard ratePerMinute > 60 else { return nil }
+                    guard adjustedValue > 0 else { return nil }
 
                     return DateValueSample(
                         startDate: availableInterval.start,
@@ -175,11 +177,11 @@ struct HealthKitEventInferenceEngine: EventInferring {
                 lhs.startDate < rhs.startDate
             })
 
-        guard !qualifiedSamples.isEmpty else { return [] }
+        guard !adjustedSamples.isEmpty else { return [] }
 
         var clusters: [[DateValueSample]] = []
 
-        for sample in qualifiedSamples {
+        for sample in adjustedSamples {
             if var lastCluster = clusters.popLast() {
                 let lastEnd = lastCluster.last?.endDate ?? sample.startDate
                 if sample.startDate.timeIntervalSince(lastEnd) <= mergeGapThreshold {
@@ -194,26 +196,75 @@ struct HealthKitEventInferenceEngine: EventInferring {
             }
         }
 
-        return clusters.compactMap { cluster in
+        return clusters.compactMap { cluster -> InferredEvent? in
             guard let first = cluster.first, let last = cluster.last else { return nil }
 
             let interval = DateInterval(start: first.startDate, end: last.endDate)
             guard interval.duration >= 10 * 60 else { return nil }
 
             let totalSteps = Int(cluster.reduce(0.0) { $0 + $1.value }.rounded())
-            let kind = classifyMovementEvent(startDate: interval.start, duration: interval.duration)
+            let cadencePerMinute = Double(totalSteps) / max(interval.duration / 60, 1)
+            let clusterHeartSamples = self.heartRateSamples(
+                overlapping: interval,
+                samples: samples
+            )
+            let averageHeartRate = clusterHeartSamples.isEmpty
+                ? nil
+                : clusterHeartSamples.map(\.value).reduce(0, +) / Double(clusterHeartSamples.count)
+            let elevatedHeartRateThreshold = restingHeartRate.map { $0 + 30 }
+            let hasHeartRateSignal = averageHeartRate != nil && elevatedHeartRateThreshold != nil
+            let isHighHeartRate = if let averageHeartRate, let elevatedHeartRateThreshold {
+                averageHeartRate > elevatedHeartRateThreshold
+            } else {
+                false
+            }
+            let isHighCadence = cadencePerMinute > 60
 
-            guard kind == .commute || kind == .activeWalk else {
-                return nil
+            let classification: (kind: EventKind, confidence: EventConfidence)? = {
+                if isHighHeartRate, isHighCadence {
+                    return (.activeWalk, .high)
+                }
+
+                if isHighHeartRate, !isHighCadence {
+                    return (.quietTime, .medium)
+                }
+
+                if hasHeartRateSignal, !isHighHeartRate, isHighCadence {
+                    return (.activeWalk, .medium)
+                }
+
+                let fallbackKind = classifyMovementEvent(startDate: interval.start, duration: interval.duration)
+                return fallbackKind == .commute || fallbackKind == .activeWalk
+                    ? (fallbackKind, .medium)
+                    : nil
+                }()
+
+            guard let classification else { return nil }
+
+            let title: String
+            switch classification.kind {
+            case .commute:
+                title = "步行通勤"
+            case .activeWalk:
+                title = "活跃步行"
+            case .quietTime:
+                title = quietTimeName(for: interval.start)
+            default:
+                title = "活动"
             }
 
+            let subtitleParts = [
+                "\(max(totalSteps, 1)) 步",
+                averageHeartRate.map { "平均 \(Int($0.rounded())) bpm" }
+            ].compactMap { $0 }
+
             return InferredEvent(
-                kind: kind,
+                kind: classification.kind,
                 startDate: interval.start,
                 endDate: interval.end,
-                confidence: .medium,
-                displayName: kind == .commute ? "步行通勤" : "活跃步行",
-                subtitle: "\(max(totalSteps, 1)) 步"
+                confidence: classification.confidence,
+                displayName: title,
+                subtitle: subtitleParts.joined(separator: " · ")
             )
         }
     }
@@ -347,6 +398,15 @@ struct HealthKitEventInferenceEngine: EventInferring {
         let samples = heartRateSamples(overlapping: candidateInterval(for: event), samples: samples)
         guard !samples.isEmpty else { return nil }
         return samples.map(\.value).reduce(0, +) / Double(samples.count)
+    }
+
+    private func restingHeartRateBaseline(from samples: [DateValueSample]) -> Double? {
+        let orderedValues = samples.map(\.value).sorted()
+        guard !orderedValues.isEmpty else { return nil }
+
+        let baselineCount = max(1, Int(Double(orderedValues.count) * 0.25))
+        let baselineValues = orderedValues.prefix(baselineCount)
+        return baselineValues.reduce(0, +) / Double(baselineValues.count)
     }
 
     private func classifyMovementEvent(startDate: Date, duration: TimeInterval) -> EventKind {
