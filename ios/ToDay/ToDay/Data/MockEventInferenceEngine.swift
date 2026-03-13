@@ -1,4 +1,5 @@
 import Foundation
+import HealthKit
 
 struct MockEventInferenceEngine: EventInferring {
     private let calendar: Calendar
@@ -18,208 +19,317 @@ struct MockEventInferenceEngine: EventInferring {
             ) ?? startOfDay
         }
 
-        return [
-            InferredEvent(
-                kind: .sleep,
-                startDate: time(0, 0),
-                endDate: time(7, 0),
-                confidence: .high,
-                displayName: "睡眠",
-                subtitle: "深睡 2h, 浅睡 3h, REM 1.5h",
-                associatedMetrics: EventMetrics(
-                    averageHeartRate: 56,
-                    maxHeartRate: 68,
-                    minHeartRate: 48,
-                    heartRateSamples: mockHeartRateSamples(from: time(0, 0), to: time(7, 0), values: [52, 55, 57, 60]),
-                    stepCount: 12,
-                    activeEnergy: 40,
-                    distance: nil,
-                    workoutType: nil
-                )
+        var events: [InferredEvent] = [
+            makeSleepEvent(rawData: rawData, start: time(0, 0), end: time(7, 0)),
+            makeQuietEvent(
+                rawData: rawData,
+                title: "晨间安静",
+                start: time(7, 0),
+                end: time(7, 30),
+                subtitle: "慢慢醒来，准备出门"
             ),
-            InferredEvent(
-                kind: .quietTime,
-                startDate: time(7, 0),
-                endDate: time(7, 30),
-                confidence: .low,
-                displayName: "安静时光",
-                associatedMetrics: EventMetrics(
-                    averageHeartRate: 64,
-                    maxHeartRate: 70,
-                    minHeartRate: 58,
-                    heartRateSamples: mockHeartRateSamples(from: time(7, 0), to: time(7, 30), values: [62, 64, 66]),
-                    stepCount: 18,
-                    activeEnergy: 16,
-                    distance: nil,
-                    workoutType: nil
-                )
+            makeCommuteEvent(
+                rawData: rawData,
+                title: "步行通勤",
+                subtitle: "家 → 公司",
+                start: time(7, 30),
+                end: time(8, 0)
             ),
-            InferredEvent(
-                kind: .commute,
-                startDate: time(7, 30),
-                endDate: time(8, 0),
-                confidence: .medium,
-                displayName: "步行通勤",
-                subtitle: "早晨通勤",
-                associatedMetrics: EventMetrics(
-                    averageHeartRate: 88,
-                    maxHeartRate: 110,
-                    minHeartRate: 74,
-                    heartRateSamples: mockHeartRateSamples(from: time(7, 30), to: time(8, 0), values: [80, 86, 92, 96]),
-                    stepCount: 2600,
-                    activeEnergy: 110,
-                    distance: 1800,
-                    workoutType: nil
-                )
+            makeQuietEvent(
+                rawData: rawData,
+                title: "安静上午",
+                start: time(8, 0),
+                end: time(12, 0),
+                subtitle: "晴 22° · 办公室"
             ),
-            InferredEvent(
-                kind: .quietTime,
-                startDate: time(8, 0),
-                endDate: time(12, 0),
-                confidence: .low,
-                displayName: "安静的上午",
-                associatedMetrics: EventMetrics(
-                    averageHeartRate: 68,
-                    maxHeartRate: 78,
-                    minHeartRate: 60,
-                    heartRateSamples: mockHeartRateSamples(from: time(8, 0), to: time(12, 0), values: [66, 69, 67, 70]),
-                    stepCount: 420,
-                    activeEnergy: 90,
-                    distance: nil,
-                    workoutType: nil
-                )
+            makeQuietEvent(
+                rawData: rawData,
+                title: "午间时光",
+                start: time(12, 0),
+                end: time(13, 0),
+                subtitle: "附近餐厅 · 午餐与放空"
             ),
-            InferredEvent(
-                kind: .mood,
-                startDate: time(9, 30),
-                endDate: time(9, 30),
-                confidence: .high,
-                displayName: "心情：专注",
-                photoAttachments: []
+            makeQuietEvent(
+                rawData: rawData,
+                title: "安静下午",
+                start: time(13, 0),
+                end: time(14, 0),
+                subtitle: "重新进入工作节奏"
             ),
-            InferredEvent(
-                kind: .quietTime,
-                startDate: time(12, 0),
-                endDate: time(13, 0),
-                confidence: .low,
-                displayName: "午间时光",
-                associatedMetrics: EventMetrics(
-                    averageHeartRate: 71,
-                    maxHeartRate: 82,
-                    minHeartRate: 63,
-                    heartRateSamples: mockHeartRateSamples(from: time(12, 0), to: time(13, 0), values: [68, 72, 75]),
-                    stepCount: 240,
-                    activeEnergy: 62,
-                    distance: nil,
-                    workoutType: nil
-                )
+            makeWorkoutEvent(rawData: rawData, start: time(14, 0), end: time(14, 45)),
+            makeQuietEvent(
+                rawData: rawData,
+                title: "安静下午",
+                start: time(14, 45),
+                end: time(17, 30),
+                subtitle: "跑完后回到桌前"
             ),
-            InferredEvent(
-                kind: .quietTime,
-                startDate: time(13, 0),
-                endDate: time(14, 0),
-                confidence: .low,
-                displayName: "安静的下午",
-                associatedMetrics: EventMetrics(
-                    averageHeartRate: 67,
-                    maxHeartRate: 74,
-                    minHeartRate: 61,
-                    heartRateSamples: mockHeartRateSamples(from: time(13, 0), to: time(14, 0), values: [65, 67, 69]),
-                    stepCount: 120,
-                    activeEnergy: 36,
-                    distance: nil,
-                    workoutType: nil
-                )
+            makeCommuteEvent(
+                rawData: rawData,
+                title: "步行通勤返程",
+                subtitle: "公司 → 家",
+                start: time(17, 30),
+                end: time(18, 0)
             ),
-            InferredEvent(
-                kind: .workout,
-                startDate: time(14, 0),
-                endDate: time(14, 45),
-                confidence: .high,
-                displayName: "跑步",
-                subtitle: "45 分钟 · 5.2 km",
-                associatedMetrics: EventMetrics(
-                    averageHeartRate: 138,
-                    maxHeartRate: 162,
-                    minHeartRate: 112,
-                    heartRateSamples: mockHeartRateSamples(from: time(14, 0), to: time(14, 45), values: [124, 136, 148, 156]),
-                    stepCount: 5400,
-                    activeEnergy: 430,
-                    distance: 5200,
-                    workoutType: "跑步"
-                )
+            makeQuietEvent(
+                rawData: rawData,
+                title: "安静夜晚",
+                start: time(18, 0),
+                end: time(22, 0),
+                subtitle: "在家收束今天"
             ),
-            InferredEvent(
-                kind: .quietTime,
-                startDate: time(14, 45),
-                endDate: time(17, 30),
-                confidence: .low,
-                displayName: "安静的下午",
-                associatedMetrics: EventMetrics(
-                    averageHeartRate: 73,
-                    maxHeartRate: 82,
-                    minHeartRate: 64,
-                    heartRateSamples: mockHeartRateSamples(from: time(14, 45), to: time(17, 30), values: [70, 72, 75, 74]),
-                    stepCount: 360,
-                    activeEnergy: 88,
-                    distance: nil,
-                    workoutType: nil
-                )
-            ),
-            InferredEvent(
-                kind: .commute,
-                startDate: time(17, 30),
-                endDate: time(18, 0),
-                confidence: .medium,
-                displayName: "步行通勤",
-                subtitle: "傍晚返程",
-                associatedMetrics: EventMetrics(
-                    averageHeartRate: 92,
-                    maxHeartRate: 116,
-                    minHeartRate: 78,
-                    heartRateSamples: mockHeartRateSamples(from: time(17, 30), to: time(18, 0), values: [84, 90, 96, 100]),
-                    stepCount: 2800,
-                    activeEnergy: 122,
-                    distance: 1900,
-                    workoutType: nil
-                )
-            ),
-            InferredEvent(
-                kind: .quietTime,
-                startDate: time(18, 0),
-                endDate: time(22, 0),
-                confidence: .low,
-                displayName: "安静的夜晚",
-                associatedMetrics: EventMetrics(
-                    averageHeartRate: 70,
-                    maxHeartRate: 79,
-                    minHeartRate: 61,
-                    heartRateSamples: mockHeartRateSamples(from: time(18, 0), to: time(22, 0), values: [68, 71, 73, 69]),
-                    stepCount: 220,
-                    activeEnergy: 58,
-                    distance: nil,
-                    workoutType: nil
-                )
-            ),
-            InferredEvent(
-                kind: .mood,
-                startDate: time(20, 0),
-                endDate: time(20, 0),
-                confidence: .high,
-                displayName: "心情：平静",
-                photoAttachments: []
+            makeQuietEvent(
+                rawData: rawData,
+                title: "安静深夜",
+                start: time(22, 0),
+                end: time(24, 0),
+                subtitle: "准备休息"
             )
         ]
+
+        events.append(
+            contentsOf: rawData.moodRecords.map {
+                $0.toInferredEvent(referenceDate: date, calendar: calendar)
+            }
+        )
+
+        return events.sorted { lhs, rhs in
+            if lhs.startDate == rhs.startDate {
+                return lhs.id.uuidString < rhs.id.uuidString
+            }
+
+            return lhs.startDate < rhs.startDate
+        }
     }
 
-    private func mockHeartRateSamples(from startDate: Date, to endDate: Date, values: [Double]) -> [HeartRateSample] {
-        guard !values.isEmpty else { return [] }
-        let step = endDate.timeIntervalSince(startDate) / Double(values.count + 1)
-        return values.enumerated().map { index, value in
-            HeartRateSample(
-                date: startDate.addingTimeInterval(step * Double(index + 1)),
-                value: value
-            )
+    private func makeSleepEvent(rawData: DayRawData, start: Date, end: Date) -> InferredEvent {
+        let metrics = makeMetrics(rawData: rawData, start: start, end: end, includeSleepStages: true)
+        let stageText = sleepStageSummary(from: metrics.sleepStages ?? [])
+
+        return InferredEvent(
+            kind: .sleep,
+            startDate: start,
+            endDate: end,
+            confidence: .high,
+            displayName: "睡眠",
+            subtitle: stageText,
+            associatedMetrics: metrics
+        )
+    }
+
+    private func makeQuietEvent(
+        rawData: DayRawData,
+        title: String,
+        start: Date,
+        end: Date,
+        subtitle: String
+    ) -> InferredEvent {
+        InferredEvent(
+            kind: .quietTime,
+            startDate: start,
+            endDate: end,
+            confidence: .low,
+            displayName: title,
+            subtitle: subtitle,
+            associatedMetrics: makeMetrics(rawData: rawData, start: start, end: end)
+        )
+    }
+
+    private func makeCommuteEvent(
+        rawData: DayRawData,
+        title: String,
+        subtitle: String,
+        start: Date,
+        end: Date
+    ) -> InferredEvent {
+        let metrics = makeMetrics(rawData: rawData, start: start, end: end)
+
+        return InferredEvent(
+            kind: .commute,
+            startDate: start,
+            endDate: end,
+            confidence: .high,
+            displayName: title,
+            subtitle: subtitleWithDistanceAndSteps(
+                base: subtitle,
+                distance: metrics.distance,
+                steps: metrics.stepCount
+            ),
+            associatedMetrics: metrics
+        )
+    }
+
+    private func makeWorkoutEvent(rawData: DayRawData, start: Date, end: Date) -> InferredEvent {
+        let metrics = makeMetrics(
+            rawData: rawData,
+            start: start,
+            end: end,
+            workoutType: "跑步"
+        )
+
+        return InferredEvent(
+            kind: .workout,
+            startDate: start,
+            endDate: end,
+            confidence: .high,
+            displayName: "跑步",
+            subtitle: workoutSubtitle(from: metrics),
+            associatedMetrics: metrics
+        )
+    }
+
+    private func makeMetrics(
+        rawData: DayRawData,
+        start: Date,
+        end: Date,
+        workoutType: String? = nil,
+        includeSleepStages: Bool = false
+    ) -> EventMetrics {
+        let interval = DateInterval(start: start, end: end)
+        let heartRateSamples = heartRateSamples(in: interval, from: rawData)
+        let averageHeartRate = heartRateSamples.isEmpty ? nil : heartRateSamples.map(\.value).reduce(0, +) / Double(heartRateSamples.count)
+        let maxHeartRate = heartRateSamples.map(\.value).max()
+        let minHeartRate = heartRateSamples.map(\.value).min()
+        let stepCount = Int(samples(in: interval, from: rawData.stepSamples).reduce(0) { $0 + $1.value }.rounded())
+        let activeEnergy = samples(in: interval, from: rawData.activeEnergySamples).reduce(0) { $0 + $1.value }
+        let workout = rawData.workouts.first(where: { DateInterval(start: $0.startDate, end: $0.endDate).intersection(with: interval) != nil })
+        let photos = rawData.photos
+            .filter { interval.contains($0.creationDate) }
+
+        return EventMetrics(
+            averageHeartRate: averageHeartRate,
+            maxHeartRate: maxHeartRate,
+            minHeartRate: minHeartRate,
+            heartRateSamples: heartRateSamples.isEmpty ? nil : heartRateSamples,
+            weather: nearestWeather(to: start, in: rawData.hourlyWeather),
+            location: overlappingLocation(in: interval, visits: rawData.locationVisits),
+            photos: photos.isEmpty ? nil : photos,
+            sleepStages: includeSleepStages ? sleepStages(in: interval, from: rawData.sleepSamples) : nil,
+            stepCount: stepCount > 0 ? stepCount : nil,
+            activeEnergy: activeEnergy > 0 ? activeEnergy : nil,
+            distance: workout?.distance,
+            workoutType: workoutType ?? workout?.displayName
+        )
+    }
+
+    private func samples(in interval: DateInterval, from values: [DateValueSample]) -> [DateValueSample] {
+        values.filter { sample in
+            DateInterval(start: sample.startDate, end: sample.endDate).intersection(with: interval) != nil
+        }
+    }
+
+    private func heartRateSamples(in interval: DateInterval, from rawData: DayRawData) -> [HeartRateSample] {
+        rawData.heartRateSamples
+            .filter { sample in
+                DateInterval(start: sample.startDate, end: sample.endDate).intersection(with: interval) != nil
+            }
+            .sorted { $0.startDate < $1.startDate }
+            .map { HeartRateSample(date: $0.startDate, value: $0.value) }
+    }
+
+    private func sleepStages(in interval: DateInterval, from sleepSamples: [SleepSample]) -> [SleepStageSegment] {
+        sleepSamples
+            .filter { sample in
+                DateInterval(start: sample.startDate, end: sample.endDate).intersection(with: interval) != nil
+            }
+            .sorted { $0.startDate < $1.startDate }
+            .map { sample in
+                SleepStageSegment(
+                    start: sample.startDate,
+                    end: sample.endDate,
+                    stage: sample.stage
+                )
+            }
+    }
+
+    private func nearestWeather(to date: Date, in weather: [HourlyWeather]) -> HourlyWeather? {
+        weather.min {
+            abs($0.date.timeIntervalSince(date)) < abs($1.date.timeIntervalSince(date))
+        }
+    }
+
+    private func overlappingLocation(in interval: DateInterval, visits: [LocationVisit]) -> LocationVisit? {
+        visits
+            .filter { visit in
+                DateInterval(start: visit.arrivalDate, end: visit.departureDate).intersection(with: interval) != nil
+            }
+            .sorted {
+                $0.arrivalDate < $1.arrivalDate
+            }
+            .first
+    }
+
+    private func sleepStageSummary(from stages: [SleepStageSegment]) -> String {
+        guard !stages.isEmpty else { return "整夜休息" }
+
+        let grouped = Dictionary(grouping: stages, by: \.stage)
+        let orderedStages: [SleepStage] = [.deep, .light, .rem]
+
+        return orderedStages
+            .compactMap { stage in
+                guard let segments = grouped[stage], !segments.isEmpty else { return nil }
+                let minutes = segments.reduce(0.0) { partial, segment in
+                    partial + segment.end.timeIntervalSince(segment.start) / 60
+                }
+                return "\(stage.label) \(durationText(minutes: Int(minutes.rounded())))"
+            }
+            .joined(separator: " · ")
+    }
+
+    private func subtitleWithDistanceAndSteps(base: String, distance: Double?, steps: Int?) -> String {
+        var segments = [base]
+
+        if let distance {
+            segments.append(String(format: "%.1f km", distance / 1_000))
+        }
+
+        if let steps {
+            segments.append("\(steps) 步")
+        }
+
+        return segments.joined(separator: " · ")
+    }
+
+    private func workoutSubtitle(from metrics: EventMetrics) -> String {
+        var segments = ["45 分钟"]
+
+        if let distance = metrics.distance {
+            segments.append(String(format: "%.1f km", distance / 1_000))
+        }
+
+        if let activeEnergy = metrics.activeEnergy {
+            segments.append("\(Int(activeEnergy.rounded())) kcal")
+        }
+
+        segments.append("5'15\"/km")
+        return segments.joined(separator: " · ")
+    }
+
+    private func durationText(minutes: Int) -> String {
+        let hours = minutes / 60
+        let remainder = minutes % 60
+
+        if hours > 0 {
+            return remainder == 0 ? "\(hours)h" : "\(hours)h\(remainder)min"
+        }
+
+        return "\(minutes)min"
+    }
+}
+
+private extension SleepStage {
+    var label: String {
+        switch self {
+        case .deep:
+            return "深睡"
+        case .light:
+            return "浅睡"
+        case .rem:
+            return "REM"
+        case .awake:
+            return "清醒"
+        case .unknown:
+            return "未知"
         }
     }
 }
