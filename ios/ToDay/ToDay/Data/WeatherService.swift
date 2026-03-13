@@ -20,7 +20,7 @@ enum WeatherCondition: String, Codable, Sendable {
     case unknown
 }
 
-final class WeatherService {
+final class ToDayWeatherService {
     func fetchHourlyWeather(for date: Date, location: CLLocation) async throws -> [HourlyWeather] {
         let service = WeatherKit.WeatherService.shared
         let calendar = Calendar.current

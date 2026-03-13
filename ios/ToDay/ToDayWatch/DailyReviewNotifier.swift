@@ -39,29 +39,17 @@ final class DailyReviewNotifier {
     }
 
     private func reviewBody() -> String {
-        guard let data = sharedDefaults?.data(forKey: SharedAppGroup.currentEventSnapshotKey),
-              let snapshot = try? JSONDecoder().decode(CurrentEventSnapshot.self, from: data) else {
-            return "今天的故事等你回看。"
-        }
-
-        if snapshot.durationMinutes > 0 {
-            return "今天已经\(snapshot.eventName)\(durationText(snapshot.durationMinutes))。打开手机看看完整的一天。"
-        }
-
-        return "今天记录了新的片段。打开手机看看完整的一天。"
-    }
-
-    private func durationText(_ minutes: Int) -> String {
-        let hours = minutes / 60
-        let remainingMinutes = minutes % 60
-
-        if hours > 0 {
-            if remainingMinutes > 0 {
-                return "\(hours) 小时 \(remainingMinutes) 分钟"
+        if let data = sharedDefaults?.data(forKey: SharedAppGroup.dailySummaryKey),
+           let summary = try? JSONDecoder().decode(DailySummarySnapshot.self, from: data) {
+            if summary.exerciseMinutes > 0 || summary.moodCount > 0 {
+                return "今天运动了 \(summary.exerciseMinutes) 分钟，记录了 \(summary.moodCount) 个心情。打开手机看看完整的一天。"
             }
-            return "\(hours) 小时"
+
+            if summary.eventCount > 0 {
+                return "今天生成了 \(summary.eventCount) 个生活片段。打开手机看看完整的一天。"
+            }
         }
 
-        return "\(minutes) 分钟"
+        return "今天的故事等你回看。"
     }
 }

@@ -334,27 +334,30 @@ struct PhotoThumbnailView: View {
                 .stroke(TodayTheme.border, lineWidth: 1)
         )
         .task(id: localIdentifier) {
-            await loadImage()
+            loadImage()
         }
     }
 
-    private func loadImage() async {
+    private func loadImage() {
         let assets = PHAsset.fetchAssets(withLocalIdentifiers: [localIdentifier], options: nil)
         guard let asset = assets.firstObject else { return }
 
         let options = PHImageRequestOptions()
         options.resizeMode = .fast
-        options.deliveryMode = .highQualityFormat
+        options.deliveryMode = .opportunistic
         options.isNetworkAccessAllowed = true
+        options.isSynchronous = false
 
-        image = await withCheckedContinuation { continuation in
-            imageManager.requestImage(
-                for: asset,
-                targetSize: CGSize(width: 300, height: 300),
-                contentMode: .aspectFill,
-                options: options
-            ) { image, _ in
-                continuation.resume(returning: image)
+        imageManager.requestImage(
+            for: asset,
+            targetSize: CGSize(width: 300, height: 300),
+            contentMode: .aspectFill,
+            options: options
+        ) { image, info in
+            guard let image else { return }
+
+            Task { @MainActor in
+                self.image = image
             }
         }
     }

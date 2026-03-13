@@ -329,6 +329,8 @@ final class TodayViewModel: ObservableObject {
             timeline = nil
             refreshDerivedState(referenceDate: referenceDate)
         }
+
+        persistDailySummary(referenceDate: referenceDate)
     }
 
     private func refreshDerivedState(referenceDate: Date) {
@@ -481,6 +483,29 @@ final class TodayViewModel: ObservableObject {
         } catch {
             errorMessage = "留白标注保存失败：\(error.localizedDescription)"
         }
+    }
+
+    private func persistDailySummary(referenceDate: Date) {
+        let sharedDefaults = UserDefaults(suiteName: SharedAppGroup.identifier)
+        guard let timeline else {
+            sharedDefaults?.removeObject(forKey: SharedAppGroup.dailySummaryKey)
+            return
+        }
+
+        let exerciseMinutes = timeline.entries
+            .filter { [.workout, .activeWalk, .commute].contains($0.kind) }
+            .reduce(0) { total, event in
+                total + max(0, Int(event.endDate.timeIntervalSince(event.startDate)) / 60)
+            }
+        let moodCount = records(on: referenceDate).count
+        let snapshot = DailySummarySnapshot(
+            exerciseMinutes: exerciseMinutes,
+            moodCount: moodCount,
+            eventCount: timeline.entries.count
+        )
+
+        guard let data = try? JSONEncoder().encode(snapshot) else { return }
+        sharedDefaults?.set(data, forKey: SharedAppGroup.dailySummaryKey)
     }
 
     private func syncWatchState(referenceDate: Date) {

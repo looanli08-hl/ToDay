@@ -203,7 +203,11 @@ final class HealthKitTimelineDataProvider: TimelineDataProviding {
         let predicate = HKQuery.predicate(forActivitySummariesBetweenStart: dayComponents, end: dayComponents)
 
         return await withCheckedContinuation { continuation in
+            var hasResumed = false
             let query = HKActivitySummaryQuery(predicate: predicate) { _, summaries, error in
+                guard !hasResumed else { return }
+                hasResumed = true
+
                 guard error == nil, let summary = summaries?.first else {
                     continuation.resume(returning: nil)
                     return
@@ -272,7 +276,7 @@ final class HealthKitTimelineDataProvider: TimelineDataProviding {
 
         return DayDataAggregator(
             healthProvider: self,
-            weatherService: WeatherService(),
+            weatherService: ToDayWeatherService(),
             locationService: locationService,
             photoService: PhotoService()
         )

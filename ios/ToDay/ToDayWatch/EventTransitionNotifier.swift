@@ -37,7 +37,9 @@ final class EventTransitionNotifier {
     }
 
     private func shouldNotify(previous: CurrentEventSnapshot, current: CurrentEventSnapshot, now: Date) -> Bool {
-        guard previous != current else { return false }
+        guard previous.eventKind != current.eventKind || previous.eventName != current.eventName else {
+            return false
+        }
         guard !(previous.eventKind == "quietTime" && current.eventKind == "quietTime") else { return false }
         guard !isSleepWindow(now) else { return false }
 

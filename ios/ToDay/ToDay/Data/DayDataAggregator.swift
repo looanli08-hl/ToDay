@@ -3,13 +3,13 @@ import Foundation
 
 final class DayDataAggregator {
     let healthProvider: HealthKitTimelineDataProvider
-    let weatherService: WeatherService
+    let weatherService: ToDayWeatherService
     let locationService: LocationService
     let photoService: PhotoService
 
     init(
         healthProvider: HealthKitTimelineDataProvider,
-        weatherService: WeatherService,
+        weatherService: ToDayWeatherService,
         locationService: LocationService,
         photoService: PhotoService
     ) {
