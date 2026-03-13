@@ -2,237 +2,155 @@ import SwiftUI
 
 struct WatchHomeView: View {
     @StateObject private var viewModel = WatchViewModel()
-    @State private var isChoosingSessionMood = false
-    @State private var showSuccess = false
-    @State private var successMood: MoodRecord.Mood?
-
-    private let idleColumns = Array(repeating: GridItem(.flexible(), spacing: 8), count: 3)
-    private let activeColumns = Array(repeating: GridItem(.flexible(), spacing: 6), count: 5)
+    @State private var isShowingAnnotation = false
+    @State private var isShowingMood = false
 
     var body: some View {
-        ZStack {
-            ScrollView(showsIndicators: false) {
-                VStack(spacing: 14) {
-                    if let activeSession = viewModel.activeSession {
-                        activeSessionSection(activeSession)
-                        activePointRow(excluding: activeSession.mood)
-                    } else {
-                        idleSection
-                    }
-                }
-                .padding(.horizontal, 10)
-                .padding(.vertical, 12)
-            }
-            .background(WatchTheme.background)
-
-            if showSuccess, let successMood {
-                successOverlay(for: successMood)
-                    .transition(.scale(scale: 0.9).combined(with: .opacity))
-            }
-        }
-        .background(WatchTheme.background.ignoresSafeArea())
-    }
-
-    private var idleSection: some View {
-        VStack(spacing: 14) {
-            VStack(spacing: 4) {
-                Text("现在，你感觉")
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(WatchTheme.textMuted)
-
-                Text("点一下就记下")
-                    .font(.system(size: 10, weight: .medium))
-                    .foregroundStyle(WatchTheme.textMuted.opacity(0.85))
-            }
-            .frame(maxWidth: .infinity)
-
-            LazyVGrid(columns: idleColumns, spacing: 8) {
-                ForEach(MoodRecord.Mood.allCases) { mood in
-                    moodButton(mood, style: .idlePoint) {
-                        recordPoint(mood)
-                    }
-                }
-            }
-
-            if isChoosingSessionMood {
-                sessionChooserSection
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
-            }
-
-            Button {
-                withAnimation(.spring(response: 0.28, dampingFraction: 0.88)) {
-                    isChoosingSessionMood.toggle()
-                }
-            } label: {
-                HStack(spacing: 6) {
-                    Text("开始一段")
-                    Image(systemName: isChoosingSessionMood ? "chevron.down" : "play.fill")
-                        .font(.system(size: 10, weight: .bold))
-                }
-                .font(.system(size: 15, weight: .bold))
-                .foregroundStyle(WatchTheme.background)
-                .frame(maxWidth: .infinity, minHeight: 48)
-                .background(WatchTheme.accent)
-                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-            }
-            .buttonStyle(.plain)
-        }
-    }
-
-    private var sessionChooserSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("选一个状态开始")
-                .font(.system(size: 11, weight: .bold))
-                .foregroundStyle(WatchTheme.text)
-
-            LazyVGrid(columns: idleColumns, spacing: 8) {
-                ForEach(MoodRecord.Mood.allCases) { mood in
-                    moodButton(mood, style: .sessionChoice) {
-                        withAnimation(.spring(response: 0.25, dampingFraction: 0.9)) {
-                            isChoosingSessionMood = false
-                        }
-                        viewModel.startSession(mood: mood)
-                    }
-                }
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(10)
-        .background(WatchTheme.surface)
-        .overlay(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .stroke(WatchTheme.border, lineWidth: 1)
-        )
-        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-    }
-
-    private func activeSessionSection(_ activeSession: MoodRecord) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("\(activeSession.mood.emoji) \(activeSession.mood.rawValue)中")
-                    .font(.system(size: 18, weight: .bold))
+        VStack(spacing: 12) {
+            TimelineView(.periodic(from: .now, by: 60)) { context in
+                Text(Self.timeFormatter.string(from: context.date))
+                    .font(.system(size: 28, weight: .heavy, design: .rounded))
                     .foregroundStyle(WatchTheme.text)
-
-                TimelineView(.periodic(from: Date(), by: 60)) { context in
-                    Text(durationText(since: activeSession.createdAt, now: context.date))
-                        .font(.system(size: 12, weight: .bold))
-                        .foregroundStyle(WatchTheme.teal)
-                }
-
-                Text("\(Self.timeFormatter.string(from: activeSession.createdAt)) 开始")
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(WatchTheme.textMuted)
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
 
-            Button {
-                viewModel.endSession()
-            } label: {
-                HStack(spacing: 6) {
-                    Text("结束这段")
-                    Image(systemName: "stop.fill")
-                        .font(.system(size: 10, weight: .bold))
+            currentEventCard
+
+            HStack(spacing: 10) {
+                actionButton(title: "标注", systemImage: "pencil") {
+                    isShowingAnnotation = true
                 }
-                .font(.system(size: 15, weight: .bold))
-                .foregroundStyle(WatchTheme.background)
-                .frame(maxWidth: .infinity, minHeight: 48)
-                .background(WatchTheme.teal)
-                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+
+                actionButton(title: "心情", systemImage: "face.smiling") {
+                    isShowingMood = true
+                }
             }
-            .buttonStyle(.plain)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(12)
-        .background(WatchTheme.surface)
-        .overlay(
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .stroke(WatchTheme.border, lineWidth: 1)
-        )
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
+        .background(WatchTheme.background.ignoresSafeArea())
+        .sheet(isPresented: $isShowingAnnotation) {
+            pendingSheet(title: "快捷标注", description: "下一步会把常用活动预设放在这里。")
+        }
+        .sheet(isPresented: $isShowingMood) {
+            pendingSheet(title: "快捷心情", description: "下一步会把极简心情记录放在这里。")
+        }
     }
 
-    private func activePointRow(excluding currentMood: MoodRecord.Mood) -> some View {
-        let moods = MoodRecord.Mood.allCases.filter { $0 != currentMood }
+    private var currentEventCard: some View {
+        Group {
+            if let currentEvent = viewModel.currentEvent {
+                eventCard(for: currentEvent)
+            } else {
+                waitingCard
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .frame(minHeight: 132)
+    }
 
-        return VStack(alignment: .leading, spacing: 8) {
-            Text("补一个点")
-                .font(.system(size: 11, weight: .bold))
+    private func eventCard(for event: CurrentEventSnapshot) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(event.eventName)
+                        .font(.system(size: 22, weight: .heavy, design: .rounded))
+                        .foregroundStyle(WatchTheme.text)
+                        .lineLimit(2)
+
+                    Text(WatchTheme.badgeText(for: event.eventKind))
+                        .font(.system(size: 10, weight: .bold, design: .rounded))
+                        .foregroundStyle(WatchTheme.textMuted)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(WatchTheme.badgeFill(for: event.eventKind))
+                        .clipShape(Capsule())
+                }
+
+                Spacer(minLength: 8)
+
+                Image(systemName: event.iconName)
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(WatchTheme.text.opacity(0.92))
+            }
+
+            TimelineView(.periodic(from: event.startDate, by: 60)) { context in
+                Text(durationText(since: event.startDate, now: context.date))
+                    .font(.system(size: 16, weight: .bold, design: .rounded))
+                    .foregroundStyle(WatchTheme.text)
+            }
+
+            Text("\(Self.timeFormatter.string(from: event.startDate)) 开始")
+                .font(.system(size: 11, weight: .semibold, design: .rounded))
                 .foregroundStyle(WatchTheme.textMuted)
 
-            LazyVGrid(columns: activeColumns, spacing: 6) {
-                ForEach(moods) { mood in
-                    moodButton(mood, style: .activePoint) {
-                        recordPoint(mood)
-                    }
-                }
-            }
+            Spacer(minLength: 0)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(10)
-        .background(WatchTheme.surface)
+        .padding(14)
+        .background(WatchTheme.eventCardBackground(for: event.eventKind))
         .overlay(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
                 .stroke(WatchTheme.border, lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
     }
 
-    private func moodButton(
-        _ mood: MoodRecord.Mood,
-        style: MoodButtonStyle,
-        action: @escaping () -> Void
-    ) -> some View {
+    private var waitingCard: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("等待数据同步")
+                .font(.system(size: 20, weight: .heavy, design: .rounded))
+                .foregroundStyle(WatchTheme.text)
+
+            Text("抬手后会在这里看到当前正在做的事。")
+                .font(.system(size: 12, weight: .medium, design: .rounded))
+                .foregroundStyle(WatchTheme.textMuted)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Spacer(minLength: 0)
+        }
+        .padding(14)
+        .background(WatchTheme.eventCardBackground(for: "quietTime"))
+        .overlay(
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .stroke(WatchTheme.border, lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+    }
+
+    private func actionButton(title: String, systemImage: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            Text(mood.emoji)
-                .font(.system(size: style.emojiSize))
-                .frame(maxWidth: .infinity, minHeight: style.minHeight)
-                .background(style.backgroundColor)
-                .overlay(
-                    RoundedRectangle(cornerRadius: style.cornerRadius, style: .continuous)
-                        .stroke(style.borderColor, lineWidth: 1)
-                )
-                .clipShape(RoundedRectangle(cornerRadius: style.cornerRadius, style: .continuous))
+            VStack(spacing: 6) {
+                Image(systemName: systemImage)
+                    .font(.system(size: 18, weight: .bold))
+
+                Text(title)
+                    .font(.system(size: 14, weight: .bold, design: .rounded))
+            }
+            .foregroundStyle(WatchTheme.text)
+            .frame(maxWidth: .infinity, minHeight: 54)
+            .background(WatchTheme.surface)
+            .overlay(
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .stroke(WatchTheme.border, lineWidth: 1)
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(mood.rawValue)
     }
 
-    private func successOverlay(for mood: MoodRecord.Mood) -> some View {
-        VStack(spacing: 8) {
-            Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 34, weight: .bold))
-                .foregroundStyle(WatchTheme.teal)
+    private func pendingSheet(title: String, description: String) -> some View {
+        VStack(spacing: 10) {
+            Text(title)
+                .font(.system(size: 17, weight: .bold, design: .rounded))
+                .foregroundStyle(WatchTheme.text)
 
-            Text(mood.emoji)
-                .font(.system(size: 30))
+            Text(description)
+                .font(.system(size: 12, weight: .medium, design: .rounded))
+                .multilineTextAlignment(.center)
+                .foregroundStyle(WatchTheme.textMuted)
         }
-        .frame(width: 116, height: 116)
-        .background(WatchTheme.surface.opacity(0.92))
-        .overlay(
-            RoundedRectangle(cornerRadius: 26, style: .continuous)
-                .stroke(WatchTheme.border, lineWidth: 1)
-        )
-        .clipShape(RoundedRectangle(cornerRadius: 26, style: .continuous))
-    }
-
-    private func recordPoint(_ mood: MoodRecord.Mood) {
-        viewModel.recordPoint(mood: mood)
-        showPointSuccess(for: mood)
-    }
-
-    private func showPointSuccess(for mood: MoodRecord.Mood) {
-        successMood = mood
-        withAnimation(.spring(response: 0.28, dampingFraction: 0.88)) {
-            showSuccess = true
-        }
-
-        Task {
-            try? await Task.sleep(for: .seconds(0.8))
-            await MainActor.run {
-                withAnimation(.easeOut(duration: 0.18)) {
-                    showSuccess = false
-                }
-            }
-        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(WatchTheme.background.ignoresSafeArea())
     }
 
     private func durationText(since startDate: Date, now: Date) -> String {
@@ -251,7 +169,7 @@ struct WatchHomeView: View {
             return "已持续 \(minutes) 分钟"
         }
 
-        return "已持续不到 1 分钟"
+        return "刚刚开始"
     }
 
     private static let timeFormatter: DateFormatter = {
@@ -260,38 +178,6 @@ struct WatchHomeView: View {
         formatter.dateFormat = "HH:mm"
         return formatter
     }()
-}
-
-private struct MoodButtonStyle {
-    let minHeight: CGFloat
-    let emojiSize: CGFloat
-    let cornerRadius: CGFloat
-    let backgroundColor: Color
-    let borderColor: Color
-
-    static let idlePoint = MoodButtonStyle(
-        minHeight: 54,
-        emojiSize: 26,
-        cornerRadius: 18,
-        backgroundColor: WatchTheme.elevated,
-        borderColor: WatchTheme.border
-    )
-
-    static let sessionChoice = MoodButtonStyle(
-        minHeight: 48,
-        emojiSize: 24,
-        cornerRadius: 16,
-        backgroundColor: WatchTheme.accentSoft,
-        borderColor: WatchTheme.accent.opacity(0.2)
-    )
-
-    static let activePoint = MoodButtonStyle(
-        minHeight: 46,
-        emojiSize: 22,
-        cornerRadius: 14,
-        backgroundColor: WatchTheme.elevated,
-        borderColor: WatchTheme.border
-    )
 }
 
 #Preview {
