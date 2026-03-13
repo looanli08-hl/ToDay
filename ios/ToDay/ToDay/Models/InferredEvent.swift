@@ -22,61 +22,26 @@ enum EventConfidence: Int, Codable, Comparable, Sendable {
     }
 }
 
+struct HeartRateSample: Codable, Hashable, Sendable {
+    let date: Date
+    let value: Double
+}
+
 /// 事件关联的数据指标
-struct EventMetrics: Equatable, Hashable, Sendable {
+struct EventMetrics: Codable, Hashable, Sendable {
     var averageHeartRate: Double?
     var maxHeartRate: Double?
     var minHeartRate: Double?
-    var heartRateSamples: [(date: Date, value: Double)]?
+    var heartRateSamples: [HeartRateSample]?
     var sleepStages: [SleepStageSegment]?
     var stepCount: Int?
     var activeEnergy: Double?
     var distance: Double?
     var workoutType: String?
-
-    static func == (lhs: EventMetrics, rhs: EventMetrics) -> Bool {
-        lhs.averageHeartRate == rhs.averageHeartRate &&
-        lhs.maxHeartRate == rhs.maxHeartRate &&
-        lhs.minHeartRate == rhs.minHeartRate &&
-        lhs.stepCount == rhs.stepCount &&
-        lhs.activeEnergy == rhs.activeEnergy &&
-        lhs.distance == rhs.distance &&
-        lhs.workoutType == rhs.workoutType &&
-        lhs.sleepStages == rhs.sleepStages &&
-        heartRateSamplesEqual(lhs.heartRateSamples, rhs.heartRateSamples)
-    }
-
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(averageHeartRate)
-        hasher.combine(maxHeartRate)
-        hasher.combine(minHeartRate)
-        hasher.combine(stepCount)
-        hasher.combine(activeEnergy)
-        hasher.combine(distance)
-        hasher.combine(workoutType)
-        hasher.combine(sleepStages)
-    }
-
-    private static func heartRateSamplesEqual(
-        _ lhs: [(date: Date, value: Double)]?,
-        _ rhs: [(date: Date, value: Double)]?
-    ) -> Bool {
-        switch (lhs, rhs) {
-        case (nil, nil):
-            return true
-        case let (left?, right?):
-            guard left.count == right.count else { return false }
-            return zip(left, right).allSatisfy { lhsSample, rhsSample in
-                lhsSample.date == rhsSample.date && lhsSample.value == rhsSample.value
-            }
-        default:
-            return false
-        }
-    }
 }
 
 /// 推理出的单个事件
-struct InferredEvent: Identifiable, Hashable, Sendable {
+struct InferredEvent: Codable, Identifiable, Hashable, Sendable {
     let id: UUID
     let kind: EventKind
     let startDate: Date

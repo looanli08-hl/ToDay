@@ -346,7 +346,9 @@ struct HealthKitEventInferenceEngine: EventInferring {
             metrics.averageHeartRate = values.reduce(0, +) / Double(values.count)
             metrics.maxHeartRate = values.max()
             metrics.minHeartRate = values.min()
-            metrics.heartRateSamples = heartSamples.map { ($0.startDate, $0.value) }
+            metrics.heartRateSamples = heartSamples.map {
+                HeartRateSample(date: $0.startDate, value: $0.value)
+            }
         }
 
         let stepCount = summedValue(of: rawData.stepSamples, over: candidateInterval(for: event))

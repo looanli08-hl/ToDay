@@ -212,11 +212,14 @@ struct MockEventInferenceEngine: EventInferring {
         ]
     }
 
-    private func mockHeartRateSamples(from startDate: Date, to endDate: Date, values: [Double]) -> [(date: Date, value: Double)] {
+    private func mockHeartRateSamples(from startDate: Date, to endDate: Date, values: [Double]) -> [HeartRateSample] {
         guard !values.isEmpty else { return [] }
         let step = endDate.timeIntervalSince(startDate) / Double(values.count + 1)
         return values.enumerated().map { index, value in
-            (date: startDate.addingTimeInterval(step * Double(index + 1)), value: value)
+            HeartRateSample(
+                date: startDate.addingTimeInterval(step * Double(index + 1)),
+                value: value
+            )
         }
     }
 }
