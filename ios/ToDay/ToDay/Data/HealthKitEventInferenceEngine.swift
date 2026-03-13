@@ -148,7 +148,7 @@ struct HealthKitEventInferenceEngine: EventInferring {
                     startDate: clipped.start,
                     endDate: clipped.end,
                     confidence: .high,
-                    displayName: workout.activityType,
+                    displayName: workout.displayName,
                     subtitle: subtitleParts.isEmpty ? nil : subtitleParts.joined(separator: " · ")
                 )
             }
@@ -366,7 +366,7 @@ struct HealthKitEventInferenceEngine: EventInferring {
             }
 
             if let workout = overlappingWorkouts.first {
-                metrics.workoutType = workout.activityType
+                metrics.workoutType = workout.displayName
                 metrics.activeEnergy = workout.activeEnergy ?? metrics.activeEnergy
                 metrics.distance = workout.distance
             }

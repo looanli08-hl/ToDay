@@ -1,4 +1,5 @@
 import Foundation
+import HealthKit
 
 /// 事件推理引擎协议
 protocol EventInferring {
@@ -94,7 +95,7 @@ struct WorkoutSample: Identifiable, Hashable, Sendable {
     let id: UUID
     let startDate: Date
     let endDate: Date
-    let activityType: String
+    let activityType: UInt
     let activeEnergy: Double?
     let distance: Double?
 
@@ -102,7 +103,7 @@ struct WorkoutSample: Identifiable, Hashable, Sendable {
         id: UUID = UUID(),
         startDate: Date,
         endDate: Date,
-        activityType: String,
+        activityType: UInt,
         activeEnergy: Double? = nil,
         distance: Double? = nil
     ) {
@@ -112,5 +113,34 @@ struct WorkoutSample: Identifiable, Hashable, Sendable {
         self.activityType = activityType
         self.activeEnergy = activeEnergy
         self.distance = distance
+    }
+
+    var displayName: String {
+        HKWorkoutActivityType(rawValue: activityType)?.todayDisplayName ?? "训练"
+    }
+}
+
+private extension HKWorkoutActivityType {
+    var todayDisplayName: String {
+        switch self {
+        case .running:
+            return "跑步"
+        case .walking:
+            return "走路"
+        case .hiking:
+            return "徒步"
+        case .cycling:
+            return "骑行"
+        case .traditionalStrengthTraining, .functionalStrengthTraining:
+            return "力量训练"
+        case .mindAndBody:
+            return "身心训练"
+        case .swimming:
+            return "游泳"
+        case .yoga:
+            return "瑜伽"
+        default:
+            return "训练"
+        }
     }
 }

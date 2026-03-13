@@ -1,4 +1,5 @@
 import XCTest
+import HealthKit
 @testable import ToDay
 
 final class EventInferenceEngineTests: XCTestCase {
@@ -87,7 +88,7 @@ final class EventInferenceEngineTests: XCTestCase {
                 WorkoutSample(
                     startDate: makeDate(year: 2026, month: 3, day: 12, hour: 14, minute: 0),
                     endDate: makeDate(year: 2026, month: 3, day: 12, hour: 15, minute: 0),
-                    activityType: "跑步",
+                    activityType: HKWorkoutActivityType.running.rawValue,
                     activeEnergy: 420,
                     distance: 5000
                 )
@@ -218,7 +219,7 @@ final class EventInferenceEngineTests: XCTestCase {
             workouts: [
                 WorkoutSample(startDate: makeDate(year: 2026, month: 3, day: 12, hour: 14, minute: 0),
                               endDate: makeDate(year: 2026, month: 3, day: 12, hour: 15, minute: 0),
-                              activityType: "跑步")
+                              activityType: HKWorkoutActivityType.running.rawValue)
             ],
             moodRecords: [
                 MoodRecord(mood: .happy, createdAt: makeDate(year: 2026, month: 3, day: 12, hour: 20, minute: 0))
@@ -239,10 +240,10 @@ final class EventInferenceEngineTests: XCTestCase {
             workouts: [
                 WorkoutSample(startDate: makeDate(year: 2026, month: 3, day: 12, hour: 11, minute: 0),
                               endDate: makeDate(year: 2026, month: 3, day: 12, hour: 11, minute: 58),
-                              activityType: "力量训练"),
+                              activityType: HKWorkoutActivityType.functionalStrengthTraining.rawValue),
                 WorkoutSample(startDate: makeDate(year: 2026, month: 3, day: 12, hour: 12, minute: 2),
                               endDate: makeDate(year: 2026, month: 3, day: 12, hour: 13, minute: 0),
-                              activityType: "走路")
+                              activityType: HKWorkoutActivityType.walking.rawValue)
             ]
         )
 
@@ -260,10 +261,10 @@ final class EventInferenceEngineTests: XCTestCase {
             workouts: [
                 WorkoutSample(startDate: makeDate(year: 2026, month: 3, day: 12, hour: 10, minute: 0),
                               endDate: makeDate(year: 2026, month: 3, day: 12, hour: 11, minute: 0),
-                              activityType: "快走"),
+                              activityType: HKWorkoutActivityType.walking.rawValue),
                 WorkoutSample(startDate: makeDate(year: 2026, month: 3, day: 12, hour: 12, minute: 30),
                               endDate: makeDate(year: 2026, month: 3, day: 12, hour: 13, minute: 0),
-                              activityType: "快走")
+                              activityType: HKWorkoutActivityType.walking.rawValue)
             ]
         )
 
