@@ -31,6 +31,7 @@
 		5CB385201F226102AFA0885C /* ToDayWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D3FD0290794CC321F5BB45C /* ToDayWidgetBundle.swift */; };
 		5F154D8DB1E79ED9B6747A94 /* MonetizationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29FDC86F425DD463F32D7EC2 /* MonetizationViewModel.swift */; };
 		6009F788A2DCD8E51F97E8D5 /* AppConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB09FC4279F21A281C6D8DC2 /* AppConfiguration.swift */; };
+		6B947898CEDD1667A23D2876 /* QuickMoodView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5C06EC261F5C05B001ECF8B /* QuickMoodView.swift */; };
 		6F5A4DD0ADB0320753D8C263 /* WeeklyInsightView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D394589F8B025A30D507181 /* WeeklyInsightView.swift */; };
 		70015EAB0824A09939C59B0C /* WatchMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24EB665732263021672AC442 /* WatchMessage.swift */; };
 		76D22AE6FF2D1C7E9B79AAB9 /* DayScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04A70AC6E3B59988B44AA384 /* DayScrollView.swift */; };
@@ -169,6 +170,7 @@
 		9D3FD0290794CC321F5BB45C /* ToDayWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDayWidgetBundle.swift; sourceTree = "<group>"; };
 		A17D304A041BE90AA6BD31E0 /* HealthKitEventInferenceEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitEventInferenceEngine.swift; sourceTree = "<group>"; };
 		A50CAC68CF65C166C6C84DED /* PhotoService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoService.swift; sourceTree = "<group>"; };
+		A5C06EC261F5C05B001ECF8B /* QuickMoodView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickMoodView.swift; sourceTree = "<group>"; };
 		AD8F9694BC13B76959CA8639 /* ToDay.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ToDay.entitlements; sourceTree = "<group>"; };
 		AE6AEF94FAE90C7F469449EE /* WeatherService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherService.swift; sourceTree = "<group>"; };
 		C268A9DD9F2B26A8E72AA794 /* InferredEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InferredEvent.swift; sourceTree = "<group>"; };
@@ -288,6 +290,7 @@
 			isa = PBXGroup;
 			children = (
 				EB56CA12B997184DA22194AB /* QuickAnnotationView.swift */,
+				A5C06EC261F5C05B001ECF8B /* QuickMoodView.swift */,
 				6804ACA15DF00E193DD8A7C0 /* ToDayWatch.entitlements */,
 				58552F8BAC9DB54DD43EC5B6 /* ToDayWatchApp.swift */,
 				404E8EA06CD9AA4AF4D9231A /* WatchHomeView.swift */,
@@ -594,6 +597,7 @@
 				A2C3A2BAE1FB4EC9DA3094A6 /* MoodPhotoAttachment.swift in Sources */,
 				AA1395F7BDB54D44B1959AFC /* MoodRecord.swift in Sources */,
 				FBA3DE548250BD9652D6EFC9 /* QuickAnnotationView.swift in Sources */,
+				6B947898CEDD1667A23D2876 /* QuickMoodView.swift in Sources */,
 				D2A26BDCFACB65C571297A68 /* ToDayWatchApp.swift in Sources */,
 				EAAD572985D8CFF5B456DA14 /* WatchHomeView.swift in Sources */,
 				7C48F4DF83B6CE21C4BFB47A /* WatchMessage.swift in Sources */,

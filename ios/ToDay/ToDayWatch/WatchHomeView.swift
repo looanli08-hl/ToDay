@@ -37,7 +37,9 @@ struct WatchHomeView: View {
             }
         }
         .sheet(isPresented: $isShowingMood) {
-            pendingSheet(title: "快捷心情", description: "下一步会把极简心情记录放在这里。")
+            QuickMoodView { mood in
+                viewModel.recordPoint(mood: mood)
+            }
         }
     }
 
@@ -140,21 +142,6 @@ struct WatchHomeView: View {
             .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
         }
         .buttonStyle(.plain)
-    }
-
-    private func pendingSheet(title: String, description: String) -> some View {
-        VStack(spacing: 10) {
-            Text(title)
-                .font(.system(size: 17, weight: .bold, design: .rounded))
-                .foregroundStyle(WatchTheme.text)
-
-            Text(description)
-                .font(.system(size: 12, weight: .medium, design: .rounded))
-                .multilineTextAlignment(.center)
-                .foregroundStyle(WatchTheme.textMuted)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(WatchTheme.background.ignoresSafeArea())
     }
 
     private func durationText(since startDate: Date, now: Date) -> String {
