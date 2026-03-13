@@ -17,6 +17,7 @@
 		3167A5A7F4562369CA4F54B4 /* HealthKitTimelineDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 248EB0D5C59CF49B72179706 /* HealthKitTimelineDataProvider.swift */; };
 		366F7C8E30E432042B253F16 /* ConnectivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88ECC52BFECC7DC8A36A235E /* ConnectivityManager.swift */; };
 		3EDD590CF25E429FB8186758 /* ToDayApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCCD453022FB7D3DE28EDE60 /* ToDayApp.swift */; };
+		4250A250313DBA68A83F130E /* WeatherService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE6AEF94FAE90C7F469449EE /* WeatherService.swift */; };
 		44823975A98302AEB5069E00 /* HistoryScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = E41D5FDB97C97E39345EF797 /* HistoryScreen.swift */; };
 		4788852ACD6C662593EE18E6 /* WatchTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E06395E1BD9FE3C2B493042 /* WatchTheme.swift */; };
 		4E0E762B4D92B8C4703F24C0 /* MoodRecordEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 517D081EC92833825D6C1658 /* MoodRecordEntity.swift */; };
@@ -117,6 +118,7 @@
 		88ECC52BFECC7DC8A36A235E /* ConnectivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectivityManager.swift; sourceTree = "<group>"; };
 		A17D304A041BE90AA6BD31E0 /* HealthKitEventInferenceEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitEventInferenceEngine.swift; sourceTree = "<group>"; };
 		AD8F9694BC13B76959CA8639 /* ToDay.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ToDay.entitlements; sourceTree = "<group>"; };
+		AE6AEF94FAE90C7F469449EE /* WeatherService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherService.swift; sourceTree = "<group>"; };
 		C268A9DD9F2B26A8E72AA794 /* InferredEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InferredEvent.swift; sourceTree = "<group>"; };
 		CB09FC4279F21A281C6D8DC2 /* AppConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfiguration.swift; sourceTree = "<group>"; };
 		CCCD453022FB7D3DE28EDE60 /* ToDayApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDayApp.swift; sourceTree = "<group>"; };
@@ -249,6 +251,7 @@
 				517D081EC92833825D6C1658 /* MoodRecordEntity.swift */,
 				3E53E00BCF5527A4FE8FD775 /* MoodRecordStoring.swift */,
 				7D72C488C5C21014C1FAB59A /* TimelineDataProviding.swift */,
+				AE6AEF94FAE90C7F469449EE /* WeatherService.swift */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -444,6 +447,7 @@
 				88D47212DD537145F4F5E730 /* TodayTheme.swift in Sources */,
 				9C701A7285E2666EFC829AEF /* TodayViewModel.swift in Sources */,
 				70015EAB0824A09939C59B0C /* WatchMessage.swift in Sources */,
+				4250A250313DBA68A83F130E /* WeatherService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

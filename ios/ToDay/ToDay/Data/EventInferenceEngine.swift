@@ -11,6 +11,7 @@ protocol EventInferring {
 struct DayRawData: Sendable {
     let date: Date
     let activitySummary: ActivitySummaryData?
+    let hourlyWeather: [HourlyWeather]
     let heartRateSamples: [DateValueSample]
     let stepSamples: [DateValueSample]
     let sleepSamples: [SleepSample]
@@ -21,6 +22,7 @@ struct DayRawData: Sendable {
     init(
         date: Date,
         activitySummary: ActivitySummaryData? = nil,
+        hourlyWeather: [HourlyWeather] = [],
         heartRateSamples: [DateValueSample] = [],
         stepSamples: [DateValueSample] = [],
         sleepSamples: [SleepSample] = [],
@@ -30,6 +32,7 @@ struct DayRawData: Sendable {
     ) {
         self.date = date
         self.activitySummary = activitySummary
+        self.hourlyWeather = hourlyWeather
         self.heartRateSamples = heartRateSamples
         self.stepSamples = stepSamples
         self.sleepSamples = sleepSamples

@@ -26,13 +26,17 @@ targets:
     deploymentTarget: "17.0"
     sources:
       - path: ToDay
+    entitlements:
+      path: ToDay/ToDay.entitlements
+      properties:
+        com.apple.developer.healthkit: true
+        com.apple.developer.weatherkit: true
     dependencies:
       - target: ToDayWatch
         embed: true
     settings:
       base:
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
-        CODE_SIGN_ENTITLEMENTS: ToDay/ToDay.entitlements
         DEVELOPMENT_ASSET_PATHS: "\"ToDay/Preview Content\""
         ENABLE_PREVIEWS: YES
   ToDayWatch:

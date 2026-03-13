@@ -351,6 +351,11 @@ struct HealthKitEventInferenceEngine: EventInferring {
             }
         }
 
+        metrics.weather = closestWeather(
+            to: event.startDate,
+            in: rawData.hourlyWeather
+        )
+
         let stepCount = summedValue(of: rawData.stepSamples, over: candidateInterval(for: event))
         if stepCount > 0 {
             metrics.stepCount = Int(stepCount.rounded())
@@ -376,6 +381,12 @@ struct HealthKitEventInferenceEngine: EventInferring {
 
         updatedEvent.associatedMetrics = metrics
         return updatedEvent
+    }
+
+    private func closestWeather(to date: Date, in weather: [HourlyWeather]) -> HourlyWeather? {
+        weather.min { lhs, rhs in
+            abs(lhs.date.timeIntervalSince(date)) < abs(rhs.date.timeIntervalSince(date))
+        }
     }
 
     private func buildAllDayQuietEvent(in dayInterval: DateInterval, heartRateSamples: [DateValueSample]) -> InferredEvent {
