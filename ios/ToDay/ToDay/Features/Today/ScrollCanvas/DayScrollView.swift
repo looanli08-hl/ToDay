@@ -51,9 +51,25 @@ struct DayScrollCanvasContent: View {
     let timeline: DayTimeline
     let onEventTap: (InferredEvent) -> Void
     let onBlankTap: (InferredEvent) -> Void
-    var showsCurrentTimeNeedle: Bool = true
+    let showsCurrentTimeNeedle: Bool
 
     private let calendar = Calendar.current
+    private let moodEvents: [InferredEvent]
+    private let canvasEvents: [InferredEvent]
+
+    init(
+        timeline: DayTimeline,
+        onEventTap: @escaping (InferredEvent) -> Void,
+        onBlankTap: @escaping (InferredEvent) -> Void,
+        showsCurrentTimeNeedle: Bool = true
+    ) {
+        self.timeline = timeline
+        self.onEventTap = onEventTap
+        self.onBlankTap = onBlankTap
+        self.showsCurrentTimeNeedle = showsCurrentTimeNeedle
+        self.moodEvents = Self.makeMoodEvents(from: timeline)
+        self.canvasEvents = Self.makeCanvasEvents(for: timeline, calendar: .current)
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -186,13 +202,13 @@ struct DayScrollCanvasContent: View {
         ]
     }
 
-    private var moodEvents: [InferredEvent] {
+    private static func makeMoodEvents(from timeline: DayTimeline) -> [InferredEvent] {
         timeline.entries
             .filter { $0.kind == .mood }
             .sorted { $0.startDate < $1.startDate }
     }
 
-    private var canvasEvents: [InferredEvent] {
+    private static func makeCanvasEvents(for timeline: DayTimeline, calendar: Calendar) -> [InferredEvent] {
         let intervalStart = calendar.startOfDay(for: timeline.date)
         let intervalEnd = calendar.date(byAdding: .day, value: 1, to: intervalStart) ?? intervalStart
         let sortedEvents = timeline.entries
@@ -208,7 +224,7 @@ struct DayScrollCanvasContent: View {
             guard boundedEnd > boundedStart else { continue }
 
             if boundedStart > cursor {
-                result.append(blankEvent(start: cursor, end: boundedStart))
+                result.append(blankEvent(start: cursor, end: boundedStart, calendar: calendar))
             }
 
             result.append(event)
@@ -216,24 +232,24 @@ struct DayScrollCanvasContent: View {
         }
 
         if cursor < intervalEnd {
-            result.append(blankEvent(start: cursor, end: intervalEnd))
+            result.append(blankEvent(start: cursor, end: intervalEnd, calendar: calendar))
         }
 
         return result
     }
 
-    private func blankEvent(start: Date, end: Date) -> InferredEvent {
+    private static func blankEvent(start: Date, end: Date, calendar: Calendar) -> InferredEvent {
         InferredEvent(
             kind: .quietTime,
             startDate: start,
             endDate: end,
             confidence: .low,
-            displayName: quietDisplayName(for: start),
+            displayName: quietDisplayName(for: start, calendar: calendar),
             subtitle: "这段时间还没有被明确命名。"
         )
     }
 
-    private func quietDisplayName(for date: Date) -> String {
+    private static func quietDisplayName(for date: Date, calendar: Calendar) -> String {
         let hour = calendar.component(.hour, from: date)
         switch hour {
         case 0..<5:
