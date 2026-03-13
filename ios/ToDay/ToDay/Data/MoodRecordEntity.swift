@@ -36,7 +36,7 @@ final class MoodRecordEntity {
     func toMoodRecord() -> MoodRecord {
         MoodRecord(
             id: id,
-            mood: MoodRecord.Mood(rawValue: moodRawValue) ?? .calm,
+            mood: MoodRecord.Mood(storedValue: moodRawValue) ?? .calm,
             note: note,
             createdAt: createdAt,
             endedAt: endedAt,

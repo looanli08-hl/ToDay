@@ -142,14 +142,26 @@ struct TodayInsightComposer {
             headline = "最近 7 天更像在往上抬"
         case .calm:
             headline = "最近 7 天偏平稳推进"
-        case .tired:
-            headline = "最近 7 天更需要恢复"
-        case .irritated:
-            headline = "最近 7 天有些拉扯感"
         case .focused:
             headline = "最近 7 天存在明显推进段"
-        case .zoning:
-            headline = "最近 7 天像在缓慢漂浮"
+        case .grateful:
+            headline = "最近 7 天有种被善待的感觉"
+        case .excited:
+            headline = "最近 7 天有不少高光时刻"
+        case .tired:
+            headline = "最近 7 天更需要恢复"
+        case .anxious:
+            headline = "最近 7 天有些紧绷"
+        case .sad:
+            headline = "最近 7 天整体偏低落"
+        case .irritated:
+            headline = "最近 7 天有些拉扯感"
+        case .bored:
+            headline = "最近 7 天有些空转"
+        case .sleepy:
+            headline = "最近 7 天经常在低电量里移动"
+        case .satisfied:
+            headline = "最近 7 天收尾感不错"
         case .none:
             headline = "最近 7 天已经开始形成自己的节奏"
         }
@@ -330,14 +342,26 @@ struct TodayInsightComposer {
             return "今天整体偏轻快，值得记住那些让状态变好的片段。"
         case .calm:
             return "今天更像是平稳推进的一天，节奏相对柔和。"
-        case .tired:
-            return "今天像是在低电量下推进，最好给自己留出恢复空间。"
-        case .irritated:
-            return "今天的情绪里有些摩擦感，回看触发点会比硬扛更有价值。"
         case .focused:
             return "今天有一条比较明确的专注主线，适合回看哪段时间最顺。"
-        case .zoning:
-            return "今天更像在缓慢漂浮，可能需要更轻一点的记录方式。"
+        case .grateful:
+            return "今天有一些让你想感谢的瞬间，适合把具体触发点留下来。"
+        case .excited:
+            return "今天有几次明显抬升的时刻，值得回看高光是怎么出现的。"
+        case .tired:
+            return "今天像是在低电量下推进，最好给自己留出恢复空间。"
+        case .anxious:
+            return "今天的状态有些紧绷，回看触发点会比硬扛更有帮助。"
+        case .sad:
+            return "今天整体有点下沉，给低落时段命名本身就很重要。"
+        case .irritated:
+            return "今天的情绪里有些摩擦感，回看触发点会比硬扛更有价值。"
+        case .bored:
+            return "今天有一些空转时段，补上活动名称后会更容易看清节奏。"
+        case .sleepy:
+            return "今天困意比较明显，适合观察哪些时段最容易掉电。"
+        case .satisfied:
+            return "今天整体有种收拢感，值得记住那些让你觉得完成了的片段。"
         case .none:
             return "今天已经开始积累一些片段，但还没有形成明确主情绪。"
         }

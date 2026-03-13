@@ -392,14 +392,26 @@ struct RecentDayCard: View {
             return TodayTheme.accent
         case .calm:
             return TodayTheme.teal
-        case .tired:
-            return TodayTheme.blue
-        case .irritated:
-            return TodayTheme.rose
         case .focused:
             return TodayTheme.teal
-        case .zoning:
+        case .grateful:
+            return TodayTheme.scrollGold
+        case .excited:
+            return TodayTheme.workoutOrange
+        case .tired:
+            return TodayTheme.blue
+        case .anxious:
+            return TodayTheme.scrollViolet
+        case .sad:
+            return TodayTheme.sleepIndigo
+        case .irritated:
+            return TodayTheme.rose
+        case .bored:
             return TodayTheme.inkFaint
+        case .sleepy:
+            return TodayTheme.blue
+        case .satisfied:
+            return TodayTheme.scrollSunrise
         case .none:
             return TodayTheme.inkFaint
         }

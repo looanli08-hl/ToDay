@@ -23,10 +23,16 @@ struct MoodRecord: Identifiable, Codable {
     enum Mood: String, CaseIterable, Identifiable, Codable {
         case happy = "开心"
         case calm = "平静"
-        case tired = "疲惫"
-        case irritated = "烦躁"
         case focused = "专注"
-        case zoning = "放空"
+        case grateful = "感恩"
+        case excited = "兴奋"
+        case tired = "疲惫"
+        case anxious = "焦虑"
+        case sad = "难过"
+        case irritated = "烦躁"
+        case bored = "无聊"
+        case sleepy = "困倦"
+        case satisfied = "满足"
 
         var id: String { rawValue }
 
@@ -34,10 +40,66 @@ struct MoodRecord: Identifiable, Codable {
             switch self {
             case .happy: return "😊"
             case .calm: return "🌿"
-            case .tired: return "😴"
-            case .irritated: return "😤"
             case .focused: return "🎯"
-            case .zoning: return "☁️"
+            case .grateful: return "🙏"
+            case .excited: return "🤩"
+            case .tired: return "😴"
+            case .anxious: return "😰"
+            case .sad: return "😔"
+            case .irritated: return "😤"
+            case .bored: return "🥱"
+            case .sleepy: return "😪"
+            case .satisfied: return "☺️"
+            }
+        }
+
+        init(from decoder: any Decoder) throws {
+            let container = try decoder.singleValueContainer()
+            let rawValue = try container.decode(String.self)
+            if let mood = Self(storedValue: rawValue) {
+                self = mood
+                return
+            }
+
+            throw DecodingError.dataCorruptedError(
+                in: container,
+                debugDescription: "不支持的 Mood 值：\(rawValue)"
+            )
+        }
+
+        func encode(to encoder: any Encoder) throws {
+            var container = encoder.singleValueContainer()
+            try container.encode(rawValue)
+        }
+
+        init?(storedValue: String) {
+            switch storedValue {
+            case Self.happy.rawValue:
+                self = .happy
+            case Self.calm.rawValue:
+                self = .calm
+            case Self.focused.rawValue:
+                self = .focused
+            case Self.grateful.rawValue:
+                self = .grateful
+            case Self.excited.rawValue:
+                self = .excited
+            case Self.tired.rawValue:
+                self = .tired
+            case Self.anxious.rawValue:
+                self = .anxious
+            case Self.sad.rawValue:
+                self = .sad
+            case Self.irritated.rawValue:
+                self = .irritated
+            case Self.bored.rawValue, "放空":
+                self = .bored
+            case Self.sleepy.rawValue:
+                self = .sleepy
+            case Self.satisfied.rawValue:
+                self = .satisfied
+            default:
+                return nil
             }
         }
     }

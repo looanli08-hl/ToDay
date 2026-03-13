@@ -98,22 +98,39 @@ struct TodayScreen: View {
 
                 Spacer()
 
-                Button {
-                    Task {
-                        await viewModel.load(forceReload: true)
+                HStack(spacing: 10) {
+                    Button {
+                        viewModel.openQuickRecordComposer()
+                    } label: {
+                        Image(systemName: "heart.circle.fill")
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundStyle(TodayTheme.accent)
+                            .frame(width: 42, height: 42)
+                            .background(TodayTheme.card)
+                            .overlay(
+                                Circle()
+                                    .stroke(TodayTheme.border, lineWidth: 1)
+                            )
                     }
-                } label: {
-                    Image(systemName: "arrow.clockwise")
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundStyle(TodayTheme.inkSoft)
-                        .frame(width: 42, height: 42)
-                        .background(TodayTheme.card)
-                        .overlay(
-                            Circle()
-                                .stroke(TodayTheme.border, lineWidth: 1)
-                        )
+                    .buttonStyle(.plain)
+
+                    Button {
+                        Task {
+                            await viewModel.load(forceReload: true)
+                        }
+                    } label: {
+                        Image(systemName: "arrow.clockwise")
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundStyle(TodayTheme.inkSoft)
+                            .frame(width: 42, height: 42)
+                            .background(TodayTheme.card)
+                            .overlay(
+                                Circle()
+                                    .stroke(TodayTheme.border, lineWidth: 1)
+                            )
+                    }
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
             }
 
             Text(viewModel.timeline?.summary ?? "先把今天铺成一张可回看的画卷，再决定哪些片段值得长期留下。")

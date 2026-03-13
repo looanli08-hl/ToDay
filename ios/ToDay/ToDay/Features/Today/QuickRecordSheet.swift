@@ -8,6 +8,8 @@ enum QuickRecordSheetMode {
 }
 
 struct QuickRecordSheet: View {
+    private static let maxPhotoCount = 3
+
     @Environment(\.dismiss) private var dismiss
     @State private var selectedMood: MoodRecord.Mood?
     @State private var note: String = ""
@@ -146,7 +148,7 @@ struct QuickRecordSheet: View {
 
                 PhotosPicker(
                     selection: $pickerItems,
-                    maxSelectionCount: max(0, 4 - draftPhotos.count),
+                    maxSelectionCount: max(0, Self.maxPhotoCount - draftPhotos.count),
                     matching: .images,
                     photoLibrary: .shared()
                 ) {
@@ -162,7 +164,7 @@ struct QuickRecordSheet: View {
                         )
                         .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                 }
-                .disabled(draftPhotos.count >= 4 || isSubmitting)
+                .disabled(draftPhotos.count >= Self.maxPhotoCount || isSubmitting)
             }
 
             if !draftPhotos.isEmpty {
@@ -378,17 +380,17 @@ struct QuickRecordSheet: View {
 
     private var photoSectionCaption: String {
         if draftPhotos.isEmpty {
-            return "最多添加 4 张，会跟着这条记录一起保存。"
+            return "最多添加 \(Self.maxPhotoCount) 张，会跟着这条记录一起保存。"
         }
 
-        return "已选 \(draftPhotos.count) / 4 张，保存后可在时间线里点开查看。"
+        return "已选 \(draftPhotos.count) / \(Self.maxPhotoCount) 张，保存后可在时间线里点开查看。"
     }
 
     private func importPhotos(from items: [PhotosPickerItem]) async {
         guard !items.isEmpty else { return }
 
         var importedPhotos: [DraftPhoto] = []
-        let remainingSlots = max(0, 4 - draftPhotos.count)
+        let remainingSlots = max(0, Self.maxPhotoCount - draftPhotos.count)
 
         for item in items.prefix(remainingSlots) {
             guard let data = try? await item.loadTransferable(type: Data.self),
