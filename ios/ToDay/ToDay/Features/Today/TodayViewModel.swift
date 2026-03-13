@@ -463,7 +463,16 @@ final class TodayViewModel: ObservableObject {
     }
 
     private func loadStoredAnnotations() {
-        guard let data = UserDefaults.standard.data(forKey: Self.annotationStorageKey) else {
+        let sharedDefaults = UserDefaults(suiteName: SharedAppGroup.identifier) ?? .standard
+        let standardDefaults = UserDefaults.standard
+
+        if sharedDefaults.data(forKey: Self.annotationStorageKey) == nil,
+           let legacyData = standardDefaults.data(forKey: Self.annotationStorageKey) {
+            sharedDefaults.set(legacyData, forKey: Self.annotationStorageKey)
+            standardDefaults.removeObject(forKey: Self.annotationStorageKey)
+        }
+
+        guard let data = sharedDefaults.data(forKey: Self.annotationStorageKey) else {
             storedAnnotations = [:]
             return
         }
@@ -479,16 +488,17 @@ final class TodayViewModel: ObservableObject {
     private func persistStoredAnnotations() {
         do {
             let data = try JSONEncoder().encode(storedAnnotations.values.sorted { $0.startDate < $1.startDate })
-            UserDefaults.standard.set(data, forKey: Self.annotationStorageKey)
+            let sharedDefaults = UserDefaults(suiteName: SharedAppGroup.identifier) ?? .standard
+            sharedDefaults.set(data, forKey: Self.annotationStorageKey)
         } catch {
             errorMessage = "留白标注保存失败：\(error.localizedDescription)"
         }
     }
 
     private func persistDailySummary(referenceDate: Date) {
-        let sharedDefaults = UserDefaults(suiteName: SharedAppGroup.identifier)
+        let sharedDefaults = UserDefaults(suiteName: SharedAppGroup.identifier) ?? .standard
         guard let timeline else {
-            sharedDefaults?.removeObject(forKey: SharedAppGroup.dailySummaryKey)
+            sharedDefaults.removeObject(forKey: SharedAppGroup.dailySummaryKey)
             return
         }
 
@@ -505,7 +515,7 @@ final class TodayViewModel: ObservableObject {
         )
 
         guard let data = try? JSONEncoder().encode(snapshot) else { return }
-        sharedDefaults?.set(data, forKey: SharedAppGroup.dailySummaryKey)
+        sharedDefaults.set(data, forKey: SharedAppGroup.dailySummaryKey)
     }
 
     private func syncWatchState(referenceDate: Date) {
