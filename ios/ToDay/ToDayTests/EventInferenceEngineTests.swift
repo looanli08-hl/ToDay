@@ -296,6 +296,198 @@ final class EventInferenceEngineTests: XCTestCase {
         XCTAssertEqual(sleepEvent.endDate, makeDate(year: 2026, month: 3, day: 12, hour: 7, minute: 15))
     }
 
+    func testWeatherIsAttachedToClosestEvent() async throws {
+        let targetWeather = HourlyWeather(
+            date: makeDate(year: 2026, month: 3, day: 12, hour: 14, minute: 0),
+            temperature: 22,
+            condition: .clear,
+            symbolName: "sun.max.fill"
+        )
+        let rawData = DayRawData(
+            date: targetDate,
+            hourlyWeather: [
+                HourlyWeather(
+                    date: makeDate(year: 2026, month: 3, day: 12, hour: 9, minute: 0),
+                    temperature: 18,
+                    condition: .cloudy,
+                    symbolName: "cloud.fill"
+                ),
+                targetWeather
+            ],
+            workouts: [
+                WorkoutSample(
+                    startDate: makeDate(year: 2026, month: 3, day: 12, hour: 14, minute: 10),
+                    endDate: makeDate(year: 2026, month: 3, day: 12, hour: 14, minute: 55),
+                    activityType: HKWorkoutActivityType.running.rawValue
+                )
+            ]
+        )
+
+        let events = try await infer(rawData)
+        let workoutEvent = try XCTUnwrap(events.first(where: { $0.kind == .workout }))
+
+        XCTAssertEqual(workoutEvent.associatedMetrics?.weather, targetWeather)
+    }
+
+    func testPhotosAreMatchedToOverlappingEvent() async throws {
+        let firstPhoto = PhotoReference(
+            id: "photo.running.1",
+            creationDate: makeDate(year: 2026, month: 3, day: 12, hour: 14, minute: 12),
+            location: nil,
+            pixelWidth: 1200,
+            pixelHeight: 900
+        )
+        let secondPhoto = PhotoReference(
+            id: "photo.running.2",
+            creationDate: makeDate(year: 2026, month: 3, day: 12, hour: 14, minute: 40),
+            location: nil,
+            pixelWidth: 1200,
+            pixelHeight: 900
+        )
+        let rawData = DayRawData(
+            date: targetDate,
+            photos: [
+                firstPhoto,
+                secondPhoto,
+                PhotoReference(
+                    id: "photo.other",
+                    creationDate: makeDate(year: 2026, month: 3, day: 12, hour: 20, minute: 0),
+                    location: nil,
+                    pixelWidth: 800,
+                    pixelHeight: 600
+                )
+            ],
+            workouts: [
+                WorkoutSample(
+                    startDate: makeDate(year: 2026, month: 3, day: 12, hour: 14, minute: 0),
+                    endDate: makeDate(year: 2026, month: 3, day: 12, hour: 15, minute: 0),
+                    activityType: HKWorkoutActivityType.running.rawValue
+                )
+            ]
+        )
+
+        let events = try await infer(rawData)
+        let workoutEvent = try XCTUnwrap(events.first(where: { $0.kind == .workout }))
+
+        XCTAssertEqual(workoutEvent.associatedMetrics?.photos, [firstPhoto, secondPhoto])
+    }
+
+    func testLocationIsAttachedToOverlappingEvent() async throws {
+        let cafeVisit = LocationVisit(
+            coordinate: CoordinateValue(latitude: 39.984, longitude: 116.319),
+            arrivalDate: makeDate(year: 2026, month: 3, day: 12, hour: 12, minute: 5),
+            departureDate: makeDate(year: 2026, month: 3, day: 12, hour: 12, minute: 55),
+            placeName: "附近餐厅"
+        )
+        let rawData = DayRawData(
+            date: targetDate,
+            locationVisits: [cafeVisit],
+            workouts: [
+                WorkoutSample(
+                    startDate: makeDate(year: 2026, month: 3, day: 12, hour: 12, minute: 0),
+                    endDate: makeDate(year: 2026, month: 3, day: 12, hour: 13, minute: 0),
+                    activityType: HKWorkoutActivityType.walking.rawValue
+                )
+            ]
+        )
+
+        let events = try await infer(rawData)
+        let event = try XCTUnwrap(events.first(where: { $0.kind == .workout }))
+
+        XCTAssertEqual(event.associatedMetrics?.location, cafeVisit)
+    }
+
+    func testUserAnnotationOverridesDisplayName() {
+        let original = InferredEvent(
+            kind: .quietTime,
+            startDate: makeDate(year: 2026, month: 3, day: 12, hour: 9, minute: 0),
+            endDate: makeDate(year: 2026, month: 3, day: 12, hour: 10, minute: 0),
+            confidence: .low,
+            displayName: "安静的上午"
+        )
+
+        let annotated = original.applyingAnnotation("读书")
+
+        XCTAssertEqual(annotated.resolvedName, "读书")
+    }
+
+    func testActivitySummaryDoesNotAffectInference() async throws {
+        let baseline = DayRawData(
+            date: targetDate,
+            workouts: [
+                WorkoutSample(
+                    startDate: makeDate(year: 2026, month: 3, day: 12, hour: 8, minute: 0),
+                    endDate: makeDate(year: 2026, month: 3, day: 12, hour: 8, minute: 45),
+                    activityType: HKWorkoutActivityType.running.rawValue
+                )
+            ]
+        )
+        let withSummary = DayRawData(
+            date: targetDate,
+            activitySummary: ActivitySummaryData(
+                activeEnergyBurned: 320,
+                activeEnergyGoal: 500,
+                exerciseMinutes: 25,
+                exerciseGoal: 30,
+                standHours: 8,
+                standGoal: 12
+            ),
+            workouts: baseline.workouts
+        )
+
+        let baselineEvents = try await infer(baseline)
+        let summaryEvents = try await infer(withSummary)
+
+        XCTAssertEqual(summaryEvents.map(\.kind), baselineEvents.map(\.kind))
+        XCTAssertEqual(summaryEvents.map(\.displayName), baselineEvents.map(\.displayName))
+    }
+
+    func testMultipleSleepSessionsAreMerged() async throws {
+        let rawData = DayRawData(
+            date: targetDate,
+            sleepSamples: [
+                SleepSample(
+                    startDate: makeDate(year: 2026, month: 3, day: 11, hour: 23, minute: 40),
+                    endDate: makeDate(year: 2026, month: 3, day: 12, hour: 2, minute: 0),
+                    stage: .light
+                ),
+                SleepSample(
+                    startDate: makeDate(year: 2026, month: 3, day: 12, hour: 2, minute: 3),
+                    endDate: makeDate(year: 2026, month: 3, day: 12, hour: 6, minute: 50),
+                    stage: .deep
+                )
+            ]
+        )
+
+        let events = try await infer(rawData)
+        let sleepEvents = events.filter { $0.kind == .sleep }
+
+        XCTAssertEqual(sleepEvents.count, 1)
+        XCTAssertEqual(sleepEvents.first?.startDate, startOfDay)
+        XCTAssertEqual(sleepEvents.first?.endDate, makeDate(year: 2026, month: 3, day: 12, hour: 6, minute: 50))
+    }
+
+    func testAllDayNoHealthDataShowsSingleQuietEvent() async throws {
+        let events = try await infer(
+            DayRawData(
+                date: targetDate,
+                activitySummary: ActivitySummaryData(
+                    activeEnergyBurned: 310,
+                    activeEnergyGoal: 500,
+                    exerciseMinutes: 18,
+                    exerciseGoal: 30,
+                    standHours: 7,
+                    standGoal: 12
+                )
+            )
+        )
+
+        XCTAssertEqual(events.count, 1)
+        XCTAssertEqual(events.first?.kind, .quietTime)
+        XCTAssertEqual(events.first?.startDate, startOfDay)
+        XCTAssertEqual(events.first?.endDate, endOfDay)
+    }
+
     private var startOfDay: Date {
         calendar.startOfDay(for: targetDate)
     }
