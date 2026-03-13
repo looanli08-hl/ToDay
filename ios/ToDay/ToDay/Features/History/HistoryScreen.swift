@@ -2,9 +2,6 @@ import SwiftUI
 
 struct HistoryScreen: View {
     @ObservedObject var viewModel: TodayViewModel
-    @ObservedObject var monetizationViewModel: MonetizationViewModel
-
-    let onOpenPro: () -> Void
 
     @State private var visibleMonth = Calendar.current.todayMonthAnchor
     @State private var monthTimelines: [Date: DayTimeline] = [:]
@@ -36,17 +33,8 @@ struct HistoryScreen: View {
 
     @ViewBuilder
     private var weeklyInsightSection: some View {
-        if monetizationViewModel.isProUnlocked {
-            WeeklyInsightView(timelines: weeklyTimelines)
-                .padding(.horizontal, 20)
-        } else {
-            LockedInsightCard(
-                title: "一周洞察",
-                detail: "免费版先开放当天画卷回看，Pro 会把最近 7 天的运动、睡眠和心情波动整理成连续洞察。",
-                buttonTitle: "前往会员页",
-                action: onOpenPro
-            )
-        }
+        WeeklyInsightView(timelines: weeklyTimelines)
+            .padding(.horizontal, 20)
     }
 
     private var calendarSection: some View {
@@ -301,50 +289,6 @@ private struct HistoryCalendarDayCell: View {
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .stroke(isToday ? TodayTheme.accent : TodayTheme.border, lineWidth: isToday ? 1.4 : 1)
         )
-    }
-}
-
-private struct LockedInsightCard: View {
-    let title: String
-    let detail: String
-    let buttonTitle: String
-    let action: () -> Void
-
-    var body: some View {
-        ContentCard {
-            EyebrowLabel("PRO")
-
-            HStack {
-                Text(title)
-                    .font(.system(size: 23, weight: .regular, design: .serif))
-                    .italic()
-                    .foregroundStyle(TodayTheme.ink)
-                Spacer()
-                Text("Pro")
-                    .font(.caption.weight(.bold))
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 6)
-                    .foregroundStyle(TodayTheme.accent)
-                    .background(TodayTheme.accentSoft)
-                    .clipShape(Capsule())
-            }
-
-            Text(detail)
-                .font(.subheadline)
-                .foregroundStyle(TodayTheme.inkMuted)
-
-            Button(action: action) {
-                Text(buttonTitle)
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
-                    .background(TodayTheme.teal)
-                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-            }
-            .buttonStyle(.plain)
-        }
-        .padding(.horizontal, 20)
     }
 }
 

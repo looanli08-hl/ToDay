@@ -121,7 +121,7 @@ struct TodayInsightComposer {
             return WeeklyInsightSummary(
                 headline: "连续洞察会从最近 7 天开始长出来",
                 narrative: "当你开始持续记录，ToDay 会逐渐告诉你最近一周更像在恢复、推进、拉扯还是漂浮。",
-                badges: ["0/7 活跃天", "等待记录", "Pro 适合长期回看"]
+                badges: ["0/7 活跃天", "等待记录", "连续回看会逐渐成形"]
             )
         }
 

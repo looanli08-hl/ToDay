@@ -3,13 +3,11 @@ import UIKit
 
 struct TodayScreen: View {
     @ObservedObject var viewModel: TodayViewModel
-    @ObservedObject var monetizationViewModel: MonetizationViewModel
     @State private var selectedEvent: InferredEvent?
     @State private var annotatingEvent: InferredEvent?
     @State private var sharePayload: ScrollSharePayload?
 
     let onOpenHistory: () -> Void
-    let onOpenPro: () -> Void
 
     private let chineseLocale = Locale(identifier: "zh_CN")
     private static let dateHeaderFormatter: DateFormatter = {
@@ -258,7 +256,7 @@ struct TodayScreen: View {
 
     @ViewBuilder
     private var weeklySpotlightSection: some View {
-        if monetizationViewModel.isProUnlocked, let weeklyInsight = viewModel.weeklyInsight {
+        if let weeklyInsight = viewModel.weeklyInsight {
             ContentCard(background: TodayTheme.tealSoft.opacity(0.7)) {
                 EyebrowLabel("WEEKLY RHYTHM")
 
@@ -277,45 +275,6 @@ struct TodayScreen: View {
                     .lineSpacing(4)
 
                 FlexibleBadgeRow(items: weeklyInsight.badges, tone: .teal)
-            }
-        } else {
-            ContentCard {
-                EyebrowLabel("PRO PREVIEW")
-
-                HStack(alignment: .top) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("把生活记录变成可付费的陪伴")
-                            .font(.system(size: 23, weight: .regular, design: .serif))
-                            .italic()
-                            .foregroundStyle(TodayTheme.ink)
-
-                        Text("免费版先把今天讲清楚，Pro 再负责把最近 7 天的节奏、波峰和回看价值整理出来。")
-                            .font(.system(size: 14))
-                            .foregroundStyle(TodayTheme.inkMuted)
-                            .lineSpacing(4)
-                    }
-
-                    Spacer()
-
-                    Text("会员")
-                        .font(.system(size: 11, weight: .bold, design: .monospaced))
-                        .foregroundStyle(TodayTheme.accent)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 6)
-                        .background(TodayTheme.accentSoft)
-                        .clipShape(Capsule())
-                }
-
-                Button(action: onOpenPro) {
-                    Text("前往会员页")
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 14)
-                        .background(TodayTheme.teal)
-                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                }
-                .buttonStyle(.plain)
             }
         }
     }
@@ -527,10 +486,6 @@ private struct ScrollSharePayload: Identifiable {
                 defaults: UserDefaults(suiteName: "ToDayPreviewStore") ?? .standard,
                 key: "preview.manualRecords"
             )
-        ),
-        monetizationViewModel: MonetizationViewModel(
-            defaults: UserDefaults(suiteName: "ToDayPreviewStore") ?? .standard,
-            key: "preview.pro"
         )
     )
 }

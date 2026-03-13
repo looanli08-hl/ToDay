@@ -23,11 +23,6 @@ enum AppContainer {
         return viewModel
     }
 
-    @MainActor
-    static func makeMonetizationViewModel() -> MonetizationViewModel {
-        MonetizationViewModel()
-    }
-
     static func makeTimelineProvider() -> any TimelineDataProviding {
         let environment = ProcessInfo.processInfo.environment
 
