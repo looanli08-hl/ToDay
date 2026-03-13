@@ -1,4 +1,5 @@
 import Foundation
+import HealthKit
 import SwiftData
 #if os(iOS)
 import WatchConnectivity
@@ -25,12 +26,18 @@ enum AppContainer {
 
     static func makeTimelineProvider() -> any TimelineDataProviding {
         let environment = ProcessInfo.processInfo.environment
-
-        if environment["TODAY_USE_HEALTHKIT"] == "1" {
-            return HealthKitTimelineDataProvider()
+        if environment["TODAY_USE_MOCK"] == "1" {
+            return MockTimelineDataProvider()
         }
 
+        #if targetEnvironment(simulator)
         return MockTimelineDataProvider()
+        #else
+        if HKHealthStore.isHealthDataAvailable() {
+            return HealthKitTimelineDataProvider()
+        }
+        return MockTimelineDataProvider()
+        #endif
     }
 
     static func makeMoodRecordStore() -> any MoodRecordStoring {

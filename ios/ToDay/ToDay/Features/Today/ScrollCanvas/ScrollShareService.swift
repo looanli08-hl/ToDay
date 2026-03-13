@@ -4,15 +4,11 @@ import UIKit
 @MainActor
 enum ScrollShareService {
     static func renderScrollAsImage(timeline: DayTimeline) -> UIImage {
-        let content = ScrollShareSnapshotView(timeline: timeline, contentWidth: 920)
+        let content = ScrollShareSnapshotView(timeline: timeline)
         let renderer = ImageRenderer(content: content)
         renderer.scale = UIScreen.main.scale
 
-        if let image = renderer.uiImage {
-            return image
-        }
-
-        return UIImage()
+        return renderer.uiImage ?? UIImage()
     }
 }
 
@@ -28,7 +24,6 @@ struct ScrollShareSheet: UIViewControllerRepresentable {
 
 private struct ScrollShareSnapshotView: View {
     let timeline: DayTimeline
-    let contentWidth: CGFloat
 
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
@@ -37,16 +32,15 @@ private struct ScrollShareSnapshotView: View {
                 .foregroundStyle(TodayTheme.inkMuted.opacity(0.78))
                 .frame(maxWidth: .infinity, alignment: .trailing)
 
-            DayScrollView(
+            DayVerticalTimelineContent(
                 timeline: timeline,
                 onEventTap: { _ in },
                 onBlankTap: { _ in },
                 showsCurrentTimeNeedle: false
             )
-            .frame(width: contentWidth, alignment: .topLeading)
         }
         .padding(24)
-        .frame(width: contentWidth + 48, alignment: .topLeading)
+        .frame(width: 390)
         .background(TodayTheme.background)
     }
 

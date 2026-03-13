@@ -29,8 +29,12 @@ struct TodayScreen: View {
                     } else if let message = viewModel.errorMessage, viewModel.timeline == nil {
                         errorCard(message: message)
                     } else if let timeline = viewModel.timeline {
-                        signatureSection(timeline)
-                        scrollCanvasSection(timeline)
+                        if timeline.entries.isEmpty {
+                            emptyStateCard
+                        } else {
+                            signatureSection(timeline)
+                            scrollCanvasSection(timeline)
+                        }
                     }
 
                     summarySection
@@ -224,6 +228,37 @@ struct TodayScreen: View {
                     annotatingEvent = event
                 }
             )
+        }
+    }
+
+    private var emptyStateCard: some View {
+        ContentCard {
+            VStack(spacing: 16) {
+                Image(systemName: "applewatch.and.arrow.forward")
+                    .font(.system(size: 36))
+                    .foregroundStyle(TodayTheme.inkFaint)
+
+                Text("等待数据中")
+                    .font(.system(size: 20, weight: .regular, design: .serif))
+                    .italic()
+                    .foregroundStyle(TodayTheme.ink)
+
+                Text("戴上 Apple Watch 活动一会儿，心率、步数和运动数据会自动填入时间轴。你也可以先用下方的「记录此刻」手动打点。")
+                    .font(.system(size: 14))
+                    .foregroundStyle(TodayTheme.inkMuted)
+                    .multilineTextAlignment(.center)
+                    .lineSpacing(4)
+
+                Button("刷新") {
+                    Task {
+                        await viewModel.load(forceReload: true)
+                    }
+                }
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(TodayTheme.teal)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 8)
         }
     }
 

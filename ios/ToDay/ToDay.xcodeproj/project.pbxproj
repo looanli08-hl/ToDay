@@ -27,6 +27,7 @@
 		4788852ACD6C662593EE18E6 /* WatchTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E06395E1BD9FE3C2B493042 /* WatchTheme.swift */; };
 		4E0E762B4D92B8C4703F24C0 /* MoodRecordEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 517D081EC92833825D6C1658 /* MoodRecordEntity.swift */; };
 		4FE7ED6B910849760A8ED1BE /* QuickRecordSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90DD0AA794ABBBE1F95F1B7 /* QuickRecordSheet.swift */; };
+		52BA7C5CA039BE601267E41F /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEBA7D34F5C9C73353085631 /* OnboardingView.swift */; };
 		5CB385201F226102AFA0885C /* ToDayWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D3FD0290794CC321F5BB45C /* ToDayWidgetBundle.swift */; };
 		6009F788A2DCD8E51F97E8D5 /* AppConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB09FC4279F21A281C6D8DC2 /* AppConfiguration.swift */; };
 		6B947898CEDD1667A23D2876 /* QuickMoodView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5C06EC261F5C05B001ECF8B /* QuickMoodView.swift */; };
@@ -180,6 +181,7 @@
 		D5E3EC90284C88262A943A15 /* TodayInsightComposerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayInsightComposerTests.swift; sourceTree = "<group>"; };
 		D703F427121F57213803215D /* DayDataAggregator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayDataAggregator.swift; sourceTree = "<group>"; };
 		D796A8133E65C0F7E468E8AB /* MoodRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodRecord.swift; sourceTree = "<group>"; };
+		DEBA7D34F5C9C73353085631 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		E41D5FDB97C97E39345EF797 /* HistoryScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryScreen.swift; sourceTree = "<group>"; };
 		E7BB74516D89AD97D04F81B3 /* AppContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppContainer.swift; sourceTree = "<group>"; };
 		E90DD0AA794ABBBE1F95F1B7 /* QuickRecordSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickRecordSheet.swift; sourceTree = "<group>"; };
@@ -260,6 +262,7 @@
 			isa = PBXGroup;
 			children = (
 				FA5F7307AB8CE7799D63CA0E /* History */,
+				BC4957CD8636026C582CA4C6 /* Onboarding */,
 				FF51E490980F90F9A6AEEBED /* Today */,
 			);
 			path = Features;
@@ -290,6 +293,14 @@
 				6AAB5EA48FC1A363AF03230D /* WatchViewModel.swift */,
 			);
 			path = ToDayWatch;
+			sourceTree = "<group>";
+		};
+		BC4957CD8636026C582CA4C6 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				DEBA7D34F5C9C73353085631 /* OnboardingView.swift */,
+			);
+			path = Onboarding;
 			sourceTree = "<group>";
 		};
 		BDF9E53E8979EE3E9CB77A86 /* ToDayTests */ = {
@@ -551,6 +562,7 @@
 				EC421489F126891847F7CEFB /* MoodRecord.swift in Sources */,
 				4E0E762B4D92B8C4703F24C0 /* MoodRecordEntity.swift in Sources */,
 				AFB0264365F2546579D2F53A /* MoodRecordStoring.swift in Sources */,
+				52BA7C5CA039BE601267E41F /* OnboardingView.swift in Sources */,
 				3FD248DEB5BDF808804ABA6C /* PhotoService.swift in Sources */,
 				4FE7ED6B910849760A8ED1BE /* QuickRecordSheet.swift in Sources */,
 				347C2C0A0BE952A9E9C93A3C /* ScrollShareService.swift in Sources */,

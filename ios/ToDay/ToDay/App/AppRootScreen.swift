@@ -6,26 +6,33 @@ private enum AppTab: Hashable {
 }
 
 struct AppRootScreen: View {
+    @AppStorage("today.hasCompletedOnboarding") private var hasCompletedOnboarding = false
     @ObservedObject var todayViewModel: TodayViewModel
     @State private var selectedTab: AppTab = .today
 
     var body: some View {
-        TabView(selection: $selectedTab) {
-            TodayScreen(
-                viewModel: todayViewModel,
-                onOpenHistory: { selectedTab = .history }
-            )
-            .tabItem {
-                Label("今天", systemImage: "sun.max.fill")
-            }
-            .tag(AppTab.today)
+        if hasCompletedOnboarding {
+            TabView(selection: $selectedTab) {
+                TodayScreen(
+                    viewModel: todayViewModel,
+                    onOpenHistory: { selectedTab = .history }
+                )
+                .tabItem {
+                    Label("今天", systemImage: "sun.max.fill")
+                }
+                .tag(AppTab.today)
 
-            HistoryScreen(viewModel: todayViewModel)
-            .tabItem {
-                Label("回看", systemImage: "clock.arrow.circlepath")
+                HistoryScreen(viewModel: todayViewModel)
+                .tabItem {
+                    Label("回看", systemImage: "clock.arrow.circlepath")
+                }
+                .tag(AppTab.history)
             }
-            .tag(AppTab.history)
+            .tint(TodayTheme.teal)
+        } else {
+            OnboardingView {
+                hasCompletedOnboarding = true
+            }
         }
-        .tint(Color(red: 0.35, green: 0.63, blue: 0.54))
     }
 }
