@@ -390,11 +390,13 @@ struct QuickRecordSheet: View {
         guard !items.isEmpty else { return }
 
         var importedPhotos: [DraftPhoto] = []
+        var failedPhotoCount = 0
         let remainingSlots = max(0, Self.maxPhotoCount - draftPhotos.count)
 
         for item in items.prefix(remainingSlots) {
             guard let data = try? await item.loadTransferable(type: Data.self),
                   let image = UIImage(data: data) else {
+                failedPhotoCount += 1
                 continue
             }
 
@@ -402,7 +404,13 @@ struct QuickRecordSheet: View {
         }
 
         await MainActor.run {
-            photoErrorMessage = importedPhotos.isEmpty ? "照片读取失败，请重新选择。" : nil
+            if failedPhotoCount == 0 {
+                photoErrorMessage = nil
+            } else if importedPhotos.isEmpty {
+                photoErrorMessage = "照片读取失败，请重新选择。"
+            } else {
+                photoErrorMessage = "\(failedPhotoCount) 张照片读取失败"
+            }
             draftPhotos.append(contentsOf: importedPhotos)
             pickerItems = []
         }
