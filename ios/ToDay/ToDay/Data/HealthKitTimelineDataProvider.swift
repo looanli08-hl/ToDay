@@ -4,9 +4,22 @@ import HealthKit
 final class HealthKitTimelineDataProvider: TimelineDataProviding {
     let source: TimelineSource = .healthKit
 
-    private let healthStore = HKHealthStore()
-    private let calendar = Calendar.current
-    private let authorizationGate = HealthAuthorizationGate()
+    private let healthStore: HKHealthStore
+    private let calendar: Calendar
+    private let authorizationGate: HealthAuthorizationGate
+    private let eventInferenceEngine: any EventInferring
+
+    init(
+        healthStore: HKHealthStore = HKHealthStore(),
+        calendar: Calendar = .current,
+        authorizationGate: HealthAuthorizationGate = HealthAuthorizationGate(),
+        eventInferenceEngine: any EventInferring = HealthKitEventInferenceEngine()
+    ) {
+        self.healthStore = healthStore
+        self.calendar = calendar
+        self.authorizationGate = authorizationGate
+        self.eventInferenceEngine = eventInferenceEngine
+    }
 
     func loadTimeline(for date: Date) async throws -> DayTimeline {
         guard HKHealthStore.isHealthDataAvailable() else {
@@ -15,49 +28,64 @@ final class HealthKitTimelineDataProvider: TimelineDataProviding {
 
         try await requestAuthorizationIfNeeded()
 
-        let startOfDay = calendar.startOfDay(for: date)
-
-        async let stepCount = fetchCumulativeQuantity(.stepCount, unit: .count(), start: startOfDay, end: date)
-        async let activeEnergy = fetchCumulativeQuantity(.activeEnergyBurned, unit: .kilocalorie(), start: startOfDay, end: date)
-        async let sleepHours = fetchSleepHours(referenceDate: date)
-        async let workouts = fetchWorkouts(start: startOfDay, end: date)
-        async let activitySummary = fetchActivitySummary(for: date)
-
-        let steps = try await stepCount
-        let energy = try await activeEnergy
-        let sleep = try await sleepHours
-        let workoutSamples = try await workouts
-        let rings = await activitySummary
-
-        let entries = buildEntries(
-            referenceDate: date,
-            steps: steps,
-            activeEnergy: energy,
-            sleepHours: sleep,
-            workouts: workoutSamples
-        )
-
-        if entries.isEmpty {
-            throw TimelineDataError.noDataForToday
-        }
+        let rawData = await makeDayDataAggregator().loadRawData(for: date)
+        let entries = try await eventInferenceEngine.inferEvents(from: rawData, on: date)
 
         return DayTimeline(
             date: date,
-            summary: "这条时间线来自今天这台设备里的 HealthKit 数据。",
+            summary: makeSummary(from: rawData),
             source: source,
-            stats: makeStats(
-                activitySummary: rings,
-                steps: steps,
-                activeEnergy: energy,
-                workoutCount: workoutSamples.count
-            ),
+            stats: makeStats(from: rawData),
             entries: entries
+        )
+    }
+
+    func loadRawData(for date: Date) async -> DayRawData {
+        guard HKHealthStore.isHealthDataAvailable() else {
+            return DayRawData(date: date)
+        }
+
+        let startOfDay = calendar.startOfDay(for: date)
+        let endOfDay = calendar.date(byAdding: .day, value: 1, to: startOfDay) ?? date
+        let sleepWindowStart = calendar.date(byAdding: .hour, value: -12, to: startOfDay) ?? startOfDay
+
+        async let heartRateSamples = fetchQuantitySamples(
+            .heartRate,
+            unit: HKUnit.count().unitDivided(by: .minute()),
+            start: startOfDay,
+            end: endOfDay
+        )
+        async let stepSamples = fetchQuantitySamples(
+            .stepCount,
+            unit: .count(),
+            start: startOfDay,
+            end: endOfDay
+        )
+        async let activeEnergySamples = fetchQuantitySamples(
+            .activeEnergyBurned,
+            unit: .kilocalorie(),
+            start: startOfDay,
+            end: endOfDay
+        )
+        async let sleepSamples = fetchSleepSamples(start: sleepWindowStart, end: endOfDay)
+        async let workouts = fetchWorkouts(start: startOfDay, end: endOfDay)
+        async let activitySummary = fetchActivitySummary(for: date)
+
+        return DayRawData(
+            date: date,
+            activitySummary: await activitySummary,
+            heartRateSamples: await heartRateSamples,
+            stepSamples: await stepSamples,
+            sleepSamples: await sleepSamples,
+            workouts: await workouts,
+            activeEnergySamples: await activeEnergySamples
         )
     }
 
     private func requestAuthorizationIfNeeded() async throws {
         let readTypes = [
             HKObjectType.activitySummaryType(),
+            HKObjectType.quantityType(forIdentifier: .heartRate),
             HKObjectType.quantityType(forIdentifier: .stepCount),
             HKObjectType.quantityType(forIdentifier: .activeEnergyBurned),
             HKObjectType.categoryType(forIdentifier: .sleepAnalysis),
@@ -83,81 +111,94 @@ final class HealthKitTimelineDataProvider: TimelineDataProviding {
         }
     }
 
-    private func fetchCumulativeQuantity(
+    private func fetchQuantitySamples(
         _ identifier: HKQuantityTypeIdentifier,
         unit: HKUnit,
         start: Date,
         end: Date
-    ) async throws -> Double {
+    ) async -> [DateValueSample] {
         guard let quantityType = HKObjectType.quantityType(forIdentifier: identifier) else {
-            return 0
+            return []
         }
 
-        let predicate = HKSamplePredicate.quantitySample(
-            type: quantityType,
-            predicate: HKQuery.predicateForSamples(withStart: start, end: end)
-        )
-        let descriptor = HKStatisticsQueryDescriptor(predicate: predicate, options: .cumulativeSum)
-
-        do {
-            let result = try await descriptor.result(for: healthStore)
-            return result?.sumQuantity()?.doubleValue(for: unit) ?? 0
-        } catch {
-            throw TimelineDataError.queryFailed(error.localizedDescription)
-        }
-    }
-
-    private func fetchSleepHours(referenceDate: Date) async throws -> Double {
-        guard let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis) else {
-            return 0
-        }
-
-        let startOfDay = calendar.startOfDay(for: referenceDate)
-        let intervalStart = calendar.date(byAdding: .hour, value: -12, to: startOfDay) ?? startOfDay
+        let predicate = HKQuery.predicateForSamples(withStart: start, end: end)
         let descriptor = HKSampleQueryDescriptor(
-            predicates: [
-                HKSamplePredicate.categorySample(
-                    type: sleepType,
-                    predicate: HKQuery.predicateForSamples(withStart: intervalStart, end: referenceDate)
-                )
-            ],
+            predicates: [HKSamplePredicate.quantitySample(type: quantityType, predicate: predicate)],
             sortDescriptors: [],
             limit: nil
         )
 
         do {
-            let samples = try await descriptor.result(for: healthStore)
-            let totalSleep = samples
-                .filter { Self.sleepValues.contains($0.value) }
-                .reduce(0.0) { total, sample in
-                    total + sample.endDate.timeIntervalSince(sample.startDate)
-                }
-            return totalSleep / 3600
-        } catch {
-            throw TimelineDataError.queryFailed(error.localizedDescription)
-        }
-    }
-
-    private func fetchWorkouts(start: Date, end: Date) async throws -> [HKWorkout] {
-        let descriptor = HKSampleQueryDescriptor(
-            predicates: [
-                HKSamplePredicate.workout(HKQuery.predicateForSamples(withStart: start, end: end))
-            ],
-            sortDescriptors: [],
-            limit: nil
-        )
-
-        do {
-            return try await descriptor.result(for: healthStore)
+            let samples: [HKQuantitySample] = try await descriptor.result(for: healthStore)
+            return samples
                 .sorted { $0.startDate < $1.startDate }
+                .map { sample in
+                    DateValueSample(
+                        startDate: sample.startDate,
+                        endDate: sample.endDate,
+                        value: sample.quantity.doubleValue(for: unit)
+                    )
+                }
         } catch {
-            throw TimelineDataError.queryFailed(error.localizedDescription)
+            return []
+        }
+    }
+
+    private func fetchSleepSamples(start: Date, end: Date) async -> [SleepSample] {
+        guard let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis) else {
+            return []
+        }
+
+        let predicate = HKQuery.predicateForSamples(withStart: start, end: end)
+        let descriptor = HKSampleQueryDescriptor(
+            predicates: [HKSamplePredicate.categorySample(type: sleepType, predicate: predicate)],
+            sortDescriptors: [],
+            limit: nil
+        )
+
+        do {
+            let samples: [HKCategorySample] = try await descriptor.result(for: healthStore)
+            return samples
+                .sorted { $0.startDate < $1.startDate }
+                .map { sample in
+                    SleepSample(
+                        startDate: sample.startDate,
+                        endDate: sample.endDate,
+                        stage: Self.sleepStage(for: sample.value)
+                    )
+                }
+        } catch {
+            return []
+        }
+    }
+
+    private func fetchWorkouts(start: Date, end: Date) async -> [WorkoutSample] {
+        let predicate = HKQuery.predicateForSamples(withStart: start, end: end)
+        let descriptor = HKSampleQueryDescriptor(
+            predicates: [HKSamplePredicate.workout(predicate)],
+            sortDescriptors: [],
+            limit: nil
+        )
+
+        do {
+            let samples: [HKWorkout] = try await descriptor.result(for: healthStore)
+            return samples
+                .sorted { $0.startDate < $1.startDate }
+                .map { workout in
+                    WorkoutSample(
+                        startDate: workout.startDate,
+                        endDate: workout.endDate,
+                        activityType: workout.workoutActivityType.rawValue,
+                        activeEnergy: workout.totalEnergyBurned?.doubleValue(for: .kilocalorie()),
+                        distance: workout.totalDistance?.doubleValue(for: .meter())
+                    )
+                }
+        } catch {
+            return []
         }
     }
 
     private func fetchActivitySummary(for date: Date) async -> ActivitySummaryData? {
-        guard HKHealthStore.isHealthDataAvailable() else { return nil }
-
         let dayComponents = calendar.dateComponents([.year, .month, .day], from: date)
         let predicate = HKQuery.predicate(forActivitySummariesBetweenStart: dayComponents, end: dayComponents)
 
@@ -184,83 +225,16 @@ final class HealthKitTimelineDataProvider: TimelineDataProviding {
         }
     }
 
-    private func buildEntries(
-        referenceDate: Date,
-        steps: Double,
-        activeEnergy: Double,
-        sleepHours: Double,
-        workouts: [HKWorkout]
-    ) -> [InferredEvent] {
-        var entries: [InferredEvent] = []
-        let startOfDay = calendar.startOfDay(for: referenceDate)
-        if sleepHours > 0 {
-            entries.append(
-                InferredEvent(
-                    kind: .sleep,
-                    startDate: startOfDay,
-                    endDate: startOfDay.addingTimeInterval(sleepHours * 3600),
-                    confidence: .high,
-                    displayName: "睡眠",
-                    subtitle: String(format: "今天开始前大约记录了 %.1f 小时睡眠。", sleepHours)
-                )
-            )
+    private func makeSummary(from rawData: DayRawData) -> String {
+        let hasContext = !rawData.hourlyWeather.isEmpty || !rawData.locationVisits.isEmpty || !rawData.photos.isEmpty
+        if hasContext {
+            return "这条时间线综合了 HealthKit、天气、地点和照片线索。"
         }
-
-        if steps > 0 || activeEnergy > 0 {
-            entries.append(
-                InferredEvent(
-                    kind: .activeWalk,
-                    startDate: startOfDay,
-                    endDate: referenceDate,
-                    confidence: .medium,
-                    displayName: "活动",
-                    subtitle: "今天目前累计 \(formatWholeNumber(steps)) 步，消耗 \(formatWholeNumber(activeEnergy)) kcal。"
-                )
-            )
-        }
-
-        for workout in workouts {
-            let activity = workout.workoutActivityType.displayName
-
-            entries.append(
-                InferredEvent(
-                    kind: .workout,
-                    startDate: workout.startDate,
-                    endDate: workout.endDate,
-                    confidence: .high,
-                    displayName: activity,
-                    subtitle: "HealthKit 记录了 \(Int(workout.duration / 60)) 分钟训练。"
-                )
-            )
-        }
-
-        if entries.isEmpty && calendar.isDate(referenceDate, inSameDayAs: Date()) {
-            entries.append(
-                InferredEvent(
-                    kind: .quietTime,
-                    startDate: startOfDay,
-                    endDate: referenceDate,
-                    confidence: .low,
-                    displayName: "等待数据",
-                    subtitle: "HealthKit 已连接，但今天还没有可见样本。"
-                )
-            )
-        }
-
-        return entries
+        return "这条时间线来自今天这台设备里的 HealthKit 数据。"
     }
 
-    private func formatWholeNumber(_ value: Double) -> String {
-        value.formatted(.number.precision(.fractionLength(0)))
-    }
-
-    private func makeStats(
-        activitySummary: ActivitySummaryData?,
-        steps: Double,
-        activeEnergy: Double,
-        workoutCount: Int
-    ) -> [TimelineStat] {
-        if let activitySummary {
+    private func makeStats(from rawData: DayRawData) -> [TimelineStat] {
+        if let activitySummary = rawData.activitySummary {
             return [
                 TimelineStat(
                     title: "活动",
@@ -277,22 +251,52 @@ final class HealthKitTimelineDataProvider: TimelineDataProviding {
             ]
         }
 
+        let stepCount = rawData.stepSamples.reduce(0.0) { $0 + $1.value }
+        let activeEnergy = rawData.activeEnergySamples.reduce(0.0) { $0 + $1.value }
+
         return [
-            TimelineStat(title: "步数", value: formatWholeNumber(steps)),
+            TimelineStat(title: "步数", value: formatWholeNumber(stepCount)),
             TimelineStat(title: "能量", value: "\(formatWholeNumber(activeEnergy)) kcal"),
-            TimelineStat(title: "训练", value: "\(workoutCount)")
+            TimelineStat(title: "训练", value: "\(rawData.workouts.count)")
         ]
     }
 
-    private static let sleepValues: Set<Int> = [
-        HKCategoryValueSleepAnalysis.asleepUnspecified.rawValue,
-        HKCategoryValueSleepAnalysis.asleepCore.rawValue,
-        HKCategoryValueSleepAnalysis.asleepDeep.rawValue,
-        HKCategoryValueSleepAnalysis.asleepREM.rawValue
-    ]
+    private func formatWholeNumber(_ value: Double) -> String {
+        value.formatted(.number.precision(.fractionLength(0)))
+    }
+
+    private func makeDayDataAggregator() async -> DayDataAggregator {
+        let locationService = await MainActor.run {
+            LocationService.shared
+        }
+
+        return DayDataAggregator(
+            healthProvider: self,
+            weatherService: WeatherService(),
+            locationService: locationService,
+            photoService: PhotoService()
+        )
+    }
+
+    private static func sleepStage(for value: Int) -> SleepStage {
+        switch value {
+        case HKCategoryValueSleepAnalysis.awake.rawValue:
+            return .awake
+        case HKCategoryValueSleepAnalysis.asleepREM.rawValue:
+            return .rem
+        case HKCategoryValueSleepAnalysis.asleepDeep.rawValue:
+            return .deep
+        case HKCategoryValueSleepAnalysis.asleepCore.rawValue:
+            return .light
+        case HKCategoryValueSleepAnalysis.asleepUnspecified.rawValue:
+            return .unknown
+        default:
+            return .unknown
+        }
+    }
 }
 
-private actor HealthAuthorizationGate {
+actor HealthAuthorizationGate {
     private enum State {
         case idle
         case inFlight(Task<Void, Error>)
