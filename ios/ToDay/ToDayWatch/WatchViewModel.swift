@@ -1,5 +1,6 @@
 import Combine
 import Foundation
+import WidgetKit
 
 @MainActor
 final class WatchViewModel: ObservableObject {
@@ -9,6 +10,7 @@ final class WatchViewModel: ObservableObject {
     private let connectivityManager: WatchConnectivityManager
     private let transitionNotifier: EventTransitionNotifier
     private var cancellables = Set<AnyCancellable>()
+    private var currentAnnotationTargetID: UUID?
 
     convenience init() {
         self.init(connectivityManager: .shared, transitionNotifier: EventTransitionNotifier())
@@ -18,23 +20,34 @@ final class WatchViewModel: ObservableObject {
         self.connectivityManager = connectivityManager
         self.transitionNotifier = transitionNotifier
         activeSession = connectivityManager.activeSession
-        currentEvent = Self.snapshot(from: connectivityManager.activeSession)
+        currentAnnotationTargetID = connectivityManager.currentEventID
+        currentEvent = connectivityManager.currentEventSnapshot ?? Self.snapshot(from: connectivityManager.activeSession)
 
-        connectivityManager.$activeSession
-            .sink { [weak self] session in
-                let previous = self?.currentEvent
-                let next = Self.snapshot(from: session)
-                self?.activeSession = session
-                self?.currentEvent = next
-                self?.transitionNotifier.checkTransition(previous: previous, current: next)
+        Publishers.CombineLatest3(
+            connectivityManager.$activeSession,
+            connectivityManager.$currentEventSnapshot,
+            connectivityManager.$currentEventID
+        )
+        .sink { [weak self] session, snapshot, eventID in
+            guard let self else { return }
+            let previous = self.currentEvent
+            self.activeSession = session
+            self.currentAnnotationTargetID = eventID
+            self.currentEvent = snapshot ?? Self.snapshot(from: session)
+            self.transitionNotifier.checkTransition(previous: previous, current: self.currentEvent)
+        }
+        .store(in: &cancellables)
+
+        connectivityManager.$complicationRefreshDate
+            .sink { refreshDate in
+                guard refreshDate != nil else { return }
+                WidgetCenter.shared.reloadAllTimelines()
             }
             .store(in: &cancellables)
     }
 
     func recordPoint(mood: MoodRecord.Mood) {
-        connectivityManager.sendPointRecord(
-            MoodRecord(mood: mood, createdAt: Date(), isTracking: false)
-        )
+        connectivityManager.sendMoodRecord(mood: mood, timestamp: Date())
     }
 
     func startSession(mood: MoodRecord.Mood) {
@@ -97,6 +110,6 @@ final class WatchViewModel: ObservableObject {
     }
 
     private var annotationTargetID: UUID? {
-        activeSession?.id
+        currentAnnotationTargetID
     }
 }

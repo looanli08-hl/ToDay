@@ -29,6 +29,7 @@ final class TodayViewModel: ObservableObject {
     private var timelineCache: [Date: DayTimeline] = [:]
     private var storedAnnotations: [UUID: StoredAnnotation] = [:]
     private var lastSubmittedFingerprint: DuplicateSubmissionFingerprint?
+    private var lastSharedEventState = SharedEventState(snapshot: nil, eventID: nil)
     private var connectivityCancellable: AnyCancellable?
     private(set) var manualRecords: [MoodRecord] = []
 
@@ -52,7 +53,6 @@ final class TodayViewModel: ObservableObject {
         loadStoredAnnotations()
         reloadManualRecords()
         refreshDerivedState(referenceDate: Date())
-        phoneConnectivityManager?.updatePhoneContext(activeSession: activeRecord)
     }
 
     func loadIfNeeded() async {
@@ -263,6 +263,17 @@ final class TodayViewModel: ObservableObject {
         rebuildTimeline(referenceDate: currentBaseTimeline?.date ?? event.startDate)
     }
 
+    func annotateEvent(id: UUID, title: String) {
+        let allTimelines = [timeline, currentBaseTimeline] + timelineCache.values.map(Optional.some)
+        let event = allTimelines
+            .compactMap { $0 }
+            .flatMap(\.entries)
+            .first(where: { $0.id == id })
+
+        guard let event else { return }
+        annotateEvent(event, title: title)
+    }
+
     private func mergedTimeline(base: DayTimeline) -> DayTimeline {
         let recordsForDay = records(on: base.date)
         let manualEntries = recordsForDay.map { $0.toInferredEvent(referenceDate: Date(), calendar: calendar) }
@@ -335,6 +346,7 @@ final class TodayViewModel: ObservableObject {
             recordsForDay: recordsForDay
         )
         weeklyInsight = insightComposer.buildWeeklyInsight(referenceDate: referenceDate, manualRecords: manualRecords)
+        syncWatchState(referenceDate: referenceDate)
     }
 
     private func reloadManualRecords() {
@@ -412,8 +424,6 @@ final class TodayViewModel: ObservableObject {
         } else {
             recordingState = .idle
         }
-
-        phoneConnectivityManager?.updatePhoneContext(activeSession: activeRecord)
     }
 
     private func removedRecords(from original: [MoodRecord], keeping sanitized: [MoodRecord]) -> [MoodRecord] {
@@ -470,6 +480,102 @@ final class TodayViewModel: ObservableObject {
             UserDefaults.standard.set(data, forKey: Self.annotationStorageKey)
         } catch {
             errorMessage = "留白标注保存失败：\(error.localizedDescription)"
+        }
+    }
+
+    private func syncWatchState(referenceDate: Date) {
+        let eventState = currentEventState(referenceDate: referenceDate)
+        phoneConnectivityManager?.updatePhoneContext(
+            activeSession: activeRecord,
+            currentEvent: eventState.snapshot,
+            currentEventID: eventState.eventID
+        )
+
+        guard eventState != lastSharedEventState else { return }
+        lastSharedEventState = eventState
+        phoneConnectivityManager?.storeCurrentEventSnapshot(eventState.snapshot)
+
+        if let snapshot = eventState.snapshot {
+            phoneConnectivityManager?.sendCurrentEventUpdate(snapshot)
+        }
+
+        phoneConnectivityManager?.sendComplicationRefresh()
+    }
+
+    private func currentEventState(referenceDate: Date) -> SharedEventState {
+        if let event = timeline?.entries
+            .sorted(by: { $0.startDate < $1.startDate })
+            .last(where: { $0.startDate <= referenceDate && ($0.endDate >= referenceDate || $0.isLive) }) {
+            return SharedEventState(snapshot: snapshot(for: event, at: referenceDate), eventID: event.id)
+        }
+
+        guard let activeRecord else {
+            return SharedEventState(snapshot: nil, eventID: nil)
+        }
+
+        let fallbackEvent = activeRecord.toInferredEvent(referenceDate: referenceDate, calendar: calendar)
+        return SharedEventState(snapshot: snapshot(for: fallbackEvent, at: referenceDate), eventID: fallbackEvent.id)
+    }
+
+    private func snapshot(for event: InferredEvent, at referenceDate: Date) -> CurrentEventSnapshot {
+        CurrentEventSnapshot(
+            eventName: event.resolvedName,
+            eventKind: event.kind.rawValue,
+            startDate: event.startDate,
+            durationMinutes: max(1, Int(max(referenceDate.timeIntervalSince(event.startDate), 60)) / 60),
+            iconName: iconName(for: event)
+        )
+    }
+
+    private func iconName(for event: InferredEvent) -> String {
+        switch event.kind {
+        case .sleep:
+            return "bed.double.fill"
+        case .workout:
+            if let workoutType = event.associatedMetrics?.workoutType {
+                if workoutType.contains("跑") {
+                    return "figure.run"
+                }
+                if workoutType.contains("骑") {
+                    return "bicycle"
+                }
+            }
+            return "figure.strengthtraining.traditional"
+        case .commute:
+            return "tram.fill"
+        case .activeWalk:
+            return "figure.walk"
+        case .quietTime:
+            return "sparkles.rectangle.stack"
+        case .userAnnotated:
+            return "pencil.and.scribble"
+        case .mood:
+            switch MoodRecord.Mood(storedValue: event.displayName) {
+            case .happy:
+                return "sun.max.fill"
+            case .calm:
+                return "leaf.fill"
+            case .focused:
+                return "scope"
+            case .grateful:
+                return "hands.sparkles.fill"
+            case .excited:
+                return "sparkles"
+            case .tired, .sleepy:
+                return "bed.double.fill"
+            case .anxious:
+                return "waveform.path.ecg"
+            case .sad:
+                return "cloud.rain.fill"
+            case .irritated:
+                return "flame.fill"
+            case .bored:
+                return "ellipsis.circle.fill"
+            case .satisfied:
+                return "checkmark.seal.fill"
+            case nil:
+                return "face.smiling"
+            }
         }
     }
 }
@@ -532,4 +638,9 @@ private struct StoredAnnotation: Codable, Hashable {
             subtitle: "你补上了这段时间的名字。"
         )
     }
+}
+
+private struct SharedEventState: Equatable {
+    let snapshot: CurrentEventSnapshot?
+    let eventID: UUID?
 }

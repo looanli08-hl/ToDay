@@ -5,6 +5,9 @@ enum WatchMessage: Codable {
     case startSession(MoodRecord)
     case endSession(recordID: UUID, endedAt: Date)
     case annotation(eventID: UUID, title: String, timestamp: Date)
+    case currentEventUpdate(CurrentEventSnapshot)
+    case moodRecord(mood: String, timestamp: Date)
+    case complicationRefresh
 
     private enum CodingKeys: String, CodingKey {
         case type
@@ -14,6 +17,8 @@ enum WatchMessage: Codable {
         case eventID
         case title
         case timestamp
+        case snapshot
+        case mood
     }
 
     private enum MessageType: String, Codable {
@@ -21,6 +26,9 @@ enum WatchMessage: Codable {
         case startSession
         case endSession
         case annotation
+        case currentEventUpdate
+        case moodRecord
+        case complicationRefresh
     }
 
     init(from decoder: any Decoder) throws {
@@ -43,6 +51,15 @@ enum WatchMessage: Codable {
                 title: try container.decode(String.self, forKey: .title),
                 timestamp: try container.decode(Date.self, forKey: .timestamp)
             )
+        case .currentEventUpdate:
+            self = .currentEventUpdate(try container.decode(CurrentEventSnapshot.self, forKey: .snapshot))
+        case .moodRecord:
+            self = .moodRecord(
+                mood: try container.decode(String.self, forKey: .mood),
+                timestamp: try container.decode(Date.self, forKey: .timestamp)
+            )
+        case .complicationRefresh:
+            self = .complicationRefresh
         }
     }
 
@@ -65,10 +82,21 @@ enum WatchMessage: Codable {
             try container.encode(eventID, forKey: .eventID)
             try container.encode(title, forKey: .title)
             try container.encode(timestamp, forKey: .timestamp)
+        case let .currentEventUpdate(snapshot):
+            try container.encode(MessageType.currentEventUpdate, forKey: .type)
+            try container.encode(snapshot, forKey: .snapshot)
+        case let .moodRecord(mood, timestamp):
+            try container.encode(MessageType.moodRecord, forKey: .type)
+            try container.encode(mood, forKey: .mood)
+            try container.encode(timestamp, forKey: .timestamp)
+        case .complicationRefresh:
+            try container.encode(MessageType.complicationRefresh, forKey: .type)
         }
     }
 }
 
 struct PhoneContext: Codable {
     let activeSession: MoodRecord?
+    let currentEvent: CurrentEventSnapshot?
+    let currentEventID: UUID?
 }

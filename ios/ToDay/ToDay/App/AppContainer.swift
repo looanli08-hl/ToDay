@@ -14,11 +14,13 @@ enum AppContainer {
 
     @MainActor
     static func makeTodayViewModel() -> TodayViewModel {
-        TodayViewModel(
+        let viewModel = TodayViewModel(
             provider: makeTimelineProvider(),
             recordStore: makeMoodRecordStore(),
             phoneConnectivityManager: phoneConnectivityManager
         )
+        phoneConnectivityManager.bind(todayViewModel: viewModel)
+        return viewModel
     }
 
     @MainActor
