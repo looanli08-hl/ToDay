@@ -32,6 +32,8 @@ targets:
       properties:
         com.apple.developer.healthkit: true
         com.apple.developer.weatherkit: true
+        com.apple.security.application-groups:
+          - group.com.looanli.today
     dependencies:
       - target: ToDayWatch
         embed: true
@@ -46,7 +48,17 @@ targets:
     deploymentTarget: "10.0"
     sources:
       - path: ToDayWatch
+        excludes:
+          - Complication/**
       - path: ToDay/Shared
+    entitlements:
+      path: ToDayWatch/ToDayWatch.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.looanli.today
+    dependencies:
+      - target: ToDayWatchWidgets
+        embed: true
     settings:
       base:
         PRODUCT_NAME: ToDayWatch
@@ -55,6 +67,30 @@ targets:
         INFOPLIST_KEY_CFBundleDisplayName: ToDay Watch
         INFOPLIST_KEY_WKApplication: YES
         INFOPLIST_KEY_WKCompanionAppBundleIdentifier: com.looanli.today
+  ToDayWatchWidgets:
+    type: app-extension
+    platform: watchOS
+    deploymentTarget: "10.0"
+    sources:
+      - path: ToDayWatch/Complication
+      - path: ToDay/Shared
+    info:
+      path: ToDayWatch/Complication/Info.plist
+      properties:
+        CFBundleDisplayName: ToDay Widgets
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    entitlements:
+      path: ToDayWatch/Complication/ToDayWatchWidgets.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.looanli.today
+    settings:
+      base:
+        PRODUCT_NAME: ToDayWatchWidgets
+        PRODUCT_BUNDLE_IDENTIFIER: com.looanli.today.watchkitapp.widgets
+        TARGETED_DEVICE_FAMILY: 4
+        SKIP_INSTALL: YES
   ToDayTests:
     type: bundle.unit-test
     platform: iOS
@@ -74,6 +110,7 @@ schemes:
       targets:
         ToDay: all
         ToDayWatch: all
+        ToDayWatchWidgets: all
     test:
       config: Debug
       targets:
@@ -86,6 +123,7 @@ schemes:
     build:
       targets:
         ToDayWatch: all
+        ToDayWatchWidgets: all
     run:
       config: Debug
     archive:

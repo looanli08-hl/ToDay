@@ -35,6 +35,20 @@
                ReferencedContainer = "container:ToDay.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "FC13BC69541FEC8E4CF291D2"
+               BuildableName = "ToDayWatchWidgets.appex"
+               BlueprintName = "ToDayWatchWidgets"
+               ReferencedContainer = "container:ToDay.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
