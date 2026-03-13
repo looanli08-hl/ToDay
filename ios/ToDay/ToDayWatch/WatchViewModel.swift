@@ -7,21 +7,26 @@ final class WatchViewModel: ObservableObject {
     @Published private(set) var currentEvent: CurrentEventSnapshot?
 
     private let connectivityManager: WatchConnectivityManager
+    private let transitionNotifier: EventTransitionNotifier
     private var cancellables = Set<AnyCancellable>()
 
     convenience init() {
-        self.init(connectivityManager: .shared)
+        self.init(connectivityManager: .shared, transitionNotifier: EventTransitionNotifier())
     }
 
-    init(connectivityManager: WatchConnectivityManager) {
+    init(connectivityManager: WatchConnectivityManager, transitionNotifier: EventTransitionNotifier) {
         self.connectivityManager = connectivityManager
+        self.transitionNotifier = transitionNotifier
         activeSession = connectivityManager.activeSession
         currentEvent = Self.snapshot(from: connectivityManager.activeSession)
 
         connectivityManager.$activeSession
             .sink { [weak self] session in
+                let previous = self?.currentEvent
+                let next = Self.snapshot(from: session)
                 self?.activeSession = session
-                self?.currentEvent = Self.snapshot(from: session)
+                self?.currentEvent = next
+                self?.transitionNotifier.checkTransition(previous: previous, current: next)
             }
             .store(in: &cancellables)
     }
