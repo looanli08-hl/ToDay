@@ -65,6 +65,12 @@ struct SettingsView: View {
                         }
                     }
 
+                    if let termsOfServiceURL = AppConfiguration.termsOfServiceURL {
+                        Link(destination: termsOfServiceURL) {
+                            simpleRow(title: "服务条款")
+                        }
+                    }
+
                     NavigationLink("数据说明") {
                         DataExplanationView()
                     }
@@ -83,6 +89,12 @@ struct SettingsView: View {
                        let mailURL = URL(string: "mailto:\(supportEmail)") {
                         Link(destination: mailURL) {
                             simpleRow(title: "联系我们")
+                        }
+                    }
+
+                    if let websiteURL = AppConfiguration.websiteURL {
+                        Link(destination: websiteURL) {
+                            simpleRow(title: "官网")
                         }
                     }
                 }
