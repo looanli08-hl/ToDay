@@ -75,7 +75,7 @@ struct WatchMiniTimelineView: View {
                     .font(.system(size: 18, weight: .heavy, design: .rounded))
                     .foregroundStyle(WatchTheme.text)
 
-                Text(dataSource.label)
+                Label(dataSource.label, systemImage: WatchTheme.sourceIcon(for: dataSource))
                     .font(.system(size: 10, weight: .bold, design: .rounded))
                     .foregroundStyle(WatchTheme.sourceFill(for: dataSource))
                     .padding(.horizontal, 8)
@@ -115,15 +115,22 @@ struct WatchMiniTimelineView: View {
 
     private func timelineRow(_ event: WatchTimelineEventSnapshot, isCurrent: Bool) -> some View {
         HStack(spacing: 10) {
-            VStack(spacing: 3) {
-                Image(systemName: event.iconName)
-                    .font(.system(size: 14, weight: .bold))
-                    .foregroundStyle(WatchTheme.eventAccent(for: event.kindRawValue))
+            VStack(spacing: 6) {
+                ZStack {
+                    Circle()
+                        .fill(WatchTheme.eventAccent(for: event.kindRawValue).opacity(0.16))
+                        .frame(width: 28, height: 28)
+
+                    Image(systemName: event.iconName)
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundStyle(WatchTheme.eventAccent(for: event.kindRawValue))
+                }
+
                 Circle()
                     .fill(isCurrent ? WatchTheme.accent : WatchTheme.border)
-                    .frame(width: isCurrent ? 6 : 4, height: isCurrent ? 6 : 4)
+                    .frame(width: isCurrent ? 7 : 4, height: isCurrent ? 7 : 4)
             }
-            .frame(width: 20)
+            .frame(width: 28)
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(event.resolvedName)
@@ -131,10 +138,22 @@ struct WatchMiniTimelineView: View {
                     .foregroundStyle(WatchTheme.text)
                     .lineLimit(1)
 
-                Text(event.timeRangeLabel)
-                    .font(.system(size: 11, weight: .medium, design: .monospaced))
-                    .foregroundStyle(WatchTheme.textMuted)
-                    .lineLimit(1)
+                HStack(spacing: 6) {
+                    Text(event.timeRangeLabel)
+                        .font(.system(size: 11, weight: .medium, design: .monospaced))
+                        .foregroundStyle(WatchTheme.textMuted)
+                        .lineLimit(1)
+
+                    if event.isLive {
+                        Text("进行中")
+                            .font(.system(size: 9, weight: .bold, design: .rounded))
+                            .foregroundStyle(WatchTheme.accent)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 3)
+                            .background(WatchTheme.accent.opacity(0.14))
+                            .clipShape(Capsule())
+                    }
+                }
             }
 
             Spacer(minLength: 8)
@@ -148,7 +167,7 @@ struct WatchMiniTimelineView: View {
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(isCurrent ? WatchTheme.elevated : WatchTheme.surface)
+        .background(isCurrent ? WatchTheme.elevatedSoft : WatchTheme.surface)
         .overlay(
             RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .stroke(isCurrent ? WatchTheme.accent.opacity(0.55) : WatchTheme.border, lineWidth: 1)
