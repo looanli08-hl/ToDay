@@ -77,10 +77,14 @@ struct WatchMiniTimelineView: View {
 
                 Label(dataSource.label, systemImage: WatchTheme.sourceIcon(for: dataSource))
                     .font(.system(size: 10, weight: .bold, design: .rounded))
-                    .foregroundStyle(WatchTheme.sourceFill(for: dataSource))
+                    .foregroundStyle(WatchTheme.textMuted)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 4)
-                    .background(WatchTheme.sourceBackground(for: dataSource))
+                    .background(WatchTheme.surface.opacity(0.82))
+                    .overlay(
+                        Capsule()
+                            .stroke(WatchTheme.border, lineWidth: 1)
+                    )
                     .clipShape(Capsule())
             }
 
