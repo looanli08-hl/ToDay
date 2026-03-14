@@ -142,23 +142,23 @@ final class PhoneConnectivityManager: NSObject, WCSessionDelegate {
         sendMessageOrFallback(.complicationRefresh)
     }
 
-    func session(
+    nonisolated func session(
         _ session: WCSession,
         activationDidCompleteWith activationState: WCSessionActivationState,
         error: Error?
     ) {}
 
-    func sessionDidBecomeInactive(_ session: WCSession) {}
+    nonisolated func sessionDidBecomeInactive(_ session: WCSession) {}
 
-    func sessionDidDeactivate(_ session: WCSession) {
+    nonisolated func sessionDidDeactivate(_ session: WCSession) {
         session.activate()
     }
 
-    func session(_ session: WCSession, didReceiveUserInfo userInfo: [String: Any]) {
+    nonisolated func session(_ session: WCSession, didReceiveUserInfo userInfo: [String: Any]) {
         handleIncomingPayload(userInfo)
     }
 
-    func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
+    nonisolated func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
         handleIncomingPayload(message)
     }
 
@@ -298,16 +298,18 @@ final class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDeleg
         sendMessageOrFallback(.annotation(eventID: eventID, title: title, timestamp: timestamp))
     }
 
-    func session(
+    nonisolated func session(
         _ session: WCSession,
         activationDidCompleteWith activationState: WCSessionActivationState,
         error: Error?
     ) {
-        loadInitialContext()
-        flushPendingTransfers()
+        Task { @MainActor [weak self] in
+            self?.loadInitialContext()
+            self?.flushPendingTransfers()
+        }
     }
 
-    func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String: Any]) {
+    nonisolated func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String: Any]) {
         guard let phoneContext = ConnectivityCoding.decodePhoneContext(from: applicationContext) else { return }
         Task { @MainActor in
             self.activeSession = phoneContext.activeSession
@@ -319,15 +321,19 @@ final class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDeleg
         }
     }
 
-    func session(_ session: WCSession, didReceiveUserInfo userInfo: [String: Any]) {
-        handleIncomingPayload(userInfo)
+    nonisolated func session(_ session: WCSession, didReceiveUserInfo userInfo: [String: Any]) {
+        Task { @MainActor [weak self] in
+            self?.handleIncomingPayload(userInfo)
+        }
     }
 
-    func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
-        handleIncomingPayload(message)
+    nonisolated func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
+        Task { @MainActor [weak self] in
+            self?.handleIncomingPayload(message)
+        }
     }
 
-    func session(
+    nonisolated func session(
         _ session: WCSession,
         didFinish userInfoTransfer: WCSessionUserInfoTransfer,
         error: (any Error)?
@@ -337,7 +343,9 @@ final class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDeleg
             return
         }
 
-        removePendingEnvelope(id: envelope.id)
+        Task { @MainActor [weak self] in
+            self?.removePendingEnvelope(id: envelope.id)
+        }
     }
 
     private func loadInitialContext() {

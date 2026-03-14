@@ -8,8 +8,11 @@ final class WatchHealthKitProvider: ObservableObject {
     private let calendar: Calendar
     private let authorizationGate: WatchHealthAuthorizationGate
     private var liveHeartRateQuery: HKAnchoredObjectQuery?
+    private var backgroundObserverQueries: [HKObserverQuery] = []
+    private var hasRegisteredBackgroundDelivery = false
 
     @Published private(set) var latestHeartRate: Double?
+    var onHealthDataUpdate: (@Sendable () -> Void)?
 
     init(
         healthStore: HKHealthStore = HKHealthStore(),
@@ -140,6 +143,32 @@ final class WatchHealthKitProvider: ObservableObject {
         self.liveHeartRateQuery = nil
     }
 
+    func registerBackgroundDelivery() async {
+        guard await requestAuthorizationIfNeeded() else { return }
+        guard !hasRegisteredBackgroundDelivery else { return }
+
+        let types = [
+            HKObjectType.quantityType(forIdentifier: .heartRate),
+            HKObjectType.quantityType(forIdentifier: .stepCount)
+        ].compactMap { $0 }
+
+        for type in types {
+            let query = HKObserverQuery(sampleType: type, predicate: nil) { [weak self] _, completionHandler, _ in
+                defer { completionHandler() }
+
+                Task { @MainActor [weak self] in
+                    self?.onHealthDataUpdate?()
+                }
+            }
+
+            backgroundObserverQueries.append(query)
+            healthStore.execute(query)
+            await enableBackgroundDelivery(for: type)
+        }
+
+        hasRegisteredBackgroundDelivery = true
+    }
+
     private func consumeLiveHeartRate(_ samples: [HKSample]?) {
         guard let latestSample = samples?
             .compactMap({ $0 as? HKQuantitySample })
@@ -149,8 +178,14 @@ final class WatchHealthKitProvider: ObservableObject {
         }
 
         let value = latestSample.quantity.doubleValue(for: HKUnit.count().unitDivided(by: .minute()))
-        Task { @MainActor [weak self] in
-            self?.latestHeartRate = value
+        latestHeartRate = value
+    }
+
+    private func enableBackgroundDelivery(for type: HKQuantityType) async {
+        await withCheckedContinuation { continuation in
+            healthStore.enableBackgroundDelivery(for: type, frequency: .hourly) { _, _ in
+                continuation.resume()
+            }
         }
     }
 

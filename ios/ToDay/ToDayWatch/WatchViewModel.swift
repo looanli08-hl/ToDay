@@ -78,6 +78,12 @@ final class WatchViewModel: ObservableObject {
         currentHeartRate = localHealthProvider.latestHeartRate.map { Int($0.rounded()) }
 
         observeConnectivity()
+        localHealthProvider.onHealthDataUpdate = { [weak self] in
+            guard let self else { return }
+            Task { @MainActor [weak self] in
+                await self?.refreshLocalTimeline(force: true)
+            }
+        }
         refreshPresentationState(referenceDate: Date())
     }
 
@@ -154,6 +160,10 @@ final class WatchViewModel: ObservableObject {
         connectivityManager.sendAnnotation(eventID: event.id, title: title, timestamp: Date())
     }
 
+    func registerBackgroundDelivery() async {
+        await localHealthProvider.registerBackgroundDelivery()
+    }
+
     private func observeConnectivity() {
         Publishers.CombineLatest4(
             connectivityManager.$activeSession,
@@ -208,7 +218,6 @@ final class WatchViewModel: ObservableObject {
     }
 
     private func tick() async {
-        currentHeartRate = localHealthProvider.latestHeartRate.map { Int($0.rounded()) }
         let now = Date()
 
         if shouldRefreshLocalTimeline(at: now) {
@@ -480,27 +489,5 @@ private struct PersistedComplicationKey: Equatable {
         eventKind = selection.snapshot?.eventKind
         startDate = selection.snapshot?.startDate
         iconName = selection.snapshot?.iconName
-    }
-}
-
-private extension WatchTimelineEventSnapshot {
-    init(
-        id: UUID,
-        kindRawValue: String,
-        startDate: Date,
-        endDate: Date,
-        displayName: String,
-        userAnnotation: String?,
-        confidenceRawValue: Int,
-        isLive: Bool
-    ) {
-        self.id = id
-        self.kindRawValue = kindRawValue
-        self.startDate = startDate
-        self.endDate = endDate
-        self.displayName = displayName
-        self.userAnnotation = userAnnotation
-        self.confidenceRawValue = confidenceRawValue
-        self.isLive = isLive
     }
 }

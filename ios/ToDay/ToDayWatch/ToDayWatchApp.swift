@@ -11,6 +11,7 @@ struct ToDayWatchApp: App {
             WatchHomeView(viewModel: viewModel)
                 .task {
                     await dailyReviewNotifier.requestAuthorizationAndSchedule()
+                    await viewModel.registerBackgroundDelivery()
                     viewModel.setAppActive(true)
                 }
                 .onChange(of: scenePhase) { _, newValue in

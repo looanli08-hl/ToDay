@@ -43,6 +43,26 @@ struct WatchTimelineEventSnapshot: Codable, Hashable, Identifiable, Sendable {
         userAnnotation ?? displayName
     }
 
+    init(
+        id: UUID,
+        kindRawValue: String,
+        startDate: Date,
+        endDate: Date,
+        displayName: String,
+        userAnnotation: String?,
+        confidenceRawValue: Int,
+        isLive: Bool
+    ) {
+        self.id = id
+        self.kindRawValue = kindRawValue
+        self.startDate = startDate
+        self.endDate = endDate
+        self.displayName = displayName
+        self.userAnnotation = userAnnotation
+        self.confidenceRawValue = confidenceRawValue
+        self.isLive = isLive
+    }
+
     init(event: InferredEvent) {
         id = event.id
         kindRawValue = event.kind.rawValue
