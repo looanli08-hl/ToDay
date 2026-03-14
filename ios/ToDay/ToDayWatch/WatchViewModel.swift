@@ -6,6 +6,7 @@ import WidgetKit
 final class WatchViewModel: ObservableObject {
     @Published private(set) var activeSession: MoodRecord?
     @Published private(set) var currentEvent: CurrentEventSnapshot?
+    @Published private(set) var phoneTimelineSnapshot: WatchTimelineSnapshot?
 
     private let connectivityManager: WatchConnectivityManager
     private let transitionNotifier: EventTransitionNotifier
@@ -22,6 +23,7 @@ final class WatchViewModel: ObservableObject {
         activeSession = connectivityManager.activeSession
         currentAnnotationTargetID = connectivityManager.currentEventID
         currentEvent = connectivityManager.currentEventSnapshot ?? Self.snapshot(from: connectivityManager.activeSession)
+        phoneTimelineSnapshot = connectivityManager.timelineSnapshot
 
         Publishers.CombineLatest3(
             connectivityManager.$activeSession,
@@ -42,6 +44,12 @@ final class WatchViewModel: ObservableObject {
             .sink { refreshDate in
                 guard refreshDate != nil else { return }
                 WidgetCenter.shared.reloadAllTimelines()
+            }
+            .store(in: &cancellables)
+
+        connectivityManager.$timelineSnapshot
+            .sink { [weak self] snapshot in
+                self?.phoneTimelineSnapshot = snapshot
             }
             .store(in: &cancellables)
     }

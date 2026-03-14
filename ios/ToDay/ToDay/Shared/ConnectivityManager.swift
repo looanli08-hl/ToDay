@@ -91,14 +91,16 @@ final class PhoneConnectivityManager: NSObject, WCSessionDelegate {
     func updatePhoneContext(
         activeSession: MoodRecord?,
         currentEvent: CurrentEventSnapshot?,
-        currentEventID: UUID?
+        currentEventID: UUID?,
+        timelineSnapshot: WatchTimelineSnapshot?
     ) {
         guard let session,
               let dictionary = ConnectivityCoding.contextDictionary(
                 for: PhoneContext(
                     activeSession: activeSession,
                     currentEvent: currentEvent,
-                    currentEventID: currentEventID
+                    currentEventID: currentEventID,
+                    timelineSnapshot: timelineSnapshot
                 )
               ) else {
             return
@@ -114,6 +116,22 @@ final class PhoneConnectivityManager: NSObject, WCSessionDelegate {
         } else {
             sharedDefaults?.removeObject(forKey: SharedAppGroup.currentEventSnapshotKey)
         }
+    }
+
+    func storeTimelineSnapshot(_ snapshot: WatchTimelineSnapshot?) {
+        if let snapshot,
+           let data = try? ConnectivityCoding.encoder.encode(snapshot) {
+            sharedDefaults?.set(data, forKey: SharedAppGroup.watchTimelineSnapshotKey)
+        } else {
+            sharedDefaults?.removeObject(forKey: SharedAppGroup.watchTimelineSnapshotKey)
+        }
+    }
+
+    private func loadTimelineSnapshot() -> WatchTimelineSnapshot? {
+        guard let data = sharedDefaults?.data(forKey: SharedAppGroup.watchTimelineSnapshotKey) else {
+            return nil
+        }
+        return try? ConnectivityCoding.decoder.decode(WatchTimelineSnapshot.self, from: data)
     }
 
     func sendCurrentEventUpdate(_ snapshot: CurrentEventSnapshot) {
@@ -191,7 +209,12 @@ final class PhoneConnectivityManager: NSObject, WCSessionDelegate {
             try recordStore.saveRecords(records)
             let activeSession = records.first(where: \.isOngoing)
             DispatchQueue.main.async { [weak self] in
-                self?.updatePhoneContext(activeSession: activeSession, currentEvent: nil, currentEventID: nil)
+                self?.updatePhoneContext(
+                    activeSession: activeSession,
+                    currentEvent: nil,
+                    currentEventID: nil,
+                    timelineSnapshot: self?.loadTimelineSnapshot()
+                )
                 self?.recordsDidChange.send()
             }
         } catch {
@@ -235,6 +258,7 @@ final class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDeleg
     @Published private(set) var activeSession: MoodRecord?
     @Published private(set) var currentEventSnapshot: CurrentEventSnapshot?
     @Published private(set) var currentEventID: UUID?
+    @Published private(set) var timelineSnapshot: WatchTimelineSnapshot?
     @Published private(set) var complicationRefreshDate: Date?
 
     private let defaults = UserDefaults.standard
@@ -289,7 +313,9 @@ final class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDeleg
             self.activeSession = phoneContext.activeSession
             self.currentEventSnapshot = phoneContext.currentEvent
             self.currentEventID = phoneContext.currentEventID
+            self.timelineSnapshot = phoneContext.timelineSnapshot
             self.persistCurrentEventSnapshot(phoneContext.currentEvent)
+            self.persistTimelineSnapshot(phoneContext.timelineSnapshot)
         }
     }
 
@@ -317,12 +343,16 @@ final class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDeleg
     private func loadInitialContext() {
         guard let session else { return }
         guard let phoneContext = ConnectivityCoding.decodePhoneContext(from: session.receivedApplicationContext) else {
+            currentEventSnapshot = loadPersistedCurrentEventSnapshot()
+            timelineSnapshot = loadPersistedTimelineSnapshot()
             return
         }
         activeSession = phoneContext.activeSession
         currentEventSnapshot = phoneContext.currentEvent
         currentEventID = phoneContext.currentEventID
+        timelineSnapshot = phoneContext.timelineSnapshot
         persistCurrentEventSnapshot(phoneContext.currentEvent)
+        persistTimelineSnapshot(phoneContext.timelineSnapshot)
     }
 
     private func sendMessageOrFallback(_ message: WatchMessage) {
@@ -410,6 +440,29 @@ final class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDeleg
         } else {
             sharedDefaults?.removeObject(forKey: SharedAppGroup.currentEventSnapshotKey)
         }
+    }
+
+    private func persistTimelineSnapshot(_ snapshot: WatchTimelineSnapshot?) {
+        if let snapshot,
+           let data = try? ConnectivityCoding.encoder.encode(snapshot) {
+            sharedDefaults?.set(data, forKey: SharedAppGroup.watchTimelineSnapshotKey)
+        } else {
+            sharedDefaults?.removeObject(forKey: SharedAppGroup.watchTimelineSnapshotKey)
+        }
+    }
+
+    private func loadPersistedCurrentEventSnapshot() -> CurrentEventSnapshot? {
+        guard let data = sharedDefaults?.data(forKey: SharedAppGroup.currentEventSnapshotKey) else {
+            return nil
+        }
+        return try? ConnectivityCoding.decoder.decode(CurrentEventSnapshot.self, from: data)
+    }
+
+    private func loadPersistedTimelineSnapshot() -> WatchTimelineSnapshot? {
+        guard let data = sharedDefaults?.data(forKey: SharedAppGroup.watchTimelineSnapshotKey) else {
+            return nil
+        }
+        return try? ConnectivityCoding.decoder.decode(WatchTimelineSnapshot.self, from: data)
     }
 }
 #endif

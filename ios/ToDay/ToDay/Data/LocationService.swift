@@ -1,33 +1,6 @@
 import CoreLocation
 import Foundation
 
-struct LocationVisit: Identifiable, Sendable, Codable, Hashable {
-    let id: UUID
-    let coordinate: CoordinateValue
-    let arrivalDate: Date
-    let departureDate: Date
-    let placeName: String?
-
-    init(
-        id: UUID = UUID(),
-        coordinate: CoordinateValue,
-        arrivalDate: Date,
-        departureDate: Date,
-        placeName: String? = nil
-    ) {
-        self.id = id
-        self.coordinate = coordinate
-        self.arrivalDate = arrivalDate
-        self.departureDate = departureDate
-        self.placeName = placeName
-    }
-}
-
-struct CoordinateValue: Sendable, Codable, Hashable {
-    let latitude: Double
-    let longitude: Double
-}
-
 @MainActor
 final class LocationService: NSObject, CLLocationManagerDelegate {
     static let shared = LocationService()

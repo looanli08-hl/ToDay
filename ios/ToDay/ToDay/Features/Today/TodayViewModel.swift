@@ -577,11 +577,14 @@ final class TodayViewModel: ObservableObject {
 
     private func syncWatchState(referenceDate: Date) {
         let eventState = currentEventState(referenceDate: referenceDate)
+        let timelineSnapshot = makeWatchTimelineSnapshot(referenceDate: referenceDate)
         phoneConnectivityManager?.updatePhoneContext(
             activeSession: activeRecord,
             currentEvent: eventState.snapshot,
-            currentEventID: eventState.eventID
+            currentEventID: eventState.eventID,
+            timelineSnapshot: timelineSnapshot
         )
+        phoneConnectivityManager?.storeTimelineSnapshot(timelineSnapshot)
 
         guard eventState != lastSharedEventState else { return }
         lastSharedEventState = eventState
@@ -592,6 +595,18 @@ final class TodayViewModel: ObservableObject {
         }
 
         phoneConnectivityManager?.sendComplicationRefresh()
+    }
+
+    private func makeWatchTimelineSnapshot(referenceDate: Date) -> WatchTimelineSnapshot? {
+        guard let timeline else { return nil }
+
+        return WatchTimelineSnapshot(
+            date: timeline.date,
+            summary: timeline.summary,
+            sourceRawValue: timeline.source.rawValue,
+            generatedAt: referenceDate,
+            events: timeline.entries.map(WatchTimelineEventSnapshot.init(event:))
+        )
     }
 
     private func currentEventState(referenceDate: Date) -> SharedEventState {

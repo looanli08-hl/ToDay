@@ -99,4 +99,5 @@ struct PhoneContext: Codable {
     let activeSession: MoodRecord?
     let currentEvent: CurrentEventSnapshot?
     let currentEventID: UUID?
+    let timelineSnapshot: WatchTimelineSnapshot?
 }

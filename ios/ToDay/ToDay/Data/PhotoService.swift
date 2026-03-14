@@ -1,14 +1,6 @@
 import Foundation
 import Photos
 
-struct PhotoReference: Codable, Identifiable, Sendable, Hashable {
-    let id: String
-    let creationDate: Date
-    let location: CoordinateValue?
-    let pixelWidth: Int
-    let pixelHeight: Int
-}
-
 final class PhotoService {
     func requestAuthorization() async -> Bool {
         let currentStatus = PHPhotoLibrary.authorizationStatus(for: .readWrite)

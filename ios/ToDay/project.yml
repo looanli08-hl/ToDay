@@ -53,6 +53,7 @@ targets:
     entitlements:
       path: ToDayWatch/ToDayWatch.entitlements
       properties:
+        com.apple.developer.healthkit: true
         com.apple.security.application-groups:
           - group.com.looanli.today
     dependencies:
@@ -64,6 +65,7 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.looanli.today.watchkitapp
         TARGETED_DEVICE_FAMILY: 4
         INFOPLIST_KEY_CFBundleDisplayName: ToDay Watch
+        INFOPLIST_KEY_NSHealthShareUsageDescription: ToDay 读取手表上的运动、心率和睡眠数据，用来补全每日生活画卷。所有数据仅存储在本地。
         INFOPLIST_KEY_WKApplication: YES
         INFOPLIST_KEY_WKCompanionAppBundleIdentifier: com.looanli.today
   ToDayWatchWidgets:

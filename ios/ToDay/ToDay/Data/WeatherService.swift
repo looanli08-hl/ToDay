@@ -2,24 +2,6 @@ import CoreLocation
 import Foundation
 import WeatherKit
 
-struct HourlyWeather: Sendable, Codable, Hashable {
-    let date: Date
-    let temperature: Double
-    let condition: WeatherCondition
-    let symbolName: String
-}
-
-enum WeatherCondition: String, Codable, Sendable {
-    case clear
-    case cloudy
-    case rain
-    case snow
-    case fog
-    case wind
-    case thunderstorm
-    case unknown
-}
-
 final class ToDayWeatherService {
     func fetchHourlyWeather(for date: Date, location: CLLocation) async throws -> [HourlyWeather] {
         let service = WeatherKit.WeatherService.shared
