@@ -50,6 +50,7 @@ targets:
         excludes:
           - Complication/**
       - path: ToDay/Shared
+      - path: ToDay/Data/HealthKitEventInferenceEngine.swift
     entitlements:
       path: ToDayWatch/ToDayWatch.entitlements
       properties:
