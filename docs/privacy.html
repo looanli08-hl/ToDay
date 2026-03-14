@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ToDay 隐私政策</title>
+  <style>
+    :root {
+      --bg: #f4efe6;
+      --card: rgba(255, 251, 246, 0.88);
+      --ink: #2f312f;
+      --muted: #6f726f;
+      --border: rgba(54, 59, 54, 0.12);
+      --shadow: 0 18px 50px rgba(46, 50, 46, 0.08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top right, rgba(91, 154, 139, 0.16), transparent 26rem),
+        var(--bg);
+    }
+    .page {
+      width: min(860px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 32px 0 64px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      padding: 28px;
+    }
+    .nav {
+      display: flex;
+      gap: 14px;
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 18px;
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-family: "Iowan Old Style", "Times New Roman", serif;
+      font-size: 42px;
+      font-style: italic;
+      font-weight: 400;
+    }
+    .meta {
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 28px;
+    }
+    h2 {
+      margin: 28px 0 10px;
+      font-size: 20px;
+    }
+    p, li {
+      font-size: 15px;
+      line-height: 1.8;
+    }
+    ul { padding-left: 20px; }
+    .note {
+      padding: 16px 18px;
+      border-radius: 18px;
+      background: rgba(91, 154, 139, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <nav class="nav" aria-label="面包屑导航">
+      <a href="./index.html">首页</a>
+      <span>·</span>
+      <a href="./terms.html">服务条款</a>
+    </nav>
+
+    <article class="card">
+      <h1>隐私政策</h1>
+      <div class="meta">最后更新：2026 年 3 月 14 日</div>
+
+      <div class="note">
+        ToDay 的设计原则是：尽量把你的个人数据留在你的设备本地。我们不以广告追踪为目的收集数据，也不会将你的健康、位置、照片或心情记录上传到我们的服务器。
+      </div>
+
+      <h2>1. ToDay 会使用哪些数据</h2>
+      <p>在你授权后，ToDay 可能会读取以下信息，用来生成每日生活时间轴与相关洞察：</p>
+      <ul>
+        <li>健康数据：心率、步数、活动能量、锻炼、睡眠等。</li>
+        <li>位置数据：到访地点和附近位置，用于为事件提供地理上下文。</li>
+        <li>照片信息：当天拍摄照片的拍摄时间与地点，用于匹配到对应时段。</li>
+        <li>你主动输入的数据：心情、标注、备注、附加照片。</li>
+      </ul>
+
+      <h2>2. 数据如何被使用</h2>
+      <p>这些数据仅用于在你的设备上完成事件推理、生成时间轴、展示历史回看、手表同步和本地通知提醒。我们不会将这些数据出售、出租或用于第三方广告画像。</p>
+
+      <h2>3. 数据存储方式</h2>
+      <p>ToDay 默认将数据存储在你的本地设备中，包括 SwiftData、本地文件、App Group 共享容器等系统提供的本地存储能力。当前版本不提供云端同步，也不会上传至我们的服务器。</p>
+
+      <h2>4. 权限说明</h2>
+      <ul>
+        <li>健康数据权限：用于读取运动、心率、睡眠和活动三环信息，生成更完整的每日画卷。</li>
+        <li>位置权限：用于识别你到访过的地点，使事件有更清晰的上下文。</li>
+        <li>照片权限：用于把当天照片匹配到对应事件，但不会上传照片内容。</li>
+      </ul>
+
+      <h2>5. 你如何控制数据</h2>
+      <p>你可以在系统设置中随时撤回健康、位置或照片权限，也可以在 ToDay 的设置页清除所有手动标注和心情记录。撤回权限后，相关数据将不再继续被读取。</p>
+
+      <h2>6. 儿童与敏感信息</h2>
+      <p>ToDay 不是医疗产品，也不提供诊断建议。请不要在备注或标注中输入不必要的身份证号、银行卡号等高度敏感个人信息。</p>
+
+      <h2>7. 联系方式</h2>
+      <p>如果你对隐私政策有疑问，可以通过邮箱联系我们：<a href="mailto:looanli08@gmail.com">looanli08@gmail.com</a></p>
+    </article>
+  </main>
+</body>
+</html>
