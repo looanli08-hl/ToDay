@@ -9,6 +9,19 @@ final class WatchViewModel: ObservableObject {
         case local
         case sessionFallback
         case waiting
+
+        var label: String {
+            switch self {
+            case .phone:
+                return "手机同步"
+            case .local:
+                return "手表推理"
+            case .sessionFallback:
+                return "当前状态"
+            case .waiting:
+                return "等待同步"
+            }
+        }
     }
 
     @Published private(set) var activeSession: MoodRecord?
@@ -21,6 +34,7 @@ final class WatchViewModel: ObservableObject {
     private let transitionNotifier: EventTransitionNotifier
     private let localHealthProvider: WatchHealthKitProvider
     private let localInferenceEngine: WatchEventInferenceEngine
+    private let sharedDefaults: UserDefaults?
     private let localRefreshInterval: TimeInterval = 5 * 60
     private let phoneFreshnessInterval: TimeInterval = 10 * 60
 
@@ -32,6 +46,8 @@ final class WatchViewModel: ObservableObject {
     private var localTimelineSnapshot: WatchTimelineSnapshot?
     private var lastLocalRefreshDate: Date?
     private var refreshLoopTask: Task<Void, Never>?
+    private var isAppActive = false
+    private var lastComplicationKey: PersistedComplicationKey?
 
     convenience init() {
         self.init(
@@ -46,12 +62,14 @@ final class WatchViewModel: ObservableObject {
         connectivityManager: WatchConnectivityManager,
         transitionNotifier: EventTransitionNotifier,
         localHealthProvider: WatchHealthKitProvider,
-        localInferenceEngine: WatchEventInferenceEngine
+        localInferenceEngine: WatchEventInferenceEngine,
+        sharedDefaults: UserDefaults? = UserDefaults(suiteName: SharedAppGroup.identifier)
     ) {
         self.connectivityManager = connectivityManager
         self.transitionNotifier = transitionNotifier
         self.localHealthProvider = localHealthProvider
         self.localInferenceEngine = localInferenceEngine
+        self.sharedDefaults = sharedDefaults
 
         activeSession = connectivityManager.activeSession
         phoneCurrentEvent = connectivityManager.currentEventSnapshot
@@ -60,12 +78,56 @@ final class WatchViewModel: ObservableObject {
         currentHeartRate = localHealthProvider.latestHeartRate.map { Int($0.rounded()) }
 
         observeConnectivity()
-        startLocalRefreshLoop()
         refreshPresentationState(referenceDate: Date())
     }
 
-    deinit {
-        refreshLoopTask?.cancel()
+    var canAnnotate: Bool {
+        annotationTargetID != nil
+    }
+
+    var timelineEvents: [WatchTimelineEventSnapshot] {
+        if let currentTimelineSnapshot {
+            return currentTimelineSnapshot.events.sorted(by: { $0.startDate < $1.startDate })
+        }
+
+        if let activeSession {
+            return [makeSessionEventSnapshot(from: activeSession)]
+        }
+
+        return []
+    }
+
+    var currentEventIdentifier: UUID? {
+        currentAnnotationTargetID
+    }
+
+    var timelineSummary: String {
+        if let summary = currentTimelineSnapshot?.summary, !summary.isEmpty {
+            return summary
+        }
+
+        switch dataSource {
+        case .phone:
+            return "手机端已同步今天的主线。"
+        case .local:
+            return "手机长时间未刷新，手表正在用本地健康数据补全今天。"
+        case .sessionFallback:
+            return "先记住当前状态，稍后会并回完整时间线。"
+        case .waiting:
+            return "活动一会儿，手表会慢慢拼出今天的片段。"
+        }
+    }
+
+    func setAppActive(_ isActive: Bool) {
+        guard isActive != isAppActive else { return }
+        isAppActive = isActive
+
+        if isActive {
+            startLocalRefreshLoopIfNeeded()
+            return
+        }
+
+        stopLocalRefreshLoop()
     }
 
     func recordPoint(mood: MoodRecord.Mood) {
@@ -83,13 +145,13 @@ final class WatchViewModel: ObservableObject {
         connectivityManager.endSession(recordID: activeSession.id, endedAt: Date())
     }
 
-    var canAnnotate: Bool {
-        annotationTargetID != nil
-    }
-
     func annotateCurrentEvent(title: String) {
         guard let annotationTargetID else { return }
         connectivityManager.sendAnnotation(eventID: annotationTargetID, title: title, timestamp: Date())
+    }
+
+    func annotate(_ event: WatchTimelineEventSnapshot, title: String) {
+        connectivityManager.sendAnnotation(eventID: event.id, title: title, timestamp: Date())
     }
 
     private func observeConnectivity() {
@@ -123,7 +185,9 @@ final class WatchViewModel: ObservableObject {
             .store(in: &cancellables)
     }
 
-    private func startLocalRefreshLoop() {
+    private func startLocalRefreshLoopIfNeeded() {
+        guard refreshLoopTask == nil else { return }
+
         refreshLoopTask = Task { [weak self] in
             guard let self else { return }
             await self.localHealthProvider.startLiveHeartRateStream()
@@ -135,6 +199,12 @@ final class WatchViewModel: ObservableObject {
                 await self.tick()
             }
         }
+    }
+
+    private func stopLocalRefreshLoop() {
+        refreshLoopTask?.cancel()
+        refreshLoopTask = nil
+        localHealthProvider.stopLiveHeartRateStream()
     }
 
     private func tick() async {
@@ -183,6 +253,7 @@ final class WatchViewModel: ObservableObject {
         currentAnnotationTargetID = selection.eventID
         dataSource = selection.source
 
+        persistComplicationState(for: selection)
         transitionNotifier.checkTransition(previous: previousEvent, current: selection.snapshot)
     }
 
@@ -247,6 +318,29 @@ final class WatchViewModel: ObservableObject {
         )
     }
 
+    private func persistComplicationState(for selection: EventSelection) {
+        let newKey = PersistedComplicationKey(selection: selection)
+
+        if let snapshot = selection.snapshot,
+           let data = try? JSONEncoder().encode(snapshot) {
+            sharedDefaults?.set(data, forKey: SharedAppGroup.currentEventSnapshotKey)
+        } else {
+            sharedDefaults?.removeObject(forKey: SharedAppGroup.currentEventSnapshotKey)
+        }
+
+        if let timelineSnapshot = selection.timelineSnapshot,
+           let data = try? JSONEncoder().encode(timelineSnapshot) {
+            sharedDefaults?.set(data, forKey: SharedAppGroup.watchTimelineSnapshotKey)
+        } else if selection.source != .phone {
+            sharedDefaults?.removeObject(forKey: SharedAppGroup.watchTimelineSnapshotKey)
+        }
+
+        if newKey != lastComplicationKey {
+            lastComplicationKey = newKey
+            WidgetCenter.shared.reloadAllTimelines()
+        }
+    }
+
     private func makeLocalTimelineSnapshot(from timeline: DayTimeline, generatedAt: Date) -> WatchTimelineSnapshot {
         WatchTimelineSnapshot(
             date: timeline.date,
@@ -254,6 +348,19 @@ final class WatchViewModel: ObservableObject {
             sourceRawValue: "watchLocal",
             generatedAt: generatedAt,
             events: timeline.entries.map(WatchTimelineEventSnapshot.init(event:))
+        )
+    }
+
+    private func makeSessionEventSnapshot(from record: MoodRecord) -> WatchTimelineEventSnapshot {
+        WatchTimelineEventSnapshot(
+            id: record.id,
+            kindRawValue: "session",
+            startDate: record.createdAt,
+            endDate: record.endedAt ?? record.createdAt,
+            displayName: record.mood.rawValue,
+            userAnnotation: nil,
+            confidenceRawValue: 2,
+            isLive: true
         )
     }
 
@@ -358,4 +465,42 @@ private struct EventSelection {
     let snapshot: CurrentEventSnapshot?
     let eventID: UUID?
     let timelineSnapshot: WatchTimelineSnapshot?
+}
+
+private struct PersistedComplicationKey: Equatable {
+    let source: WatchViewModel.TimelineDataSource
+    let eventName: String?
+    let eventKind: String?
+    let startDate: Date?
+    let iconName: String?
+
+    init(selection: EventSelection) {
+        source = selection.source
+        eventName = selection.snapshot?.eventName
+        eventKind = selection.snapshot?.eventKind
+        startDate = selection.snapshot?.startDate
+        iconName = selection.snapshot?.iconName
+    }
+}
+
+private extension WatchTimelineEventSnapshot {
+    init(
+        id: UUID,
+        kindRawValue: String,
+        startDate: Date,
+        endDate: Date,
+        displayName: String,
+        userAnnotation: String?,
+        confidenceRawValue: Int,
+        isLive: Bool
+    ) {
+        self.id = id
+        self.kindRawValue = kindRawValue
+        self.startDate = startDate
+        self.endDate = endDate
+        self.displayName = displayName
+        self.userAnnotation = userAnnotation
+        self.confidenceRawValue = confidenceRawValue
+        self.isLive = isLive
+    }
 }

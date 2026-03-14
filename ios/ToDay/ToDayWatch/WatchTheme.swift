@@ -8,8 +8,11 @@ enum WatchTheme {
     static let accentSoft = Color(red: 0.34, green: 0.30, blue: 0.24)
     static let teal = Color(red: 0.42, green: 0.73, blue: 0.65)
     static let tealSoft = Color(red: 0.19, green: 0.29, blue: 0.27)
+    static let rose = Color(red: 0.86, green: 0.45, blue: 0.52)
+    static let indigo = Color(red: 0.33, green: 0.40, blue: 0.74)
     static let text = Color.white
     static let textMuted = Color.white.opacity(0.68)
+    static let textFaint = Color.white.opacity(0.42)
     static let border = Color.white.opacity(0.10)
 
     static func eventCardBackground(for eventKind: String) -> LinearGradient {
@@ -71,5 +74,43 @@ enum WatchTheme {
         default:
             return teal.opacity(0.28)
         }
+    }
+
+    static func eventAccent(for eventKind: String) -> Color {
+        switch eventKind {
+        case "sleep":
+            return indigo
+        case "workout":
+            return Color(red: 0.92, green: 0.52, blue: 0.32)
+        case "commute", "activeWalk":
+            return teal
+        case "quietTime":
+            return Color.white.opacity(0.28)
+        case "mood":
+            return accent
+        case "userAnnotated":
+            return rose
+        case "session":
+            return accent
+        default:
+            return teal
+        }
+    }
+
+    static func sourceFill(for source: WatchViewModel.TimelineDataSource) -> Color {
+        switch source {
+        case .phone:
+            return teal
+        case .local:
+            return indigo
+        case .sessionFallback:
+            return accent
+        case .waiting:
+            return Color.white.opacity(0.14)
+        }
+    }
+
+    static func sourceBackground(for source: WatchViewModel.TimelineDataSource) -> Color {
+        sourceFill(for: source).opacity(0.18)
     }
 }

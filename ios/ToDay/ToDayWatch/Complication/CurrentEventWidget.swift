@@ -35,12 +35,53 @@ struct ToDayTimelineProvider: TimelineProvider {
     }
 
     private func loadSnapshot() -> CurrentEventSnapshot? {
-        guard let defaults = UserDefaults(suiteName: SharedAppGroup.identifier),
-              let data = defaults.data(forKey: SharedAppGroup.currentEventSnapshotKey) else {
+        guard let defaults = UserDefaults(suiteName: SharedAppGroup.identifier) else {
             return nil
         }
 
-        return try? JSONDecoder().decode(CurrentEventSnapshot.self, from: data)
+        if let data = defaults.data(forKey: SharedAppGroup.currentEventSnapshotKey),
+           let snapshot = try? JSONDecoder().decode(CurrentEventSnapshot.self, from: data) {
+            return snapshot
+        }
+
+        guard let timelineData = defaults.data(forKey: SharedAppGroup.watchTimelineSnapshotKey),
+              let timeline = try? JSONDecoder().decode(WatchTimelineSnapshot.self, from: timelineData) else {
+            return nil
+        }
+
+        let now = Date()
+        guard let event = timeline.events
+            .sorted(by: { $0.startDate < $1.startDate })
+            .last(where: { $0.startDate <= now && ($0.endDate >= now || $0.isLive) }) else {
+            return nil
+        }
+
+        return CurrentEventSnapshot(
+            eventName: event.resolvedName,
+            eventKind: event.kindRawValue,
+            startDate: event.startDate,
+            durationMinutes: max(1, Int(max(now.timeIntervalSince(event.startDate), 60)) / 60),
+            iconName: iconName(for: event)
+        )
+    }
+
+    private func iconName(for event: WatchTimelineEventSnapshot) -> String {
+        switch event.kindRawValue {
+        case "sleep":
+            return "bed.double.fill"
+        case "workout":
+            return event.resolvedName.contains("跑") ? "figure.run" : "figure.strengthtraining.traditional"
+        case "commute":
+            return "tram.fill"
+        case "activeWalk":
+            return "figure.walk"
+        case "userAnnotated":
+            return "pencil.and.scribble"
+        case "mood":
+            return "heart.circle.fill"
+        default:
+            return "sparkles.rectangle.stack"
+        }
     }
 }
 

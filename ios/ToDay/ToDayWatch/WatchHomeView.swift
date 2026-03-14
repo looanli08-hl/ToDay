@@ -1,15 +1,49 @@
 import SwiftUI
 
 struct WatchHomeView: View {
-    @StateObject private var viewModel = WatchViewModel()
-    @State private var isShowingAnnotation = false
+    @ObservedObject var viewModel: WatchViewModel
+
     @State private var isShowingMood = false
+    @State private var annotationContext: AnnotationContext?
 
     var body: some View {
+        TabView {
+            homePage
+                .tag(0)
+
+            WatchMiniTimelineView(
+                events: viewModel.timelineEvents,
+                selectedEventID: viewModel.currentEventIdentifier,
+                summary: viewModel.timelineSummary,
+                dataSource: viewModel.dataSource
+            ) { event in
+                annotationContext = AnnotationContext(id: event.id, title: event.resolvedName, event: event)
+            }
+            .tag(1)
+        }
+        .tabViewStyle(.verticalPage)
+        .background(WatchTheme.background.ignoresSafeArea())
+        .sheet(item: $annotationContext) { context in
+            QuickAnnotationView(contextTitle: context.title) { title in
+                if let event = context.event {
+                    viewModel.annotate(event, title: title)
+                } else {
+                    viewModel.annotateCurrentEvent(title: title)
+                }
+            }
+        }
+        .sheet(isPresented: $isShowingMood) {
+            QuickMoodView { mood in
+                viewModel.recordPoint(mood: mood)
+            }
+        }
+    }
+
+    private var homePage: some View {
         VStack(spacing: 12) {
             TimelineView(.periodic(from: .now, by: 60)) { context in
                 Text(Self.timeFormatter.string(from: context.date))
-                    .font(.system(size: 28, weight: .heavy, design: .rounded))
+                    .font(.system(size: 30, weight: .heavy, design: .rounded))
                     .foregroundStyle(WatchTheme.text)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
@@ -17,8 +51,28 @@ struct WatchHomeView: View {
             currentEventCard
 
             HStack(spacing: 10) {
+                metricPill(
+                    systemImage: "heart.fill",
+                    title: "心率",
+                    value: viewModel.currentHeartRate.map { "\($0)" } ?? "—",
+                    tint: WatchTheme.rose
+                )
+
+                metricPill(
+                    systemImage: "dot.radiowaves.left.and.right",
+                    title: "来源",
+                    value: viewModel.dataSource.label,
+                    tint: WatchTheme.sourceFill(for: viewModel.dataSource)
+                )
+            }
+
+            HStack(spacing: 10) {
                 actionButton(title: "标注", systemImage: "pencil") {
-                    isShowingAnnotation = true
+                    annotationContext = AnnotationContext(
+                        id: viewModel.currentEventIdentifier ?? UUID(),
+                        title: viewModel.currentEvent?.eventName ?? "快捷标注",
+                        event: nil
+                    )
                 }
                 .disabled(!viewModel.canAnnotate)
                 .opacity(viewModel.canAnnotate ? 1 : 0.45)
@@ -31,16 +85,6 @@ struct WatchHomeView: View {
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
         .background(WatchTheme.background.ignoresSafeArea())
-        .sheet(isPresented: $isShowingAnnotation) {
-            QuickAnnotationView { title in
-                viewModel.annotateCurrentEvent(title: title)
-            }
-        }
-        .sheet(isPresented: $isShowingMood) {
-            QuickMoodView { mood in
-                viewModel.recordPoint(mood: mood)
-            }
-        }
     }
 
     private var currentEventCard: some View {
@@ -52,7 +96,7 @@ struct WatchHomeView: View {
             }
         }
         .frame(maxWidth: .infinity)
-        .frame(minHeight: 132)
+        .frame(minHeight: 144)
     }
 
     private func eventCard(for event: CurrentEventSnapshot) -> some View {
@@ -66,7 +110,7 @@ struct WatchHomeView: View {
 
                     Text(WatchTheme.badgeText(for: event.eventKind))
                         .font(.system(size: 10, weight: .bold, design: .rounded))
-                        .foregroundStyle(WatchTheme.textMuted)
+                        .foregroundStyle(WatchTheme.eventAccent(for: event.eventKind))
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
                         .background(WatchTheme.badgeFill(for: event.eventKind))
@@ -107,7 +151,7 @@ struct WatchHomeView: View {
                 .font(.system(size: 20, weight: .heavy, design: .rounded))
                 .foregroundStyle(WatchTheme.text)
 
-            Text("抬手后会在这里看到当前正在做的事。")
+            Text("先活动一会儿，或先记一个心情，手表会逐渐拼出今天。")
                 .font(.system(size: 12, weight: .medium, design: .rounded))
                 .foregroundStyle(WatchTheme.textMuted)
                 .fixedSize(horizontal: false, vertical: true)
@@ -121,6 +165,32 @@ struct WatchHomeView: View {
                 .stroke(WatchTheme.border, lineWidth: 1)
         )
         .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+    }
+
+    private func metricPill(systemImage: String, title: String, value: String, tint: Color) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 6) {
+                Image(systemName: systemImage)
+                    .font(.system(size: 11, weight: .bold))
+                Text(title)
+                    .font(.system(size: 11, weight: .bold, design: .rounded))
+            }
+            .foregroundStyle(tint)
+
+            Text(value)
+                .font(.system(size: 14, weight: .heavy, design: .rounded))
+                .foregroundStyle(WatchTheme.text)
+                .lineLimit(1)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
+        .background(WatchTheme.surface)
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(WatchTheme.border, lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
     }
 
     private func actionButton(title: String, systemImage: String, action: @escaping () -> Void) -> some View {
@@ -171,6 +241,12 @@ struct WatchHomeView: View {
     }()
 }
 
+private struct AnnotationContext: Identifiable {
+    let id: UUID
+    let title: String
+    let event: WatchTimelineEventSnapshot?
+}
+
 #Preview {
-    WatchHomeView()
+    WatchHomeView(viewModel: WatchViewModel())
 }

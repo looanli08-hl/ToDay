@@ -51,6 +51,13 @@ targets:
           - Complication/**
       - path: ToDay/Shared
       - path: ToDay/Data/HealthKitEventInferenceEngine.swift
+    info:
+      path: ToDayWatch/Info.plist
+      properties:
+        CFBundleDisplayName: ToDay Watch
+        NSHealthShareUsageDescription: ToDay 读取手表上的运动、心率和睡眠数据，用来补全每日生活画卷。所有数据仅存储在本地。
+        WKApplication: true
+        WKCompanionAppBundleIdentifier: com.looanli.today
     entitlements:
       path: ToDayWatch/ToDayWatch.entitlements
       properties:
@@ -65,10 +72,6 @@ targets:
         PRODUCT_NAME: ToDayWatch
         PRODUCT_BUNDLE_IDENTIFIER: com.looanli.today.watchkitapp
         TARGETED_DEVICE_FAMILY: 4
-        INFOPLIST_KEY_CFBundleDisplayName: ToDay Watch
-        INFOPLIST_KEY_NSHealthShareUsageDescription: ToDay 读取手表上的运动、心率和睡眠数据，用来补全每日生活画卷。所有数据仅存储在本地。
-        INFOPLIST_KEY_WKApplication: YES
-        INFOPLIST_KEY_WKCompanionAppBundleIdentifier: com.looanli.today
   ToDayWatchWidgets:
     type: app-extension
     platform: watchOS
