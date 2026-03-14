@@ -3,6 +3,7 @@ import SwiftUI
 private enum AppTab: Hashable {
     case today
     case history
+    case settings
 }
 
 struct AppRootScreen: View {
@@ -27,6 +28,12 @@ struct AppRootScreen: View {
                     Label("回看", systemImage: "clock.arrow.circlepath")
                 }
                 .tag(AppTab.history)
+
+                SettingsView()
+                    .tabItem {
+                        Label("设置", systemImage: "gear")
+                    }
+                    .tag(AppTab.settings)
             }
             .tint(TodayTheme.teal)
         } else {

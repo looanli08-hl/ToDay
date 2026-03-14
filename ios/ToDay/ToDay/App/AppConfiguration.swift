@@ -1,8 +1,8 @@
 import Foundation
 
 enum AppConfiguration {
-    static let supportEmail: String? = nil
-    static let privacyPolicyURL: URL? = nil
-    static let termsOfServiceURL: URL? = nil
-    static let websiteURL: URL? = nil
+    static let supportEmail: String? = "looanli08@gmail.com"
+    static let privacyPolicyURL: URL? = URL(string: "https://looanli08-hl.github.io/today/privacy.html")
+    static let termsOfServiceURL: URL? = URL(string: "https://looanli08-hl.github.io/today/terms.html")
+    static let websiteURL: URL? = URL(string: "https://looanli08-hl.github.io")
 }
