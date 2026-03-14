@@ -1,3 +1,4 @@
+import SwiftData
 import SwiftUI
 import UIKit
 
@@ -520,7 +521,14 @@ private struct ScrollSharePayload: Identifiable {
             recordStore: UserDefaultsMoodRecordStore(
                 defaults: UserDefaults(suiteName: "ToDayPreviewStore") ?? .standard,
                 key: "preview.manualRecords"
-            )
+            ),
+            modelContainer: previewModelContainer
         )
     )
 }
+
+@MainActor
+private let previewModelContainer: ModelContainer = {
+    let configuration = ModelConfiguration(isStoredInMemoryOnly: true)
+    return try! ModelContainer(for: MoodRecordEntity.self, DayTimelineEntity.self, configurations: configuration)
+}()

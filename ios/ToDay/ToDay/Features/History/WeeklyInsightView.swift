@@ -3,61 +3,60 @@ import SwiftUI
 
 struct WeeklyInsightView: View {
     let timelines: [DayTimeline]
+    private let calendar = Calendar.current
 
     private var currentWeek: [DayTimeline] {
-        Array(timelines.suffix(7))
+        currentWeekDates.compactMap { timelineLookup[$0] }
     }
 
     private var previousWeek: [DayTimeline] {
-        Array(timelines.dropLast(min(7, timelines.count)).suffix(7))
+        previousWeekDates.compactMap { timelineLookup[$0] }
+    }
+
+    private var timelineLookup: [Date: DayTimeline] {
+        Dictionary(uniqueKeysWithValues: timelines.map { (calendar.startOfDay(for: $0.date), $0) })
+    }
+
+    private var referenceDate: Date {
+        calendar.startOfDay(for: timelines.last?.date ?? Date())
+    }
+
+    private var currentWeekDates: [Date] {
+        (-6...0).compactMap { offset in
+            calendar.date(byAdding: .day, value: offset, to: referenceDate)
+        }
+    }
+
+    private var previousWeekDates: [Date] {
+        (-13 ... -7).compactMap { offset in
+            calendar.date(byAdding: .day, value: offset, to: referenceDate)
+        }
     }
 
     var body: some View {
         ContentCard(background: TodayTheme.tealSoft.opacity(0.68)) {
             EyebrowLabel("WEEKLY INSIGHT")
 
-            Text("一周洞察")
-                .font(.system(size: 23, weight: .regular, design: .serif))
-                .italic()
+            Text(summaryText)
+                .font(.system(size: 15))
                 .foregroundStyle(TodayTheme.ink)
+                .lineSpacing(5)
 
-            Text("把最近 7 天的推进、睡眠和情绪压成一个可回看的横截面。")
-                .font(.system(size: 14))
-                .foregroundStyle(TodayTheme.inkMuted)
-                .lineSpacing(4)
-
-            HStack(spacing: 10) {
-                highlightCard(title: "本周运动", value: durationText(totalActiveMinutes(in: currentWeek)))
-                highlightCard(title: "平均睡眠", value: sleepAverageText)
-            }
-
-            Chart(activityComparison) { item in
-                BarMark(
-                    x: .value("周期", item.label),
-                    y: .value("分钟", item.minutes)
+            HStack(spacing: 12) {
+                trendCard(
+                    title: "运动趋势",
+                    metricText: durationText(totalActiveMinutes(in: currentWeek)),
+                    entries: movementTrend
                 )
-                .foregroundStyle(item.label == "本周" ? TodayTheme.teal : TodayTheme.teal.opacity(0.35))
-                .cornerRadius(8)
+                trendCard(
+                    title: "睡眠趋势",
+                    metricText: averageSleepLabel,
+                    entries: sleepTrend
+                )
             }
-            .frame(height: 160)
-            .chartYAxis {
-                AxisMarks(position: .leading)
-            }
+            .frame(height: 140)
 
-            if !moodDistribution.isEmpty {
-                Chart(moodDistribution) { item in
-                    BarMark(
-                        x: .value("情绪", item.label),
-                        y: .value("次数", item.count)
-                    )
-                    .foregroundStyle(item.color)
-                    .cornerRadius(6)
-                }
-                .frame(height: 180)
-                .chartYAxis {
-                    AxisMarks(position: .leading)
-                }
-            }
+            moodHeatBand
 
             HStack(spacing: 10) {
                 spotlightCard(
@@ -74,36 +73,131 @@ struct WeeklyInsightView: View {
         }
     }
 
-    private var activityComparison: [WeeklyActivityComparison] {
-        [
-            .init(label: "上周", minutes: totalActiveMinutes(in: previousWeek)),
-            .init(label: "本周", minutes: totalActiveMinutes(in: currentWeek))
-        ]
-    }
-
-    private var moodDistribution: [WeeklyMoodCount] {
-        let moodEvents = currentWeek
-            .flatMap(\.entries)
-            .filter { $0.kind == .mood }
-
-        let counts = moodEvents.reduce(into: [MoodRecord.Mood: Int]()) { partialResult, event in
-            if let mood = MoodRecord.Mood(storedValue: event.resolvedName) {
-                partialResult[mood, default: 0] += 1
-            }
+    private var summaryText: String {
+        guard hasEnoughData else {
+            return "这周的数据还在积累中，戴着手表过完几天就能看到完整洞察。"
         }
 
-        return counts
-            .map { WeeklyMoodCount(mood: $0.key, count: $0.value) }
-            .sorted { $0.count > $1.count }
+        let thisWeekMovement = totalActiveMinutes(in: currentWeek)
+        let lastWeekMovement = totalActiveMinutes(in: previousWeek)
+        let difference = thisWeekMovement - lastWeekMovement
+        let comparisonText: String
+
+        if lastWeekMovement == 0 {
+            comparisonText = "这是你开始积累画卷的第一周。"
+        } else if difference > 0 {
+            comparisonText = "比上周多了 \(durationText(difference))。"
+        } else if difference < 0 {
+            comparisonText = "比上周少了 \(durationText(abs(difference)))。"
+        } else {
+            comparisonText = "和上周基本持平。"
+        }
+
+        let averageSleep = averageSleepHours(in: currentWeek)
+        let averageSleepText = averageSleep > 0 ? String(format: "%.1f", averageSleep) : "0.0"
+        let sleepLowlightText: String
+        if let sleepLowlight = leastSleepDay {
+            sleepLowlightText = "周\(sleepLowlight.weekdayLabel)睡得最少（\(String(format: "%.1f", sleepLowlight.hours))h）。"
+        } else {
+            sleepLowlightText = "睡眠数据还不够完整。"
+        }
+
+        return "这周你运动了 \(durationText(thisWeekMovement))，\(comparisonText) 平均每晚睡 \(averageSleepText) 小时，\(sleepLowlightText)"
     }
 
-    private var sleepAverageText: String {
+    private var hasEnoughData: Bool {
+        currentWeek.count >= 3
+    }
+
+    private var averageSleepLabel: String {
         let hours = averageSleepHours(in: currentWeek)
         guard hours > 0 else { return "暂无" }
-        if hours >= 10 {
-            return String(format: "%.1f h", hours)
-        }
         return String(format: "%.1f h", hours)
+    }
+
+    private var movementTrend: [WeeklyTrendPoint] {
+        currentWeekDates.map { date in
+            WeeklyTrendPoint(
+                date: date,
+                label: weekdayLabel(for: date),
+                value: timelineLookup[date].map { totalActiveMinutes(in: [$0]) } ?? 0
+            )
+        }
+    }
+
+    private var sleepTrend: [WeeklyTrendPoint] {
+        currentWeekDates.map { date in
+            WeeklyTrendPoint(
+                date: date,
+                label: weekdayLabel(for: date),
+                value: timelineLookup[date].map(sleepHours(in:)) ?? 0
+            )
+        }
+    }
+
+    private var moodSummaries: [WeeklyMoodSummary] {
+        currentWeekDates.map { date in
+            let moods = (timelineLookup[date]?.entries ?? []).compactMap { event -> MoodRecord.Mood? in
+                guard event.kind == .mood else { return nil }
+                return MoodRecord.Mood(storedValue: event.resolvedName)
+            }
+            let counts = moods.reduce(into: [MoodRecord.Mood: Int]()) { partialResult, mood in
+                partialResult[mood, default: 0] += 1
+            }
+            let dominantMood = counts.max { lhs, rhs in
+                if lhs.value == rhs.value {
+                    return lhs.key.rawValue > rhs.key.rawValue
+                }
+                return lhs.value < rhs.value
+            }?.key
+
+            return WeeklyMoodSummary(
+                date: date,
+                weekdayLabel: weekdayLabel(for: date),
+                mood: dominantMood
+            )
+        }
+    }
+
+    private var moodHeatBand: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("情绪热力带")
+                .font(.system(size: 11, weight: .medium, design: .monospaced))
+                .foregroundStyle(TodayTheme.inkMuted)
+
+            HStack(spacing: 10) {
+                ForEach(moodSummaries) { summary in
+                    VStack(spacing: 8) {
+                        Group {
+                            if let mood = summary.mood {
+                                Text(mood.emoji)
+                                    .font(.system(size: 18))
+                                    .frame(width: 38, height: 38)
+                                    .background(moodColor(for: mood))
+                                    .clipShape(Circle())
+                            } else {
+                                Circle()
+                                    .stroke(TodayTheme.border, lineWidth: 1.2)
+                                    .frame(width: 38, height: 38)
+                                    .overlay {
+                                        Text("—")
+                                            .font(.system(size: 15, weight: .medium))
+                                            .foregroundStyle(TodayTheme.inkFaint)
+                                    }
+                            }
+                        }
+
+                        Text(summary.weekdayLabel)
+                            .font(.system(size: 11, weight: .medium, design: .monospaced))
+                            .foregroundStyle(TodayTheme.inkMuted)
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+            }
+        }
+        .padding(14)
+        .background(TodayTheme.card.opacity(0.72))
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
     }
 
     private var mostActiveDay: WeeklyDaySpotlight? {
@@ -130,6 +224,13 @@ struct WeeklyInsightView: View {
             .max(by: { $0.value < $1.value })
     }
 
+    private var leastSleepDay: WeeklySleepLowlight? {
+        currentWeek
+            .map { WeeklySleepLowlight(date: $0.date, hours: sleepHours(in: $0)) }
+            .filter { $0.hours > 0 }
+            .min { $0.hours < $1.hours }
+    }
+
     private func totalActiveMinutes(in timelines: [DayTimeline]) -> Double {
         timelines.reduce(0) { partial, timeline in
             partial + timeline.entries.reduce(0) { subtotal, event in
@@ -151,14 +252,16 @@ struct WeeklyInsightView: View {
     }
 
     private func averageSleepHours(in timelines: [DayTimeline]) -> Double {
-        let sleepDurations = timelines.map { timeline in
-            timeline.entries
-                .filter { $0.kind == .sleep }
-                .reduce(0.0) { $0 + $1.duration / 3600 }
-        }
+        let sleepDurations = timelines.map(sleepHours(in:))
         let validDurations = sleepDurations.filter { $0 > 0 }
         guard !validDurations.isEmpty else { return 0 }
         return validDurations.reduce(0, +) / Double(validDurations.count)
+    }
+
+    private func sleepHours(in timeline: DayTimeline) -> Double {
+        timeline.entries
+            .filter { $0.kind == .sleep }
+            .reduce(0.0) { $0 + $1.duration / 3600 }
     }
 
     private func durationText(_ minutes: Double) -> String {
@@ -172,17 +275,64 @@ struct WeeklyInsightView: View {
         return "\(roundedMinutes)m"
     }
 
-    private func highlightCard(title: String, value: String) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(title)
-                .font(.system(size: 11, weight: .medium, design: .monospaced))
-                .foregroundStyle(TodayTheme.inkMuted)
+    private func weekdayLabel(for date: Date) -> String {
+        let weekday = Calendar.current.component(.weekday, from: date)
+        switch weekday {
+        case 1: return "日"
+        case 2: return "一"
+        case 3: return "二"
+        case 4: return "三"
+        case 5: return "四"
+        case 6: return "五"
+        default: return "六"
+        }
+    }
 
-            Text(value)
-                .font(.system(size: 24, weight: .bold, design: .rounded))
-                .foregroundStyle(TodayTheme.ink)
-                .lineLimit(1)
-                .minimumScaleFactor(0.75)
+    private func trendCard(title: String, metricText: String, entries: [WeeklyTrendPoint]) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .firstTextBaseline) {
+                Text(title)
+                    .font(.system(size: 11, weight: .medium, design: .monospaced))
+                    .foregroundStyle(TodayTheme.inkMuted)
+
+                Spacer()
+
+                Text(metricText)
+                    .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                    .foregroundStyle(TodayTheme.inkSoft)
+            }
+
+            Chart(entries) { entry in
+                AreaMark(
+                    x: .value("星期", entry.label),
+                    y: .value("值", entry.value)
+                )
+                .interpolationMethod(.catmullRom)
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: title == "运动趋势"
+                            ? [TodayTheme.tealSoft.opacity(0.9), TodayTheme.teal.opacity(0.14)]
+                            : [TodayTheme.blueSoft.opacity(0.9), TodayTheme.sleepIndigo.opacity(0.14)],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+
+                LineMark(
+                    x: .value("星期", entry.label),
+                    y: .value("值", entry.value)
+                )
+                .interpolationMethod(.catmullRom)
+                .lineStyle(StrokeStyle(lineWidth: 2.2, lineCap: .round, lineJoin: .round))
+                .foregroundStyle(title == "运动趋势" ? TodayTheme.teal : TodayTheme.sleepIndigo)
+            }
+            .chartXAxis {
+                AxisMarks(values: entries.map(\.label)) { value in
+                    AxisValueLabel()
+                }
+            }
+            .chartYAxis(.hidden)
+            .chartLegend(.hidden)
         }
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -209,22 +359,8 @@ struct WeeklyInsightView: View {
         .background(TodayTheme.card.opacity(0.72))
         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
     }
-}
 
-private struct WeeklyActivityComparison: Identifiable {
-    let label: String
-    let minutes: Double
-
-    var id: String { label }
-}
-
-private struct WeeklyMoodCount: Identifiable {
-    let mood: MoodRecord.Mood
-    let count: Int
-
-    var id: String { mood.rawValue }
-    var label: String { mood.rawValue }
-    var color: Color {
+    private func moodColor(for mood: MoodRecord.Mood) -> Color {
         switch mood {
         case .happy:
             return TodayTheme.accent
@@ -254,6 +390,22 @@ private struct WeeklyMoodCount: Identifiable {
     }
 }
 
+private struct WeeklyTrendPoint: Identifiable {
+    let date: Date
+    let label: String
+    let value: Double
+
+    var id: Date { date }
+}
+
+private struct WeeklyMoodSummary: Identifiable {
+    let date: Date
+    let weekdayLabel: String
+    let mood: MoodRecord.Mood?
+
+    var id: Date { date }
+}
+
 private struct WeeklyDaySpotlight {
     let date: Date
     let value: Double
@@ -265,5 +417,22 @@ private struct WeeklyDaySpotlight {
 
     var detail: String {
         detailValue
+    }
+}
+
+private struct WeeklySleepLowlight {
+    let date: Date
+    let hours: Double
+
+    var weekdayLabel: String {
+        switch Calendar.current.component(.weekday, from: date) {
+        case 1: return "日"
+        case 2: return "一"
+        case 3: return "二"
+        case 4: return "三"
+        case 5: return "四"
+        case 6: return "五"
+        default: return "六"
+        }
     }
 }

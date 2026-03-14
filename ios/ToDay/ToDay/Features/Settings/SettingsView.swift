@@ -251,13 +251,20 @@ struct SettingsView: View {
         sharedDefaults?.removeObject(forKey: annotationStorageKey)
         UserDefaults.standard.removeObject(forKey: annotationStorageKey)
 
-        let descriptor = FetchDescriptor<MoodRecordEntity>()
+        let moodDescriptor = FetchDescriptor<MoodRecordEntity>()
+        let timelineDescriptor = FetchDescriptor<DayTimelineEntity>()
 
         do {
-            let records = try modelContext.fetch(descriptor)
+            let records = try modelContext.fetch(moodDescriptor)
             for record in records {
                 modelContext.delete(record)
             }
+
+            let timelines = try modelContext.fetch(timelineDescriptor)
+            for timeline in timelines {
+                modelContext.delete(timeline)
+            }
+
             try modelContext.save()
             withAnimation(.spring(response: 0.28, dampingFraction: 0.82)) {
                 showClearSuccess = true

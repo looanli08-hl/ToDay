@@ -7,6 +7,7 @@ struct HistoryScreen: View {
     @State private var monthTimelines: [Date: DayTimeline] = [:]
     @State private var weeklyTimelines: [DayTimeline] = []
     @State private var isMonthLoading = false
+    @State private var cachedTimelineDates: Set<Date> = []
 
     private let calendar = Calendar.current
     private let chineseLocale = Locale(identifier: "zh_CN")
@@ -123,6 +124,7 @@ struct HistoryScreen: View {
                     HistoryCalendarDayCell(
                         date: date,
                         dayNumber: dayNumber,
+                        dominantEmoji: dominantEmoji(for: date),
                         previewColors: previewColors(for: date),
                         isToday: calendar.isDateInToday(date),
                         isInFuture: date > Date()
@@ -133,6 +135,7 @@ struct HistoryScreen: View {
                 HistoryCalendarDayCell(
                     date: date,
                     dayNumber: dayNumber,
+                    dominantEmoji: dominantEmoji(for: date),
                     previewColors: previewColors(for: date),
                     isToday: calendar.isDateInToday(date),
                     isInFuture: date > Date()
@@ -204,7 +207,34 @@ struct HistoryScreen: View {
             return false
         }
 
-        return monthTimelines[day] != nil || viewModel.historyDetail(for: date) != nil
+        return monthTimelines[day] != nil || cachedTimelineDates.contains(day) || viewModel.historyDetail(for: date) != nil
+    }
+
+    private func dominantEmoji(for date: Date) -> String? {
+        let day = calendar.startOfDay(for: date)
+
+        if let timeline = monthTimelines[day] {
+            let moods = timeline.entries.compactMap { event -> MoodRecord.Mood? in
+                guard event.kind == .mood else { return nil }
+                return MoodRecord.Mood(storedValue: event.resolvedName)
+            }
+            let counts = moods.reduce(into: [MoodRecord.Mood: Int]()) { partialResult, mood in
+                partialResult[mood, default: 0] += 1
+            }
+            if let dominantMood = counts.max(by: { lhs, rhs in
+                if lhs.value == rhs.value {
+                    return lhs.key.rawValue > rhs.key.rawValue
+                }
+                return lhs.value < rhs.value
+            })?.key {
+                return dominantMood.emoji
+            }
+        }
+
+        return viewModel.historyDigests
+            .first(where: { calendar.isDate($0.date, inSameDayAs: day) })?
+            .mood?
+            .emoji
     }
 
     private func digestColor(for mood: MoodRecord.Mood?) -> Color {
@@ -254,21 +284,30 @@ struct HistoryScreen: View {
             .filter { $0 <= Date() }
         let loadedTimelines = await viewModel.loadTimelines(for: monthDates)
         monthTimelines = Dictionary(uniqueKeysWithValues: loadedTimelines.map { (calendar.startOfDay(for: $0.date), $0) })
+        cachedTimelineDates = Set(loadedTimelines.map { calendar.startOfDay(for: $0.date) })
     }
 }
 
 private struct HistoryCalendarDayCell: View {
     let date: Date
     let dayNumber: Int
+    let dominantEmoji: String?
     let previewColors: [Color]
     let isToday: Bool
     let isInFuture: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("\(dayNumber)")
-                .font(.system(size: 15, weight: isToday ? .bold : .medium, design: .rounded))
-                .foregroundStyle(isInFuture ? TodayTheme.inkFaint : TodayTheme.inkSoft)
+            HStack(spacing: 4) {
+                Text("\(dayNumber)")
+                    .font(.system(size: 15, weight: isToday ? .bold : .medium, design: .rounded))
+                    .foregroundStyle(isInFuture ? TodayTheme.inkFaint : TodayTheme.inkSoft)
+
+                if let dominantEmoji {
+                    Text(dominantEmoji)
+                        .font(.system(size: 12))
+                }
+            }
 
             HStack(spacing: 3) {
                 ForEach(0..<6, id: \.self) { index in

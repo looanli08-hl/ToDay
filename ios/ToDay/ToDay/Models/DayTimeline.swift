@@ -1,6 +1,6 @@
 import Foundation
 
-struct DayTimeline {
+struct DayTimeline: Codable, Sendable {
     let date: Date
     let summary: String
     let source: TimelineSource
@@ -8,7 +8,7 @@ struct DayTimeline {
     let entries: [InferredEvent]
 }
 
-enum TimelineSource: String {
+enum TimelineSource: String, Codable, Sendable {
     case mock
     case healthKit
 
@@ -31,7 +31,7 @@ enum TimelineSource: String {
     }
 }
 
-struct TimelineStat: Identifiable {
+struct TimelineStat: Identifiable, Codable, Sendable {
     let id: String
     let title: String
     let value: String

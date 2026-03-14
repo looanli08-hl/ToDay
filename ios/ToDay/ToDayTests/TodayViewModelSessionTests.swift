@@ -1,5 +1,6 @@
 import XCTest
 @testable import ToDay
+import SwiftData
 import UIKit
 
 @MainActor
@@ -7,7 +8,7 @@ final class TodayViewModelSessionTests: XCTestCase {
     func testStartAndFinishMoodSessionUpdatesTimelineEvent() async {
         let provider = StubTimelineProvider()
         let store = InMemoryMoodRecordStore()
-        let viewModel = TodayViewModel(provider: provider, recordStore: store)
+        let viewModel = TodayViewModel(provider: provider, recordStore: store, modelContainer: makeModelContainer())
 
         await viewModel.load(forceReload: true)
 
@@ -53,7 +54,7 @@ final class TodayViewModelSessionTests: XCTestCase {
     func testStartMoodRecordIgnoresDuplicateSubmission() async {
         let provider = StubTimelineProvider()
         let store = InMemoryMoodRecordStore()
-        let viewModel = TodayViewModel(provider: provider, recordStore: store)
+        let viewModel = TodayViewModel(provider: provider, recordStore: store, modelContainer: makeModelContainer())
 
         await viewModel.load(forceReload: true)
 
@@ -85,7 +86,7 @@ final class TodayViewModelSessionTests: XCTestCase {
     func testAddingSecondRecordDoesNotDuplicateExistingTimelineEntries() async {
         let provider = StubTimelineProvider()
         let store = InMemoryMoodRecordStore()
-        let viewModel = TodayViewModel(provider: provider, recordStore: store)
+        let viewModel = TodayViewModel(provider: provider, recordStore: store, modelContainer: makeModelContainer())
 
         await viewModel.load(forceReload: true)
 
@@ -115,7 +116,7 @@ final class TodayViewModelSessionTests: XCTestCase {
     func testForceReloadDoesNotDuplicateManualTimelineEntries() async {
         let provider = StubTimelineProvider()
         let store = InMemoryMoodRecordStore()
-        let viewModel = TodayViewModel(provider: provider, recordStore: store)
+        let viewModel = TodayViewModel(provider: provider, recordStore: store, modelContainer: makeModelContainer())
 
         await viewModel.load(forceReload: true)
 
@@ -153,7 +154,7 @@ final class TodayViewModelSessionTests: XCTestCase {
         )
         let store = InMemoryMoodRecordStore(records: [duplicateA, duplicateB])
 
-        let viewModel = TodayViewModel(provider: provider, recordStore: store)
+        let viewModel = TodayViewModel(provider: provider, recordStore: store, modelContainer: makeModelContainer())
 
         XCTAssertEqual(viewModel.todayManualRecordCount, 2)
         XCTAssertEqual(store.records.count, 2)
@@ -162,7 +163,7 @@ final class TodayViewModelSessionTests: XCTestCase {
     func testPointRecordCanBeAddedWhileSessionIsActive() async {
         let provider = StubTimelineProvider()
         let store = InMemoryMoodRecordStore()
-        let viewModel = TodayViewModel(provider: provider, recordStore: store)
+        let viewModel = TodayViewModel(provider: provider, recordStore: store, modelContainer: makeModelContainer())
 
         await viewModel.load(forceReload: true)
 
@@ -252,7 +253,7 @@ final class TodayViewModelSessionTests: XCTestCase {
     func testRemovingRecordDeletesOrphanedPhotos() throws {
         let provider = StubTimelineProvider()
         let store = InMemoryMoodRecordStore()
-        let viewModel = TodayViewModel(provider: provider, recordStore: store)
+        let viewModel = TodayViewModel(provider: provider, recordStore: store, modelContainer: makeModelContainer())
         let attachment = try MoodPhotoLibrary.storeImageData(sampleJPEGData())
         let fileURL = MoodPhotoLibrary.url(for: attachment)
         let record = MoodRecord(
@@ -321,4 +322,10 @@ private func sampleJPEGData() -> Data {
     }
 
     return image.jpegData(compressionQuality: 0.9) ?? Data()
+}
+
+@MainActor
+private func makeModelContainer() -> ModelContainer {
+    let configuration = ModelConfiguration(isStoredInMemoryOnly: true)
+    return try! ModelContainer(for: MoodRecordEntity.self, DayTimelineEntity.self, configurations: configuration)
 }

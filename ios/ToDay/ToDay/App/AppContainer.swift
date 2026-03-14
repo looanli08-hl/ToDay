@@ -18,7 +18,8 @@ enum AppContainer {
         let viewModel = TodayViewModel(
             provider: makeTimelineProvider(),
             recordStore: makeMoodRecordStore(),
-            phoneConnectivityManager: phoneConnectivityManager
+            phoneConnectivityManager: phoneConnectivityManager,
+            modelContainer: modelContainer
         )
         phoneConnectivityManager.bind(todayViewModel: viewModel)
         return viewModel
@@ -46,7 +47,7 @@ enum AppContainer {
 
     private static func makeModelContainer() -> ModelContainer {
         do {
-            let container = try ModelContainer(for: MoodRecordEntity.self)
+            let container = try ModelContainer(for: MoodRecordEntity.self, DayTimelineEntity.self)
             migrateLegacyMoodRecordsIfNeeded(into: container)
             return container
         } catch {

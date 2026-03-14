@@ -1,5 +1,6 @@
 import Combine
 import Foundation
+import SwiftData
 
 @MainActor
 final class TodayViewModel: ObservableObject {
@@ -24,6 +25,7 @@ final class TodayViewModel: ObservableObject {
     private let insightComposer: TodayInsightComposer
     private let calendar: Calendar
     private let phoneConnectivityManager: PhoneConnectivityManager?
+    private let modelContainer: ModelContainer
     private var hasLoadedOnce = false
     private var currentBaseTimeline: DayTimeline?
     private var timelineCache: [Date: DayTimeline] = [:]
@@ -38,12 +40,14 @@ final class TodayViewModel: ObservableObject {
         recordStore: any MoodRecordStoring,
         insightComposer: TodayInsightComposer = TodayInsightComposer(),
         phoneConnectivityManager: PhoneConnectivityManager? = nil,
+        modelContainer: ModelContainer,
         calendar: Calendar = .current
     ) {
         self.provider = provider
         self.recordStore = recordStore
         self.insightComposer = insightComposer
         self.phoneConnectivityManager = phoneConnectivityManager
+        self.modelContainer = modelContainer
         self.calendar = calendar
         self.connectivityCancellable = phoneConnectivityManager?.recordsDidChange.sink { [weak self] in
             Task { @MainActor in
@@ -70,9 +74,8 @@ final class TodayViewModel: ObservableObject {
         rebuildTimeline(referenceDate: currentBaseTimeline?.date ?? Date())
 
         do {
-            let base = try await provider.loadTimeline(for: Date())
+            let base = try await loadBaseTimeline(for: Date(), forceReload: forceReload)
             currentBaseTimeline = base
-            cacheTimeline(base)
             rebuildTimeline(referenceDate: base.date)
             hasLoadedOnce = true
         } catch {
@@ -223,13 +226,8 @@ final class TodayViewModel: ObservableObject {
     func loadTimeline(for date: Date, forceReload: Bool = false) async -> DayTimeline? {
         let day = calendar.startOfDay(for: date)
 
-        if !forceReload, let cachedTimeline = cachedTimeline(for: day) {
-            return cachedTimeline
-        }
-
         do {
-            let baseTimeline = try await provider.loadTimeline(for: day)
-            cacheTimeline(baseTimeline)
+            let baseTimeline = try await loadBaseTimeline(for: day, forceReload: forceReload)
             return mergedTimeline(base: baseTimeline)
         } catch {
             return nil
@@ -417,6 +415,65 @@ final class TodayViewModel: ObservableObject {
             for key in sortedKeys.prefix(overflow) {
                 timelineCache.removeValue(forKey: key)
             }
+        }
+    }
+
+    private func loadBaseTimeline(for date: Date, forceReload: Bool) async throws -> DayTimeline {
+        let day = calendar.startOfDay(for: date)
+
+        if !forceReload {
+            if let currentBaseTimeline, calendar.isDate(currentBaseTimeline.date, inSameDayAs: day) {
+                return currentBaseTimeline
+            }
+
+            if let cachedTimeline = timelineCache[day] {
+                return cachedTimeline
+            }
+
+            if let diskTimeline = loadFromDiskCache(for: day) {
+                cacheTimeline(diskTimeline)
+                return diskTimeline
+            }
+        }
+
+        let timeline = try await provider.loadTimeline(for: day)
+        cacheTimeline(timeline)
+        saveToDiskCache(timeline)
+        return timeline
+    }
+
+    private func saveToDiskCache(_ timeline: DayTimeline) {
+        let context = ModelContext(modelContainer)
+        let key = DayTimelineEntity.dateKey(for: timeline.date)
+        var descriptor = FetchDescriptor<DayTimelineEntity>(
+            predicate: #Predicate { $0.dateKey == key }
+        )
+        descriptor.fetchLimit = 1
+
+        do {
+            if let existingEntity = try context.fetch(descriptor).first {
+                existingEntity.update(from: timeline)
+            } else {
+                context.insert(DayTimelineEntity(timeline: timeline))
+            }
+            try context.save()
+        } catch {
+            errorMessage = "时间轴缓存保存失败：\(error.localizedDescription)"
+        }
+    }
+
+    private func loadFromDiskCache(for date: Date) -> DayTimeline? {
+        let context = ModelContext(modelContainer)
+        let key = DayTimelineEntity.dateKey(for: date)
+        var descriptor = FetchDescriptor<DayTimelineEntity>(
+            predicate: #Predicate { $0.dateKey == key }
+        )
+        descriptor.fetchLimit = 1
+
+        do {
+            return try context.fetch(descriptor).first?.toDayTimeline()
+        } catch {
+            return nil
         }
     }
 
