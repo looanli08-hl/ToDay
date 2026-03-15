@@ -40,7 +40,7 @@ struct HistoryScreen: View {
 
     private var calendarSection: some View {
         ContentCard {
-            EyebrowLabel("MONTHLY SCROLL")
+            EyebrowLabel("月度回看")
 
             HStack {
                 Button {

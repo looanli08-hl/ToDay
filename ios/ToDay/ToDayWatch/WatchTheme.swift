@@ -81,23 +81,23 @@ enum WatchTheme {
     static func badgeText(for eventKind: String) -> String {
         switch eventKind {
         case "sleep":
-            return "SLEEP"
+            return "睡眠"
         case "workout":
-            return "WORKOUT"
+            return "运动"
         case "commute":
-            return "COMMUTE"
+            return "通勤"
         case "activeWalk":
-            return "WALK"
+            return "步行"
         case "quietTime":
-            return "BLANK"
+            return "留白"
         case "userAnnotated":
-            return "NOTED"
+            return "标注"
         case "mood":
-            return "MOOD"
+            return "心情"
         case "session":
-            return "SESSION"
+            return "状态"
         default:
-            return "LIVE"
+            return "实时"
         }
     }
 

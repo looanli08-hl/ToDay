@@ -175,11 +175,11 @@ extension InferredEvent {
             let hours = minutes / 60
             let remainder = minutes % 60
             if remainder == 0 {
-                return "\(hours)h"
+                return "\(hours) 小时"
             }
-            return "\(hours)h\(remainder)min"
+            return "\(hours) 小时 \(remainder) 分钟"
         }
-        return "\(minutes)min"
+        return "\(minutes) 分钟"
     }
 
     var cardFill: Color {
@@ -235,19 +235,19 @@ extension InferredEvent {
     var kindBadgeTitle: String {
         switch kind {
         case .sleep:
-            return "SLEEP"
+            return "睡眠"
         case .workout:
-            return associatedMetrics?.workoutType?.uppercased() ?? "WORKOUT"
+            return associatedMetrics?.workoutType ?? "运动"
         case .commute:
-            return "COMMUTE"
+            return "通勤"
         case .activeWalk:
-            return "WALK"
+            return "步行"
         case .quietTime:
-            return "BLANK"
+            return "留白"
         case .userAnnotated:
-            return "MARKED"
+            return "标注"
         case .mood:
-            return "MOOD"
+            return "心情"
         }
     }
 
@@ -260,14 +260,14 @@ extension InferredEvent {
 
         if let distance = associatedMetrics?.distance, distance > 0 {
             if distance >= 1000 {
-                parts.append(String(format: "%.1fkm", distance / 1000))
+                parts.append(String(format: "%.1f 公里", distance / 1000))
             } else {
-                parts.append("\(Int(distance.rounded()))m")
+                parts.append("\(Int(distance.rounded())) 米")
             }
         }
 
         if let activeEnergy = associatedMetrics?.activeEnergy, activeEnergy > 0 {
-            parts.append("\(Int(activeEnergy.rounded()))kcal")
+            parts.append("\(Int(activeEnergy.rounded())) 千卡")
         }
 
         if let stepCount = associatedMetrics?.stepCount, stepCount > 0, kind != .workout {

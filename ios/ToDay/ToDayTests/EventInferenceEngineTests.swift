@@ -157,7 +157,7 @@ final class EventInferenceEngineTests: XCTestCase {
         }))
 
         XCTAssertEqual(quietEvent.confidence, .medium)
-        XCTAssertTrue(quietEvent.subtitle?.contains("平均 101 bpm") == true)
+        XCTAssertTrue(quietEvent.subtitle?.contains("平均 101 次/分") == true)
     }
 
     func testLowHeartRateWithHighCadenceBecomesActiveWalk() async throws {

@@ -266,9 +266,9 @@ struct DayVerticalTimelineContent: View {
         if durationMinutes >= 60 {
             let hours = durationMinutes / 60
             let minutes = durationMinutes % 60
-            return minutes == 0 ? "\(hours)h" : "\(hours)h\(minutes)min"
+            return minutes == 0 ? "\(hours) 小时" : "\(hours) 小时 \(minutes) 分钟"
         }
-        return "\(durationMinutes)min"
+        return "\(durationMinutes) 分钟"
     }
 
     private func gapHeight(_ durationMinutes: Int) -> CGFloat {

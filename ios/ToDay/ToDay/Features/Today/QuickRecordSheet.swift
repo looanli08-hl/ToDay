@@ -317,9 +317,9 @@ struct QuickRecordSheet: View {
     private var modeBadgeTitle: String {
         switch mode {
         case .flexible:
-            return "POINT / SESSION"
+            return "打点 / 记录"
         case .pointOnly:
-            return "POINT ONLY"
+            return "仅打点"
         }
     }
 

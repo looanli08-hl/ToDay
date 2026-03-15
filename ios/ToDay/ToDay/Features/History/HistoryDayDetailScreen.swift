@@ -46,7 +46,7 @@ struct HistoryDayDetailScreen: View {
 
     private var summaryCard: some View {
         ContentCard(background: TodayTheme.accentSoft.opacity(0.72)) {
-            EyebrowLabel("DAY SCROLL")
+            EyebrowLabel("单日回看")
 
             Text("当天画卷")
                 .font(.system(size: 23, weight: .regular, design: .serif))
@@ -69,14 +69,14 @@ struct HistoryDayDetailScreen: View {
 
     private func canvasSection(_ timeline: DayTimeline) -> some View {
         ContentCard {
-            EyebrowLabel("SCROLL REPLAY")
+            EyebrowLabel("时间轴回放")
 
-            Text("横向回看")
+            Text("当天时间轴")
                 .font(.system(size: 23, weight: .regular, design: .serif))
                 .italic()
                 .foregroundStyle(TodayTheme.ink)
 
-            Text("把这一天摊成一卷，从凌晨到夜里重新看一遍。")
+            Text("从凌晨到夜里，把这一天重新走一遍。")
                 .font(.system(size: 14))
                 .foregroundStyle(TodayTheme.inkMuted)
                 .lineSpacing(4)
@@ -119,7 +119,7 @@ struct HistoryDayDetailScreen: View {
 
     private var emptyState: some View {
         ContentCard {
-            EyebrowLabel("EMPTY")
+            EyebrowLabel("暂无内容")
 
             Text("这一天还没有可回看的画卷")
                 .font(.system(size: 23, weight: .regular, design: .serif))

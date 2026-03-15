@@ -173,19 +173,19 @@ private struct CurrentEventWidgetView: View {
         let hours = minutes / 60
         let remaining = minutes % 60
         if hours == 0 {
-            return "\(minutes)min"
+            return "\(minutes) 分钟"
         }
         if remaining == 0 {
-            return "\(hours)h"
+            return "\(hours) 小时"
         }
-        return "\(hours)h\(remaining)min"
+        return "\(hours) 小时 \(remaining) 分钟"
     }
 
     private func shortDurationText(_ minutes: Int) -> String {
-        guard minutes > 0 else { return "Now" }
+        guard minutes > 0 else { return "刚刚" }
         if minutes >= 60 {
-            return "\(minutes / 60)h"
+            return "\(minutes / 60)小时"
         }
-        return "\(minutes)m"
+        return "\(minutes)分"
     }
 }

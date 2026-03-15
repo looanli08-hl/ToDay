@@ -116,7 +116,7 @@ struct WatchHomeView: View {
                         .font(.system(size: 12, weight: .bold))
                         .foregroundStyle(WatchTheme.rose)
 
-                    Text(viewModel.currentHeartRate.map { "\($0) bpm" } ?? "—")
+                    Text(viewModel.currentHeartRate.map { "\($0) 次/分" } ?? "—")
                         .font(.system(size: 13, weight: .bold, design: .rounded))
                         .foregroundStyle(WatchTheme.text)
                 }
@@ -141,7 +141,7 @@ struct WatchHomeView: View {
     private func sessionCard(for session: MoodRecord) -> some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack(spacing: 6) {
-                Text("SESSION")
+                Text("状态")
                     .font(.system(size: 10, weight: .bold, design: .rounded))
                     .foregroundStyle(WatchTheme.moodAccent(for: session.mood))
                     .padding(.horizontal, 8)
@@ -173,7 +173,7 @@ struct WatchHomeView: View {
                         .font(.system(size: 12, weight: .bold))
                         .foregroundStyle(WatchTheme.rose)
 
-                    Text(viewModel.currentHeartRate.map { "\($0) bpm" } ?? "—")
+                    Text(viewModel.currentHeartRate.map { "\($0) 次/分" } ?? "—")
                         .font(.system(size: 13, weight: .bold, design: .rounded))
                         .foregroundStyle(WatchTheme.text)
                 }

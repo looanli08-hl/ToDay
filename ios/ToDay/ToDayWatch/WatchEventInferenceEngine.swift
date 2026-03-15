@@ -36,7 +36,7 @@ struct WatchEventInferenceEngine {
             return [
                 TimelineStat(
                     title: "活动",
-                    value: "\(formatWholeNumber(activitySummary.activeEnergyBurned))/\(formatWholeNumber(activitySummary.activeEnergyGoal)) kcal"
+                    value: "\(formatWholeNumber(activitySummary.activeEnergyBurned))/\(formatWholeNumber(activitySummary.activeEnergyGoal)) 千卡"
                 ),
                 TimelineStat(
                     title: "锻炼",
@@ -54,7 +54,7 @@ struct WatchEventInferenceEngine {
 
         return [
             TimelineStat(title: "步数", value: formatWholeNumber(stepCount)),
-            TimelineStat(title: "能量", value: "\(formatWholeNumber(activeEnergy)) kcal"),
+            TimelineStat(title: "能量", value: "\(formatWholeNumber(activeEnergy)) 千卡"),
             TimelineStat(title: "训练", value: "\(rawData.workouts.count)")
         ]
     }

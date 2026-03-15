@@ -139,7 +139,7 @@ struct HealthKitEventInferenceEngine: EventInferring {
                 let durationMinutes = max(Int(clipped.duration / 60), 1)
                 let subtitleParts = [
                     "\(durationMinutes) 分钟",
-                    workout.activeEnergy.map { "\(Int($0.rounded())) kcal" },
+                    workout.activeEnergy.map { "\(Int($0.rounded())) 千卡" },
                     workout.distance.map { formatDistance($0) }
                 ].compactMap { $0 }
 
@@ -263,7 +263,7 @@ struct HealthKitEventInferenceEngine: EventInferring {
 
             let subtitleParts = [
                 "\(max(totalSteps, 1)) 步",
-                averageHeartRate.map { "平均 \(Int($0.rounded())) bpm" }
+                averageHeartRate.map { "平均 \(Int($0.rounded())) 次/分" }
             ].compactMap { $0 }
 
             return InferredEvent(
@@ -322,7 +322,7 @@ struct HealthKitEventInferenceEngine: EventInferring {
                 isLive: event.isLive,
                 displayName: event.displayName,
                 userAnnotation: event.userAnnotation,
-                subtitle: "心率平稳 · \(Int(averageHeartRate.rounded())) bpm",
+                subtitle: "心率平稳 · \(Int(averageHeartRate.rounded())) 次/分",
                 associatedMetrics: event.associatedMetrics,
                 photoAttachments: event.photoAttachments
             )
@@ -463,7 +463,7 @@ struct HealthKitEventInferenceEngine: EventInferring {
                 isLive: quietEvent.isLive,
                 displayName: quietEvent.displayName,
                 userAnnotation: quietEvent.userAnnotation,
-                subtitle: "心率平稳 · \(Int(averageHeartRate.rounded())) bpm",
+                subtitle: "心率平稳 · \(Int(averageHeartRate.rounded())) 次/分",
                 associatedMetrics: quietEvent.associatedMetrics,
                 photoAttachments: quietEvent.photoAttachments
             )
@@ -609,7 +609,7 @@ struct HealthKitEventInferenceEngine: EventInferring {
         case .awake:
             return "清醒"
         case .rem:
-            return "REM"
+            return "快眼动"
         case .light:
             return "浅睡"
         case .deep:
@@ -622,16 +622,16 @@ struct HealthKitEventInferenceEngine: EventInferring {
     private func formattedHours(_ duration: TimeInterval) -> String {
         let hours = duration / 3600
         if hours.rounded() == hours {
-            return "\(Int(hours))h"
+            return "\(Int(hours)) 小时"
         }
-        return String(format: "%.1fh", hours)
+        return String(format: "%.1f 小时", hours)
     }
 
     private func formatDistance(_ meters: Double) -> String {
         if meters >= 1000 {
-            return String(format: "%.1f km", meters / 1000)
+            return String(format: "%.1f 公里", meters / 1000)
         }
-        return "\(Int(meters.rounded())) m"
+        return "\(Int(meters.rounded())) 米"
     }
 
     private func makeDayInterval(for date: Date) -> DateInterval {

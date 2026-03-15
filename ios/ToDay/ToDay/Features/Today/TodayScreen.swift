@@ -177,7 +177,7 @@ struct TodayScreen: View {
 
     private func signatureSection(_ timeline: DayTimeline) -> some View {
         ContentCard {
-            EyebrowLabel("DAILY SIGNATURE")
+            EyebrowLabel("今日脉络")
 
             Text("今日脉络")
                 .font(.system(size: 23, weight: .regular, design: .serif))
@@ -208,7 +208,7 @@ struct TodayScreen: View {
 
     private func scrollCanvasSection(_ timeline: DayTimeline) -> some View {
         VStack(alignment: .leading, spacing: 14) {
-            EyebrowLabel("DAY TIMELINE")
+            EyebrowLabel("今日时间轴")
 
             Text("今日时间轴")
                 .font(.system(size: 23, weight: .regular, design: .serif))
@@ -267,7 +267,7 @@ struct TodayScreen: View {
     private var summarySection: some View {
         if let summary = viewModel.insightSummary {
             ContentCard {
-                EyebrowLabel("TODAY SUMMARY")
+                EyebrowLabel("今日总结")
 
                 Text("今日自动总结")
                     .font(.system(size: 23, weight: .regular, design: .serif))
@@ -294,7 +294,7 @@ struct TodayScreen: View {
     private var weeklySpotlightSection: some View {
         if let weeklyInsight = viewModel.weeklyInsight {
             ContentCard(background: TodayTheme.tealSoft.opacity(0.7)) {
-                EyebrowLabel("WEEKLY RHYTHM")
+                EyebrowLabel("七日节律")
 
                 Text("最近 7 天")
                     .font(.system(size: 23, weight: .regular, design: .serif))
@@ -321,7 +321,7 @@ struct TodayScreen: View {
             ContentCard {
                 HStack(alignment: .top) {
                     VStack(alignment: .leading, spacing: 6) {
-                        EyebrowLabel("RECENT DAYS")
+                        EyebrowLabel("最近几天")
 
                         Text("最近记录")
                             .font(.system(size: 23, weight: .regular, design: .serif))
@@ -441,7 +441,7 @@ struct TodayScreen: View {
 
     private var loadingCard: some View {
         ContentCard {
-            EyebrowLabel("LOADING")
+            EyebrowLabel("整理中")
             ProgressView()
             Text("正在整理今天的脉络...")
                 .font(.system(size: 18, weight: .semibold))
@@ -456,7 +456,7 @@ struct TodayScreen: View {
         let showsSettingsButton = message.contains("授权")
 
         return ContentCard {
-            EyebrowLabel("UNAVAILABLE")
+            EyebrowLabel("暂不可用")
             Text("时间线暂时不可用")
                 .font(.system(size: 24, weight: .regular, design: .serif))
                 .italic()

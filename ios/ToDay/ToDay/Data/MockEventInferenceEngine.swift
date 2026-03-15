@@ -280,7 +280,7 @@ struct MockEventInferenceEngine: EventInferring {
         var segments = [base]
 
         if let distance {
-            segments.append(String(format: "%.1f km", distance / 1_000))
+            segments.append(String(format: "%.1f 公里", distance / 1_000))
         }
 
         if let steps {
@@ -294,14 +294,14 @@ struct MockEventInferenceEngine: EventInferring {
         var segments = ["45 分钟"]
 
         if let distance = metrics.distance {
-            segments.append(String(format: "%.1f km", distance / 1_000))
+            segments.append(String(format: "%.1f 公里", distance / 1_000))
         }
 
         if let activeEnergy = metrics.activeEnergy {
-            segments.append("\(Int(activeEnergy.rounded())) kcal")
+            segments.append("\(Int(activeEnergy.rounded())) 千卡")
         }
 
-        segments.append("5'15\"/km")
+        segments.append("5'15\"/公里")
         return segments.joined(separator: " · ")
     }
 
@@ -310,10 +310,10 @@ struct MockEventInferenceEngine: EventInferring {
         let remainder = minutes % 60
 
         if hours > 0 {
-            return remainder == 0 ? "\(hours)h" : "\(hours)h\(remainder)min"
+            return remainder == 0 ? "\(hours) 小时" : "\(hours) 小时 \(remainder) 分钟"
         }
 
-        return "\(minutes)min"
+        return "\(minutes) 分钟"
     }
 }
 
@@ -325,7 +325,7 @@ private extension SleepStage {
         case .light:
             return "浅睡"
         case .rem:
-            return "REM"
+            return "快眼动"
         case .awake:
             return "清醒"
         case .unknown:

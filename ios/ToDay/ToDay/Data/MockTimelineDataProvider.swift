@@ -238,7 +238,7 @@ struct MockTimelineDataProvider: TimelineDataProviding {
         return [
             TimelineStat(
                 title: "活动",
-                value: "\(formatWholeNumber(activitySummary.activeEnergyBurned))/\(formatWholeNumber(activitySummary.activeEnergyGoal)) kcal"
+                value: "\(formatWholeNumber(activitySummary.activeEnergyBurned))/\(formatWholeNumber(activitySummary.activeEnergyGoal)) 千卡"
             ),
             TimelineStat(
                 title: "锻炼",

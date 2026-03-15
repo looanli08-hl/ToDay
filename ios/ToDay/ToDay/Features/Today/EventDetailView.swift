@@ -90,7 +90,7 @@ struct EventDetailView: View {
     private var photoSection: some View {
         if let photos = event.associatedMetrics?.photos, !photos.isEmpty {
             ContentCard {
-                EyebrowLabel("PHOTOS")
+                EyebrowLabel("相关照片")
                 Text("相关照片")
                     .font(.system(size: 22, weight: .regular, design: .serif))
                     .italic()
@@ -110,7 +110,7 @@ struct EventDetailView: View {
     @ViewBuilder
     private var workoutSection: some View {
         ContentCard {
-            EyebrowLabel("VITALS")
+            EyebrowLabel("生命体征")
             Text("心率与负荷")
                 .font(.system(size: 22, weight: .regular, design: .serif))
                 .italic()
@@ -149,7 +149,7 @@ struct EventDetailView: View {
 
             HStack(spacing: 10) {
                 metricCard(title: "步数", value: event.associatedMetrics?.stepCount.map(String.init) ?? "0")
-                metricCard(title: "热量", value: event.associatedMetrics?.activeEnergy.map { "\(Int($0.rounded())) kcal" } ?? "0")
+                metricCard(title: "热量", value: event.associatedMetrics?.activeEnergy.map { "\(Int($0.rounded())) 千卡" } ?? "0")
                 metricCard(title: "距离", value: distanceText(event.associatedMetrics?.distance))
             }
         }
@@ -159,7 +159,7 @@ struct EventDetailView: View {
     private var sleepSection: some View {
         if let sleepStages = event.associatedMetrics?.sleepStages, !sleepStages.isEmpty {
             ContentCard {
-                EyebrowLabel("SLEEP STAGES")
+                EyebrowLabel("睡眠阶段")
                 Text("睡眠结构")
                     .font(.system(size: 22, weight: .regular, design: .serif))
                     .italic()
@@ -183,7 +183,7 @@ struct EventDetailView: View {
     @ViewBuilder
     private var annotationSection: some View {
         ContentCard {
-            EyebrowLabel("ANNOTATE")
+            EyebrowLabel("补充标注")
             Text("这段时间还没有名字")
                 .font(.system(size: 22, weight: .regular, design: .serif))
                 .italic()
@@ -268,23 +268,23 @@ struct EventDetailView: View {
                 let duration = values.reduce(0.0) { $0 + $1.end.timeIntervalSince($1.start) }
                 let minutes = max(Int(duration / 60), 1)
                 return (stage: stage, durationText: minutes >= 60
-                    ? "\(minutes / 60)h\(minutes % 60)m"
-                    : "\(minutes)min")
+                    ? "\(minutes / 60) 小时 \(minutes % 60) 分钟"
+                    : "\(minutes) 分钟")
             }
             .sorted { $0.stage.sortOrder < $1.stage.sortOrder }
     }
 
     private func bpmText(_ value: Double?) -> String {
         guard let value else { return "无" }
-        return "\(Int(value.rounded())) bpm"
+        return "\(Int(value.rounded())) 次/分"
     }
 
     private func distanceText(_ value: Double?) -> String {
         guard let value else { return "无" }
         if value >= 1000 {
-            return String(format: "%.1f km", value / 1000)
+            return String(format: "%.1f 公里", value / 1000)
         }
-        return "\(Int(value.rounded())) m"
+        return "\(Int(value.rounded())) 米"
     }
 
     private var headerPrimaryColor: Color {
@@ -421,7 +421,7 @@ private extension SleepStage {
         case .light:
             return "浅睡"
         case .rem:
-            return "REM"
+            return "快眼动"
         case .awake:
             return "清醒"
         case .unknown:

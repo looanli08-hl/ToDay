@@ -35,7 +35,7 @@ struct WeeklyInsightView: View {
 
     var body: some View {
         ContentCard(background: TodayTheme.tealSoft.opacity(0.68)) {
-            EyebrowLabel("WEEKLY INSIGHT")
+            EyebrowLabel("一周洞察")
 
             Text(summaryText)
                 .font(.system(size: 15))
@@ -97,7 +97,7 @@ struct WeeklyInsightView: View {
         let averageSleepText = averageSleep > 0 ? String(format: "%.1f", averageSleep) : "0.0"
         let sleepLowlightText: String
         if let sleepLowlight = leastSleepDay {
-            sleepLowlightText = "周\(sleepLowlight.weekdayLabel)睡得最少（\(String(format: "%.1f", sleepLowlight.hours))h）。"
+            sleepLowlightText = "周\(sleepLowlight.weekdayLabel)睡得最少（\(String(format: "%.1f", sleepLowlight.hours)) 小时）。"
         } else {
             sleepLowlightText = "睡眠数据还不够完整。"
         }
@@ -112,7 +112,7 @@ struct WeeklyInsightView: View {
     private var averageSleepLabel: String {
         let hours = averageSleepHours(in: currentWeek)
         guard hours > 0 else { return "暂无" }
-        return String(format: "%.1f h", hours)
+        return String(format: "%.1f 小时", hours)
     }
 
     private var movementTrend: [WeeklyTrendPoint] {
@@ -270,9 +270,9 @@ struct WeeklyInsightView: View {
         let remainder = roundedMinutes % 60
 
         if hours > 0 {
-            return remainder == 0 ? "\(hours)h" : "\(hours)h\(remainder)m"
+            return remainder == 0 ? "\(hours) 小时" : "\(hours) 小时 \(remainder) 分钟"
         }
-        return "\(roundedMinutes)m"
+        return "\(roundedMinutes) 分钟"
     }
 
     private func weekdayLabel(for date: Date) -> String {
