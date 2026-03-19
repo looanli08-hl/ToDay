@@ -11,6 +11,7 @@ struct ToDayWatchApp: App {
             WatchHomeView(viewModel: viewModel)
                 .task {
                     await dailyReviewNotifier.requestAuthorizationAndSchedule()
+                    _ = await viewModel.requestHealthKitAuthorization()
                     await viewModel.registerBackgroundDelivery()
                     viewModel.setAppActive(true)
                 }

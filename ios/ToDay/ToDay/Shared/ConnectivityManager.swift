@@ -60,8 +60,13 @@ private struct WatchEnvelope: Codable {
 }
 
 #if os(iOS)
-final class PhoneConnectivityManager: NSObject, WCSessionDelegate {
+final class PhoneConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
     static let shared = PhoneConnectivityManager()
+
+    @Published private(set) var isWatchPaired = false
+    @Published private(set) var isWatchAppInstalled = false
+    @Published private(set) var isWatchReachable = false
+    @Published private(set) var isActivated = false
 
     let recordsDidChange = PassthroughSubject<Void, Never>()
 
@@ -78,6 +83,9 @@ final class PhoneConnectivityManager: NSObject, WCSessionDelegate {
         super.init()
         session?.delegate = self
         session?.activate()
+        if let session {
+            refreshWatchState(session)
+        }
     }
 
     func configure(recordStore: any MoodRecordStoring) {
@@ -134,6 +142,22 @@ final class PhoneConnectivityManager: NSObject, WCSessionDelegate {
         return try? ConnectivityCoding.decoder.decode(WatchTimelineSnapshot.self, from: data)
     }
 
+    private func loadCurrentEventSnapshot() -> CurrentEventSnapshot? {
+        guard let data = sharedDefaults?.data(forKey: SharedAppGroup.currentEventSnapshotKey) else {
+            return nil
+        }
+        return try? ConnectivityCoding.decoder.decode(CurrentEventSnapshot.self, from: data)
+    }
+
+    private func syncLatestContext() {
+        updatePhoneContext(
+            activeSession: nil,
+            currentEvent: loadCurrentEventSnapshot(),
+            currentEventID: nil,
+            timelineSnapshot: loadTimelineSnapshot()
+        )
+    }
+
     func sendCurrentEventUpdate(_ snapshot: CurrentEventSnapshot) {
         sendMessageOrFallback(.currentEventUpdate(snapshot))
     }
@@ -146,7 +170,31 @@ final class PhoneConnectivityManager: NSObject, WCSessionDelegate {
         _ session: WCSession,
         activationDidCompleteWith activationState: WCSessionActivationState,
         error: Error?
-    ) {}
+    ) {
+        guard activationState == .activated, error == nil else {
+            DispatchQueue.main.async { [weak self] in
+                self?.refreshWatchState(session)
+            }
+            return
+        }
+
+        DispatchQueue.main.async { [weak self] in
+            self?.refreshWatchState(session)
+            self?.syncLatestContext()
+        }
+    }
+
+    nonisolated func sessionWatchStateDidChange(_ session: WCSession) {
+        DispatchQueue.main.async { [weak self] in
+            self?.refreshWatchState(session)
+        }
+    }
+
+    nonisolated func sessionReachabilityDidChange(_ session: WCSession) {
+        DispatchQueue.main.async { [weak self] in
+            self?.isWatchReachable = session.isReachable
+        }
+    }
 
     nonisolated func sessionDidBecomeInactive(_ session: WCSession) {}
 
@@ -248,6 +296,13 @@ final class PhoneConnectivityManager: NSObject, WCSessionDelegate {
         session.sendMessage(payload, replyHandler: nil) { [weak session] _ in
             session?.transferUserInfo(payload)
         }
+    }
+
+    private func refreshWatchState(_ session: WCSession) {
+        isActivated = session.activationState == .activated
+        isWatchPaired = session.isPaired
+        isWatchAppInstalled = session.isWatchAppInstalled
+        isWatchReachable = session.isReachable
     }
 }
 #elseif os(watchOS)

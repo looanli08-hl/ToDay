@@ -4,9 +4,11 @@ import Photos
 import SwiftData
 import SwiftUI
 import UIKit
+import WatchConnectivity
 
 struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
+    @ObservedObject private var connectivityManager = PhoneConnectivityManager.shared
     @State private var healthStatus: HKAuthorizationStatus = .notDetermined
     @State private var locationStatus: CLAuthorizationStatus = .notDetermined
     @State private var photoStatus: PHAuthorizationStatus = .notDetermined
@@ -20,6 +22,10 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             Form {
+                Section("Apple Watch") {
+                    watchConnectionRow
+                }
+
                 Section("数据权限") {
                     Button {
                         UIApplication.shared.open(URL(string: "x-apple-health://")!)
@@ -164,6 +170,45 @@ struct SettingsView: View {
         let shortVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0"
         let buildVersion = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "0"
         return "\(shortVersion) (\(buildVersion))"
+    }
+
+    private var watchConnectionRow: some View {
+        HStack(spacing: 12) {
+            Text("手表连接")
+                .foregroundStyle(TodayTheme.ink)
+
+            Spacer()
+
+            Text(watchStatusText)
+                .foregroundStyle(TodayTheme.inkMuted)
+
+            Image(systemName: watchStatusIcon)
+                .foregroundStyle(watchStatusColor)
+        }
+    }
+
+    private var watchStatusText: String {
+        if !WCSession.isSupported() { return "不支持" }
+        if !connectivityManager.isWatchPaired { return "未配对" }
+        if !connectivityManager.isWatchAppInstalled { return "未安装 App" }
+        if connectivityManager.isWatchReachable { return "已连接" }
+        return "已配对"
+    }
+
+    private var watchStatusIcon: String {
+        if connectivityManager.isWatchReachable {
+            return "checkmark.circle.fill"
+        }
+        if connectivityManager.isWatchPaired && connectivityManager.isWatchAppInstalled {
+            return "applewatch"
+        }
+        return "exclamationmark.circle.fill"
+    }
+
+    private var watchStatusColor: Color {
+        if connectivityManager.isWatchReachable { return .green }
+        if connectivityManager.isWatchPaired && connectivityManager.isWatchAppInstalled { return TodayTheme.inkMuted }
+        return .orange
     }
 
     private var healthStatusText: String {

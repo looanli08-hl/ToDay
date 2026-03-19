@@ -197,11 +197,15 @@ struct WatchHomeView: View {
 
     private var waitingCard: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("戴着手表，开始你的一天")
+            Text(viewModel.healthKitAuthorized ? "戴着手表，开始你的一天" : "需要健康数据权限")
                 .font(.system(size: 22, weight: .heavy, design: .rounded))
                 .foregroundStyle(WatchTheme.text)
 
-            Text("活动一会儿后，这里会出现你正在做的事。")
+            Text(
+                viewModel.healthKitAuthorized
+                    ? "活动一会儿后，这里会出现你正在做的事。"
+                    : "请在手表上的「设置 → 健康 → 数据访问」中允许 ToDay 读取健康数据。"
+            )
                 .font(.system(size: 14, weight: .medium, design: .rounded))
                 .foregroundStyle(WatchTheme.textMuted)
                 .fixedSize(horizontal: false, vertical: true)

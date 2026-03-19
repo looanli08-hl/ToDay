@@ -29,6 +29,7 @@ final class WatchViewModel: ObservableObject {
     @Published private(set) var currentHeartRate: Int?
     @Published private(set) var currentTimelineSnapshot: WatchTimelineSnapshot?
     @Published private(set) var dataSource: TimelineDataSource = .waiting
+    @Published private(set) var healthKitAuthorized = false
 
     private let connectivityManager: WatchConnectivityManager
     private let transitionNotifier: EventTransitionNotifier
@@ -162,6 +163,12 @@ final class WatchViewModel: ObservableObject {
 
     func registerBackgroundDelivery() async {
         await localHealthProvider.registerBackgroundDelivery()
+    }
+
+    func requestHealthKitAuthorization() async -> Bool {
+        let authorized = await localHealthProvider.requestAuthorizationIfNeeded()
+        healthKitAuthorized = authorized
+        return authorized
     }
 
     private func observeConnectivity() {
