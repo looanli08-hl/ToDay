@@ -22,6 +22,8 @@ enum AppContainer {
             provider: makeTimelineProvider(),
             recordStore: makeMoodRecordStore(),
             shutterRecordStore: makeShutterRecordStore(),
+            spendingRecordStore: makeSpendingRecordStore(),
+            screenTimeRecordStore: makeScreenTimeRecordStore(),
             phoneConnectivityManager: phoneConnectivityManager,
             modelContainer: modelContainer
         )

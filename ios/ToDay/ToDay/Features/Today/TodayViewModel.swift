@@ -17,11 +17,15 @@ final class TodayViewModel: ObservableObject {
     @Published var showShutterPanel = false
     @Published var isRecordingVoice = false
     @Published private(set) var quickRecordMode: QuickRecordSheetMode = .flexible
+    @Published var showSpendingInput = false
+    @Published var showScreenTimeInput = false
 
     // MARK: - Managers
 
     private let recordManager: MoodRecordManager
     private let shutterManager: ShutterManager
+    private let spendingManager: SpendingManager
+    private let screenTimeStore: any ScreenTimeRecordStoring
     private let annotationStore: AnnotationStore
     private let insightComposer: TodayInsightComposer
     #if os(iOS)
@@ -46,6 +50,8 @@ final class TodayViewModel: ObservableObject {
         provider: any TimelineDataProviding,
         recordStore: any MoodRecordStoring,
         shutterRecordStore: any ShutterRecordStoring = SwiftDataShutterRecordStore(container: AppContainer.modelContainer),
+        spendingRecordStore: (any SpendingRecordStoring)? = nil,
+        screenTimeRecordStore: (any ScreenTimeRecordStoring)? = nil,
         insightComposer: TodayInsightComposer = TodayInsightComposer(),
         phoneConnectivityManager: PhoneConnectivityManager? = nil,
         modelContainer: ModelContainer,
@@ -57,6 +63,11 @@ final class TodayViewModel: ObservableObject {
         self.insightComposer = insightComposer
         self.recordManager = MoodRecordManager(recordStore: recordStore, calendar: calendar)
         self.shutterManager = ShutterManager(recordStore: shutterRecordStore, calendar: calendar)
+        self.spendingManager = SpendingManager(
+            recordStore: spendingRecordStore ?? InMemorySpendingRecordStore(),
+            calendar: calendar
+        )
+        self.screenTimeStore = screenTimeRecordStore ?? InMemoryScreenTimeRecordStore()
         self.annotationStore = AnnotationStore(calendar: calendar)
         #if os(iOS)
         self.watchSync = WatchSyncHelper(connectivityManager: phoneConnectivityManager, calendar: calendar)
@@ -152,6 +163,49 @@ final class TodayViewModel: ObservableObject {
         quickRecordMode = .pointOnly
         showQuickRecord = true
     }
+
+    // MARK: - Spending Records
+
+    func addSpendingRecord(_ record: SpendingRecord) {
+        spendingManager.addRecord(record)
+        rebuildTimeline(referenceDate: currentBaseTimeline?.date ?? Date())
+    }
+
+    func removeSpendingRecord(id: UUID) {
+        spendingManager.removeRecord(id: id)
+        rebuildTimeline(referenceDate: currentBaseTimeline?.date ?? Date())
+    }
+
+    func spendingRecords(forCurrentDay: Bool) -> [SpendingRecord] {
+        let date = currentBaseTimeline?.date ?? Date()
+        return forCurrentDay ? spendingManager.records(on: date) : spendingManager.records
+    }
+
+    var todaySpendingTotal: Double {
+        spendingManager.todayTotal(on: currentBaseTimeline?.date ?? Date())
+    }
+
+    // MARK: - Screen Time Records
+
+    func saveScreenTimeRecord(_ record: ScreenTimeRecord) {
+        try? screenTimeStore.save(record)
+        rebuildTimeline(referenceDate: currentBaseTimeline?.date ?? Date())
+    }
+
+    func currentDateKey() -> String {
+        let date = currentBaseTimeline?.date ?? Date()
+        return Self.dateKeyFormatter.string(from: date)
+    }
+
+    func existingScreenTimeRecord() -> ScreenTimeRecord? {
+        screenTimeStore.loadForDateKey(currentDateKey())
+    }
+
+    private static let dateKeyFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "yyyy-MM-dd"
+        return f
+    }()
 
     // MARK: - UI Computed Properties
 
@@ -256,6 +310,15 @@ final class TodayViewModel: ObservableObject {
         let annotationsForDay = annotationStore.annotations(on: base.date)
         let notesCount = recordsForDay.filter(MoodRecordManager.hasNote).count
 
+        // Spending events
+        let spendingForDay = spendingManager.records(on: base.date)
+        let spendingEntries = spendingForDay.map { $0.toInferredEvent() }
+
+        // Screen time event
+        let dateKey = Self.dateKeyFormatter.string(from: base.date)
+        let screenTimeRecord = screenTimeStore.loadForDateKey(dateKey)
+        let screenTimeEntries: [InferredEvent] = screenTimeRecord.map { [$0.toInferredEvent()] } ?? []
+
         var stats = base.stats
         stats.append(TimelineStat(title: "记录", value: "\(recordsForDay.count)"))
         if !annotationsForDay.isEmpty {
@@ -266,6 +329,13 @@ final class TodayViewModel: ObservableObject {
         }
         if let active = recordManager.activeRecord {
             stats.append(TimelineStat(title: "当前", value: active.mood.rawValue))
+        }
+        if !spendingForDay.isEmpty {
+            let total = spendingForDay.reduce(0) { $0 + $1.amount }
+            stats.append(TimelineStat(title: "消费", value: "¥\(String(format: "%.0f", total))"))
+        }
+        if let st = screenTimeRecord {
+            stats.append(TimelineStat(title: "屏幕时间", value: st.formattedTotalTime))
         }
 
         var matchedIDs = Set<UUID>()
@@ -278,7 +348,7 @@ final class TodayViewModel: ObservableObject {
             .filter { !matchedIDs.contains($0.id) }
             .map(\.asEvent)
 
-        let entries = (manualEntries + shutterEntries + syntheticEntries + annotatedBase).sorted { lhs, rhs in
+        let entries = (manualEntries + shutterEntries + syntheticEntries + annotatedBase + spendingEntries + screenTimeEntries).sorted { lhs, rhs in
             lhs.startDate == rhs.startDate
                 ? lhs.id.uuidString < rhs.id.uuidString
                 : lhs.startDate < rhs.startDate
@@ -405,4 +475,55 @@ final class TodayViewModel: ObservableObject {
         f.dateFormat = "HH:mm"
         return f
     }()
+}
+
+// MARK: - In-Memory Fallback Stores
+
+/// Fallback spending store when no SwiftData store is provided (e.g. tests).
+private final class InMemorySpendingRecordStore: SpendingRecordStoring {
+    private var records: [SpendingRecord] = []
+
+    func loadAll() -> [SpendingRecord] { records }
+
+    func loadForDate(_ date: Date) -> [SpendingRecord] {
+        let calendar = Calendar.current
+        return records.filter { calendar.isDate($0.createdAt, inSameDayAs: date) }
+    }
+
+    func save(_ record: SpendingRecord) throws {
+        if let index = records.firstIndex(where: { $0.id == record.id }) {
+            records[index] = record
+        } else {
+            records.append(record)
+        }
+    }
+
+    func delete(_ id: UUID) throws {
+        records.removeAll { $0.id == id }
+    }
+}
+
+/// Fallback screen time store when no SwiftData store is provided (e.g. tests).
+private final class InMemoryScreenTimeRecordStore: ScreenTimeRecordStoring {
+    private var records: [ScreenTimeRecord] = []
+
+    func loadAll() -> [ScreenTimeRecord] { records }
+
+    func loadForDateKey(_ dateKey: String) -> ScreenTimeRecord? {
+        records.first { $0.dateKey == dateKey }
+    }
+
+    func save(_ record: ScreenTimeRecord) throws {
+        if let index = records.firstIndex(where: { $0.id == record.id }) {
+            records[index] = record
+        } else if let index = records.firstIndex(where: { $0.dateKey == record.dateKey }) {
+            records[index] = record
+        } else {
+            records.append(record)
+        }
+    }
+
+    func delete(_ id: UUID) throws {
+        records.removeAll { $0.id == id }
+    }
 }
