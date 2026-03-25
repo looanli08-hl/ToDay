@@ -29,7 +29,7 @@ struct EventDetailView: View {
                 }
                 .padding(20)
             }
-            .background(TodayTheme.background)
+            .background(Color(UIColor.systemGroupedBackground))
             .navigationTitle("片段详情")
             .navigationBarTitleDisplayMode(.inline)
         }
@@ -94,7 +94,7 @@ struct EventDetailView: View {
                 Text("相关照片")
                     .font(.system(size: 22, weight: .regular, design: .serif))
                     .italic()
-                    .foregroundStyle(TodayTheme.ink)
+                    .foregroundStyle(.primary)
 
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 12) {
@@ -114,7 +114,7 @@ struct EventDetailView: View {
             Text("心率与负荷")
                 .font(.system(size: 22, weight: .regular, design: .serif))
                 .italic()
-                .foregroundStyle(TodayTheme.ink)
+                .foregroundStyle(.primary)
 
             if let heartRateSamples = event.associatedMetrics?.heartRateSamples, !heartRateSamples.isEmpty {
                 Chart(heartRateSamples, id: \.date) { sample in
@@ -163,7 +163,7 @@ struct EventDetailView: View {
                 Text("睡眠结构")
                     .font(.system(size: 22, weight: .regular, design: .serif))
                     .italic()
-                    .foregroundStyle(TodayTheme.ink)
+                    .foregroundStyle(.primary)
 
                 SleepStageDetailBar(segments: sleepStages)
                     .frame(height: 28)
@@ -187,11 +187,11 @@ struct EventDetailView: View {
             Text("这段时间还没有名字")
                 .font(.system(size: 22, weight: .regular, design: .serif))
                 .italic()
-                .foregroundStyle(TodayTheme.ink)
+                .foregroundStyle(.primary)
 
             Text("如果你记得这段留白发生了什么，现在就可以把它标出来。")
                 .font(.system(size: 14))
-                .foregroundStyle(TodayTheme.inkMuted)
+                .foregroundStyle(Color(UIColor.tertiaryLabel))
 
             Button("标注这段时间") {
                 onAnnotate?()
@@ -210,7 +210,7 @@ struct EventDetailView: View {
         VStack(alignment: .leading, spacing: 6) {
             Text(title)
                 .font(.system(size: 11, weight: .medium, design: .monospaced))
-                .foregroundStyle(TodayTheme.inkMuted)
+                .foregroundStyle(Color(UIColor.tertiaryLabel))
 
             HStack(spacing: 6) {
                 if let systemImage {
@@ -222,11 +222,11 @@ struct EventDetailView: View {
                     .font(.system(size: 13, weight: .semibold))
                     .lineLimit(2)
             }
-            .foregroundStyle(TodayTheme.inkSoft)
+            .foregroundStyle(.secondary)
         }
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(TodayTheme.card.opacity(0.78))
+        .background(Color(UIColor.secondarySystemGroupedBackground).opacity(0.78))
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 
@@ -234,17 +234,17 @@ struct EventDetailView: View {
         VStack(alignment: .leading, spacing: 6) {
             Text(title)
                 .font(.system(size: 11, weight: .medium, design: .monospaced))
-                .foregroundStyle(TodayTheme.inkMuted)
+                .foregroundStyle(Color(UIColor.tertiaryLabel))
 
             Text(value)
                 .font(.system(size: 18, weight: .bold, design: .rounded))
-                .foregroundStyle(TodayTheme.inkSoft)
+                .foregroundStyle(.secondary)
                 .lineLimit(1)
                 .minimumScaleFactor(0.75)
         }
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(TodayTheme.elevatedCard.opacity(0.7))
+        .background(Color(UIColor.tertiarySystemGroupedBackground).opacity(0.7))
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 
@@ -288,15 +288,15 @@ struct EventDetailView: View {
     }
 
     private var headerPrimaryColor: Color {
-        event.kind == .quietTime ? TodayTheme.ink : .white
+        event.kind == .quietTime ? .primary : .white
     }
 
     private var headerSecondaryColor: Color {
-        event.kind == .quietTime ? TodayTheme.inkMuted : Color.white.opacity(0.78)
+        event.kind == .quietTime ? Color(UIColor.tertiaryLabel) : Color.white.opacity(0.78)
     }
 
     private var headerBadgeBackground: Color {
-        event.kind == .quietTime ? TodayTheme.card.opacity(0.7) : Color.white.opacity(0.14)
+        event.kind == .quietTime ? Color(UIColor.secondarySystemGroupedBackground).opacity(0.7) : Color.white.opacity(0.14)
     }
 }
 
@@ -328,7 +328,7 @@ struct PhotoThumbnailView: View {
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .fill(TodayTheme.card)
+                .fill(Color(UIColor.secondarySystemGroupedBackground))
 
             if let image {
                 Image(uiImage: image)
@@ -336,14 +336,14 @@ struct PhotoThumbnailView: View {
                     .scaledToFill()
             } else {
                 ProgressView()
-                    .tint(TodayTheme.inkMuted)
+                    .tint(Color(UIColor.tertiaryLabel))
             }
         }
         .frame(width: 150, height: 150)
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .stroke(TodayTheme.border, lineWidth: 1)
+                .stroke(Color(UIColor.separator), lineWidth: 1)
         )
         .task(id: localIdentifier) {
             loadImage()
@@ -410,7 +410,7 @@ private extension SleepStage {
         case .awake:
             return TodayTheme.scrollGold
         case .unknown:
-            return TodayTheme.inkFaint
+            return Color(UIColor.quaternaryLabel)
         }
     }
 

@@ -29,7 +29,7 @@ private struct ScrollShareSnapshotView: View {
         VStack(alignment: .leading, spacing: 18) {
             Text("由 ToDay 生成 · \(watermarkDate)")
                 .font(.system(size: 11, weight: .medium))
-                .foregroundStyle(TodayTheme.inkMuted.opacity(0.78))
+                .foregroundStyle(Color(UIColor.tertiaryLabel).opacity(0.78))
                 .frame(maxWidth: .infinity, alignment: .trailing)
 
             DayVerticalTimelineContent(
@@ -41,7 +41,7 @@ private struct ScrollShareSnapshotView: View {
         }
         .padding(24)
         .frame(width: 390)
-        .background(TodayTheme.background)
+        .background(Color(UIColor.systemGroupedBackground))
     }
 
     private var watermarkDate: String {

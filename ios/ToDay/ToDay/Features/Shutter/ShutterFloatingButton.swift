@@ -23,8 +23,8 @@ struct ShutterFloatingButton: View {
                 .font(.system(size: 24, weight: .semibold))
                 .foregroundStyle(.white)
                 .frame(width: 60, height: 60)
-                .background(Circle().fill(TodayTheme.accent))
-                .shadow(color: TodayTheme.accent.opacity(0.40), radius: 16, x: 0, y: 8)
+                .background(Circle().fill(Color.accentColor))
+                .shadow(color: Color.accentColor.opacity(0.40), radius: 16, x: 0, y: 8)
         }
         .buttonStyle(.plain)
         .accessibilityLabel("快门")

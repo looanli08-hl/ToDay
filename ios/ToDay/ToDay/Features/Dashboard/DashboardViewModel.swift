@@ -148,7 +148,7 @@ struct DashboardViewModel {
             icon: "camera.fill",
             label: "快门",
             value: value,
-            tint: TodayTheme.accent
+            tint: Color.accentColor
         )
     }
 

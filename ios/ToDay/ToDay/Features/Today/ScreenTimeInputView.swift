@@ -31,7 +31,7 @@ struct ScreenTimeInputView: View {
                 .padding(.top, 20)
                 .padding(.bottom, 120)
             }
-            .background(TodayTheme.background)
+            .background(Color(UIColor.systemGroupedBackground))
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button {
@@ -39,9 +39,9 @@ struct ScreenTimeInputView: View {
                     } label: {
                         Image(systemName: "xmark")
                             .font(.system(size: 13, weight: .bold))
-                            .foregroundStyle(TodayTheme.inkSoft)
+                            .foregroundStyle(.secondary)
                             .frame(width: 32, height: 32)
-                            .background(TodayTheme.card)
+                            .background(Color(UIColor.secondarySystemGroupedBackground))
                             .clipShape(Circle())
                     }
                 }
@@ -51,7 +51,7 @@ struct ScreenTimeInputView: View {
                     .padding(.horizontal, 20)
                     .padding(.top, 8)
                     .padding(.bottom, 12)
-                    .background(TodayTheme.background.opacity(0.96))
+                    .background(Color(UIColor.systemGroupedBackground).opacity(0.96))
             }
             .onAppear {
                 if let existing = existingRecord {
@@ -84,11 +84,11 @@ struct ScreenTimeInputView: View {
                 Text("屏幕时间")
                     .font(.system(size: 28, weight: .regular, design: .serif))
                     .italic()
-                    .foregroundStyle(TodayTheme.ink)
+                    .foregroundStyle(.primary)
 
                 Text("记录今天的屏幕使用情况。\n可以在 设置 > 屏幕使用时间 中查看系统数据。")
                     .font(.system(size: 14))
-                    .foregroundStyle(TodayTheme.inkMuted)
+                    .foregroundStyle(Color(UIColor.tertiaryLabel))
                     .lineSpacing(3)
             }
 
@@ -108,7 +108,7 @@ struct ScreenTimeInputView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text("总时长")
                 .font(.subheadline.weight(.medium))
-                .foregroundStyle(TodayTheme.inkMuted)
+                .foregroundStyle(Color(UIColor.tertiaryLabel))
 
             HStack(spacing: 12) {
                 HStack(spacing: 6) {
@@ -123,7 +123,7 @@ struct ScreenTimeInputView: View {
 
                     Text("小时")
                         .font(.system(size: 14))
-                        .foregroundStyle(TodayTheme.inkSoft)
+                        .foregroundStyle(.secondary)
                 }
 
                 HStack(spacing: 6) {
@@ -138,16 +138,16 @@ struct ScreenTimeInputView: View {
 
                     Text("分钟")
                         .font(.system(size: 14))
-                        .foregroundStyle(TodayTheme.inkSoft)
+                        .foregroundStyle(.secondary)
                 }
             }
             .padding(14)
             .frame(maxWidth: .infinity, alignment: .center)
-            .background(TodayTheme.card)
+            .background(Color(UIColor.secondarySystemGroupedBackground))
             .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .stroke(TodayTheme.border, lineWidth: 1)
+                    .stroke(Color(UIColor.separator), lineWidth: 1)
             )
         }
     }
@@ -156,7 +156,7 @@ struct ScreenTimeInputView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text("拿起次数")
                 .font(.subheadline.weight(.medium))
-                .foregroundStyle(TodayTheme.inkMuted)
+                .foregroundStyle(Color(UIColor.tertiaryLabel))
 
             HStack(spacing: 12) {
                 Button {
@@ -164,13 +164,13 @@ struct ScreenTimeInputView: View {
                 } label: {
                     Image(systemName: "minus.circle.fill")
                         .font(.system(size: 28))
-                        .foregroundStyle(TodayTheme.inkMuted)
+                        .foregroundStyle(Color(UIColor.tertiaryLabel))
                 }
                 .buttonStyle(.plain)
 
                 Text("\(pickupCount)")
                     .font(.system(size: 24, weight: .bold, design: .monospaced))
-                    .foregroundStyle(TodayTheme.ink)
+                    .foregroundStyle(.primary)
                     .frame(minWidth: 50)
 
                 Button {
@@ -186,14 +186,14 @@ struct ScreenTimeInputView: View {
 
                 Text("次")
                     .font(.system(size: 14))
-                    .foregroundStyle(TodayTheme.inkSoft)
+                    .foregroundStyle(.secondary)
             }
             .padding(14)
-            .background(TodayTheme.card)
+            .background(Color(UIColor.secondarySystemGroupedBackground))
             .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .stroke(TodayTheme.border, lineWidth: 1)
+                    .stroke(Color(UIColor.separator), lineWidth: 1)
             )
         }
     }
@@ -203,7 +203,7 @@ struct ScreenTimeInputView: View {
             HStack {
                 Text("常用 App（可选）")
                     .font(.subheadline.weight(.medium))
-                    .foregroundStyle(TodayTheme.inkMuted)
+                    .foregroundStyle(Color(UIColor.tertiaryLabel))
 
                 Spacer()
 
@@ -241,17 +241,17 @@ struct ScreenTimeInputView: View {
                         } label: {
                             Image(systemName: "xmark.circle.fill")
                                 .font(.system(size: 16))
-                                .foregroundStyle(TodayTheme.inkFaint)
+                                .foregroundStyle(Color(UIColor.quaternaryLabel))
                         }
                         .buttonStyle(.plain)
                     }
                 }
                 .padding(12)
-                .background(TodayTheme.card)
+                .background(Color(UIColor.secondarySystemGroupedBackground))
                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                 .overlay(
                     RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .stroke(TodayTheme.border, lineWidth: 1)
+                        .stroke(Color(UIColor.separator), lineWidth: 1)
                 )
             }
         }

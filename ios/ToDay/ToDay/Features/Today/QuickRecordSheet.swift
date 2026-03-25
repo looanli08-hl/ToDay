@@ -37,7 +37,7 @@ struct QuickRecordSheet: View {
                 .padding(.top, 20)
                 .padding(.bottom, 120)
             }
-            .background(TodayTheme.background)
+            .background(Color(UIColor.systemGroupedBackground))
             .onChange(of: pickerItems) { _, newItems in
                 Task {
                     await importPhotos(from: newItems)
@@ -50,9 +50,9 @@ struct QuickRecordSheet: View {
                     } label: {
                         Image(systemName: "xmark")
                             .font(.system(size: 13, weight: .bold))
-                            .foregroundStyle(TodayTheme.inkSoft)
+                            .foregroundStyle(.secondary)
                             .frame(width: 32, height: 32)
-                            .background(TodayTheme.card)
+                            .background(Color(UIColor.secondarySystemGroupedBackground))
                             .clipShape(Circle())
                     }
                 }
@@ -62,7 +62,7 @@ struct QuickRecordSheet: View {
                     .padding(.horizontal, 20)
                     .padding(.top, 8)
                     .padding(.bottom, 12)
-                    .background(TodayTheme.background.opacity(0.96))
+                    .background(Color(UIColor.systemGroupedBackground).opacity(0.96))
             }
         }
         .presentationDetents([.medium, .large], selection: $selectedDetent)
@@ -110,11 +110,11 @@ struct QuickRecordSheet: View {
                     Text(sheetTitle)
                         .font(.system(size: 28, weight: .regular, design: .serif))
                         .italic()
-                        .foregroundStyle(TodayTheme.ink)
+                        .foregroundStyle(.primary)
 
                     Text(sheetSubtitle)
                         .font(.system(size: 14))
-                        .foregroundStyle(TodayTheme.inkMuted)
+                        .foregroundStyle(Color(UIColor.tertiaryLabel))
                         .lineSpacing(3)
                 }
 
@@ -137,11 +137,11 @@ struct QuickRecordSheet: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("照片")
                         .font(.subheadline.weight(.medium))
-                        .foregroundStyle(TodayTheme.inkMuted)
+                        .foregroundStyle(Color(UIColor.tertiaryLabel))
 
                     Text(photoSectionCaption)
                         .font(.system(size: 12))
-                        .foregroundStyle(TodayTheme.inkFaint)
+                        .foregroundStyle(Color(UIColor.quaternaryLabel))
                 }
 
                 Spacer()
@@ -154,13 +154,13 @@ struct QuickRecordSheet: View {
                 ) {
                     Label(draftPhotos.isEmpty ? "添加照片" : "继续添加", systemImage: "photo.on.rectangle.angled")
                         .font(.system(size: 13, weight: .semibold))
-                        .foregroundStyle(TodayTheme.inkSoft)
+                        .foregroundStyle(.secondary)
                         .padding(.horizontal, 12)
                         .padding(.vertical, 10)
-                        .background(TodayTheme.card)
+                        .background(Color(UIColor.secondarySystemGroupedBackground))
                         .overlay(
                             RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                .stroke(TodayTheme.border, lineWidth: 1)
+                                .stroke(Color(UIColor.separator), lineWidth: 1)
                         )
                         .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                 }
@@ -179,7 +179,7 @@ struct QuickRecordSheet: View {
                                     .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
                                     .overlay(
                                         RoundedRectangle(cornerRadius: 18, style: .continuous)
-                                            .stroke(TodayTheme.border, lineWidth: 1)
+                                            .stroke(Color(UIColor.separator), lineWidth: 1)
                                     )
 
                                 Button {
@@ -189,7 +189,7 @@ struct QuickRecordSheet: View {
                                         .font(.system(size: 10, weight: .bold))
                                         .foregroundStyle(.white)
                                         .frame(width: 22, height: 22)
-                                        .background(TodayTheme.ink.opacity(0.7))
+                                        .background(.primary.opacity(0.7))
                                         .clipShape(Circle())
                                 }
                                 .buttonStyle(.plain)
@@ -212,16 +212,16 @@ struct QuickRecordSheet: View {
         VStack(alignment: .leading, spacing: 8) {
             Text("备注")
                 .font(.subheadline.weight(.medium))
-                .foregroundStyle(TodayTheme.inkMuted)
+                .foregroundStyle(Color(UIColor.tertiaryLabel))
 
             TextField("写一句话记录当下…", text: $note)
                 .textFieldStyle(.plain)
                 .padding(14)
-                .background(TodayTheme.card)
+                .background(Color(UIColor.secondarySystemGroupedBackground))
                 .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                 .overlay(
                     RoundedRectangle(cornerRadius: 14, style: .continuous)
-                        .stroke(TodayTheme.border, lineWidth: 1)
+                        .stroke(Color(UIColor.separator), lineWidth: 1)
                 )
         }
     }
@@ -230,7 +230,7 @@ struct QuickRecordSheet: View {
         VStack(alignment: .leading, spacing: 8) {
             Text(timeFieldTitle)
                 .font(.subheadline.weight(.medium))
-                .foregroundStyle(TodayTheme.inkMuted)
+                .foregroundStyle(Color(UIColor.tertiaryLabel))
 
             DatePicker(
                 "记录时间",
@@ -242,11 +242,11 @@ struct QuickRecordSheet: View {
             .datePickerStyle(.compact)
             .padding(14)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(TodayTheme.card)
+            .background(Color(UIColor.secondarySystemGroupedBackground))
             .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .stroke(TodayTheme.border, lineWidth: 1)
+                    .stroke(Color(UIColor.separator), lineWidth: 1)
             )
         }
     }
@@ -258,13 +258,13 @@ struct QuickRecordSheet: View {
                 submit(record)
             }
             .font(.system(size: 15, weight: .semibold))
-            .foregroundStyle(mode == .pointOnly ? .white : TodayTheme.inkSoft)
+            .foregroundStyle(mode == .pointOnly ? .white : .secondary)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 14)
-            .background(mode == .pointOnly ? TodayTheme.teal : TodayTheme.card)
+            .background(mode == .pointOnly ? TodayTheme.teal : Color(UIColor.secondarySystemGroupedBackground))
             .overlay(
                 RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .stroke(mode == .pointOnly ? Color.clear : TodayTheme.border, lineWidth: 1)
+                    .stroke(mode == .pointOnly ? Color.clear : Color(UIColor.separator), lineWidth: 1)
             )
             .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
             .disabled(selectedMood == nil || isSubmitting)
@@ -279,7 +279,7 @@ struct QuickRecordSheet: View {
                 .foregroundStyle(.white)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 14)
-                .background(TodayTheme.accent)
+                .background(Color.accentColor)
                 .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                 .disabled(selectedMood == nil || isSubmitting)
                 .opacity(selectedMood == nil || isSubmitting ? 0.45 : 1)
@@ -326,7 +326,7 @@ struct QuickRecordSheet: View {
     private var modeBadgeTint: Color {
         switch mode {
         case .flexible:
-            return TodayTheme.accent
+            return Color.accentColor
         case .pointOnly:
             return TodayTheme.teal
         }
@@ -335,7 +335,7 @@ struct QuickRecordSheet: View {
     private var modeBadgeBackground: Color {
         switch mode {
         case .flexible:
-            return TodayTheme.accentSoft
+            return Color.accentColor.opacity(0.12)
         case .pointOnly:
             return TodayTheme.tealSoft
         }
@@ -359,15 +359,15 @@ struct QuickRecordSheet: View {
                     .padding(.vertical, 14)
                     .background(
                         selectedMood == mood
-                            ? TodayTheme.accentSoft
-                            : TodayTheme.card
+                            ? Color.accentColor.opacity(0.12)
+                            : Color(UIColor.secondarySystemGroupedBackground)
                     )
                     .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                     .overlay(
                         RoundedRectangle(cornerRadius: 16, style: .continuous)
                             .stroke(
                                 selectedMood == mood
-                                    ? TodayTheme.accent
+                                    ? Color.accentColor
                                     : Color.clear,
                                 lineWidth: 2
                             )

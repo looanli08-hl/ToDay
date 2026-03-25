@@ -30,20 +30,20 @@ struct EventCardView: View {
 
                     Text(event.resolvedName)
                         .font(.system(size: 15, weight: .semibold))
-                        .foregroundStyle(TodayTheme.ink)
+                        .foregroundStyle(.primary)
                         .lineLimit(1)
 
                     Spacer(minLength: 8)
 
                     Text(event.scrollDurationText)
                         .font(.system(size: 13, weight: .bold, design: .monospaced))
-                        .foregroundStyle(TodayTheme.inkMuted)
+                        .foregroundStyle(Color(UIColor.tertiaryLabel))
                 }
 
                 if let detailLine = event.compactDetailLine {
                     Text(detailLine)
                         .font(.system(size: 13))
-                        .foregroundStyle(TodayTheme.inkMuted)
+                        .foregroundStyle(Color(UIColor.tertiaryLabel))
                         .lineLimit(1)
                 }
 
@@ -58,7 +58,7 @@ struct EventCardView: View {
         }
         .padding(.vertical, 12)
         .padding(.trailing, 14)
-        .background(TodayTheme.card.opacity(event.isBlankCandidate ? 0.62 : 0.82))
+        .background(Color(UIColor.secondarySystemGroupedBackground).opacity(event.isBlankCandidate ? 0.62 : 0.82))
         .background(.ultraThinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
         .overlay(cardBorder)
@@ -75,17 +75,17 @@ struct EventCardView: View {
             )
             .foregroundStyle(
                 event.isBlankCandidate
-                    ? TodayTheme.border.opacity(0.35)
-                    : TodayTheme.border.opacity(0.5)
+                    ? Color(UIColor.separator).opacity(0.35)
+                    : Color(UIColor.separator).opacity(0.5)
             )
             .overlay(alignment: .bottomTrailing) {
                 if event.isBlankCandidate {
                     Text("点击记录")
                         .font(.system(size: 11, weight: .semibold))
-                        .foregroundStyle(TodayTheme.inkSoft)
+                        .foregroundStyle(.secondary)
                         .padding(.horizontal, 10)
                         .padding(.vertical, 6)
-                        .background(TodayTheme.card.opacity(0.76))
+                        .background(Color(UIColor.secondarySystemGroupedBackground).opacity(0.76))
                         .clipShape(Capsule())
                         .padding(10)
                 }
@@ -104,23 +104,23 @@ struct EventCardView: View {
 
             Text(event.resolvedName)
                 .font(.system(size: 14, weight: .medium))
-                .foregroundStyle(TodayTheme.ink)
+                .foregroundStyle(.primary)
                 .lineLimit(1)
 
             Spacer(minLength: 8)
 
             Text(event.moodTimeText)
                 .font(.system(size: 12, weight: .medium, design: .monospaced))
-                .foregroundStyle(TodayTheme.inkMuted)
+                .foregroundStyle(Color(UIColor.tertiaryLabel))
         }
         .padding(.vertical, 6)
         .padding(.horizontal, 12)
-        .background(TodayTheme.card.opacity(0.6))
+        .background(Color(UIColor.secondarySystemGroupedBackground).opacity(0.6))
         .background(.ultraThinMaterial)
         .clipShape(Capsule())
         .overlay(
             Capsule()
-                .stroke(TodayTheme.border.opacity(0.5), lineWidth: 0.5)
+                .stroke(Color(UIColor.separator).opacity(0.5), lineWidth: 0.5)
         )
     }
 }
@@ -159,7 +159,7 @@ private struct SleepStageRibbon: View {
         case .awake:
             return TodayTheme.scrollGold
         case .unknown:
-            return TodayTheme.inkFaint
+            return Color(UIColor.quaternaryLabel)
         }
     }
 }
@@ -201,7 +201,7 @@ extension InferredEvent {
         case .userAnnotated:
             return TodayTheme.teal.opacity(0.82)
         case .mood:
-            return TodayTheme.accent
+            return Color.accentColor
         case .shutter:
             return TodayTheme.scrollGold.opacity(0.86)
         case .screenTime:
@@ -226,15 +226,15 @@ extension InferredEvent {
         case .commute, .activeWalk:
             return TodayTheme.walkGreen
         case .quietTime:
-            return TodayTheme.inkFaint
+            return Color(UIColor.quaternaryLabel)
         case .userAnnotated:
             return TodayTheme.teal
         case .mood:
-            return TodayTheme.accent
+            return Color.accentColor
         case .shutter:
             return TodayTheme.scrollGold
         case .screenTime:
-            return TodayTheme.inkFaint
+            return Color(UIColor.quaternaryLabel)
         case .spending:
             return TodayTheme.teal
         }

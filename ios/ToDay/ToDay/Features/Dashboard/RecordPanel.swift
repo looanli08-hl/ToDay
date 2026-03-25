@@ -17,7 +17,7 @@ struct RecordPanel: View {
                     timePeriodView
                 }
             }
-            .background(TodayTheme.background)
+            .background(Color(UIColor.systemGroupedBackground))
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button {
@@ -31,9 +31,9 @@ struct RecordPanel: View {
                     } label: {
                         Image(systemName: mode == .menu ? "xmark" : "chevron.left")
                             .font(.system(size: 13, weight: .bold))
-                            .foregroundStyle(TodayTheme.inkSoft)
+                            .foregroundStyle(.secondary)
                             .frame(width: 32, height: 32)
-                            .background(TodayTheme.card)
+                            .background(Color(UIColor.secondarySystemGroupedBackground))
                             .clipShape(Circle())
                     }
                 }
@@ -51,11 +51,11 @@ struct RecordPanel: View {
                 Text("记录")
                     .font(.system(size: 28, weight: .regular, design: .serif))
                     .italic()
-                    .foregroundStyle(TodayTheme.ink)
+                    .foregroundStyle(.primary)
 
                 Text("记录当下的心情，或者补上一段时间做了什么。")
                     .font(.system(size: 14))
-                    .foregroundStyle(TodayTheme.inkMuted)
+                    .foregroundStyle(Color(UIColor.tertiaryLabel))
                     .lineSpacing(3)
             }
             .padding(.horizontal, 20)
@@ -109,25 +109,25 @@ struct RecordPanel: View {
                 VStack(alignment: .leading, spacing: 3) {
                     Text(title)
                         .font(.system(size: 16, weight: .semibold))
-                        .foregroundStyle(TodayTheme.ink)
+                        .foregroundStyle(.primary)
 
                     Text(subtitle)
                         .font(.system(size: 13))
-                        .foregroundStyle(TodayTheme.inkMuted)
+                        .foregroundStyle(Color(UIColor.tertiaryLabel))
                 }
 
                 Spacer()
 
                 Image(systemName: "chevron.right")
                     .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(TodayTheme.inkFaint)
+                    .foregroundStyle(Color(UIColor.quaternaryLabel))
             }
             .padding(14)
-            .background(TodayTheme.card)
+            .background(Color(UIColor.secondarySystemGroupedBackground))
             .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .stroke(TodayTheme.border, lineWidth: 0.5)
+                    .stroke(Color(UIColor.separator), lineWidth: 0.5)
             )
         }
         .buttonStyle(.plain)

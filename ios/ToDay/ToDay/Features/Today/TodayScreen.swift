@@ -51,14 +51,14 @@ struct TodayScreen: View {
                     await viewModel.load(forceReload: true)
                 }
             }
-            .background(TodayTheme.background)
+            .background(Color(UIColor.systemGroupedBackground))
             .toolbar(.hidden, for: .navigationBar)
             .safeAreaInset(edge: .bottom) {
                 bottomActionBar
                     .padding(.horizontal, 20)
                     .padding(.top, 8)
                     .padding(.bottom, 8)
-                    .background(TodayTheme.background.opacity(0.92))
+                    .background(Color(UIColor.systemGroupedBackground).opacity(0.92))
             }
             .sheet(isPresented: $viewModel.showQuickRecord) {
                 QuickRecordSheet(mode: viewModel.quickRecordMode) { record in
@@ -102,13 +102,13 @@ struct TodayScreen: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text(dateHeader)
                         .font(.system(size: 12, weight: .medium, design: .monospaced))
-                        .foregroundStyle(TodayTheme.inkMuted)
+                        .foregroundStyle(Color(UIColor.tertiaryLabel))
                         .tracking(1.4)
 
                     Text("今日画卷")
                         .font(.system(size: 33, weight: .regular, design: .serif))
                         .italic()
-                        .foregroundStyle(TodayTheme.ink)
+                        .foregroundStyle(.primary)
                 }
 
                 Spacer()
@@ -119,12 +119,12 @@ struct TodayScreen: View {
                     } label: {
                         Image(systemName: "heart.circle.fill")
                             .font(.system(size: 16, weight: .semibold))
-                            .foregroundStyle(TodayTheme.accent)
+                            .foregroundStyle(Color.accentColor)
                             .frame(width: 42, height: 42)
-                            .background(TodayTheme.card)
+                            .background(Color(UIColor.secondarySystemGroupedBackground))
                             .overlay(
                                 Circle()
-                                    .stroke(TodayTheme.border, lineWidth: 1)
+                                    .stroke(Color(UIColor.separator), lineWidth: 1)
                             )
                     }
                     .buttonStyle(.plain)
@@ -134,12 +134,12 @@ struct TodayScreen: View {
                     } label: {
                         Image(systemName: "square.and.arrow.up")
                             .font(.system(size: 15, weight: .semibold))
-                            .foregroundStyle(TodayTheme.inkSoft)
+                            .foregroundStyle(.secondary)
                             .frame(width: 42, height: 42)
-                            .background(TodayTheme.card)
+                            .background(Color(UIColor.secondarySystemGroupedBackground))
                             .overlay(
                                 Circle()
-                                    .stroke(TodayTheme.border, lineWidth: 1)
+                                    .stroke(Color(UIColor.separator), lineWidth: 1)
                             )
                     }
                     .buttonStyle(.plain)
@@ -153,12 +153,12 @@ struct TodayScreen: View {
                     } label: {
                         Image(systemName: "arrow.clockwise")
                             .font(.system(size: 15, weight: .semibold))
-                            .foregroundStyle(TodayTheme.inkSoft)
+                            .foregroundStyle(.secondary)
                             .frame(width: 42, height: 42)
-                            .background(TodayTheme.card)
+                            .background(Color(UIColor.secondarySystemGroupedBackground))
                             .overlay(
                                 Circle()
-                                    .stroke(TodayTheme.border, lineWidth: 1)
+                                    .stroke(Color(UIColor.separator), lineWidth: 1)
                             )
                     }
                     .buttonStyle(.plain)
@@ -167,7 +167,7 @@ struct TodayScreen: View {
 
             Text(viewModel.timeline?.summary ?? "先把今天铺成一张可回看的画卷，再决定哪些片段值得长期留下。")
                 .font(.system(size: 14))
-                .foregroundStyle(TodayTheme.inkMuted)
+                .foregroundStyle(Color(UIColor.tertiaryLabel))
                 .lineSpacing(3)
         }
     }
@@ -209,11 +209,11 @@ struct TodayScreen: View {
             Text("今日脉络")
                 .font(.system(size: 23, weight: .regular, design: .serif))
                 .italic()
-                .foregroundStyle(TodayTheme.ink)
+                .foregroundStyle(.primary)
 
             Text("把一天里的起伏、停顿和推进压成一条流线，先看今天的流向，再回到具体片段。")
                 .font(.system(size: 14))
-                .foregroundStyle(TodayTheme.inkMuted)
+                .foregroundStyle(Color(UIColor.tertiaryLabel))
                 .lineSpacing(4)
 
             TodayFlowSignatureView(entries: timeline.entries)
@@ -223,7 +223,7 @@ struct TodayScreen: View {
                 ForEach(["00:00", "06:00", "12:00", "18:00", "24:00"], id: \.self) { label in
                     Text(label)
                         .font(.system(size: 10, weight: .medium, design: .monospaced))
-                        .foregroundStyle(TodayTheme.inkFaint)
+                        .foregroundStyle(Color(UIColor.quaternaryLabel))
 
                     if label != "24:00" {
                         Spacer()
@@ -240,11 +240,11 @@ struct TodayScreen: View {
             Text("今日时间轴")
                 .font(.system(size: 23, weight: .regular, design: .serif))
                 .italic()
-                .foregroundStyle(TodayTheme.ink)
+                .foregroundStyle(.primary)
 
             Text("从凌晨到夜里，一天的起伏与留白。")
                 .font(.system(size: 14))
-                .foregroundStyle(TodayTheme.inkMuted)
+                .foregroundStyle(Color(UIColor.tertiaryLabel))
                 .lineSpacing(4)
 
             DayScrollView(
@@ -264,16 +264,16 @@ struct TodayScreen: View {
             VStack(spacing: 16) {
                 Image(systemName: "applewatch.and.arrow.forward")
                     .font(.system(size: 36))
-                    .foregroundStyle(TodayTheme.inkFaint)
+                    .foregroundStyle(Color(UIColor.quaternaryLabel))
 
                 Text("等待数据中")
                     .font(.system(size: 20, weight: .regular, design: .serif))
                     .italic()
-                    .foregroundStyle(TodayTheme.ink)
+                    .foregroundStyle(.primary)
 
                 Text("戴上 Apple Watch 活动一会儿，心率、步数和运动数据会自动填入时间轴。你也可以先用下方的「记录此刻」手动打点。")
                     .font(.system(size: 14))
-                    .foregroundStyle(TodayTheme.inkMuted)
+                    .foregroundStyle(Color(UIColor.tertiaryLabel))
                     .multilineTextAlignment(.center)
                     .lineSpacing(4)
 
@@ -299,15 +299,15 @@ struct TodayScreen: View {
                 Text("今日自动总结")
                     .font(.system(size: 23, weight: .regular, design: .serif))
                     .italic()
-                    .foregroundStyle(TodayTheme.ink)
+                    .foregroundStyle(.primary)
 
                 Text(summary.headline)
                     .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(TodayTheme.inkSoft)
+                    .foregroundStyle(.secondary)
 
                 Text(summary.narrative)
                     .font(.system(size: 14))
-                    .foregroundStyle(TodayTheme.inkMuted)
+                    .foregroundStyle(Color(UIColor.tertiaryLabel))
                     .lineSpacing(4)
 
                 if !summary.badges.isEmpty {
@@ -326,15 +326,15 @@ struct TodayScreen: View {
                 Text("最近 7 天")
                     .font(.system(size: 23, weight: .regular, design: .serif))
                     .italic()
-                    .foregroundStyle(TodayTheme.ink)
+                    .foregroundStyle(.primary)
 
                 Text(weeklyInsight.headline)
                     .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(TodayTheme.inkSoft)
+                    .foregroundStyle(.secondary)
 
                 Text(weeklyInsight.narrative)
                     .font(.system(size: 14))
-                    .foregroundStyle(TodayTheme.inkMuted)
+                    .foregroundStyle(Color(UIColor.tertiaryLabel))
                     .lineSpacing(4)
 
                 FlexibleBadgeRow(items: weeklyInsight.badges, tone: .teal)
@@ -353,7 +353,7 @@ struct TodayScreen: View {
                         Text("最近记录")
                             .font(.system(size: 23, weight: .regular, design: .serif))
                             .italic()
-                            .foregroundStyle(TodayTheme.ink)
+                            .foregroundStyle(.primary)
                     }
 
                     Spacer()
@@ -361,7 +361,7 @@ struct TodayScreen: View {
                     Button(action: onOpenHistory) {
                         Text("查看全部")
                             .font(.system(size: 13, weight: .medium, design: .monospaced))
-                            .foregroundStyle(TodayTheme.inkSoft)
+                            .foregroundStyle(.secondary)
                     }
                     .buttonStyle(.plain)
                 }
@@ -391,12 +391,12 @@ struct TodayScreen: View {
 
                         Text(activeSessionTitle)
                             .font(.system(size: 15, weight: .semibold))
-                            .foregroundStyle(TodayTheme.inkSoft)
+                            .foregroundStyle(.secondary)
                     }
 
                     Text(activeSessionDetail)
                         .font(.system(size: 13))
-                        .foregroundStyle(TodayTheme.inkMuted)
+                        .foregroundStyle(Color(UIColor.tertiaryLabel))
                         .lineLimit(2)
                 }
             }
@@ -418,7 +418,7 @@ struct TodayScreen: View {
                     }
                     .padding(.vertical, 15)
                     .frame(maxWidth: .infinity)
-                    .background(TodayTheme.accent)
+                    .background(Color.accentColor)
                     .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
                 }
                 .buttonStyle(.plain)
@@ -429,13 +429,13 @@ struct TodayScreen: View {
                     } label: {
                         Label("补一个打点", systemImage: "plus.circle")
                             .font(.system(size: 15, weight: .semibold))
-                            .foregroundStyle(TodayTheme.inkSoft)
+                            .foregroundStyle(.secondary)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 14)
-                            .background(TodayTheme.card)
+                            .background(Color(UIColor.secondarySystemGroupedBackground))
                             .overlay(
                                 RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                    .stroke(TodayTheme.border, lineWidth: 1)
+                                    .stroke(Color(UIColor.separator), lineWidth: 1)
                             )
                             .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                     }
@@ -457,13 +457,13 @@ struct TodayScreen: View {
             }
         }
         .padding(14)
-        .background(TodayTheme.elevatedCard.opacity(0.94))
+        .background(Color(UIColor.tertiarySystemGroupedBackground).opacity(0.94))
         .overlay(
             RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .stroke(TodayTheme.border, lineWidth: 1)
+                .stroke(Color(UIColor.separator), lineWidth: 1)
         )
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-        .shadow(color: TodayTheme.ink.opacity(0.06), radius: 18, x: 0, y: 8)
+        .shadow(color: Color.primary.opacity(0.06), radius: 18, x: 0, y: 8)
     }
 
     private var loadingCard: some View {
@@ -472,10 +472,10 @@ struct TodayScreen: View {
             ProgressView()
             Text("正在整理今天的脉络...")
                 .font(.system(size: 18, weight: .semibold))
-                .foregroundStyle(TodayTheme.ink)
+                .foregroundStyle(.primary)
             Text("这里会根据当前环境读取模拟数据或真实 HealthKit 数据。")
                 .font(.system(size: 14))
-                .foregroundStyle(TodayTheme.inkMuted)
+                .foregroundStyle(Color(UIColor.tertiaryLabel))
         }
     }
 
@@ -487,11 +487,11 @@ struct TodayScreen: View {
             Text("时间线暂时不可用")
                 .font(.system(size: 24, weight: .regular, design: .serif))
                 .italic()
-                .foregroundStyle(TodayTheme.ink)
+                .foregroundStyle(.primary)
 
             Text(message)
                 .font(.system(size: 14))
-                .foregroundStyle(TodayTheme.inkMuted)
+                .foregroundStyle(Color(UIColor.tertiaryLabel))
 
             HStack(spacing: 12) {
                 Button("重新整理") {
@@ -508,7 +508,7 @@ struct TodayScreen: View {
                         UIApplication.shared.open(settingsURL)
                     }
                     .buttonStyle(.bordered)
-                    .tint(TodayTheme.inkSoft)
+                    .tint(.secondary)
                 }
             }
         }
@@ -522,7 +522,7 @@ struct TodayScreen: View {
             OverviewStat(label: "片段", value: "\(entryCount)", tint: TodayTheme.blue, background: TodayTheme.blueSoft),
             OverviewStat(label: "记录", value: "\(viewModel.todayManualRecordCount)", tint: TodayTheme.teal, background: TodayTheme.tealSoft),
             OverviewStat(label: "快门", value: "\(viewModel.todayShutterCount())", tint: TodayTheme.scrollGold, background: TodayTheme.scrollGold.opacity(0.12)),
-            OverviewStat(label: "来源", value: sourceText, tint: TodayTheme.accent, background: TodayTheme.accentSoft)
+            OverviewStat(label: "来源", value: sourceText, tint: Color.accentColor, background: Color.accentColor.opacity(0.12))
         ]
     }
 

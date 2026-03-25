@@ -13,26 +13,26 @@ struct VoiceRecordingOverlay: View {
             VStack(spacing: 16) {
                 Image(systemName: "waveform")
                     .font(.system(size: 48))
-                    .foregroundStyle(TodayTheme.accent)
+                    .foregroundStyle(Color.accentColor)
                     .symbolEffect(.variableColor.iterative, isActive: recorder.isRecording)
 
                 Text(recorder.isRecording ? "正在录音…" : "准备中…")
                     .font(.system(size: 18, weight: .semibold))
-                    .foregroundStyle(TodayTheme.ink)
+                    .foregroundStyle(.primary)
 
                 Text(formattedDuration)
                     .font(.system(size: 32, weight: .light, design: .monospaced))
-                    .foregroundStyle(TodayTheme.inkSoft)
+                    .foregroundStyle(.secondary)
 
                 Text("松手结束录音")
                     .font(.system(size: 14))
-                    .foregroundStyle(TodayTheme.inkMuted)
+                    .foregroundStyle(Color(UIColor.tertiaryLabel))
             }
             .padding(32)
             .frame(maxWidth: .infinity)
-            .background(TodayTheme.elevatedCard)
+            .background(Color(UIColor.tertiarySystemGroupedBackground))
             .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-            .shadow(color: TodayTheme.ink.opacity(0.1), radius: 20, x: 0, y: 10)
+            .shadow(color: .primary.opacity(0.1), radius: 20, x: 0, y: 10)
             .padding(.horizontal, 24)
 
             Spacer()

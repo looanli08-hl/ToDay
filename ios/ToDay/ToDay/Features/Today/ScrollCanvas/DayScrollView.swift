@@ -79,7 +79,7 @@ struct DayVerticalTimelineContent: View {
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .stroke(TodayTheme.border, lineWidth: 0.5)
+                .stroke(Color(UIColor.separator), lineWidth: 0.5)
         )
         .accessibilityElement(children: .contain)
         .accessibilityLabel("今日时间轴")

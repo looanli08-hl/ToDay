@@ -21,7 +21,7 @@ struct HistoryScreen: View {
                 }
                 .padding(.vertical, 20)
             }
-            .background(TodayTheme.background)
+            .background(Color(UIColor.systemGroupedBackground))
             .navigationTitle("回看")
             .task {
                 await loadWeeklyInsights()
@@ -48,9 +48,9 @@ struct HistoryScreen: View {
                 } label: {
                     Image(systemName: "chevron.left")
                         .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(TodayTheme.inkSoft)
+                        .foregroundStyle(.secondary)
                         .frame(width: 34, height: 34)
-                        .background(TodayTheme.elevatedCard.opacity(0.72))
+                        .background(Color(UIColor.tertiarySystemGroupedBackground).opacity(0.72))
                         .clipShape(Circle())
                 }
                 .buttonStyle(.plain)
@@ -61,11 +61,11 @@ struct HistoryScreen: View {
                     Text(monthTitle)
                         .font(.system(size: 23, weight: .regular, design: .serif))
                         .italic()
-                        .foregroundStyle(TodayTheme.ink)
+                        .foregroundStyle(.primary)
 
                     Text("每天的色块会先预览当天事件分布，再点进单日画卷。")
                         .font(.system(size: 12))
-                        .foregroundStyle(TodayTheme.inkMuted)
+                        .foregroundStyle(Color(UIColor.tertiaryLabel))
                 }
 
                 Spacer()
@@ -75,9 +75,9 @@ struct HistoryScreen: View {
                 } label: {
                     Image(systemName: "chevron.right")
                         .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(canAdvanceMonth ? TodayTheme.inkSoft : TodayTheme.inkFaint)
+                        .foregroundStyle(canAdvanceMonth ? .secondary : Color(UIColor.quaternaryLabel))
                         .frame(width: 34, height: 34)
-                        .background(TodayTheme.elevatedCard.opacity(0.72))
+                        .background(Color(UIColor.tertiarySystemGroupedBackground).opacity(0.72))
                         .clipShape(Circle())
                 }
                 .buttonStyle(.plain)
@@ -88,7 +88,7 @@ struct HistoryScreen: View {
                 ForEach(weekdayTitles, id: \.self) { title in
                     Text(title)
                         .font(.system(size: 11, weight: .medium, design: .monospaced))
-                        .foregroundStyle(TodayTheme.inkMuted)
+                        .foregroundStyle(Color(UIColor.tertiaryLabel))
                         .frame(maxWidth: .infinity)
                 }
 
@@ -240,7 +240,7 @@ struct HistoryScreen: View {
     private func digestColor(for mood: MoodRecord.Mood?) -> Color {
         switch mood {
         case .happy:
-            return TodayTheme.accent
+            return Color.accentColor
         case .calm:
             return TodayTheme.teal
         case .focused:
@@ -258,13 +258,13 @@ struct HistoryScreen: View {
         case .irritated:
             return TodayTheme.rose
         case .bored:
-            return TodayTheme.inkFaint
+            return Color(UIColor.quaternaryLabel)
         case .sleepy:
             return TodayTheme.blue
         case .satisfied:
             return TodayTheme.scrollSunrise
         case .none:
-            return TodayTheme.inkFaint
+            return Color(UIColor.quaternaryLabel)
         }
     }
 
@@ -301,7 +301,7 @@ private struct HistoryCalendarDayCell: View {
             HStack(spacing: 4) {
                 Text("\(dayNumber)")
                     .font(.system(size: 15, weight: isToday ? .bold : .medium, design: .rounded))
-                    .foregroundStyle(isInFuture ? TodayTheme.inkFaint : TodayTheme.inkSoft)
+                    .foregroundStyle(isInFuture ? Color(UIColor.quaternaryLabel) : .secondary)
 
                 if let dominantEmoji {
                     Text(dominantEmoji)
@@ -312,7 +312,7 @@ private struct HistoryCalendarDayCell: View {
             HStack(spacing: 3) {
                 ForEach(0..<6, id: \.self) { index in
                     RoundedRectangle(cornerRadius: 3, style: .continuous)
-                        .fill(index < previewColors.count ? previewColors[index] : TodayTheme.border.opacity(0.45))
+                        .fill(index < previewColors.count ? previewColors[index] : Color(UIColor.separator).opacity(0.45))
                         .frame(height: 8)
                 }
             }
@@ -322,11 +322,11 @@ private struct HistoryCalendarDayCell: View {
         .padding(10)
         .frame(height: 74)
         .frame(maxWidth: .infinity, alignment: .topLeading)
-        .background(isToday ? TodayTheme.accentSoft : TodayTheme.card.opacity(isInFuture ? 0.35 : 1))
+        .background(isToday ? Color.accentColor.opacity(0.12) : Color(UIColor.secondarySystemGroupedBackground).opacity(isInFuture ? 0.35 : 1))
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(isToday ? TodayTheme.accent : TodayTheme.border, lineWidth: isToday ? 1.4 : 1)
+                .stroke(isToday ? Color.accentColor : Color(UIColor.separator), lineWidth: isToday ? 1.4 : 1)
         )
     }
 }
@@ -353,10 +353,10 @@ struct HistoryBadgeRow: View {
     private func badge(_ text: String) -> some View {
         Text(text)
             .font(.system(size: 12, weight: .medium))
-            .foregroundStyle(TodayTheme.inkSoft)
+            .foregroundStyle(.secondary)
             .padding(.horizontal, 10)
             .padding(.vertical, 8)
-            .background(TodayTheme.card.opacity(0.72))
+            .background(Color(UIColor.secondarySystemGroupedBackground).opacity(0.72))
             .clipShape(Capsule())
     }
 }

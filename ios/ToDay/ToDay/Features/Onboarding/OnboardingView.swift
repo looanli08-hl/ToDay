@@ -12,11 +12,11 @@ struct OnboardingView: View {
                 Text("ToDay")
                     .font(.system(size: 42, weight: .regular, design: .serif))
                     .italic()
-                    .foregroundStyle(TodayTheme.ink)
+                    .foregroundStyle(.primary)
 
                 Text("把每一天变成可见的故事")
                     .font(.system(size: 16))
-                    .foregroundStyle(TodayTheme.inkMuted)
+                    .foregroundStyle(Color(UIColor.tertiaryLabel))
             }
 
             Spacer()
@@ -37,7 +37,7 @@ struct OnboardingView: View {
                 )
                 permissionRow(
                     icon: "photo.fill",
-                    iconColor: TodayTheme.accent,
+                    iconColor: Color.accentColor,
                     title: "照片库",
                     detail: "匹配当天拍的照片到对应事件。"
                 )
@@ -49,7 +49,7 @@ struct OnboardingView: View {
 
             Text("所有数据仅存储在本地，不会上传。")
                 .font(.system(size: 13))
-                .foregroundStyle(TodayTheme.inkFaint)
+                .foregroundStyle(Color(UIColor.quaternaryLabel))
 
             Spacer()
 
@@ -64,7 +64,7 @@ struct OnboardingView: View {
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
-                    .background(TodayTheme.accent)
+                    .background(Color.accentColor)
                     .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
             }
             .padding(.horizontal, 24)
@@ -74,10 +74,10 @@ struct OnboardingView: View {
                 onComplete()
             }
             .font(.system(size: 14))
-            .foregroundStyle(TodayTheme.inkMuted)
+            .foregroundStyle(Color(UIColor.tertiaryLabel))
             .padding(.bottom, 12)
         }
-        .background(TodayTheme.background)
+        .background(Color(UIColor.systemGroupedBackground))
     }
 
     private func permissionRow(
@@ -97,22 +97,22 @@ struct OnboardingView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
                     .font(.system(size: 15, weight: .semibold))
-                    .foregroundStyle(TodayTheme.ink)
+                    .foregroundStyle(.primary)
 
                 Text(detail)
                     .font(.system(size: 13))
-                    .foregroundStyle(TodayTheme.inkMuted)
+                    .foregroundStyle(Color(UIColor.tertiaryLabel))
                     .lineSpacing(2)
             }
 
             Spacer(minLength: 0)
         }
         .padding(14)
-        .background(TodayTheme.card)
+        .background(Color(UIColor.secondarySystemGroupedBackground))
         .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .stroke(TodayTheme.border, lineWidth: 0.5)
+                .stroke(Color(UIColor.separator), lineWidth: 0.5)
         )
     }
 

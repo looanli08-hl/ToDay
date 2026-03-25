@@ -30,7 +30,7 @@ struct OverviewStatCard: View {
         VStack(alignment: .leading, spacing: 7) {
             Text(stat.label)
                 .font(.system(size: 11))
-                .foregroundStyle(TodayTheme.inkMuted)
+                .foregroundStyle(Color(UIColor.tertiaryLabel))
 
             Text(stat.value)
                 .font(.system(size: 24, weight: .bold, design: .monospaced))
@@ -48,7 +48,7 @@ struct OverviewStatCard: View {
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .strokeBorder(TodayTheme.border, lineWidth: 1)
+                .strokeBorder(Color(UIColor.separator), lineWidth: 1)
         )
     }
 }
@@ -184,7 +184,7 @@ struct TodayFlowSignatureView: View {
     }
 
     private func flowGradient(points: [RiverPoint]) -> LinearGradient {
-        let stops = points.isEmpty ? [Gradient.Stop(color: TodayTheme.inkFaint, location: 0)] : points.map { point in
+        let stops = points.isEmpty ? [Gradient.Stop(color: Color(UIColor.quaternaryLabel), location: 0)] : points.map { point in
             Gradient.Stop(
                 color: point.color,
                 location: point.progress
@@ -224,7 +224,7 @@ struct TodayFlowSignatureView: View {
     }
 
     private func color(for date: Date) -> Color {
-        event(at: date)?.kind.flowColor ?? TodayTheme.inkFaint
+        event(at: date)?.kind.flowColor ?? Color(UIColor.quaternaryLabel)
     }
 }
 
@@ -252,7 +252,7 @@ struct TimelineStreamRow: View {
             HStack(alignment: .center, spacing: 10) {
                 Text(entry.timelineTimeLabel)
                     .font(.system(size: 12, weight: .medium, design: .monospaced))
-                    .foregroundStyle(TodayTheme.inkMuted)
+                    .foregroundStyle(Color(UIColor.tertiaryLabel))
                     .frame(width: 74, alignment: .leading)
 
                 RoundedRectangle(cornerRadius: 9, style: .continuous)
@@ -269,7 +269,7 @@ struct TimelineStreamRow: View {
 
                 Text(entry.timelineTitle)
                     .font(.system(size: 15, weight: isExpanded ? .semibold : .regular))
-                    .foregroundStyle(TodayTheme.inkSoft)
+                    .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity, alignment: .leading)
 
                 if !entry.photoAttachments.isEmpty {
@@ -278,10 +278,10 @@ struct TimelineStreamRow: View {
                         Text("\(entry.photoAttachments.count)")
                     }
                     .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(TodayTheme.inkMuted)
+                    .foregroundStyle(Color(UIColor.tertiaryLabel))
                     .padding(.horizontal, 8)
                     .padding(.vertical, 5)
-                    .background(TodayTheme.card)
+                    .background(Color(UIColor.secondarySystemGroupedBackground))
                     .clipShape(Capsule())
                 }
 
@@ -304,7 +304,7 @@ struct TimelineStreamRow: View {
 
                 Image(systemName: "chevron.down")
                     .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(TodayTheme.inkMuted)
+                    .foregroundStyle(Color(UIColor.tertiaryLabel))
                     .rotationEffect(.degrees(isExpanded ? 180 : 0))
             }
 
@@ -312,7 +312,7 @@ struct TimelineStreamRow: View {
                 VStack(alignment: .leading, spacing: 12) {
                     Text(entry.timelineDetail)
                         .font(.system(size: 14))
-                        .foregroundStyle(TodayTheme.inkMuted)
+                        .foregroundStyle(Color(UIColor.tertiaryLabel))
                         .lineSpacing(4)
 
                     if !entry.photoAttachments.isEmpty {
@@ -340,7 +340,7 @@ private struct TimelinePhotoStrip: View {
         VStack(alignment: .leading, spacing: 10) {
             Text("记录照片")
                 .font(.system(size: 12, weight: .medium))
-                .foregroundStyle(TodayTheme.inkMuted)
+                .foregroundStyle(Color(UIColor.tertiaryLabel))
 
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 10) {
@@ -366,7 +366,7 @@ private struct TimelinePhotoThumbnail: View {
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(TodayTheme.card)
+                .fill(Color(UIColor.secondarySystemGroupedBackground))
 
             if let image {
                 Image(uiImage: image)
@@ -379,14 +379,14 @@ private struct TimelinePhotoThumbnail: View {
                     Text("查看")
                         .font(.system(size: 11, weight: .semibold))
                 }
-                .foregroundStyle(TodayTheme.inkMuted)
+                .foregroundStyle(Color(UIColor.tertiaryLabel))
             }
         }
         .frame(width: 88, height: 88)
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(TodayTheme.border, lineWidth: 1)
+                .stroke(Color(UIColor.separator), lineWidth: 1)
         )
         .task(id: attachment.id) {
             image = MoodPhotoLibrary.image(for: attachment)
@@ -402,7 +402,7 @@ struct IntensityBar: View {
     var body: some View {
         ZStack(alignment: .leading) {
             Capsule()
-                .fill(TodayTheme.border)
+                .fill(Color(UIColor.separator))
                 .frame(height: 3)
 
             Capsule()
@@ -434,33 +434,33 @@ struct RecentDayCard: View {
                 HStack {
                     Text(digest.title)
                         .font(.system(size: 15, weight: .semibold))
-                        .foregroundStyle(TodayTheme.inkSoft)
+                        .foregroundStyle(.secondary)
 
                     Spacer()
 
                     Text(digest.date.formatted(.dateTime.month(.abbreviated).day().locale(locale)))
                         .font(.system(size: 12, weight: .medium, design: .monospaced))
-                        .foregroundStyle(TodayTheme.inkMuted)
+                        .foregroundStyle(Color(UIColor.tertiaryLabel))
                 }
 
                 Text(digest.detail)
                     .font(.system(size: 13))
-                    .foregroundStyle(TodayTheme.inkMuted)
+                    .foregroundStyle(Color(UIColor.tertiaryLabel))
 
                 if let notePreview = digest.notePreview {
                     Text("“\(notePreview)”")
                         .font(.system(size: 12))
-                        .foregroundStyle(TodayTheme.inkSoft)
+                        .foregroundStyle(.secondary)
                         .lineLimit(1)
                 }
             }
         }
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(TodayTheme.elevatedCard.opacity(0.72))
+        .background(Color(UIColor.tertiarySystemGroupedBackground).opacity(0.72))
         .overlay(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(TodayTheme.border, lineWidth: 1)
+                .stroke(Color(UIColor.separator), lineWidth: 1)
         )
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
@@ -468,7 +468,7 @@ struct RecentDayCard: View {
     private var color: Color {
         switch digest.mood {
         case .happy:
-            return TodayTheme.accent
+            return Color.accentColor
         case .calm:
             return TodayTheme.teal
         case .focused:
@@ -486,13 +486,13 @@ struct RecentDayCard: View {
         case .irritated:
             return TodayTheme.rose
         case .bored:
-            return TodayTheme.inkFaint
+            return Color(UIColor.quaternaryLabel)
         case .sleepy:
             return TodayTheme.blue
         case .satisfied:
             return TodayTheme.scrollSunrise
         case .none:
-            return TodayTheme.inkFaint
+            return Color(UIColor.quaternaryLabel)
         }
     }
 }
@@ -507,13 +507,13 @@ extension EventKind {
         case .userAnnotated:
             return TodayTheme.teal
         case .quietTime:
-            return TodayTheme.inkFaint
+            return Color(UIColor.quaternaryLabel)
         case .mood:
-            return TodayTheme.accent
+            return Color.accentColor
         case .shutter:
             return TodayTheme.scrollGold
         case .screenTime:
-            return TodayTheme.inkFaint
+            return Color(UIColor.quaternaryLabel)
         case .spending:
             return TodayTheme.teal
         }
@@ -528,13 +528,13 @@ extension EventKind {
         case .userAnnotated:
             return TodayTheme.tealSoft
         case .quietTime:
-            return TodayTheme.elevatedCard
+            return Color(UIColor.tertiarySystemGroupedBackground)
         case .mood:
-            return TodayTheme.accentSoft
+            return Color.accentColor.opacity(0.12)
         case .shutter:
-            return TodayTheme.accentSoft
+            return Color.accentColor.opacity(0.12)
         case .screenTime:
-            return TodayTheme.elevatedCard
+            return Color(UIColor.tertiarySystemGroupedBackground)
         case .spending:
             return TodayTheme.tealSoft
         }

@@ -33,7 +33,7 @@ struct HistoryDayDetailScreen: View {
             }
             .padding(.vertical, 20)
         }
-        .background(TodayTheme.background)
+        .background(Color(UIColor.systemGroupedBackground))
         .navigationTitle(date.formatted(.dateTime.month(.abbreviated).day().locale(chineseLocale)))
         .navigationBarTitleDisplayMode(.inline)
         .sheet(item: $selectedEvent) { event in
@@ -45,17 +45,17 @@ struct HistoryDayDetailScreen: View {
     }
 
     private var summaryCard: some View {
-        ContentCard(background: TodayTheme.accentSoft.opacity(0.72)) {
+        ContentCard(background: Color.accentColor.opacity(0.09)) {
             EyebrowLabel("单日回看")
 
             Text("当天画卷")
                 .font(.system(size: 23, weight: .regular, design: .serif))
                 .italic()
-                .foregroundStyle(TodayTheme.ink)
+                .foregroundStyle(.primary)
 
             Text(summaryText)
                 .font(.subheadline)
-                .foregroundStyle(TodayTheme.inkMuted)
+                .foregroundStyle(Color(UIColor.tertiaryLabel))
                 .lineSpacing(4)
 
             if let timeline {
@@ -74,11 +74,11 @@ struct HistoryDayDetailScreen: View {
             Text("当天时间轴")
                 .font(.system(size: 23, weight: .regular, design: .serif))
                 .italic()
-                .foregroundStyle(TodayTheme.ink)
+                .foregroundStyle(.primary)
 
             Text("从凌晨到夜里，把这一天重新走一遍。")
                 .font(.system(size: 14))
-                .foregroundStyle(TodayTheme.inkMuted)
+                .foregroundStyle(Color(UIColor.tertiaryLabel))
                 .lineSpacing(4)
 
             DayScrollView(
@@ -99,12 +99,12 @@ struct HistoryDayDetailScreen: View {
             Text("手动记录")
                 .font(.system(size: 23, weight: .regular, design: .serif))
                 .italic()
-                .foregroundStyle(TodayTheme.ink)
+                .foregroundStyle(.primary)
                 .padding(.horizontal, 20)
 
             Text(detail.narrative)
                 .font(.system(size: 14))
-                .foregroundStyle(TodayTheme.inkMuted)
+                .foregroundStyle(Color(UIColor.tertiaryLabel))
                 .lineSpacing(4)
                 .padding(.horizontal, 20)
 
@@ -124,11 +124,11 @@ struct HistoryDayDetailScreen: View {
             Text("这一天还没有可回看的画卷")
                 .font(.system(size: 23, weight: .regular, design: .serif))
                 .italic()
-                .foregroundStyle(TodayTheme.ink)
+                .foregroundStyle(.primary)
 
             Text("如果这一天没有 HealthKit 轨迹，也没有手动记录，这里会保持空白。")
                 .font(.subheadline)
-                .foregroundStyle(TodayTheme.inkMuted)
+                .foregroundStyle(Color(UIColor.tertiaryLabel))
         }
         .padding(.horizontal, 20)
     }
@@ -164,7 +164,7 @@ private struct HistoryMomentCard: View {
 
                     Text(record.displayTimeLabel())
                         .font(.caption.weight(.medium))
-                        .foregroundStyle(TodayTheme.inkMuted)
+                        .foregroundStyle(Color(UIColor.tertiaryLabel))
                 }
 
                 Spacer()
@@ -173,24 +173,24 @@ private struct HistoryMomentCard: View {
             if record.note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 Text("这条记录还没有备注，后续可以继续补充当天发生了什么。")
                     .font(.subheadline)
-                    .foregroundStyle(TodayTheme.inkMuted)
+                    .foregroundStyle(Color(UIColor.tertiaryLabel))
             } else {
                 Text(record.note)
                     .font(.subheadline)
-                    .foregroundStyle(TodayTheme.inkSoft)
+                    .foregroundStyle(.secondary)
                     .padding(12)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(TodayTheme.elevatedCard.opacity(0.72))
+                    .background(Color(UIColor.tertiarySystemGroupedBackground).opacity(0.72))
                     .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
             }
         }
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(TodayTheme.card)
+        .background(Color(UIColor.secondarySystemGroupedBackground))
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .stroke(TodayTheme.border, lineWidth: 1)
+                .stroke(Color(UIColor.separator), lineWidth: 1)
         )
     }
 }

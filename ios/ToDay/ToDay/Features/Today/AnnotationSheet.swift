@@ -40,13 +40,13 @@ struct AnnotationSheet: View {
                 .padding(.top, 20)
                 .padding(.bottom, 120)
             }
-            .background(TodayTheme.background)
+            .background(Color(UIColor.systemGroupedBackground))
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("取消") {
                         dismiss()
                     }
-                    .foregroundStyle(TodayTheme.inkSoft)
+                    .foregroundStyle(.secondary)
                 }
             }
             .safeAreaInset(edge: .bottom) {
@@ -54,7 +54,7 @@ struct AnnotationSheet: View {
                     .padding(.horizontal, 20)
                     .padding(.top, 8)
                     .padding(.bottom, 12)
-                    .background(TodayTheme.background.opacity(0.96))
+                    .background(Color(UIColor.systemGroupedBackground).opacity(0.96))
             }
         }
         .presentationDetents([.medium, .large])
@@ -66,15 +66,15 @@ struct AnnotationSheet: View {
             Text("标注这段时间")
                 .font(.system(size: 28, weight: .regular, design: .serif))
                 .italic()
-                .foregroundStyle(TodayTheme.ink)
+                .foregroundStyle(.primary)
 
             Text(timeRangeText)
                 .font(.system(size: 12, weight: .medium, design: .monospaced))
-                .foregroundStyle(TodayTheme.inkMuted)
+                .foregroundStyle(Color(UIColor.tertiaryLabel))
 
             Text("选一个最接近的活动，或者直接写下这段时间真正发生了什么。")
                 .font(.system(size: 14))
-                .foregroundStyle(TodayTheme.inkMuted)
+                .foregroundStyle(Color(UIColor.tertiaryLabel))
                 .lineSpacing(4)
         }
     }
@@ -83,7 +83,7 @@ struct AnnotationSheet: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("常见活动")
                 .font(.subheadline.weight(.medium))
-                .foregroundStyle(TodayTheme.inkMuted)
+                .foregroundStyle(Color(UIColor.tertiaryLabel))
 
             LazyVGrid(columns: columns, spacing: 10) {
                 ForEach(presets) { preset in
@@ -97,18 +97,18 @@ struct AnnotationSheet: View {
 
                             Text(preset.title)
                                 .font(.system(size: 13, weight: .semibold))
-                                .foregroundStyle(TodayTheme.inkSoft)
+                                .foregroundStyle(.secondary)
                                 .multilineTextAlignment(.center)
                                 .lineLimit(2)
                                 .minimumScaleFactor(0.75)
                         }
                         .frame(maxWidth: .infinity, minHeight: 92)
                         .padding(.horizontal, 8)
-                        .background(TodayTheme.card)
+                        .background(Color(UIColor.secondarySystemGroupedBackground))
                         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
                         .overlay(
                             RoundedRectangle(cornerRadius: 18, style: .continuous)
-                                .stroke(TodayTheme.border, lineWidth: 1)
+                                .stroke(Color(UIColor.separator), lineWidth: 1)
                         )
                     }
                     .buttonStyle(.plain)
@@ -121,16 +121,16 @@ struct AnnotationSheet: View {
         VStack(alignment: .leading, spacing: 8) {
             Text("自由输入")
                 .font(.subheadline.weight(.medium))
-                .foregroundStyle(TodayTheme.inkMuted)
+                .foregroundStyle(Color(UIColor.tertiaryLabel))
 
             TextField("例如：赶方案、和朋友聊天、在路上发呆", text: $customTitle, axis: .vertical)
                 .textFieldStyle(.plain)
                 .padding(14)
-                .background(TodayTheme.card)
+                .background(Color(UIColor.secondarySystemGroupedBackground))
                 .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                 .overlay(
                     RoundedRectangle(cornerRadius: 16, style: .continuous)
-                        .stroke(TodayTheme.border, lineWidth: 1)
+                        .stroke(Color(UIColor.separator), lineWidth: 1)
                 )
         }
     }
@@ -144,7 +144,7 @@ struct AnnotationSheet: View {
         .foregroundStyle(.white)
         .frame(maxWidth: .infinity)
         .padding(.vertical, 14)
-        .background(TodayTheme.accent)
+        .background(Color.accentColor)
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
         .disabled(customTitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
         .opacity(customTitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? 0.45 : 1)

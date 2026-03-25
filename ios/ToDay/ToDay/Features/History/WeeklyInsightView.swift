@@ -39,7 +39,7 @@ struct WeeklyInsightView: View {
 
             Text(summaryText)
                 .font(.system(size: 15))
-                .foregroundStyle(TodayTheme.ink)
+                .foregroundStyle(.primary)
                 .lineSpacing(5)
 
             HStack(spacing: 12) {
@@ -163,7 +163,7 @@ struct WeeklyInsightView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("情绪热力带")
                 .font(.system(size: 11, weight: .medium, design: .monospaced))
-                .foregroundStyle(TodayTheme.inkMuted)
+                .foregroundStyle(Color(UIColor.tertiaryLabel))
 
             HStack(spacing: 10) {
                 ForEach(moodSummaries) { summary in
@@ -177,26 +177,26 @@ struct WeeklyInsightView: View {
                                     .clipShape(Circle())
                             } else {
                                 Circle()
-                                    .stroke(TodayTheme.border, lineWidth: 1.2)
+                                    .stroke(Color(UIColor.separator), lineWidth: 1.2)
                                     .frame(width: 38, height: 38)
                                     .overlay {
                                         Text("—")
                                             .font(.system(size: 15, weight: .medium))
-                                            .foregroundStyle(TodayTheme.inkFaint)
+                                            .foregroundStyle(Color(UIColor.quaternaryLabel))
                                     }
                             }
                         }
 
                         Text(summary.weekdayLabel)
                             .font(.system(size: 11, weight: .medium, design: .monospaced))
-                            .foregroundStyle(TodayTheme.inkMuted)
+                            .foregroundStyle(Color(UIColor.tertiaryLabel))
                     }
                     .frame(maxWidth: .infinity)
                 }
             }
         }
         .padding(14)
-        .background(TodayTheme.card.opacity(0.72))
+        .background(Color(UIColor.secondarySystemGroupedBackground).opacity(0.72))
         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
     }
 
@@ -293,13 +293,13 @@ struct WeeklyInsightView: View {
             HStack(alignment: .firstTextBaseline) {
                 Text(title)
                     .font(.system(size: 11, weight: .medium, design: .monospaced))
-                    .foregroundStyle(TodayTheme.inkMuted)
+                    .foregroundStyle(Color(UIColor.tertiaryLabel))
 
                 Spacer()
 
                 Text(metricText)
                     .font(.system(size: 12, weight: .semibold, design: .monospaced))
-                    .foregroundStyle(TodayTheme.inkSoft)
+                    .foregroundStyle(.secondary)
             }
 
             Chart(entries) { entry in
@@ -336,7 +336,7 @@ struct WeeklyInsightView: View {
         }
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(TodayTheme.card.opacity(0.72))
+        .background(Color(UIColor.secondarySystemGroupedBackground).opacity(0.72))
         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
     }
 
@@ -344,26 +344,26 @@ struct WeeklyInsightView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text(title)
                 .font(.system(size: 11, weight: .medium, design: .monospaced))
-                .foregroundStyle(TodayTheme.inkMuted)
+                .foregroundStyle(Color(UIColor.tertiaryLabel))
 
             Text(value)
                 .font(.system(size: 16, weight: .semibold))
-                .foregroundStyle(TodayTheme.inkSoft)
+                .foregroundStyle(.secondary)
 
             Text(detail)
                 .font(.system(size: 13))
-                .foregroundStyle(TodayTheme.inkMuted)
+                .foregroundStyle(Color(UIColor.tertiaryLabel))
         }
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(TodayTheme.card.opacity(0.72))
+        .background(Color(UIColor.secondarySystemGroupedBackground).opacity(0.72))
         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
     }
 
     private func moodColor(for mood: MoodRecord.Mood) -> Color {
         switch mood {
         case .happy:
-            return TodayTheme.accent
+            return Color.accentColor
         case .calm:
             return TodayTheme.teal
         case .focused:
@@ -381,7 +381,7 @@ struct WeeklyInsightView: View {
         case .irritated:
             return TodayTheme.rose
         case .bored:
-            return TodayTheme.inkFaint
+            return Color(UIColor.quaternaryLabel)
         case .sleepy:
             return TodayTheme.blueSoft
         case .satisfied:

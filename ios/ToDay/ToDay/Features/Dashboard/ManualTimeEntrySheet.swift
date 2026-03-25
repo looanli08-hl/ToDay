@@ -16,11 +16,11 @@ struct ManualTimeEntrySheet: View {
                     Text("添加时段")
                         .font(.system(size: 22, weight: .regular, design: .serif))
                         .italic()
-                        .foregroundStyle(TodayTheme.ink)
+                        .foregroundStyle(.primary)
 
                     Text("手动记录一段时间里做了什么。")
                         .font(.system(size: 13))
-                        .foregroundStyle(TodayTheme.inkMuted)
+                        .foregroundStyle(Color(UIColor.tertiaryLabel))
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 20)
@@ -30,7 +30,7 @@ struct ManualTimeEntrySheet: View {
                     VStack(alignment: .leading, spacing: 6) {
                         Text("在做什么")
                             .font(.system(size: 12, weight: .medium))
-                            .foregroundStyle(TodayTheme.inkMuted)
+                            .foregroundStyle(Color(UIColor.tertiaryLabel))
                             .textCase(.uppercase)
                             .tracking(1.2)
 
@@ -38,7 +38,7 @@ struct ManualTimeEntrySheet: View {
                             .font(.system(size: 16))
                             .focused($titleFocused)
                             .padding(14)
-                            .background(TodayTheme.elevatedCard)
+                            .background(Color(UIColor.tertiarySystemGroupedBackground))
                             .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                     }
 
@@ -47,7 +47,7 @@ struct ManualTimeEntrySheet: View {
                         VStack(alignment: .leading, spacing: 6) {
                             Text("开始")
                                 .font(.system(size: 12, weight: .medium))
-                                .foregroundStyle(TodayTheme.inkMuted)
+                                .foregroundStyle(Color(UIColor.tertiaryLabel))
                                 .textCase(.uppercase)
                                 .tracking(1.2)
 
@@ -59,7 +59,7 @@ struct ManualTimeEntrySheet: View {
                         VStack(alignment: .leading, spacing: 6) {
                             Text("结束")
                                 .font(.system(size: 12, weight: .medium))
-                                .foregroundStyle(TodayTheme.inkMuted)
+                                .foregroundStyle(Color(UIColor.tertiaryLabel))
                                 .textCase(.uppercase)
                                 .tracking(1.2)
 
@@ -88,8 +88,8 @@ struct ManualTimeEntrySheet: View {
                         .padding(.vertical, 16)
                         .background(
                             title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-                                ? TodayTheme.inkFaint
-                                : TodayTheme.accent
+                                ? Color(UIColor.quaternaryLabel)
+                                : Color.accentColor
                         )
                         .clipShape(Capsule())
                 }
@@ -99,7 +99,7 @@ struct ManualTimeEntrySheet: View {
                 .padding(.bottom, 16)
             }
             .padding(.top, 16)
-            .background(TodayTheme.background)
+            .background(Color(UIColor.systemGroupedBackground))
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("取消") { dismiss() }
