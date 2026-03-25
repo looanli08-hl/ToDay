@@ -5,6 +5,7 @@ import UIKit
 struct DashboardView: View {
     @ObservedObject var todayViewModel: TodayViewModel
     let onOpenTimeline: () -> Void
+    @State private var selectedEvent: InferredEvent?
 
     private var dashboardVM: DashboardViewModel {
         DashboardViewModel(timeline: todayViewModel.timeline)
@@ -40,6 +41,11 @@ struct DashboardView: View {
             .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
                 Task {
                     await todayViewModel.load(forceReload: true)
+                }
+            }
+            .sheet(item: $selectedEvent) { event in
+                EventDetailView(event: event) {
+                    selectedEvent = nil
                 }
             }
         }
@@ -205,7 +211,9 @@ struct DashboardView: View {
 
                 DayScrollView(
                     timeline: timeline,
-                    onEventTap: { _ in },
+                    onEventTap: { event in
+                        selectedEvent = event
+                    },
                     onBlankTap: { _ in },
                     showsCurrentTimeNeedle: true
                 )
