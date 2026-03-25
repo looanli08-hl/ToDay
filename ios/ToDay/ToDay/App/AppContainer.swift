@@ -9,6 +9,8 @@ enum AppContainer {
     static let modelContainer = makeModelContainer()
     private static let legacyMoodRecordStoreKey = "today.manualRecords"
     private static let moodRecordStore = SwiftDataMoodRecordStore(container: modelContainer)
+    private static let shutterRecordStore = SwiftDataShutterRecordStore(container: modelContainer)
+    private static let spendingRecordStore = SwiftDataSpendingRecordStore(container: modelContainer)
 #if os(iOS)
     static let phoneConnectivityManager = makePhoneConnectivityManager()
 #endif
@@ -43,6 +45,14 @@ enum AppContainer {
 
     static func makeMoodRecordStore() -> any MoodRecordStoring {
         moodRecordStore
+    }
+
+    static func makeShutterRecordStore() -> any ShutterRecordStoring {
+        shutterRecordStore
+    }
+
+    static func makeSpendingRecordStore() -> any SpendingRecordStoring {
+        spendingRecordStore
     }
 
     private static func makeModelContainer() -> ModelContainer {
