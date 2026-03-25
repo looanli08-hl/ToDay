@@ -65,11 +65,6 @@ struct TodayScreen: View {
                     viewModel.startMoodRecord(record)
                 }
             }
-            .sheet(isPresented: $viewModel.showSpendingInput) {
-                SpendingInputView { record in
-                    viewModel.addSpendingRecord(record)
-                }
-            }
             .sheet(isPresented: $viewModel.showScreenTimeInput) {
                 ScreenTimeInputView(
                     dateKey: viewModel.currentDateKey(),
@@ -189,19 +184,6 @@ struct TodayScreen: View {
             }
 
             HStack(spacing: 10) {
-                Button {
-                    viewModel.showSpendingInput = true
-                } label: {
-                    Label("记一笔", systemImage: "yensign.circle.fill")
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundStyle(TodayTheme.teal)
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 10)
-                        .background(TodayTheme.tealSoft)
-                        .clipShape(Capsule())
-                }
-                .buttonStyle(.plain)
-
                 Button {
                     viewModel.showScreenTimeInput = true
                 } label: {
