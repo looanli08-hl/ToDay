@@ -47,7 +47,12 @@ enum AppContainer {
 
     private static func makeModelContainer() -> ModelContainer {
         do {
-            let container = try ModelContainer(for: MoodRecordEntity.self, DayTimelineEntity.self)
+            let container = try ModelContainer(
+                for: MoodRecordEntity.self,
+                DayTimelineEntity.self,
+                ShutterRecordEntity.self,
+                SpendingRecordEntity.self
+            )
             migrateLegacyMoodRecordsIfNeeded(into: container)
             return container
         } catch {
