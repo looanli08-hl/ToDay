@@ -40,49 +40,76 @@ enum TrendDirection {
         case .flat: return "arrow.right"
         }
     }
+
+    var label: String {
+        switch self {
+        case .up:   return "UP"
+        case .down: return "DOWN"
+        case .flat: return "SAME"
+        }
+    }
 }
 
 struct DashboardCardView: View {
     let card: DashboardCardData
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 8) {
             HStack {
+                // Icon in tinted circle
                 Image(systemName: card.icon)
-                    .font(.system(size: 16, weight: .semibold))
+                    .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(card.tint)
+                    .frame(width: 30, height: 30)
+                    .background(card.tint.opacity(0.12))
+                    .clipShape(Circle())
 
                 Spacer()
 
+                // Pill-shaped trend indicator
                 if let trend = card.trend {
-                    Image(systemName: trend.iconName)
-                        .font(.system(size: 11, weight: .bold))
-                        .foregroundStyle(trendColor(trend))
+                    HStack(spacing: 3) {
+                        Image(systemName: trend.iconName)
+                            .font(.system(size: 9, weight: .bold))
+
+                        Text(trend.label)
+                            .font(.system(size: 9, weight: .bold))
+                            .tracking(0.5)
+                    }
+                    .foregroundStyle(trendColor(trend))
+                    .padding(.horizontal, 7)
+                    .padding(.vertical, 4)
+                    .background(trendColor(trend).opacity(0.1))
+                    .clipShape(Capsule())
                 }
             }
 
             Spacer()
 
-            Text(card.label)
-                .font(.system(size: 12, weight: .medium))
+            // Label: small uppercase with letter spacing
+            Text(card.label.uppercased())
+                .font(.system(size: 11, weight: .medium))
                 .foregroundStyle(TodayTheme.inkMuted)
+                .tracking(1.2)
                 .lineLimit(1)
 
+            // Value: larger and bolder
             Text(card.value)
-                .font(.system(size: 20, weight: .bold, design: .monospaced))
+                .font(.system(size: 24, weight: .bold, design: .rounded))
                 .foregroundStyle(TodayTheme.ink)
                 .lineLimit(1)
-                .minimumScaleFactor(0.7)
+                .minimumScaleFactor(0.6)
         }
-        .padding(14)
+        .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
         .aspectRatio(1.0, contentMode: .fit)
         .background(card.background)
         .overlay(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(TodayTheme.border, lineWidth: 1)
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .stroke(TodayTheme.border.opacity(0.5), lineWidth: 0.5)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .shadow(color: Color(red: 0.17, green: 0.20, blue: 0.15).opacity(0.06), radius: 16, x: 0, y: 4)
     }
 
     private func trendColor(_ trend: TrendDirection) -> Color {
@@ -129,4 +156,5 @@ struct DashboardCardView: View {
         ))
     }
     .padding()
+    .background(TodayTheme.background)
 }
