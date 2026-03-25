@@ -24,7 +24,6 @@ struct DashboardView: View {
                 VStack(alignment: .leading, spacing: 24) {
                     headerSection
                     cardGridSection
-                    quickActionsSection
                     insightSection
                     timelinePreviewSection
                 }
@@ -57,25 +56,6 @@ struct DashboardView: View {
             .sheet(item: $annotatingEvent) { event in
                 AnnotationSheet(event: event) { title in
                     todayViewModel.annotateEvent(event, title: title)
-                }
-            }
-            .sheet(isPresented: $todayViewModel.showQuickRecord) {
-                QuickRecordSheet(mode: todayViewModel.quickRecordMode) { record in
-                    todayViewModel.startMoodRecord(record)
-                }
-            }
-            .sheet(isPresented: $showManualTimeEntry) {
-                ManualTimeEntrySheet { title, start, end in
-                    let event = InferredEvent(
-                        kind: .userAnnotated,
-                        startDate: start,
-                        endDate: end,
-                        confidence: .high,
-                        displayName: title,
-                        userAnnotation: title
-                    )
-                    todayViewModel.annotateEvent(event, title: title)
-                    showManualTimeEntry = false
                 }
             }
         }
