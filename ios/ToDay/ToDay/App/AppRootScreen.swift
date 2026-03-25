@@ -58,7 +58,10 @@ struct AppRootScreen: View {
                 ShutterPanel(viewModel: todayViewModel)
             }
             .sheet(isPresented: $showRecordPanel) {
-                RecordPanel(viewModel: todayViewModel)
+                QuickRecordSheet(mode: .flexible) { record in
+                    todayViewModel.startMoodRecord(record)
+                    showRecordPanel = false
+                }
             }
         } else {
             OnboardingView {
