@@ -23,7 +23,6 @@ struct CameraPickerView: UIViewControllerRepresentable {
         case .video:
             picker.mediaTypes = ["public.movie"]
             picker.cameraCaptureMode = .video
-            picker.videoMaximumDuration = 15
             picker.videoQuality = .typeMedium
         }
 
