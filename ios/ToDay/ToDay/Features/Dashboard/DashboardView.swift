@@ -6,6 +6,7 @@ struct DashboardView: View {
     @ObservedObject var todayViewModel: TodayViewModel
     let onOpenTimeline: () -> Void
     @State private var selectedEvent: InferredEvent?
+    @State private var annotatingEvent: InferredEvent?
 
     private var dashboardVM: DashboardViewModel {
         DashboardViewModel(timeline: todayViewModel.timeline)
@@ -46,6 +47,20 @@ struct DashboardView: View {
             .sheet(item: $selectedEvent) { event in
                 EventDetailView(event: event) {
                     selectedEvent = nil
+                    Task { @MainActor in
+                        try? await Task.sleep(for: .milliseconds(150))
+                        annotatingEvent = event
+                    }
+                }
+            }
+            .sheet(item: $annotatingEvent) { event in
+                AnnotationSheet(event: event) { title in
+                    todayViewModel.annotateEvent(event, title: title)
+                }
+            }
+            .sheet(isPresented: $todayViewModel.showQuickRecord) {
+                QuickRecordSheet(mode: todayViewModel.quickRecordMode) { record in
+                    todayViewModel.startMoodRecord(record)
                 }
             }
         }
@@ -214,7 +229,9 @@ struct DashboardView: View {
                     onEventTap: { event in
                         selectedEvent = event
                     },
-                    onBlankTap: { _ in },
+                    onBlankTap: { event in
+                        annotatingEvent = event
+                    },
                     showsCurrentTimeNeedle: true
                 )
             }
