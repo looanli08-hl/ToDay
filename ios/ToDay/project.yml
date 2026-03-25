@@ -41,6 +41,8 @@ targets:
         INFOPLIST_KEY_NSHealthShareUsageDescription: ToDay 读取你的运动、心率和睡眠数据，用来生成每日生活画卷。所有数据仅存储在本地。
         INFOPLIST_KEY_NSLocationWhenInUseUsageDescription: ToDay 记录你到访过的地点，让画卷上的事件有地理上下文。位置数据仅存储在本地。
         INFOPLIST_KEY_NSPhotoLibraryUsageDescription: ToDay 读取你当天拍摄的照片，将它们匹配到画卷中对应的事件。照片不会上传。
+        INFOPLIST_KEY_NSCameraUsageDescription: ToDay 使用相机拍摄照片和视频，快速记录生活碎片。媒体文件仅存储在本地。
+        INFOPLIST_KEY_NSMicrophoneUsageDescription: ToDay 使用麦克风录制语音备忘，帮你用最少的操作捕捉灵感。录音仅存储在本地。
   ToDayWatch:
     type: application
     platform: watchOS
