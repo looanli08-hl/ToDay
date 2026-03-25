@@ -79,6 +79,8 @@ ShutterRecord
 ├── voiceTranscript: String?
 ├── duration: TimeInterval?
 └── echoConfig: EchoConfig?
+    ├── frequency: EchoFrequency  (high / medium / low / off)
+    └── customRemindAt: Date?     (用户自定义提醒时间)
 ```
 
 ### 3.2 新增：ScreenTimeRecord（屏幕时间）
@@ -213,6 +215,7 @@ App 内独立 Tab，展示：
 
 - **MVP**: 嵌入系统 `DeviceActivityReport` 视图 + 用户手动补充
 - **原因**: Apple Screen Time API 限制严格，无法获取原始数据
+- **注意**: 需要 Family Controls entitlement 和独立的 App Extension target，如工程量过大可推迟到 MVP 之后
 - **后续**: 桌面端可更自由获取电脑端应用使用数据
 
 ### 7.2 消费记录
@@ -249,7 +252,7 @@ App 内独立 Tab，展示：
 
 ### 复用
 
-- HealthKit 数据采集（`HealthKitProvider`、`DayDataAggregator`）
+- HealthKit 数据采集（`HealthKitTimelineDataProvider`、`DayDataAggregator`）
 - 事件推理引擎（`EventInferring` protocol 体系）
 - SwiftData 模型基础（`DayTimelineEntity`、`MoodRecordEntity`）
 - Protocol 抽象体系（`TimelineDataProviding`、`MoodRecordStoring`）
@@ -259,8 +262,7 @@ App 内独立 Tab，展示：
 ### 搁置
 
 - Watch 端全部代码（`ToDayWatch/`）— 不删除，不维护
-- `SignatureFlowView`（心率河流图）— 后续可作为可选组件回归
-- `WeeklySpotlightSection` — 由仪表盘洞察替代
+- 心率河流图、周报等旧版可视化组件 — 如仍存在则搁置，后续可作为可选组件回归
 
 ### 重写
 
