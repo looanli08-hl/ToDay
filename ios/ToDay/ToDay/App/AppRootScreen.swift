@@ -45,7 +45,7 @@ struct AppRootScreen: View {
                         }
                         .tag(AppTab.settings)
                 }
-                .tint(TodayTheme.teal)
+                .tint(.accentColor)
 
                 // Floating record + shutter bar at the bottom
                 VStack {
@@ -74,35 +74,32 @@ struct AppRootScreen: View {
 
     private var floatingRecordBar: some View {
         HStack(spacing: 12) {
-            // Combined mood + time period button
+            // Record button
             Button {
                 showRecordPanel = true
             } label: {
                 HStack(spacing: 6) {
                     Image(systemName: "plus.circle.fill")
-                        .font(.system(size: 18))
+                        .font(.body)
                     Text("记录")
-                        .font(.system(size: 15, weight: .semibold))
+                        .font(.body.weight(.semibold))
                 }
-                .foregroundStyle(.white)
-                .padding(.horizontal, 20)
-                .padding(.vertical, 12)
-                .background(TodayTheme.accent)
-                .clipShape(Capsule())
-                .shadow(color: TodayTheme.accent.opacity(0.35), radius: 12, x: 0, y: 6)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.borderedProminent)
+            .controlSize(.regular)
+            .clipShape(Capsule())
+            .shadow(color: .accentColor.opacity(0.2), radius: 8, x: 0, y: 4)
 
             // Shutter button
             Button {
                 todayViewModel.showShutterPanel = true
             } label: {
                 Image(systemName: "camera.aperture")
-                    .font(.system(size: 20, weight: .semibold))
+                    .font(.body.weight(.semibold))
                     .foregroundStyle(.white)
-                    .frame(width: 48, height: 48)
-                    .background(Circle().fill(TodayTheme.scrollGold))
-                    .shadow(color: TodayTheme.scrollGold.opacity(0.35), radius: 12, x: 0, y: 6)
+                    .frame(width: 44, height: 44)
+                    .background(Circle().fill(Color(UIColor.secondaryLabel)))
+                    .shadow(color: Color.primary.opacity(0.1), radius: 8, x: 0, y: 4)
             }
             .buttonStyle(.plain)
         }

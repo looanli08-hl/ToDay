@@ -28,7 +28,9 @@ struct ShutterPanel: View {
                     cameraView(mode: cameraMode)
                 }
             }
-            .background(TodayTheme.background)
+            .background(Color(UIColor.systemGroupedBackground))
+            .navigationTitle(navigationTitle)
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button {
@@ -40,12 +42,15 @@ struct ShutterPanel: View {
                             }
                         }
                     } label: {
-                        Image(systemName: mode == .menu ? "xmark" : "chevron.left")
-                            .font(.system(size: 13, weight: .bold))
-                            .foregroundStyle(TodayTheme.inkSoft)
-                            .frame(width: 32, height: 32)
-                            .background(TodayTheme.card)
-                            .clipShape(Circle())
+                        if mode == .menu {
+                            Text("关闭")
+                        } else {
+                            HStack(spacing: 4) {
+                                Image(systemName: "chevron.left")
+                                    .font(.body.weight(.medium))
+                                Text("返回")
+                            }
+                        }
                     }
                 }
             }
@@ -59,37 +64,41 @@ struct ShutterPanel: View {
         .presentationDragIndicator(.visible)
     }
 
+    private var navigationTitle: String {
+        switch mode {
+        case .menu: return "快门"
+        case .text: return "文字快门"
+        case .voice: return "语音快门"
+        case .camera(.photo): return "拍照"
+        case .camera(.video): return "视频"
+        }
+    }
+
     // MARK: - Menu View
 
     private var menuView: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            VStack(alignment: .leading, spacing: 8) {
-                Text("快门")
-                    .font(.system(size: 28, weight: .regular, design: .serif))
-                    .italic()
-                    .foregroundStyle(TodayTheme.ink)
-
+        List {
+            Section {
                 Text("捕捉此刻的灵光一现，不用分类、不用打标签。")
-                    .font(.system(size: 14))
-                    .foregroundStyle(TodayTheme.inkMuted)
-                    .lineSpacing(3)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .listRowBackground(Color.clear)
+                    .listRowInsets(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 20))
             }
-            .padding(.horizontal, 20)
-            .padding(.top, 8)
 
-            VStack(spacing: 10) {
-                shutterOption(
+            Section {
+                shutterRow(
                     icon: "text.cursor",
                     title: "文字",
                     subtitle: "写下脑海里的念头",
-                    tint: TodayTheme.accent
+                    tint: .accentColor
                 ) {
                     withAnimation(.easeInOut(duration: 0.2)) {
                         mode = .text
                     }
                 }
 
-                shutterOption(
+                shutterRow(
                     icon: "mic.fill",
                     title: "语音",
                     subtitle: "说出来，比打字更快",
@@ -100,7 +109,7 @@ struct ShutterPanel: View {
                     }
                 }
 
-                shutterOption(
+                shutterRow(
                     icon: "camera.fill",
                     title: "拍照",
                     subtitle: "用镜头记住这一刻",
@@ -115,7 +124,7 @@ struct ShutterPanel: View {
                     #endif
                 }
 
-                shutterOption(
+                shutterRow(
                     icon: "video.fill",
                     title: "视频",
                     subtitle: "录一段 15 秒短片",
@@ -130,13 +139,11 @@ struct ShutterPanel: View {
                     #endif
                 }
             }
-            .padding(.horizontal, 20)
-
-            Spacer()
         }
+        .listStyle(.insetGrouped)
     }
 
-    private func shutterOption(
+    private func shutterRow(
         icon: String,
         title: String,
         subtitle: String,
@@ -146,56 +153,38 @@ struct ShutterPanel: View {
         Button(action: action) {
             HStack(spacing: 14) {
                 Image(systemName: icon)
-                    .font(.system(size: 20, weight: .semibold))
+                    .font(.body.weight(.semibold))
                     .foregroundStyle(tint)
-                    .frame(width: 44, height: 44)
-                    .background(tint.opacity(0.12))
-                    .clipShape(Circle())
+                    .frame(width: 28)
 
-                VStack(alignment: .leading, spacing: 3) {
+                VStack(alignment: .leading, spacing: 2) {
                     Text(title)
-                        .font(.system(size: 17, weight: .bold))
-                        .foregroundStyle(TodayTheme.ink)
+                        .font(.body.weight(.medium))
+                        .foregroundStyle(.primary)
 
                     Text(subtitle)
-                        .font(.system(size: 13))
-                        .foregroundStyle(TodayTheme.inkFaint)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
 
                 Spacer()
 
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(TodayTheme.inkFaint)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Color(UIColor.tertiaryLabel))
             }
-            .padding(14)
-            .background(TodayTheme.card)
-            .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                    .stroke(TodayTheme.border, lineWidth: 1)
-            )
-            .shadow(color: TodayTheme.ink.opacity(0.06), radius: 16, x: 0, y: 4)
         }
-        .buttonStyle(.plain)
     }
 
     // MARK: - Text View
 
     private var textView: some View {
         VStack(alignment: .leading, spacing: 12) {
-            VStack(alignment: .leading, spacing: 8) {
-                Text("文字快门")
-                    .font(.system(size: 22, weight: .regular, design: .serif))
-                    .italic()
-                    .foregroundStyle(TodayTheme.ink)
-
-                Text("写完按发送，会自动出现在时间线上。")
-                    .font(.system(size: 13))
-                    .foregroundStyle(TodayTheme.inkMuted)
-            }
-            .padding(.horizontal, 20)
-            .padding(.top, 8)
+            Text("写完按发送，会自动出现在时间线上。")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .padding(.horizontal, 20)
+                .padding(.top, 8)
 
             Spacer()
 

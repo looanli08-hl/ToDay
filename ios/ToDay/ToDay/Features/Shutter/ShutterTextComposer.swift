@@ -11,16 +11,12 @@ struct ShutterTextComposer: View {
             HStack(alignment: .bottom, spacing: 10) {
                 TextField("写下此刻的想法…", text: $text, axis: .vertical)
                     .textFieldStyle(.plain)
-                    .font(.system(size: 16))
+                    .font(.body)
                     .lineLimit(1...6)
                     .focused($isFocused)
                     .padding(14)
-                    .background(TodayTheme.card)
-                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16, style: .continuous)
-                            .stroke(TodayTheme.border, lineWidth: 1)
-                    )
+                    .background(Color(UIColor.secondarySystemGroupedBackground))
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
 
                 Button {
                     let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -31,8 +27,8 @@ struct ShutterTextComposer: View {
                         .font(.system(size: 36))
                         .foregroundStyle(
                             text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-                                ? TodayTheme.inkFaint
-                                : TodayTheme.accent
+                                ? Color(UIColor.quaternaryLabel)
+                                : .accentColor
                         )
                 }
                 .disabled(text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)

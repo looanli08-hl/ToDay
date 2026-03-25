@@ -21,14 +21,10 @@ struct VoiceRecordView: View {
     var body: some View {
         VStack(spacing: 20) {
             // Header
-            VStack(alignment: .leading, spacing: 8) {
-                Text("语音快门")
-                    .font(.system(size: 22, weight: .regular, design: .serif))
-                    .italic()
-                    .foregroundStyle(TodayTheme.ink)
+            VStack(alignment: .leading, spacing: 4) {
                 Text("点击录音，再次点击停止。")
-                    .font(.system(size: 13))
-                    .foregroundStyle(TodayTheme.inkMuted)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 20)
@@ -39,7 +35,7 @@ struct VoiceRecordView: View {
             // Duration display
             Text(formattedDuration)
                 .font(.system(size: 48, weight: .light, design: .monospaced))
-                .foregroundStyle(state == .recording ? TodayTheme.accent : TodayTheme.inkSoft)
+                .foregroundStyle(state == .recording ? Color.accentColor : Color.secondary)
 
             // Mic button
             Button {
@@ -47,14 +43,14 @@ struct VoiceRecordView: View {
             } label: {
                 Image(systemName: state == .recording ? "stop.circle.fill" : "mic.circle.fill")
                     .font(.system(size: 72))
-                    .foregroundStyle(state == .recording ? TodayTheme.rose : TodayTheme.accent)
+                    .foregroundStyle(state == .recording ? .red : .accentColor)
                     .symbolEffect(.pulse, isActive: state == .recording)
             }
             .buttonStyle(.plain)
 
             Text(state == .recording ? "点击停止录音" : state == .idle ? "点击开始录音" : "录音完成")
-                .font(.system(size: 14))
-                .foregroundStyle(TodayTheme.inkMuted)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
 
             Spacer()
 
@@ -63,10 +59,8 @@ struct VoiceRecordView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
                         Text("语音转文字")
-                            .font(.system(size: 12, weight: .medium))
-                            .foregroundStyle(TodayTheme.inkMuted)
-                            .textCase(.uppercase)
-                            .tracking(1.2)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
 
                         if isTranscribing {
                             ProgressView()
@@ -75,11 +69,11 @@ struct VoiceRecordView: View {
                     }
 
                     Text(transcript.isEmpty ? (isTranscribing ? "正在识别…" : "未识别到文字") : transcript)
-                        .font(.system(size: 15))
-                        .foregroundStyle(transcript.isEmpty ? TodayTheme.inkFaint : TodayTheme.ink)
+                        .font(.body)
+                        .foregroundStyle(transcript.isEmpty ? Color(UIColor.quaternaryLabel) : .primary)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(12)
-                        .background(TodayTheme.elevatedCard)
+                        .background(Color(UIColor.tertiarySystemGroupedBackground))
                         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                 }
                 .padding(.horizontal, 20)
@@ -93,28 +87,21 @@ struct VoiceRecordView: View {
                         state = .idle
                     } label: {
                         Text("重录")
-                            .font(.system(size: 15, weight: .medium))
-                            .foregroundStyle(TodayTheme.inkSoft)
+                            .font(.body.weight(.medium))
                             .frame(maxWidth: .infinity)
-                            .padding(.vertical, 14)
-                            .background(TodayTheme.card)
-                            .clipShape(Capsule())
-                            .overlay(Capsule().stroke(TodayTheme.border, lineWidth: 1))
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.bordered)
+                    .controlSize(.large)
 
                     Button {
                         saveRecording()
                     } label: {
                         Text("保存")
-                            .font(.system(size: 15, weight: .semibold))
-                            .foregroundStyle(.white)
+                            .font(.body.weight(.semibold))
                             .frame(maxWidth: .infinity)
-                            .padding(.vertical, 14)
-                            .background(TodayTheme.accent)
-                            .clipShape(Capsule())
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.large)
                 }
                 .padding(.horizontal, 20)
                 .padding(.bottom, 16)

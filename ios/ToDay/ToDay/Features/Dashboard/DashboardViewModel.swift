@@ -88,8 +88,7 @@ struct DashboardViewModel {
             icon: "figure.run",
             label: "运动",
             value: value,
-            tint: TodayTheme.orange,
-            background: TodayTheme.orangeSoft
+            tint: TodayTheme.orange
         )
     }
 
@@ -101,8 +100,7 @@ struct DashboardViewModel {
             icon: "moon.fill",
             label: "睡眠",
             value: value,
-            tint: TodayTheme.sleepIndigo,
-            background: TodayTheme.blueSoft
+            tint: TodayTheme.sleepIndigo
         )
     }
 
@@ -114,8 +112,7 @@ struct DashboardViewModel {
             icon: "iphone",
             label: "屏幕时间",
             value: value,
-            tint: TodayTheme.purple,
-            background: TodayTheme.purpleSoft
+            tint: TodayTheme.purple
         )
     }
 
@@ -127,8 +124,7 @@ struct DashboardViewModel {
             icon: "yensign.circle.fill",
             label: "消费",
             value: value,
-            tint: TodayTheme.rose,
-            background: TodayTheme.roseSoft
+            tint: TodayTheme.rose
         )
     }
 
@@ -140,8 +136,7 @@ struct DashboardViewModel {
             icon: "figure.walk",
             label: "步数",
             value: value,
-            tint: TodayTheme.walkGreen,
-            background: TodayTheme.tealSoft
+            tint: TodayTheme.walkGreen
         )
     }
 
@@ -153,8 +148,7 @@ struct DashboardViewModel {
             icon: "camera.fill",
             label: "快门",
             value: value,
-            tint: TodayTheme.accent,
-            background: TodayTheme.accentSoft
+            tint: TodayTheme.accent
         )
     }
 
@@ -225,7 +219,7 @@ struct DashboardViewModel {
     private static let dateHeaderFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "zh_CN")
-        formatter.dateFormat = "yyyy · MM · dd EEE"
+        formatter.dateFormat = "yyyy年M月d日 EEEE"
         return formatter
     }()
 }
