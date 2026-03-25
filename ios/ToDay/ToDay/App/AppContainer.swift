@@ -20,6 +20,7 @@ enum AppContainer {
         let viewModel = TodayViewModel(
             provider: makeTimelineProvider(),
             recordStore: makeMoodRecordStore(),
+            shutterRecordStore: makeShutterRecordStore(),
             phoneConnectivityManager: phoneConnectivityManager,
             modelContainer: modelContainer
         )

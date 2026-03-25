@@ -14,11 +14,14 @@ final class TodayViewModel: ObservableObject {
     @Published private(set) var isLoading = false
     @Published private(set) var errorMessage: String?
     @Published var showQuickRecord = false
+    @Published var showShutterPanel = false
+    @Published var isRecordingVoice = false
     @Published private(set) var quickRecordMode: QuickRecordSheetMode = .flexible
 
     // MARK: - Managers
 
     private let recordManager: MoodRecordManager
+    private let shutterManager: ShutterManager
     private let annotationStore: AnnotationStore
     private let insightComposer: TodayInsightComposer
     #if os(iOS)
@@ -42,6 +45,7 @@ final class TodayViewModel: ObservableObject {
     init(
         provider: any TimelineDataProviding,
         recordStore: any MoodRecordStoring,
+        shutterRecordStore: any ShutterRecordStoring = SwiftDataShutterRecordStore(container: AppContainer.modelContainer),
         insightComposer: TodayInsightComposer = TodayInsightComposer(),
         phoneConnectivityManager: PhoneConnectivityManager? = nil,
         modelContainer: ModelContainer,
@@ -52,6 +56,7 @@ final class TodayViewModel: ObservableObject {
         self.calendar = calendar
         self.insightComposer = insightComposer
         self.recordManager = MoodRecordManager(recordStore: recordStore, calendar: calendar)
+        self.shutterManager = ShutterManager(recordStore: shutterRecordStore, calendar: calendar)
         self.annotationStore = AnnotationStore(calendar: calendar)
         #if os(iOS)
         self.watchSync = WatchSyncHelper(connectivityManager: phoneConnectivityManager, calendar: calendar)
@@ -80,6 +85,7 @@ final class TodayViewModel: ObservableObject {
         isLoading = true
         errorMessage = nil
         recordManager.reloadFromStore()
+        shutterManager.reloadFromStore()
         rebuildTimeline(referenceDate: currentBaseTimeline?.date ?? Date())
 
         do {
@@ -187,6 +193,26 @@ final class TodayViewModel: ObservableObject {
         annotateEvent(event, title: title)
     }
 
+    // MARK: - Shutter Records
+
+    var shutterRecords: [ShutterRecord] { shutterManager.records }
+
+    func todayShutterCount(on date: Date? = nil) -> Int {
+        shutterManager.records(on: date ?? timeline?.date ?? Date()).count
+    }
+
+    func saveShutterRecord(_ record: ShutterRecord) {
+        shutterManager.save(record)
+        showShutterPanel = false
+        isRecordingVoice = false
+        rebuildTimeline(referenceDate: currentBaseTimeline?.date ?? Date())
+    }
+
+    func deleteShutterRecord(id: UUID) {
+        shutterManager.delete(id: id)
+        rebuildTimeline(referenceDate: currentBaseTimeline?.date ?? Date())
+    }
+
     // MARK: - History
 
     func historyDetail(for date: Date) -> HistoryDayDetail? {
@@ -226,6 +252,7 @@ final class TodayViewModel: ObservableObject {
     private func mergedTimeline(base: DayTimeline) -> DayTimeline {
         let recordsForDay = recordManager.records(on: base.date)
         let manualEntries = recordsForDay.map { $0.toInferredEvent(referenceDate: Date(), calendar: calendar) }
+        let shutterEntries = shutterManager.inferredEvents(on: base.date)
         let annotationsForDay = annotationStore.annotations(on: base.date)
         let notesCount = recordsForDay.filter(MoodRecordManager.hasNote).count
 
@@ -251,7 +278,7 @@ final class TodayViewModel: ObservableObject {
             .filter { !matchedIDs.contains($0.id) }
             .map(\.asEvent)
 
-        let entries = (manualEntries + syntheticEntries + annotatedBase).sorted { lhs, rhs in
+        let entries = (manualEntries + shutterEntries + syntheticEntries + annotatedBase).sorted { lhs, rhs in
             lhs.startDate == rhs.startDate
                 ? lhs.id.uuidString < rhs.id.uuidString
                 : lhs.startDate < rhs.startDate
@@ -366,6 +393,7 @@ final class TodayViewModel: ObservableObject {
 
     private func handleExternalRecordsUpdate() {
         recordManager.reloadFromStore()
+        shutterManager.reloadFromStore()
         rebuildTimeline(referenceDate: currentBaseTimeline?.date ?? Date())
     }
 
