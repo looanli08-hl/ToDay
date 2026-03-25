@@ -68,6 +68,25 @@ enum AppContainer {
         echoItemStore
     }
 
+    @MainActor
+    private static let echoEngine = EchoEngine(
+        echoStore: echoItemStore
+    )
+
+    @MainActor
+    static func makeEchoViewModel() -> EchoViewModel {
+        EchoViewModel(
+            echoEngine: echoEngine,
+            shutterRecordStore: makeShutterRecordStore(),
+            screenTimeStore: makeScreenTimeRecordStore()
+        )
+    }
+
+    @MainActor
+    static func getEchoEngine() -> EchoEngine {
+        echoEngine
+    }
+
     private static func makeModelContainer() -> ModelContainer {
         do {
             let container = try ModelContainer(

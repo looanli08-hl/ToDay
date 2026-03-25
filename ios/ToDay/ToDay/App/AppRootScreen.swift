@@ -10,6 +10,7 @@ private enum AppTab: Hashable {
 struct AppRootScreen: View {
     @AppStorage("today.hasCompletedOnboarding") private var hasCompletedOnboarding = false
     @ObservedObject var todayViewModel: TodayViewModel
+    @ObservedObject var echoViewModel: EchoViewModel
     @State private var selectedTab: AppTab = .home
 
     private var showFloatingButton: Bool {
@@ -35,13 +36,13 @@ struct AppRootScreen: View {
                     }
                     .tag(AppTab.timeline)
 
-                    EchoScreen()
+                    EchoScreen(viewModel: echoViewModel)
                     .tabItem {
                         Label("Echo", systemImage: "bell.badge.fill")
                     }
                     .tag(AppTab.echo)
 
-                    SettingsView()
+                    SettingsView(echoViewModel: echoViewModel)
                         .tabItem {
                             Label("设置", systemImage: "gear")
                         }

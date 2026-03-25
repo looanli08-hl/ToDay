@@ -8,6 +8,7 @@ import WatchConnectivity
 
 struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
+    @ObservedObject var echoViewModel: EchoViewModel
     @ObservedObject private var connectivityManager = PhoneConnectivityManager.shared
     @State private var healthStatus: HKAuthorizationStatus = .notDetermined
     @State private var locationStatus: CLAuthorizationStatus = .notDetermined
