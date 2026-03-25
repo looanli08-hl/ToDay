@@ -287,18 +287,48 @@ struct InferredEvent: Codable, Identifiable, Hashable, Sendable {
         userAnnotation ?? displayName
     }
 
+    // MARK: - Convenience Copying
+
+    func withInterval(_ interval: DateInterval) -> InferredEvent {
+        InferredEvent(
+            id: id, kind: kind,
+            startDate: interval.start, endDate: interval.end,
+            confidence: confidence, isLive: isLive,
+            displayName: displayName, userAnnotation: userAnnotation,
+            subtitle: subtitle, associatedMetrics: associatedMetrics,
+            photoAttachments: photoAttachments
+        )
+    }
+
+    func withSubtitle(_ newSubtitle: String?) -> InferredEvent {
+        InferredEvent(
+            id: id, kind: kind,
+            startDate: startDate, endDate: endDate,
+            confidence: confidence, isLive: isLive,
+            displayName: displayName, userAnnotation: userAnnotation,
+            subtitle: newSubtitle, associatedMetrics: associatedMetrics,
+            photoAttachments: photoAttachments
+        )
+    }
+
+    func withMetrics(_ newMetrics: EventMetrics?) -> InferredEvent {
+        InferredEvent(
+            id: id, kind: kind,
+            startDate: startDate, endDate: endDate,
+            confidence: confidence, isLive: isLive,
+            displayName: displayName, userAnnotation: userAnnotation,
+            subtitle: subtitle, associatedMetrics: newMetrics,
+            photoAttachments: photoAttachments
+        )
+    }
+
     func applyingAnnotation(_ annotation: String) -> InferredEvent {
         InferredEvent(
-            id: id,
-            kind: .userAnnotated,
-            startDate: startDate,
-            endDate: endDate,
-            confidence: .high,
-            isLive: isLive,
-            displayName: displayName,
-            userAnnotation: annotation,
-            subtitle: subtitle,
-            associatedMetrics: associatedMetrics,
+            id: id, kind: .userAnnotated,
+            startDate: startDate, endDate: endDate,
+            confidence: .high, isLive: isLive,
+            displayName: displayName, userAnnotation: annotation,
+            subtitle: subtitle, associatedMetrics: associatedMetrics,
             photoAttachments: photoAttachments
         )
     }

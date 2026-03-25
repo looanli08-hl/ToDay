@@ -309,23 +309,10 @@ struct HealthKitEventInferenceEngine: EventInferring {
         let merged = mergeQuietTimeEvents(segmented.sorted(by: eventSortOrder))
         return merged.map { event in
             guard event.subtitle == nil,
-                  let averageHeartRate = averageHeartRate(for: event, heartRateSamples: heartRateSamples) else {
+                  let avg = averageHeartRate(for: event, heartRateSamples: heartRateSamples) else {
                 return event
             }
-
-            return InferredEvent(
-                id: event.id,
-                kind: event.kind,
-                startDate: event.startDate,
-                endDate: event.endDate,
-                confidence: event.confidence,
-                isLive: event.isLive,
-                displayName: event.displayName,
-                userAnnotation: event.userAnnotation,
-                subtitle: "心率平稳 · \(Int(averageHeartRate.rounded())) 次/分",
-                associatedMetrics: event.associatedMetrics,
-                photoAttachments: event.photoAttachments
-            )
+            return event.withSubtitle("心率平稳 · \(Int(avg.rounded())) 次/分")
         }
     }
 
@@ -349,71 +336,41 @@ struct HealthKitEventInferenceEngine: EventInferring {
     private func attachMetrics(to event: InferredEvent, using rawData: DayRawData) -> InferredEvent {
         guard event.kind != .mood else { return event }
 
+        let interval = candidateInterval(for: event)
         var metrics = event.associatedMetrics ?? EventMetrics()
 
-        let heartSamples = heartRateSamples(overlapping: candidateInterval(for: event), samples: rawData.heartRateSamples)
+        let heartSamples = heartRateSamples(overlapping: interval, samples: rawData.heartRateSamples)
         if !heartSamples.isEmpty {
             let values = heartSamples.map(\.value)
             metrics.averageHeartRate = values.reduce(0, +) / Double(values.count)
             metrics.maxHeartRate = values.max()
             metrics.minHeartRate = values.min()
-            metrics.heartRateSamples = heartSamples.map {
-                HeartRateSample(date: $0.startDate, value: $0.value)
-            }
+            metrics.heartRateSamples = heartSamples.map { HeartRateSample(date: $0.startDate, value: $0.value) }
         }
 
-        metrics.weather = closestWeather(
-            to: event.startDate,
-            in: rawData.hourlyWeather
-        )
-        metrics.location = overlappingLocationVisit(
-            for: candidateInterval(for: event),
-            in: rawData.locationVisits
-        )
-        let matchedPhotos = photos(
-            in: candidateInterval(for: event),
-            from: rawData.photos
-        )
-        if !matchedPhotos.isEmpty {
-            metrics.photos = matchedPhotos
-        }
+        metrics.weather = closestWeather(to: event.startDate, in: rawData.hourlyWeather)
+        metrics.location = overlappingLocationVisit(for: interval, in: rawData.locationVisits)
 
-        let stepCount = summedValue(of: rawData.stepSamples, over: candidateInterval(for: event))
-        if stepCount > 0 {
-            metrics.stepCount = Int(stepCount.rounded())
-        }
+        let matchedPhotos = photos(in: interval, from: rawData.photos)
+        if !matchedPhotos.isEmpty { metrics.photos = matchedPhotos }
 
-        let energy = summedValue(of: rawData.activeEnergySamples, over: candidateInterval(for: event))
-        if energy > 0 {
-            metrics.activeEnergy = energy
-        }
+        let stepCount = summedValue(of: rawData.stepSamples, over: interval)
+        if stepCount > 0 { metrics.stepCount = Int(stepCount.rounded()) }
+
+        let energy = summedValue(of: rawData.activeEnergySamples, over: interval)
+        if energy > 0 { metrics.activeEnergy = energy }
 
         if event.kind == .workout {
-            let overlappingWorkouts = rawData.workouts.filter {
-                DateInterval(start: $0.startDate, end: $0.endDate)
-                    .intersection(with: candidateInterval(for: event)) != nil
-            }
-
-            if let workout = overlappingWorkouts.first {
+            if let workout = rawData.workouts.first(where: {
+                DateInterval(start: $0.startDate, end: $0.endDate).intersection(with: interval) != nil
+            }) {
                 metrics.workoutType = workout.displayName
                 metrics.activeEnergy = workout.activeEnergy ?? metrics.activeEnergy
                 metrics.distance = workout.distance
             }
         }
 
-        return InferredEvent(
-            id: event.id,
-            kind: event.kind,
-            startDate: event.startDate,
-            endDate: event.endDate,
-            confidence: event.confidence,
-            isLive: event.isLive,
-            displayName: event.displayName,
-            userAnnotation: event.userAnnotation,
-            subtitle: event.subtitle,
-            associatedMetrics: metrics,
-            photoAttachments: event.photoAttachments
-        )
+        return event.withMetrics(metrics)
     }
 
     private func closestWeather(to date: Date, in weather: [HourlyWeather]) -> HourlyWeather? {
@@ -453,20 +410,8 @@ struct HealthKitEventInferenceEngine: EventInferring {
             displayName: "安静时光"
         )
 
-        if let averageHeartRate = averageHeartRate(for: quietEvent, heartRateSamples: heartRateSamples) {
-            return InferredEvent(
-                id: quietEvent.id,
-                kind: quietEvent.kind,
-                startDate: quietEvent.startDate,
-                endDate: quietEvent.endDate,
-                confidence: quietEvent.confidence,
-                isLive: quietEvent.isLive,
-                displayName: quietEvent.displayName,
-                userAnnotation: quietEvent.userAnnotation,
-                subtitle: "心率平稳 · \(Int(averageHeartRate.rounded())) 次/分",
-                associatedMetrics: quietEvent.associatedMetrics,
-                photoAttachments: quietEvent.photoAttachments
-            )
+        if let avg = averageHeartRate(for: quietEvent, heartRateSamples: heartRateSamples) {
+            return quietEvent.withSubtitle("心率平稳 · \(Int(avg.rounded())) 次/分")
         }
 
         return quietEvent
@@ -713,20 +658,3 @@ struct HealthKitEventInferenceEngine: EventInferring {
     }
 }
 
-private extension InferredEvent {
-    func withInterval(_ interval: DateInterval) -> InferredEvent {
-        InferredEvent(
-            id: id,
-            kind: kind,
-            startDate: interval.start,
-            endDate: interval.end,
-            confidence: confidence,
-            isLive: isLive,
-            displayName: displayName,
-            userAnnotation: userAnnotation,
-            subtitle: subtitle,
-            associatedMetrics: associatedMetrics,
-            photoAttachments: photoAttachments
-        )
-    }
-}

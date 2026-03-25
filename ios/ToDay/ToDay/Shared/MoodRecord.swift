@@ -73,34 +73,9 @@ struct MoodRecord: Identifiable, Codable {
         }
 
         init?(storedValue: String) {
-            switch storedValue {
-            case Self.happy.rawValue:
-                self = .happy
-            case Self.calm.rawValue:
-                self = .calm
-            case Self.focused.rawValue:
-                self = .focused
-            case Self.grateful.rawValue:
-                self = .grateful
-            case Self.excited.rawValue:
-                self = .excited
-            case Self.tired.rawValue:
-                self = .tired
-            case Self.anxious.rawValue:
-                self = .anxious
-            case Self.sad.rawValue:
-                self = .sad
-            case Self.irritated.rawValue:
-                self = .irritated
-            case Self.bored.rawValue, "放空":
-                self = .bored
-            case Self.sleepy.rawValue:
-                self = .sleepy
-            case Self.satisfied.rawValue:
-                self = .satisfied
-            default:
-                return nil
-            }
+            // Legacy value migration: "放空" → .bored
+            if storedValue == "放空" { self = .bored; return }
+            self.init(rawValue: storedValue)
         }
     }
 

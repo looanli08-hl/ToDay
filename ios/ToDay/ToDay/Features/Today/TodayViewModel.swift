@@ -4,10 +4,7 @@ import SwiftData
 
 @MainActor
 final class TodayViewModel: ObservableObject {
-    enum RecordingState {
-        case idle
-        case recording(MoodRecord)
-    }
+    // MARK: - Published State (observed by SwiftUI)
 
     @Published private(set) var timeline: DayTimeline?
     @Published private(set) var insightSummary: TodayInsightSummary?
@@ -16,24 +13,31 @@ final class TodayViewModel: ObservableObject {
     @Published private(set) var historyDigests: [RecentDayDigest] = []
     @Published private(set) var isLoading = false
     @Published private(set) var errorMessage: String?
-    @Published private(set) var recordingState: RecordingState = .idle
     @Published var showQuickRecord = false
     @Published private(set) var quickRecordMode: QuickRecordSheetMode = .flexible
 
-    private let provider: any TimelineDataProviding
-    private let recordStore: any MoodRecordStoring
+    // MARK: - Managers
+
+    private let recordManager: MoodRecordManager
+    private let annotationStore: AnnotationStore
     private let insightComposer: TodayInsightComposer
-    private let calendar: Calendar
-    private let phoneConnectivityManager: PhoneConnectivityManager?
+    #if os(iOS)
+    private let watchSync: WatchSyncHelper
+    #endif
+
+    // MARK: - Timeline State
+
+    private let provider: any TimelineDataProviding
     private let modelContainer: ModelContainer
+    private let calendar: Calendar
     private var hasLoadedOnce = false
     private var currentBaseTimeline: DayTimeline?
     private var timelineCache: [Date: DayTimeline] = [:]
-    private var storedAnnotations: [UUID: StoredAnnotation] = [:]
-    private var lastSubmittedFingerprint: DuplicateSubmissionFingerprint?
-    private var lastSharedEventState = SharedEventState(snapshot: nil, eventID: nil)
     private var connectivityCancellable: AnyCancellable?
-    private(set) var manualRecords: [MoodRecord] = []
+
+    private static let maxCachedTimelines = 30
+
+    // MARK: - Init
 
     init(
         provider: any TimelineDataProviding,
@@ -44,20 +48,25 @@ final class TodayViewModel: ObservableObject {
         calendar: Calendar = .current
     ) {
         self.provider = provider
-        self.recordStore = recordStore
-        self.insightComposer = insightComposer
-        self.phoneConnectivityManager = phoneConnectivityManager
         self.modelContainer = modelContainer
         self.calendar = calendar
+        self.insightComposer = insightComposer
+        self.recordManager = MoodRecordManager(recordStore: recordStore, calendar: calendar)
+        self.annotationStore = AnnotationStore(calendar: calendar)
+        #if os(iOS)
+        self.watchSync = WatchSyncHelper(connectivityManager: phoneConnectivityManager, calendar: calendar)
+        #endif
+
         self.connectivityCancellable = phoneConnectivityManager?.recordsDidChange.sink { [weak self] in
             Task { @MainActor in
                 self?.handleExternalRecordsUpdate()
             }
         }
-        loadStoredAnnotations()
-        reloadManualRecords()
+
         refreshDerivedState(referenceDate: Date())
     }
+
+    // MARK: - Loading
 
     func loadIfNeeded() async {
         guard !hasLoadedOnce else { return }
@@ -70,7 +79,7 @@ final class TodayViewModel: ObservableObject {
 
         isLoading = true
         errorMessage = nil
-        reloadManualRecords()
+        recordManager.reloadFromStore()
         rebuildTimeline(referenceDate: currentBaseTimeline?.date ?? Date())
 
         do {
@@ -85,56 +94,51 @@ final class TodayViewModel: ObservableObject {
         isLoading = false
     }
 
+    // MARK: - Mood Records
+
+    var manualRecords: [MoodRecord] { recordManager.records }
+    var activeRecord: MoodRecord? { recordManager.activeRecord }
+
+    var todayManualRecordCount: Int {
+        recordManager.records(on: timeline?.date ?? Date()).count
+    }
+
+    var todayNoteCount: Int {
+        recordManager.noteCount(on: timeline?.date ?? Date())
+    }
+
     func startMoodRecord(_ record: MoodRecord) {
-        guard !containsDuplicateRecord(record) else {
+        guard recordManager.startRecord(record) else {
             showQuickRecord = false
             return
         }
-
-        if case .recording = recordingState, record.captureMode == .session {
-            errorMessage = "先结束当前状态，再开始新的一段。"
-            return
-        }
-
-        manualRecords.insert(record, at: 0)
-        manualRecords.sort { $0.createdAt > $1.createdAt }
-        lastSubmittedFingerprint = DuplicateSubmissionFingerprint(record: record)
-        if record.isOngoing {
-            setRecordingState(from: record)
-        }
         showQuickRecord = false
-        persistRecords()
         rebuildTimeline(referenceDate: currentBaseTimeline?.date ?? Date())
     }
 
     func finishActiveMoodRecord(at date: Date = Date()) {
-        guard case let .recording(activeRecord) = recordingState,
-              let index = manualRecords.firstIndex(where: { $0.id == activeRecord.id }) else { return }
-
-        let completedRecord = activeRecord.completed(at: date)
-        manualRecords[index] = completedRecord
-        manualRecords.sort { $0.createdAt > $1.createdAt }
-        setRecordingState(from: nil)
-        persistRecords()
+        recordManager.finishActiveRecord(at: date)
         rebuildTimeline(referenceDate: currentBaseTimeline?.date ?? date)
     }
 
+    func removeMoodRecord(id: UUID) {
+        let orphanedAttachments = recordManager.removeRecord(id: id)
+        recordManager.deleteOrphanedPhotos(attachments: orphanedAttachments)
+        rebuildTimeline(referenceDate: currentBaseTimeline?.date ?? Date())
+    }
+
+    // MARK: - Quick Record Sheet
+
     func handleQuickRecordTap() {
-        switch recordingState {
-        case .idle:
-            openQuickRecordComposer()
-        case .recording:
+        if recordManager.activeRecord != nil {
             openPointComposer()
+        } else {
+            openQuickRecordComposer()
         }
     }
 
     func openQuickRecordComposer() {
-        switch recordingState {
-        case .idle:
-            quickRecordMode = .flexible
-        case .recording:
-            quickRecordMode = .pointOnly
-        }
+        quickRecordMode = recordManager.activeRecord != nil ? .pointOnly : .flexible
         showQuickRecord = true
     }
 
@@ -143,180 +147,117 @@ final class TodayViewModel: ObservableObject {
         showQuickRecord = true
     }
 
-    func removeMoodRecord(id: UUID) {
-        guard let index = manualRecords.firstIndex(where: { $0.id == id }) else { return }
+    // MARK: - UI Computed Properties
 
-        let removedRecord = manualRecords.remove(at: index)
-        deleteOrphanedPhotos(for: removedRecord.photoAttachments, remainingRecords: manualRecords)
-
-        if case let .recording(activeRecord) = recordingState, activeRecord.id == id {
-            setRecordingState(from: nil)
-        }
-
-        persistRecords()
-        rebuildTimeline(referenceDate: currentBaseTimeline?.date ?? Date())
-    }
-
-    var activeRecord: MoodRecord? {
-        switch recordingState {
-        case .idle:
-            return nil
-        case let .recording(record):
-            return record
-        }
-    }
-
-    var todayManualRecordCount: Int {
-        records(on: timeline?.date ?? Date()).count
-    }
-
-    var todayNoteCount: Int {
-        records(on: timeline?.date ?? Date()).filter(hasNote).count
-    }
-
-    var quickRecordButtonTitle: String {
-        "记录此刻"
-    }
-
-    var quickRecordButtonSystemImage: String {
-        "plus.circle.fill"
-    }
+    var quickRecordButtonTitle: String { "记录此刻" }
+    var quickRecordButtonSystemImage: String { "plus.circle.fill" }
 
     var quickRecordButtonCaption: String? {
-        switch recordingState {
-        case .idle:
-            return "打点或开始一段状态"
-        case .recording:
-            return "当前已有进行中的状态"
-        }
+        recordManager.activeRecord != nil ? "当前已有进行中的状态" : "打点或开始一段状态"
     }
 
     var activeSessionTitle: String? {
-        guard case let .recording(activeRecord) = recordingState else { return nil }
-        return "\(activeRecord.mood.rawValue) 正在进行"
+        guard let active = recordManager.activeRecord else { return nil }
+        return "\(active.mood.rawValue) 正在进行"
     }
 
     var activeSessionDetail: String? {
-        guard case let .recording(activeRecord) = recordingState else { return nil }
-        let startTime = Self.clockFormatter.string(from: activeRecord.createdAt)
-        let note = activeRecord.note.trimmingCharacters(in: .whitespacesAndNewlines)
-
+        guard let active = recordManager.activeRecord else { return nil }
+        let startTime = Self.clockFormatter.string(from: active.createdAt)
+        let note = active.note.trimmingCharacters(in: .whitespacesAndNewlines)
         if note.isEmpty {
             return "开始于 \(startTime)，你可以继续补打点，最后再结束这段状态。"
         }
-
         return "开始于 \(startTime) · \(note)"
     }
 
+    // MARK: - Annotations
+
+    func annotateEvent(_ event: InferredEvent, title: String) {
+        annotationStore.annotate(event, title: title)
+        rebuildTimeline(referenceDate: currentBaseTimeline?.date ?? event.startDate)
+    }
+
+    func annotateEvent(id: UUID, title: String) {
+        let allTimelines = [timeline, currentBaseTimeline] + timelineCache.values.map(Optional.some)
+        guard let event = allTimelines
+            .compactMap({ $0 })
+            .flatMap(\.entries)
+            .first(where: { $0.id == id }) else { return }
+        annotateEvent(event, title: title)
+    }
+
+    // MARK: - History
+
     func historyDetail(for date: Date) -> HistoryDayDetail? {
-        insightComposer.buildHistoryDetail(for: date, manualRecords: manualRecords)
+        insightComposer.buildHistoryDetail(for: date, manualRecords: recordManager.records)
     }
 
     func cachedTimeline(for date: Date) -> DayTimeline? {
         let day = calendar.startOfDay(for: date)
-
         if let currentBaseTimeline, calendar.isDate(currentBaseTimeline.date, inSameDayAs: day) {
             return mergedTimeline(base: currentBaseTimeline)
         }
-
-        guard let cachedBaseTimeline = timelineCache[day] else { return nil }
-        return mergedTimeline(base: cachedBaseTimeline)
+        guard let cached = timelineCache[day] else { return nil }
+        return mergedTimeline(base: cached)
     }
 
     func loadTimeline(for date: Date, forceReload: Bool = false) async -> DayTimeline? {
-        let day = calendar.startOfDay(for: date)
-
         do {
-            let baseTimeline = try await loadBaseTimeline(for: day, forceReload: forceReload)
-            return mergedTimeline(base: baseTimeline)
+            let base = try await loadBaseTimeline(for: calendar.startOfDay(for: date), forceReload: forceReload)
+            return mergedTimeline(base: base)
         } catch {
             return nil
         }
     }
 
     func loadTimelines(for dates: [Date], forceReload: Bool = false) async -> [DayTimeline] {
-        var timelines: [DayTimeline] = []
-
+        var result: [DayTimeline] = []
         for date in dates {
-            if let timeline = await loadTimeline(for: date, forceReload: forceReload) {
-                timelines.append(timeline)
+            if let tl = await loadTimeline(for: date, forceReload: forceReload) {
+                result.append(tl)
             }
         }
-
-        return timelines.sorted { $0.date < $1.date }
+        return result.sorted { $0.date < $1.date }
     }
 
-    func annotateEvent(_ event: InferredEvent, title: String) {
-        let trimmedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmedTitle.isEmpty else { return }
-
-        let annotation = StoredAnnotation(
-            id: event.id,
-            startDate: event.startDate,
-            endDate: event.endDate,
-            title: trimmedTitle
-        )
-        storedAnnotations[event.id] = annotation
-        persistStoredAnnotations()
-        rebuildTimeline(referenceDate: currentBaseTimeline?.date ?? event.startDate)
-    }
-
-    func annotateEvent(id: UUID, title: String) {
-        let allTimelines = [timeline, currentBaseTimeline] + timelineCache.values.map(Optional.some)
-        let event = allTimelines
-            .compactMap { $0 }
-            .flatMap(\.entries)
-            .first(where: { $0.id == id })
-
-        guard let event else { return }
-        annotateEvent(event, title: title)
-    }
+    // MARK: - Timeline Merge
 
     private func mergedTimeline(base: DayTimeline) -> DayTimeline {
-        let recordsForDay = records(on: base.date)
+        let recordsForDay = recordManager.records(on: base.date)
         let manualEntries = recordsForDay.map { $0.toInferredEvent(referenceDate: Date(), calendar: calendar) }
-        let annotationsForDay = annotations(on: base.date)
-        let notesCount = recordsForDay.filter(hasNote).count
+        let annotationsForDay = annotationStore.annotations(on: base.date)
+        let notesCount = recordsForDay.filter(MoodRecordManager.hasNote).count
 
-        var mergedStats = base.stats
-        mergedStats.append(TimelineStat(title: "记录", value: "\(recordsForDay.count)"))
+        var stats = base.stats
+        stats.append(TimelineStat(title: "记录", value: "\(recordsForDay.count)"))
         if !annotationsForDay.isEmpty {
-            mergedStats.append(TimelineStat(title: "标注", value: "\(annotationsForDay.count)"))
+            stats.append(TimelineStat(title: "标注", value: "\(annotationsForDay.count)"))
         }
-
         if notesCount > 0 {
-            mergedStats.append(TimelineStat(title: "备注", value: "\(notesCount)"))
+            stats.append(TimelineStat(title: "备注", value: "\(notesCount)"))
+        }
+        if let active = recordManager.activeRecord {
+            stats.append(TimelineStat(title: "当前", value: active.mood.rawValue))
         }
 
-        if let activeRecord {
-            mergedStats.append(TimelineStat(title: "当前", value: activeRecord.mood.rawValue))
-        }
-
-        var matchedAnnotationIDs = Set<UUID>()
-        let annotatedBaseEntries = base.entries.map { event in
-            guard let annotation = storedAnnotations[event.id] else { return event }
-            matchedAnnotationIDs.insert(annotation.id)
+        var matchedIDs = Set<UUID>()
+        let annotatedBase = base.entries.map { event -> InferredEvent in
+            guard let annotation = annotationStore.annotation(for: event.id) else { return event }
+            matchedIDs.insert(annotation.id)
             return event.applyingAnnotation(annotation.title)
         }
-        let syntheticAnnotationEntries = annotationsForDay
-            .filter { !matchedAnnotationIDs.contains($0.id) }
+        let syntheticEntries = annotationsForDay
+            .filter { !matchedIDs.contains($0.id) }
             .map(\.asEvent)
 
-        let mergedEntries = (manualEntries + syntheticAnnotationEntries + annotatedBaseEntries).sorted { lhs, rhs in
-            if lhs.startDate == rhs.startDate {
-                return lhs.id.uuidString < rhs.id.uuidString
-            }
-
-            return lhs.startDate < rhs.startDate
+        let entries = (manualEntries + syntheticEntries + annotatedBase).sorted { lhs, rhs in
+            lhs.startDate == rhs.startDate
+                ? lhs.id.uuidString < rhs.id.uuidString
+                : lhs.startDate < rhs.startDate
         }
 
-        return DayTimeline(
-            date: base.date,
-            summary: base.summary,
-            source: base.source,
-            stats: mergedStats,
-            entries: mergedEntries
-        )
+        return DayTimeline(date: base.date, summary: base.summary, source: base.source, stats: stats, entries: entries)
     }
 
     private func rebuildTimeline(referenceDate: Date) {
@@ -328,95 +269,43 @@ final class TodayViewModel: ObservableObject {
             refreshDerivedState(referenceDate: referenceDate)
         }
 
-        persistDailySummary(referenceDate: referenceDate)
+        #if os(iOS)
+        let records = recordManager.records(on: referenceDate)
+        watchSync.persistDailySummary(timeline: timeline, records: records, referenceDate: referenceDate)
+        #endif
     }
 
     private func refreshDerivedState(referenceDate: Date) {
-        let recordsForDay = records(on: referenceDate)
-        setRecordingState(from: manualRecords.first(where: \.isOngoing))
+        let recordsForDay = recordManager.records(on: referenceDate)
+
         historyDigests = insightComposer.buildHistoryDigests(
-            from: manualRecords,
+            from: recordManager.records,
             timelines: timelineCache,
             limit: 21
         )
         recentDigests = Array(historyDigests.prefix(7))
+
         insightSummary = insightComposer.buildTodaySummary(
             referenceDate: referenceDate,
             timeline: timeline,
             recordsForDay: recordsForDay
         )
-        weeklyInsight = insightComposer.buildWeeklyInsight(referenceDate: referenceDate, manualRecords: manualRecords)
-        syncWatchState(referenceDate: referenceDate)
+        weeklyInsight = insightComposer.buildWeeklyInsight(
+            referenceDate: referenceDate,
+            manualRecords: recordManager.records
+        )
+
+        #if os(iOS)
+        watchSync.sync(
+            timeline: timeline,
+            activeRecord: recordManager.activeRecord,
+            records: recordsForDay,
+            referenceDate: referenceDate
+        )
+        #endif
     }
 
-    private func reloadManualRecords() {
-        let loadedRecords = recordStore.loadRecords()
-        let sanitizedRecords = sanitizeRecords(loadedRecords)
-        let removedRecords = removedRecords(from: loadedRecords, keeping: sanitizedRecords)
-        manualRecords = sanitizedRecords
-        setRecordingState(from: sanitizedRecords.first(where: \.isOngoing))
-
-        if !removedRecords.isEmpty {
-            deleteOrphanedPhotos(
-                for: removedRecords.flatMap(\.photoAttachments),
-                remainingRecords: sanitizedRecords
-            )
-        }
-
-        if sanitizedRecords.count != loadedRecords.count {
-            persistRecords()
-        }
-    }
-
-    private func records(on date: Date) -> [MoodRecord] {
-        manualRecords
-            .filter { calendar.isDate($0.createdAt, inSameDayAs: date) }
-            .sorted { $0.createdAt > $1.createdAt }
-    }
-
-    private func hasNote(_ record: MoodRecord) -> Bool {
-        !record.note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-    }
-
-    private func persistRecords() {
-        do {
-            try recordStore.saveRecords(manualRecords)
-        } catch {
-            errorMessage = "本地记录保存失败：\(error.localizedDescription)"
-        }
-    }
-
-    private func containsDuplicateRecord(_ candidate: MoodRecord) -> Bool {
-        let candidateSignature = ManualRecordSignature(record: candidate)
-        if manualRecords.contains(where: { ManualRecordSignature(record: $0) == candidateSignature }) {
-            return true
-        }
-
-        return lastSubmittedFingerprint == DuplicateSubmissionFingerprint(record: candidate)
-    }
-
-    private func sanitizeRecords(_ records: [MoodRecord]) -> [MoodRecord] {
-        var seen = Set<ManualRecordSignature>()
-
-        return records
-            .sorted { $0.createdAt > $1.createdAt }
-            .filter { record in
-                seen.insert(ManualRecordSignature(record: record)).inserted
-            }
-    }
-
-    private func cacheTimeline(_ timeline: DayTimeline) {
-        timelineCache[calendar.startOfDay(for: timeline.date)] = timeline
-
-        let sortedKeys = timelineCache.keys.sorted()
-        let overflow = max(0, sortedKeys.count - Self.maxCachedTimelines)
-
-        if overflow > 0 {
-            for key in sortedKeys.prefix(overflow) {
-                timelineCache.removeValue(forKey: key)
-            }
-        }
-    }
+    // MARK: - Timeline Cache
 
     private func loadBaseTimeline(for date: Date, forceReload: Bool) async throws -> DayTimeline {
         let day = calendar.startOfDay(for: date)
@@ -425,329 +314,67 @@ final class TodayViewModel: ObservableObject {
             if let currentBaseTimeline, calendar.isDate(currentBaseTimeline.date, inSameDayAs: day) {
                 return currentBaseTimeline
             }
-
-            if let cachedTimeline = timelineCache[day] {
-                return cachedTimeline
-            }
-
-            if let diskTimeline = loadFromDiskCache(for: day) {
-                cacheTimeline(diskTimeline)
-                return diskTimeline
+            if let cached = timelineCache[day] { return cached }
+            if let disk = loadFromDiskCache(for: day) {
+                cacheTimeline(disk)
+                return disk
             }
         }
 
-        let timeline = try await provider.loadTimeline(for: day)
-        cacheTimeline(timeline)
-        saveToDiskCache(timeline)
-        return timeline
+        let tl = try await provider.loadTimeline(for: day)
+        cacheTimeline(tl)
+        saveToDiskCache(tl)
+        return tl
+    }
+
+    private func cacheTimeline(_ timeline: DayTimeline) {
+        timelineCache[calendar.startOfDay(for: timeline.date)] = timeline
+        let keys = timelineCache.keys.sorted()
+        let overflow = max(0, keys.count - Self.maxCachedTimelines)
+        for key in keys.prefix(overflow) {
+            timelineCache.removeValue(forKey: key)
+        }
     }
 
     private func saveToDiskCache(_ timeline: DayTimeline) {
         let context = ModelContext(modelContainer)
         let key = DayTimelineEntity.dateKey(for: timeline.date)
-        var descriptor = FetchDescriptor<DayTimelineEntity>(
-            predicate: #Predicate { $0.dateKey == key }
-        )
+        var descriptor = FetchDescriptor<DayTimelineEntity>(predicate: #Predicate { $0.dateKey == key })
         descriptor.fetchLimit = 1
 
         do {
-            if let existingEntity = try context.fetch(descriptor).first {
-                existingEntity.update(from: timeline)
+            if let existing = try context.fetch(descriptor).first {
+                existing.update(from: timeline)
             } else {
                 context.insert(DayTimelineEntity(timeline: timeline))
             }
             try context.save()
         } catch {
-            errorMessage = "时间轴缓存保存失败：\(error.localizedDescription)"
+            // Disk cache failure is non-critical
         }
     }
 
     private func loadFromDiskCache(for date: Date) -> DayTimeline? {
         let context = ModelContext(modelContainer)
         let key = DayTimelineEntity.dateKey(for: date)
-        var descriptor = FetchDescriptor<DayTimelineEntity>(
-            predicate: #Predicate { $0.dateKey == key }
-        )
+        var descriptor = FetchDescriptor<DayTimelineEntity>(predicate: #Predicate { $0.dateKey == key })
         descriptor.fetchLimit = 1
-
-        do {
-            return try context.fetch(descriptor).first?.toDayTimeline()
-        } catch {
-            return nil
-        }
+        return try? context.fetch(descriptor).first?.toDayTimeline()
     }
 
-    private func setRecordingState(from record: MoodRecord?) {
-        if let record {
-            recordingState = .recording(record)
-        } else {
-            recordingState = .idle
-        }
-    }
-
-    private func removedRecords(from original: [MoodRecord], keeping sanitized: [MoodRecord]) -> [MoodRecord] {
-        let keptIDs = Set(sanitized.map(\.id))
-        return original.filter { !keptIDs.contains($0.id) }
-    }
-
-    private func deleteOrphanedPhotos(for attachments: [MoodPhotoAttachment], remainingRecords: [MoodRecord]) {
-        let remainingAttachments = Set(remainingRecords.flatMap(\.photoAttachments))
-        let orphanedAttachments = attachments.filter { !remainingAttachments.contains($0) }
-
-        guard !orphanedAttachments.isEmpty else { return }
-        MoodPhotoLibrary.deletePhotos(for: orphanedAttachments)
-    }
-
-    private static let clockFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "zh_CN")
-        formatter.dateFormat = "HH:mm"
-        return formatter
-    }()
-
-    private static let maxCachedTimelines = 30
-    private static let annotationStorageKey = "today.eventAnnotations"
+    // MARK: - External Updates
 
     private func handleExternalRecordsUpdate() {
-        reloadManualRecords()
+        recordManager.reloadFromStore()
         rebuildTimeline(referenceDate: currentBaseTimeline?.date ?? Date())
     }
 
-    private func annotations(on date: Date) -> [StoredAnnotation] {
-        storedAnnotations.values
-            .filter { calendar.isDate($0.startDate, inSameDayAs: date) }
-            .sorted { $0.startDate < $1.startDate }
-    }
+    // MARK: - Formatters
 
-    private func loadStoredAnnotations() {
-        let sharedDefaults = UserDefaults(suiteName: SharedAppGroup.identifier) ?? .standard
-        let standardDefaults = UserDefaults.standard
-
-        if sharedDefaults.data(forKey: Self.annotationStorageKey) == nil,
-           let legacyData = standardDefaults.data(forKey: Self.annotationStorageKey) {
-            sharedDefaults.set(legacyData, forKey: Self.annotationStorageKey)
-            standardDefaults.removeObject(forKey: Self.annotationStorageKey)
-        }
-
-        guard let data = sharedDefaults.data(forKey: Self.annotationStorageKey) else {
-            storedAnnotations = [:]
-            return
-        }
-
-        do {
-            let annotations = try JSONDecoder().decode([StoredAnnotation].self, from: data)
-            storedAnnotations = Dictionary(uniqueKeysWithValues: annotations.map { ($0.id, $0) })
-        } catch {
-            storedAnnotations = [:]
-        }
-    }
-
-    private func persistStoredAnnotations() {
-        do {
-            let data = try JSONEncoder().encode(storedAnnotations.values.sorted { $0.startDate < $1.startDate })
-            let sharedDefaults = UserDefaults(suiteName: SharedAppGroup.identifier) ?? .standard
-            sharedDefaults.set(data, forKey: Self.annotationStorageKey)
-        } catch {
-            errorMessage = "留白标注保存失败：\(error.localizedDescription)"
-        }
-    }
-
-    private func persistDailySummary(referenceDate: Date) {
-        let sharedDefaults = UserDefaults(suiteName: SharedAppGroup.identifier) ?? .standard
-        guard let timeline else {
-            sharedDefaults.removeObject(forKey: SharedAppGroup.dailySummaryKey)
-            return
-        }
-
-        let exerciseMinutes = timeline.entries
-            .filter { [.workout, .activeWalk, .commute].contains($0.kind) }
-            .reduce(0) { total, event in
-                total + max(0, Int(event.endDate.timeIntervalSince(event.startDate)) / 60)
-            }
-        let moodCount = records(on: referenceDate).count
-        let snapshot = DailySummarySnapshot(
-            exerciseMinutes: exerciseMinutes,
-            moodCount: moodCount,
-            eventCount: timeline.entries.count
-        )
-
-        guard let data = try? JSONEncoder().encode(snapshot) else { return }
-        sharedDefaults.set(data, forKey: SharedAppGroup.dailySummaryKey)
-    }
-
-    private func syncWatchState(referenceDate: Date) {
-        let eventState = currentEventState(referenceDate: referenceDate)
-        let timelineSnapshot = makeWatchTimelineSnapshot(referenceDate: referenceDate)
-        phoneConnectivityManager?.updatePhoneContext(
-            activeSession: activeRecord,
-            currentEvent: eventState.snapshot,
-            currentEventID: eventState.eventID,
-            timelineSnapshot: timelineSnapshot
-        )
-        phoneConnectivityManager?.storeTimelineSnapshot(timelineSnapshot)
-
-        guard eventState != lastSharedEventState else { return }
-        lastSharedEventState = eventState
-        phoneConnectivityManager?.storeCurrentEventSnapshot(eventState.snapshot)
-
-        if let snapshot = eventState.snapshot {
-            phoneConnectivityManager?.sendCurrentEventUpdate(snapshot)
-        }
-
-        phoneConnectivityManager?.sendComplicationRefresh()
-    }
-
-    private func makeWatchTimelineSnapshot(referenceDate: Date) -> WatchTimelineSnapshot? {
-        guard let timeline else { return nil }
-
-        return WatchTimelineSnapshot(
-            date: timeline.date,
-            summary: timeline.summary,
-            sourceRawValue: timeline.source.rawValue,
-            generatedAt: referenceDate,
-            events: timeline.entries.map(WatchTimelineEventSnapshot.init(event:))
-        )
-    }
-
-    private func currentEventState(referenceDate: Date) -> SharedEventState {
-        if let event = timeline?.entries
-            .sorted(by: { $0.startDate < $1.startDate })
-            .last(where: { $0.startDate <= referenceDate && ($0.endDate >= referenceDate || $0.isLive) }) {
-            return SharedEventState(snapshot: snapshot(for: event, at: referenceDate), eventID: event.id)
-        }
-
-        guard let activeRecord else {
-            return SharedEventState(snapshot: nil, eventID: nil)
-        }
-
-        let fallbackEvent = activeRecord.toInferredEvent(referenceDate: referenceDate, calendar: calendar)
-        return SharedEventState(snapshot: snapshot(for: fallbackEvent, at: referenceDate), eventID: fallbackEvent.id)
-    }
-
-    private func snapshot(for event: InferredEvent, at referenceDate: Date) -> CurrentEventSnapshot {
-        CurrentEventSnapshot(
-            eventName: event.resolvedName,
-            eventKind: event.kind.rawValue,
-            startDate: event.startDate,
-            durationMinutes: max(1, Int(max(referenceDate.timeIntervalSince(event.startDate), 60)) / 60),
-            iconName: iconName(for: event)
-        )
-    }
-
-    private func iconName(for event: InferredEvent) -> String {
-        switch event.kind {
-        case .sleep:
-            return "bed.double.fill"
-        case .workout:
-            if let workoutType = event.associatedMetrics?.workoutType {
-                if workoutType.contains("跑") {
-                    return "figure.run"
-                }
-                if workoutType.contains("骑") {
-                    return "bicycle"
-                }
-            }
-            return "figure.strengthtraining.traditional"
-        case .commute:
-            return "tram.fill"
-        case .activeWalk:
-            return "figure.walk"
-        case .quietTime:
-            return "sparkles.rectangle.stack"
-        case .userAnnotated:
-            return "pencil.and.scribble"
-        case .mood:
-            switch MoodRecord.Mood(storedValue: event.displayName) {
-            case .happy:
-                return "sun.max.fill"
-            case .calm:
-                return "leaf.fill"
-            case .focused:
-                return "scope"
-            case .grateful:
-                return "hands.sparkles.fill"
-            case .excited:
-                return "sparkles"
-            case .tired, .sleepy:
-                return "bed.double.fill"
-            case .anxious:
-                return "waveform.path.ecg"
-            case .sad:
-                return "cloud.rain.fill"
-            case .irritated:
-                return "flame.fill"
-            case .bored:
-                return "ellipsis.circle.fill"
-            case .satisfied:
-                return "checkmark.seal.fill"
-            case nil:
-                return "face.smiling"
-            }
-        }
-    }
-}
-
-private struct ManualRecordSignature: Hashable {
-    let id: UUID
-    let mood: MoodRecord.Mood
-    let note: String
-    let createdAt: Date
-    let endedAt: Date?
-    let isTracking: Bool
-    let captureMode: MoodRecord.CaptureMode
-
-    init(record: MoodRecord) {
-        id = record.id
-        mood = record.mood
-        note = record.note
-        createdAt = record.createdAt
-        endedAt = record.endedAt
-        isTracking = record.isTracking
-        captureMode = record.captureMode
-    }
-}
-
-private struct DuplicateSubmissionFingerprint: Hashable {
-    let mood: MoodRecord.Mood
-    let note: String
-    let createdAt: Date
-    let endedAt: Date?
-    let isTracking: Bool
-    let captureMode: MoodRecord.CaptureMode
-    let photoAttachments: [MoodPhotoAttachment]
-
-    init(record: MoodRecord) {
-        mood = record.mood
-        note = record.note
-        createdAt = record.createdAt
-        endedAt = record.endedAt
-        isTracking = record.isTracking
-        captureMode = record.captureMode
-        photoAttachments = record.photoAttachments
-    }
-}
-
-private struct StoredAnnotation: Codable, Hashable {
-    let id: UUID
-    let startDate: Date
-    let endDate: Date
-    let title: String
-
-    var asEvent: InferredEvent {
-        InferredEvent(
-            id: id,
-            kind: .userAnnotated,
-            startDate: startDate,
-            endDate: endDate,
-            confidence: .high,
-            displayName: title,
-            userAnnotation: title,
-            subtitle: "你补上了这段时间的名字。"
-        )
-    }
-}
-
-private struct SharedEventState: Equatable {
-    let snapshot: CurrentEventSnapshot?
-    let eventID: UUID?
+    static let clockFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "zh_CN")
+        f.dateFormat = "HH:mm"
+        return f
+    }()
 }
