@@ -1,5 +1,6 @@
 import SwiftData
 import SwiftUI
+import UIKit
 
 struct DashboardView: View {
     @ObservedObject var todayViewModel: TodayViewModel
@@ -35,6 +36,11 @@ struct DashboardView: View {
             }
             .refreshable {
                 await todayViewModel.load(forceReload: true)
+            }
+            .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+                Task {
+                    await todayViewModel.load(forceReload: true)
+                }
             }
         }
     }
@@ -80,6 +86,19 @@ struct DashboardView: View {
                 Text("正在整理今天的数据...")
                     .font(.system(size: 14))
                     .foregroundStyle(TodayTheme.inkMuted)
+            }
+
+            if let errorMessage = todayViewModel.errorMessage, todayViewModel.timeline == nil {
+                HStack(spacing: 8) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.system(size: 14))
+                        .foregroundStyle(TodayTheme.rose)
+
+                    Text(errorMessage)
+                        .font(.system(size: 13))
+                        .foregroundStyle(TodayTheme.inkMuted)
+                        .lineLimit(2)
+                }
             }
         }
     }
