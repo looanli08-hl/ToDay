@@ -180,42 +180,35 @@ struct DashboardView: View {
         }
     }
 
-    // MARK: - Timeline Preview
+    // MARK: - Day Timeline (full scroll canvas)
 
     @ViewBuilder
     private var timelinePreviewSection: some View {
-        let preview = dashboardVM.timelinePreview
-        if !preview.isEmpty {
-            ContentCard {
-                HStack(alignment: .top) {
-                    VStack(alignment: .leading, spacing: 6) {
-                        SectionHeader("最近动态")
+        if let timeline = todayViewModel.timeline, !timeline.entries.isEmpty {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    VStack(alignment: .leading, spacing: 4) {
+                        SectionHeader("时间轴回放")
 
-                        Text("时间线")
+                        Text("当天时间轴")
                             .font(.system(size: 23, weight: .regular, design: .serif))
                             .italic()
                             .foregroundStyle(TodayTheme.ink)
                     }
 
                     Spacer()
-
-                    Button(action: onOpenTimeline) {
-                        Text("查看全部")
-                            .font(.system(size: 13, weight: .medium))
-                            .foregroundStyle(TodayTheme.accent)
-                            .padding(.horizontal, 14)
-                            .padding(.vertical, 6)
-                            .background(TodayTheme.accentSoft)
-                            .clipShape(Capsule())
-                    }
-                    .buttonStyle(.plain)
                 }
 
-                VStack(spacing: 8) {
-                    ForEach(preview) { event in
-                        DashboardEventCard(event: event)
-                    }
-                }
+                Text("从凌晨到夜里，把这一天重新走一遍。")
+                    .font(.system(size: 13))
+                    .foregroundStyle(TodayTheme.inkMuted)
+
+                DayScrollView(
+                    timeline: timeline,
+                    onEventTap: { _ in },
+                    onBlankTap: { _ in },
+                    showsCurrentTimeNeedle: true
+                )
             }
         } else if todayViewModel.timeline != nil {
             ContentCard {
@@ -241,149 +234,7 @@ struct DashboardView: View {
     }
 }
 
-// MARK: - Dashboard Event Card (neutral style, inspired by full timeline EventCardView)
 
-private struct DashboardEventCard: View {
-    let event: InferredEvent
-
-    var body: some View {
-        if event.kind == .mood {
-            moodRow
-        } else {
-            eventCard
-        }
-    }
-
-    private var eventCard: some View {
-        HStack(spacing: 0) {
-            // Left color stripe
-            RoundedRectangle(cornerRadius: 2, style: .continuous)
-                .fill(stripeColor)
-                .frame(width: 4)
-
-            VStack(alignment: .leading, spacing: 6) {
-                HStack(alignment: .firstTextBaseline, spacing: 8) {
-                    // Kind badge
-                    Text(event.kindBadgeTitle)
-                        .font(.system(size: 10, weight: .bold, design: .monospaced))
-                        .foregroundStyle(stripeColor)
-
-                    // Event name
-                    Text(event.resolvedName)
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundStyle(TodayTheme.ink)
-                        .lineLimit(1)
-
-                    Spacer(minLength: 8)
-
-                    // Duration
-                    Text(event.scrollDurationText)
-                        .font(.system(size: 13, weight: .bold, design: .monospaced))
-                        .foregroundStyle(TodayTheme.inkMuted)
-                }
-
-                // Detail line
-                if let detail = event.compactDetailLine {
-                    Text(detail)
-                        .font(.system(size: 13))
-                        .foregroundStyle(TodayTheme.inkMuted)
-                        .lineLimit(1)
-                }
-
-                // Sleep stage ribbon
-                if event.kind == .sleep,
-                   let stages = event.associatedMetrics?.sleepStages,
-                   !stages.isEmpty {
-                    SleepStageBar(segments: stages)
-                        .frame(height: 6)
-                }
-            }
-            .padding(.leading, 12)
-        }
-        .padding(.vertical, 12)
-        .padding(.trailing, 14)
-        .background(TodayTheme.card)
-        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .stroke(TodayTheme.border.opacity(0.5), lineWidth: 0.5)
-        )
-    }
-
-    private var moodRow: some View {
-        HStack(spacing: 8) {
-            Text(event.moodEmoji)
-                .font(.system(size: 14))
-                .frame(width: 28, height: 28)
-                .background(TodayTheme.roseSoft)
-                .clipShape(Circle())
-
-            Text(event.resolvedName)
-                .font(.system(size: 14, weight: .medium))
-                .foregroundStyle(TodayTheme.ink)
-                .lineLimit(1)
-
-            Spacer(minLength: 8)
-
-            Text(event.moodTimeText)
-                .font(.system(size: 12, weight: .medium, design: .monospaced))
-                .foregroundStyle(TodayTheme.inkMuted)
-        }
-        .padding(.vertical, 8)
-        .padding(.horizontal, 12)
-        .background(TodayTheme.card)
-        .clipShape(Capsule())
-        .overlay(
-            Capsule()
-                .stroke(TodayTheme.border.opacity(0.5), lineWidth: 0.5)
-        )
-    }
-
-    // Neutral stripe colors — muted versions, no bright fills
-    private var stripeColor: Color {
-        switch event.kind {
-        case .sleep:         return TodayTheme.sleepIndigo
-        case .workout:       return TodayTheme.workoutOrange
-        case .commute:       return TodayTheme.blue
-        case .activeWalk:    return TodayTheme.walkGreen
-        case .quietTime:     return TodayTheme.inkFaint
-        case .userAnnotated: return TodayTheme.teal
-        case .mood:          return TodayTheme.rose
-        case .shutter:       return TodayTheme.scrollGold
-        case .screenTime:    return TodayTheme.purple
-        case .spending:      return TodayTheme.teal
-        }
-    }
-}
-
-// Simple sleep stage bar for dashboard preview
-private struct SleepStageBar: View {
-    let segments: [SleepStageSegment]
-
-    var body: some View {
-        GeometryReader { proxy in
-            let total = max(segments.reduce(0.0) { $0 + $1.end.timeIntervalSince($1.start) }, 1)
-            HStack(spacing: 2) {
-                ForEach(Array(segments.enumerated()), id: \.offset) { _, seg in
-                    RoundedRectangle(cornerRadius: 3, style: .continuous)
-                        .fill(color(for: seg.stage))
-                        .frame(width: max(6, proxy.size.width * (seg.end.timeIntervalSince(seg.start) / total)))
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-        }
-    }
-
-    private func color(for stage: SleepStage) -> Color {
-        switch stage {
-        case .deep:    return TodayTheme.scrollNight
-        case .light:   return TodayTheme.sleepIndigo
-        case .rem:     return TodayTheme.scrollSunrise
-        case .awake:   return TodayTheme.scrollGold
-        case .unknown: return TodayTheme.inkFaint
-        }
-    }
-}
 
 #Preview {
     DashboardView(
