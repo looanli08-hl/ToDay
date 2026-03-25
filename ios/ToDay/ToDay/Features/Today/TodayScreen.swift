@@ -494,7 +494,7 @@ struct TodayScreen: View {
         return [
             OverviewStat(label: "片段", value: "\(entryCount)", tint: TodayTheme.blue, background: TodayTheme.blueSoft),
             OverviewStat(label: "记录", value: "\(viewModel.todayManualRecordCount)", tint: TodayTheme.teal, background: TodayTheme.tealSoft),
-            OverviewStat(label: "备注", value: "\(viewModel.todayNoteCount)", tint: TodayTheme.rose, background: TodayTheme.roseSoft),
+            OverviewStat(label: "快门", value: "\(viewModel.todayShutterCount())", tint: TodayTheme.scrollGold, background: TodayTheme.scrollGold.opacity(0.12)),
             OverviewStat(label: "来源", value: sourceText, tint: TodayTheme.accent, background: TodayTheme.accentSoft)
         ]
     }
@@ -530,5 +530,11 @@ private struct ScrollSharePayload: Identifiable {
 @MainActor
 private let previewModelContainer: ModelContainer = {
     let configuration = ModelConfiguration(isStoredInMemoryOnly: true)
-    return try! ModelContainer(for: MoodRecordEntity.self, DayTimelineEntity.self, configurations: configuration)
+    return try! ModelContainer(
+        for: MoodRecordEntity.self,
+        DayTimelineEntity.self,
+        ShutterRecordEntity.self,
+        SpendingRecordEntity.self,
+        configurations: configuration
+    )
 }()
