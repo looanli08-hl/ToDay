@@ -42,6 +42,7 @@ final class EchoEngine {
     private let echoStore: any EchoItemStoring
     private let notificationScheduler: any EchoNotificationScheduling
     private let calendar: Calendar
+    private var hasRequestedPermission = false
 
     /// User preference: default echo time of day (hour component, 0-23). Default = 9 (9:00 AM)
     var echoHour: Int {
@@ -80,6 +81,11 @@ final class EchoEngine {
     func scheduleEchoes(for record: ShutterRecord) {
         let frequency = globalFrequency ?? record.echoConfig.frequency
         guard frequency != .off else { return }
+
+        if !hasRequestedPermission {
+            requestNotificationPermission()
+            hasRequestedPermission = true
+        }
 
         let reminderDays = frequency.reminderDays
 
