@@ -19,15 +19,15 @@ struct DashboardView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 24) {
+                VStack(alignment: .leading, spacing: 20) {
                     headerSection
                     cardGridSection
                     insightSection
                     timelinePreviewSection
                 }
                 .padding(.horizontal, 20)
-                .padding(.top, 16)
-                .padding(.bottom, 32)
+                .padding(.top, 12)
+                .padding(.bottom, 28)
             }
             .background(TodayTheme.background)
             .toolbar(.hidden, for: .navigationBar)
@@ -48,24 +48,18 @@ struct DashboardView: View {
     // MARK: - Header
 
     private var headerSection: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .top) {
-                VStack(alignment: .leading, spacing: 4) {
-                    // Day of week + date in nature style
-                    Text(dayOfWeekText)
-                        .font(.system(size: 13, weight: .medium))
-                        .foregroundStyle(TodayTheme.accent)
-                        .tracking(1.0)
-
+                VStack(alignment: .leading, spacing: 8) {
                     Text(dashboardVM.dateText)
-                        .font(.system(size: 13, weight: .medium, design: .monospaced))
+                        .font(.system(size: 12, weight: .medium, design: .monospaced))
                         .foregroundStyle(TodayTheme.inkMuted)
                         .tracking(1.4)
 
                     Text("仪表盘")
-                        .font(.system(size: 28, weight: .semibold))
+                        .font(.system(size: 33, weight: .regular, design: .serif))
+                        .italic()
                         .foregroundStyle(TodayTheme.ink)
-                        .padding(.top, 4)
                 }
 
                 Spacer()
@@ -78,14 +72,12 @@ struct DashboardView: View {
                     Image(systemName: "arrow.clockwise")
                         .font(.system(size: 15, weight: .semibold))
                         .foregroundStyle(TodayTheme.inkSoft)
-                        .frame(width: 44, height: 44)
+                        .frame(width: 42, height: 42)
                         .background(TodayTheme.card)
                         .overlay(
                             Circle()
-                                .stroke(TodayTheme.border.opacity(0.5), lineWidth: 0.5)
+                                .stroke(TodayTheme.border, lineWidth: 1)
                         )
-                        .clipShape(Circle())
-                        .shadow(color: Color(red: 0.17, green: 0.20, blue: 0.15).opacity(0.06), radius: 8, x: 0, y: 2)
                 }
                 .buttonStyle(.plain)
             }
@@ -94,7 +86,6 @@ struct DashboardView: View {
                 Text("正在整理今天的数据...")
                     .font(.system(size: 14))
                     .foregroundStyle(TodayTheme.inkMuted)
-                    .padding(.top, 4)
             }
 
             if let errorMessage = todayViewModel.errorMessage, todayViewModel.timeline == nil {
@@ -108,23 +99,15 @@ struct DashboardView: View {
                         .foregroundStyle(TodayTheme.inkMuted)
                         .lineLimit(2)
                 }
-                .padding(.top, 4)
             }
         }
-    }
-
-    private var dayOfWeekText: String {
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "zh_CN")
-        formatter.dateFormat = "EEEE"
-        return formatter.string(from: Date()).uppercased()
     }
 
     // MARK: - Card Grid
 
     private var cardGridSection: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            sectionHeader("今日概览")
+        VStack(alignment: .leading, spacing: 12) {
+            EyebrowLabel("今日概览")
 
             if todayViewModel.isLoading && todayViewModel.timeline == nil {
                 cardGridPlaceholder
@@ -141,7 +124,7 @@ struct DashboardView: View {
     private var cardGridPlaceholder: some View {
         LazyVGrid(columns: cardColumns, spacing: 12) {
             ForEach(0..<6, id: \.self) { _ in
-                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
                     .fill(TodayTheme.elevatedCard)
                     .aspectRatio(1.0, contentMode: .fit)
                     .overlay(
@@ -156,43 +139,18 @@ struct DashboardView: View {
     @ViewBuilder
     private var insightSection: some View {
         let vm = dashboardVM
-        VStack(alignment: .leading, spacing: 14) {
-            sectionHeader("今日洞察")
+        ContentCard(background: TodayTheme.tealSoft.opacity(0.7)) {
+            EyebrowLabel("今日洞察")
 
-            VStack(alignment: .leading, spacing: 14) {
-                HStack(spacing: 10) {
-                    Image(systemName: "leaf.fill")
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(TodayTheme.accent)
-                        .frame(width: 30, height: 30)
-                        .background(TodayTheme.accent.opacity(0.12))
-                        .clipShape(Circle())
+            Text("生活脉搏")
+                .font(.system(size: 23, weight: .regular, design: .serif))
+                .italic()
+                .foregroundStyle(TodayTheme.ink)
 
-                    Text("生活脉搏")
-                        .font(.system(size: 20, weight: .semibold))
-                        .foregroundStyle(TodayTheme.ink)
-                }
-
-                Text(vm.insightText)
-                    .font(.system(size: 15))
-                    .foregroundStyle(TodayTheme.inkSoft)
-                    .lineSpacing(5)
-            }
-            .padding(20)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(
-                LinearGradient(
-                    colors: [TodayTheme.tealSoft, TodayTheme.card],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                    .stroke(TodayTheme.border.opacity(0.5), lineWidth: 0.5)
-            )
-            .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-            .shadow(color: Color(red: 0.17, green: 0.20, blue: 0.15).opacity(0.06), radius: 16, x: 0, y: 4)
+            Text(vm.insightText)
+                .font(.system(size: 14))
+                .foregroundStyle(TodayTheme.inkMuted)
+                .lineSpacing(4)
         }
     }
 
@@ -202,47 +160,47 @@ struct DashboardView: View {
     private var timelinePreviewSection: some View {
         let preview = dashboardVM.timelinePreview
         if !preview.isEmpty {
-            VStack(alignment: .leading, spacing: 14) {
-                HStack(alignment: .center) {
-                    sectionHeader("最近动态")
+            ContentCard {
+                HStack(alignment: .top) {
+                    VStack(alignment: .leading, spacing: 6) {
+                        EyebrowLabel("最近动态")
+
+                        Text("时间线")
+                            .font(.system(size: 23, weight: .regular, design: .serif))
+                            .italic()
+                            .foregroundStyle(TodayTheme.ink)
+                    }
 
                     Spacer()
 
                     Button(action: onOpenTimeline) {
                         Text("查看全部")
-                            .font(.system(size: 13, weight: .semibold))
-                            .foregroundStyle(TodayTheme.accent)
-                            .padding(.horizontal, 14)
-                            .padding(.vertical, 7)
-                            .background(TodayTheme.accentSoft)
-                            .clipShape(Capsule())
+                            .font(.system(size: 13, weight: .medium, design: .monospaced))
+                            .foregroundStyle(TodayTheme.inkSoft)
                     }
                     .buttonStyle(.plain)
                 }
 
-                ContentCard {
-                    VStack(spacing: 0) {
-                        ForEach(Array(preview.enumerated()), id: \.element.id) { index, event in
-                            TimelinePreviewRow(event: event)
+                VStack(spacing: 0) {
+                    ForEach(Array(preview.enumerated()), id: \.element.id) { index, event in
+                        TimelinePreviewRow(event: event)
 
-                            if index < preview.count - 1 {
-                                Divider()
-                                    .foregroundStyle(TodayTheme.border.opacity(0.5))
-                                    .padding(.leading, 44)
-                            }
+                        if index < preview.count - 1 {
+                            Divider()
+                                .padding(.leading, 36)
                         }
                     }
                 }
             }
         } else if todayViewModel.timeline != nil {
             ContentCard {
-                VStack(spacing: 14) {
+                VStack(spacing: 12) {
                     Image(systemName: "clock")
                         .font(.system(size: 28))
                         .foregroundStyle(TodayTheme.inkFaint)
 
                     Text("时间线还是空的")
-                        .font(.system(size: 16, weight: .semibold))
+                        .font(.system(size: 16, weight: .medium))
                         .foregroundStyle(TodayTheme.inkSoft)
 
                     Text("戴上 Apple Watch 活动一会儿，或用快门记录生活碎片。")
@@ -252,18 +210,9 @@ struct DashboardView: View {
                         .lineSpacing(4)
                 }
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 12)
+                .padding(.vertical, 8)
             }
         }
-    }
-
-    // MARK: - Section Header Helper
-
-    private func sectionHeader(_ title: String) -> some View {
-        Text(title.uppercased())
-            .font(.system(size: 13, weight: .medium))
-            .foregroundStyle(TodayTheme.inkMuted)
-            .tracking(2.0)
     }
 }
 
@@ -277,29 +226,24 @@ private struct TimelinePreviewRow: View {
             Image(systemName: iconName)
                 .font(.system(size: 14, weight: .semibold))
                 .foregroundStyle(iconColor)
-                .frame(width: 32, height: 32)
+                .frame(width: 28, height: 28)
                 .background(iconBackground)
                 .clipShape(Circle())
 
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: 3) {
                 Text(event.resolvedName)
-                    .font(.system(size: 15, weight: .medium))
+                    .font(.system(size: 14, weight: .medium))
                     .foregroundStyle(TodayTheme.inkSoft)
                     .lineLimit(1)
+
+                Text(timeText)
+                    .font(.system(size: 12, weight: .medium, design: .monospaced))
+                    .foregroundStyle(TodayTheme.inkMuted)
             }
 
             Spacer()
-
-            // Pill-shaped time badge
-            Text(timeText)
-                .font(.system(size: 11, weight: .semibold, design: .monospaced))
-                .foregroundStyle(TodayTheme.inkMuted)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 5)
-                .background(TodayTheme.surface)
-                .clipShape(Capsule())
         }
-        .padding(.vertical, 10)
+        .padding(.vertical, 8)
     }
 
     private var timeText: String {
@@ -338,7 +282,7 @@ private struct TimelinePreviewRow: View {
         case .quietTime:     return TodayTheme.teal
         case .userAnnotated: return TodayTheme.accent
         case .mood:          return TodayTheme.rose
-        case .shutter:       return TodayTheme.gold
+        case .shutter:       return TodayTheme.accent
         case .screenTime:    return TodayTheme.purple
         case .spending:      return TodayTheme.rose
         }

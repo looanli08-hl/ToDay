@@ -25,9 +25,9 @@ struct ShutterFloatingButton: View {
             longPressStarted = false
         } label: {
             Image(systemName: "camera.aperture")
-                .font(.system(size: 24, weight: .semibold))
+                .font(.system(size: 22, weight: .semibold))
                 .foregroundStyle(.white)
-                .frame(width: 60, height: 60)
+                .frame(width: 56, height: 56)
                 .background(
                     Circle()
                         .fill(
@@ -36,7 +36,7 @@ struct ShutterFloatingButton: View {
                                 : TodayTheme.accent
                         )
                 )
-                .shadow(color: TodayTheme.accent.opacity(0.4), radius: 16, x: 0, y: 8)
+                .shadow(color: TodayTheme.accent.opacity(0.35), radius: 12, x: 0, y: 6)
                 .scaleEffect(isLongPressing ? 1.15 : 1.0)
                 .animation(.easeInOut(duration: 0.2), value: isLongPressing)
         }
