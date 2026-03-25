@@ -5,7 +5,7 @@ settings:
   base:
     PRODUCT_NAME: ToDay
     PRODUCT_BUNDLE_IDENTIFIER: com.looanli.today
-    DEVELOPMENT_TEAM: ""
+    DEVELOPMENT_TEAM: G89F57S8M3
     CODE_SIGN_STYLE: Automatic
     SWIFT_VERSION: 5.0
     CURRENT_PROJECT_VERSION: "1"
@@ -29,9 +29,6 @@ targets:
         com.apple.developer.weatherkit: true
         com.apple.security.application-groups:
           - group.com.looanli.today
-    dependencies:
-      - target: ToDayWatch
-        embed: true
     settings:
       base:
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
@@ -43,6 +40,8 @@ targets:
         INFOPLIST_KEY_NSPhotoLibraryUsageDescription: ToDay 读取你当天拍摄的照片，将它们匹配到画卷中对应的事件。照片不会上传。
         INFOPLIST_KEY_NSCameraUsageDescription: ToDay 使用相机拍摄照片和视频，快速记录生活碎片。媒体文件仅存储在本地。
         INFOPLIST_KEY_NSMicrophoneUsageDescription: ToDay 使用麦克风录制语音备忘，帮你用最少的操作捕捉灵感。录音仅存储在本地。
+        INFOPLIST_KEY_NSHealthUpdateUsageDescription: ToDay 不会写入任何健康数据，此权限仅用于满足系统要求。
+        INFOPLIST_KEY_UISupportedInterfaceOrientations: "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
   ToDayWatch:
     type: application
     platform: watchOS
@@ -116,8 +115,6 @@ schemes:
     build:
       targets:
         ToDay: all
-        ToDayWatch: all
-        ToDayWatchWidgets: all
     test:
       config: Debug
       targets:

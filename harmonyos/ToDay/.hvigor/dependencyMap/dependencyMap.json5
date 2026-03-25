@@ -1,0 +1,1 @@
+{"basePath":"/Users/looanli/Projects/ToDay/harmonyos/ToDay/.hvigor/dependencyMap/dependencyMap.json5","rootDependency":"./oh-package.json5","dependencyMap":{"entry":"./entry/oh-package.json5","wear":"./wear/oh-package.json5"},"modules":[{"name":"entry","srcPath":"../../../entry"},{"name":"wear","srcPath":"../../../wear"}]}

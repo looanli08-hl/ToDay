@@ -136,16 +136,16 @@ struct ShutterPanel: View {
                     .foregroundStyle(tint)
                     .frame(width: 44, height: 44)
                     .background(tint.opacity(0.12))
-                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    .clipShape(Circle())
 
                 VStack(alignment: .leading, spacing: 3) {
                     Text(title)
-                        .font(.system(size: 16, weight: .semibold))
+                        .font(.system(size: 17, weight: .bold))
                         .foregroundStyle(TodayTheme.ink)
 
                     Text(subtitle)
                         .font(.system(size: 13))
-                        .foregroundStyle(TodayTheme.inkMuted)
+                        .foregroundStyle(TodayTheme.inkFaint)
                 }
 
                 Spacer()
@@ -156,11 +156,12 @@ struct ShutterPanel: View {
             }
             .padding(14)
             .background(TodayTheme.card)
-            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
             .overlay(
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                RoundedRectangle(cornerRadius: 20, style: .continuous)
                     .stroke(TodayTheme.border, lineWidth: 1)
             )
+            .shadow(color: TodayTheme.ink.opacity(0.06), radius: 16, x: 0, y: 4)
         }
         .buttonStyle(.plain)
     }

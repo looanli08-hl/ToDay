@@ -75,6 +75,21 @@ struct EyebrowLabel: View {
     }
 }
 
+struct SectionHeader: View {
+    let text: String
+
+    init(_ text: String) {
+        self.text = text
+    }
+
+    var body: some View {
+        Text(text.uppercased())
+            .font(.system(size: 12, weight: .medium))
+            .foregroundStyle(TodayTheme.inkMuted)
+            .tracking(2.0)
+    }
+}
+
 struct FlexibleBadgeRow: View {
     enum Tone {
         case accent

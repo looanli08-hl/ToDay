@@ -40,6 +40,14 @@ enum TrendDirection {
         case .flat: return "arrow.right"
         }
     }
+
+    var label: String {
+        switch self {
+        case .up:   return "升"
+        case .down: return "降"
+        case .flat: return "平"
+        }
+    }
 }
 
 struct DashboardCardView: View {
@@ -49,27 +57,39 @@ struct DashboardCardView: View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
                 Image(systemName: card.icon)
-                    .font(.system(size: 16, weight: .semibold))
+                    .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(card.tint)
+                    .frame(width: 32, height: 32)
+                    .background(card.tint.opacity(0.12))
+                    .clipShape(Circle())
 
                 Spacer()
 
                 if let trend = card.trend {
-                    Image(systemName: trend.iconName)
-                        .font(.system(size: 11, weight: .bold))
-                        .foregroundStyle(trendColor(trend))
+                    HStack(spacing: 3) {
+                        Image(systemName: trend.iconName)
+                            .font(.system(size: 9, weight: .bold))
+                        Text(trend.label)
+                            .font(.system(size: 10, weight: .semibold))
+                    }
+                    .foregroundStyle(trendColor(trend))
+                    .padding(.horizontal, 7)
+                    .padding(.vertical, 3)
+                    .background(trendColor(trend).opacity(0.12))
+                    .clipShape(Capsule())
                 }
             }
 
             Spacer()
 
-            Text(card.label)
-                .font(.system(size: 12, weight: .medium))
+            Text(card.label.uppercased())
+                .font(.system(size: 11, weight: .medium))
                 .foregroundStyle(TodayTheme.inkMuted)
+                .tracking(1.2)
                 .lineLimit(1)
 
             Text(card.value)
-                .font(.system(size: 20, weight: .bold, design: .monospaced))
+                .font(.system(size: 24, weight: .bold, design: .rounded))
                 .foregroundStyle(TodayTheme.ink)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
@@ -79,10 +99,11 @@ struct DashboardCardView: View {
         .aspectRatio(1.0, contentMode: .fit)
         .background(card.background)
         .overlay(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
                 .stroke(TodayTheme.border, lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .shadow(color: TodayTheme.ink.opacity(0.06), radius: 16, x: 0, y: 4)
     }
 
     private func trendColor(_ trend: TrendDirection) -> Color {

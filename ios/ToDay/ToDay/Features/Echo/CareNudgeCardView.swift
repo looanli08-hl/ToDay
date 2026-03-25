@@ -7,10 +7,10 @@ struct CareNudgeCardView: View {
         ContentCard(background: cardBackground) {
             HStack(spacing: 14) {
                 Image(systemName: nudge.iconName)
-                    .font(.system(size: 22))
+                    .font(.system(size: 20, weight: .semibold))
                     .foregroundStyle(iconColor)
-                    .frame(width: 40, height: 40)
-                    .background(iconBackground)
+                    .frame(width: 44, height: 44)
+                    .background(iconColor.opacity(0.12))
                     .clipShape(Circle())
 
                 VStack(alignment: .leading, spacing: 4) {
@@ -28,6 +28,7 @@ struct CareNudgeCardView: View {
                 Spacer()
             }
         }
+        .shadow(color: TodayTheme.ink.opacity(0.06), radius: 16, x: 0, y: 4)
     }
 
     private var cardBackground: Color {

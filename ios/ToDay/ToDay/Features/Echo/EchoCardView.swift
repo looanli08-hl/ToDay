@@ -18,8 +18,11 @@ struct EchoCardView: View {
 
                     if let record = shutterRecord {
                         Image(systemName: iconName(for: record.type))
-                            .font(.system(size: 12))
-                            .foregroundStyle(TodayTheme.inkMuted)
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundStyle(TodayTheme.accent)
+                            .frame(width: 32, height: 32)
+                            .background(TodayTheme.accent.opacity(0.12))
+                            .clipShape(Circle())
                     }
                 }
 
@@ -84,6 +87,7 @@ struct EchoCardView: View {
                 }
             }
         }
+        .shadow(color: TodayTheme.ink.opacity(0.06), radius: 16, x: 0, y: 4)
     }
 
     private func iconName(for type: ShutterType) -> String {

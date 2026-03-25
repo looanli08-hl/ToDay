@@ -19,7 +19,7 @@ struct DashboardView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
+                VStack(alignment: .leading, spacing: 24) {
                     headerSection
                     cardGridSection
                     insightSection
@@ -47,14 +47,31 @@ struct DashboardView: View {
 
     // MARK: - Header
 
+    private var dayOfWeekText: String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "zh_CN")
+        formatter.dateFormat = "EEEE"
+        return formatter.string(from: dashboardVM.timeline?.date ?? Date())
+    }
+
     private var headerSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text(dashboardVM.dateText)
-                        .font(.system(size: 12, weight: .medium, design: .monospaced))
-                        .foregroundStyle(TodayTheme.inkMuted)
-                        .tracking(1.4)
+                    HStack(spacing: 8) {
+                        Text(dashboardVM.dateText)
+                            .font(.system(size: 12, weight: .medium, design: .monospaced))
+                            .foregroundStyle(TodayTheme.inkMuted)
+                            .tracking(1.4)
+
+                        Text(dayOfWeekText)
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundStyle(TodayTheme.accent)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 3)
+                            .background(TodayTheme.accentSoft)
+                            .clipShape(Capsule())
+                    }
 
                     Text("仪表盘")
                         .font(.system(size: 33, weight: .regular, design: .serif))
@@ -107,7 +124,7 @@ struct DashboardView: View {
 
     private var cardGridSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            EyebrowLabel("今日概览")
+            SectionHeader("今日概览")
 
             if todayViewModel.isLoading && todayViewModel.timeline == nil {
                 cardGridPlaceholder
@@ -124,7 +141,7 @@ struct DashboardView: View {
     private var cardGridPlaceholder: some View {
         LazyVGrid(columns: cardColumns, spacing: 12) {
             ForEach(0..<6, id: \.self) { _ in
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                RoundedRectangle(cornerRadius: 20, style: .continuous)
                     .fill(TodayTheme.elevatedCard)
                     .aspectRatio(1.0, contentMode: .fit)
                     .overlay(
@@ -140,12 +157,21 @@ struct DashboardView: View {
     private var insightSection: some View {
         let vm = dashboardVM
         ContentCard(background: TodayTheme.tealSoft.opacity(0.7)) {
-            EyebrowLabel("今日洞察")
+            SectionHeader("今日洞察")
 
-            Text("生活脉搏")
-                .font(.system(size: 23, weight: .regular, design: .serif))
-                .italic()
-                .foregroundStyle(TodayTheme.ink)
+            HStack(spacing: 10) {
+                Image(systemName: "leaf.fill")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(TodayTheme.teal)
+                    .frame(width: 32, height: 32)
+                    .background(TodayTheme.teal.opacity(0.12))
+                    .clipShape(Circle())
+
+                Text("生活脉搏")
+                    .font(.system(size: 23, weight: .regular, design: .serif))
+                    .italic()
+                    .foregroundStyle(TodayTheme.ink)
+            }
 
             Text(vm.insightText)
                 .font(.system(size: 14))
@@ -163,7 +189,7 @@ struct DashboardView: View {
             ContentCard {
                 HStack(alignment: .top) {
                     VStack(alignment: .leading, spacing: 6) {
-                        EyebrowLabel("最近动态")
+                        SectionHeader("最近动态")
 
                         Text("时间线")
                             .font(.system(size: 23, weight: .regular, design: .serif))
@@ -175,8 +201,12 @@ struct DashboardView: View {
 
                     Button(action: onOpenTimeline) {
                         Text("查看全部")
-                            .font(.system(size: 13, weight: .medium, design: .monospaced))
-                            .foregroundStyle(TodayTheme.inkSoft)
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundStyle(TodayTheme.accent)
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 6)
+                            .background(TodayTheme.accentSoft)
+                            .clipShape(Capsule())
                     }
                     .buttonStyle(.plain)
                 }
@@ -224,21 +254,25 @@ private struct TimelinePreviewRow: View {
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: iconName)
-                .font(.system(size: 14, weight: .semibold))
+                .font(.system(size: 15, weight: .semibold))
                 .foregroundStyle(iconColor)
-                .frame(width: 28, height: 28)
+                .frame(width: 32, height: 32)
                 .background(iconBackground)
                 .clipShape(Circle())
 
-            VStack(alignment: .leading, spacing: 3) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(event.resolvedName)
                     .font(.system(size: 14, weight: .medium))
                     .foregroundStyle(TodayTheme.inkSoft)
                     .lineLimit(1)
 
                 Text(timeText)
-                    .font(.system(size: 12, weight: .medium, design: .monospaced))
+                    .font(.system(size: 11, weight: .medium, design: .monospaced))
                     .foregroundStyle(TodayTheme.inkMuted)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(TodayTheme.elevatedCard)
+                    .clipShape(Capsule())
             }
 
             Spacer()

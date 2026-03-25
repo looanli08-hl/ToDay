@@ -1,0 +1,54 @@
+{
+  "app": {
+    "signingConfigs": [
+      {
+        "name": "default",
+        "type": "HarmonyOS",
+        "material": {
+          "certpath": "./signing/ToDay-release.cer",
+          "storeFile": "./signing/ToDay-release.p12",
+          "storePassword": "替换成你的证书库密码",
+          "keyAlias": "debugKey",
+          "keyPassword": "替换成你的密钥密码",
+          "profile": "./signing/ToDay-release.p7b",
+          "signAlg": "SHA256withECDSA"
+        }
+      }
+    ],
+    "products": [
+      {
+        "name": "default",
+        "signingConfig": "default",
+        "compatibleSdkVersion": "5.0.0(12)",
+        "targetSdkVersion": "6.0.2(22)",
+        "runtimeOS": "HarmonyOS"
+      }
+    ],
+    "buildModeSet": [
+      { "name": "debug" },
+      { "name": "release" }
+    ]
+  },
+  "modules": [
+    {
+      "name": "entry",
+      "srcPath": "./entry",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [ "default" ]
+        }
+      ]
+    },
+    {
+      "name": "wear",
+      "srcPath": "./wear",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [ "default" ]
+        }
+      ]
+    }
+  ]
+}
