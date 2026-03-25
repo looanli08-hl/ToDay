@@ -65,6 +65,53 @@ struct SettingsView: View {
                     .buttonStyle(.plain)
                 }
 
+                Section("Echo 回响") {
+                    // Global frequency
+                    HStack {
+                        Text("回响频率")
+                            .foregroundStyle(TodayTheme.ink)
+                        Spacer()
+                        Picker("", selection: Binding(
+                            get: { echoViewModel.globalFrequency ?? .medium },
+                            set: { echoViewModel.globalFrequency = $0 }
+                        )) {
+                            Text("高").tag(EchoFrequency.high)
+                            Text("中").tag(EchoFrequency.medium)
+                            Text("低").tag(EchoFrequency.low)
+                            Text("关闭").tag(EchoFrequency.off)
+                        }
+                        .pickerStyle(.menu)
+                        .tint(TodayTheme.teal)
+                    }
+
+                    // Echo hour
+                    HStack {
+                        Text("回响时间")
+                            .foregroundStyle(TodayTheme.ink)
+                        Spacer()
+                        Picker("", selection: Binding(
+                            get: { echoViewModel.echoHour },
+                            set: { echoViewModel.echoHour = $0 }
+                        )) {
+                            ForEach(6..<23, id: \.self) { hour in
+                                Text(String(format: "%02d:00", hour)).tag(hour)
+                            }
+                        }
+                        .pickerStyle(.menu)
+                        .tint(TodayTheme.teal)
+                    }
+
+                    // Care nudges toggle
+                    Toggle(isOn: Binding(
+                        get: { echoViewModel.careNudgesEnabled },
+                        set: { echoViewModel.careNudgesEnabled = $0 }
+                    )) {
+                        Text("关怀推送")
+                            .foregroundStyle(TodayTheme.ink)
+                    }
+                    .tint(TodayTheme.teal)
+                }
+
                 Section("隐私") {
                     if let privacyPolicyURL = AppConfiguration.privacyPolicyURL {
                         Link(destination: privacyPolicyURL) {
