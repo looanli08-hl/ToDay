@@ -515,15 +515,16 @@ private struct ScrollSharePayload: Identifiable {
 }
 
 #Preview {
-    AppRootScreen(
-        todayViewModel: TodayViewModel(
+    TodayScreen(
+        viewModel: TodayViewModel(
             provider: MockTimelineDataProvider(),
             recordStore: UserDefaultsMoodRecordStore(
                 defaults: UserDefaults(suiteName: "ToDayPreviewStore") ?? .standard,
                 key: "preview.manualRecords"
             ),
             modelContainer: previewModelContainer
-        )
+        ),
+        onOpenHistory: {}
     )
 }
 

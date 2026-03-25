@@ -20,9 +20,9 @@ struct AppRootScreen: View {
         if hasCompletedOnboarding {
             ZStack {
                 TabView(selection: $selectedTab) {
-                    TodayScreen(
-                        viewModel: todayViewModel,
-                        onOpenHistory: { selectedTab = .timeline }
+                    DashboardView(
+                        todayViewModel: todayViewModel,
+                        onOpenTimeline: { selectedTab = .timeline }
                     )
                     .tabItem {
                         Label("首页", systemImage: "square.grid.2x2.fill")
