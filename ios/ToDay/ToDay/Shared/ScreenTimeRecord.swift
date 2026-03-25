@@ -57,4 +57,31 @@ struct ScreenTimeRecord: Codable, Identifiable, Hashable, Sendable {
         }
         return "\(minutes)m"
     }
+
+    func toInferredEvent() -> InferredEvent {
+        let displayName = "屏幕时间 \(formattedTotalTime)"
+        let topApps = appUsages
+            .sorted { $0.duration > $1.duration }
+            .prefix(3)
+            .map { "\($0.appName) \($0.formattedDuration)" }
+        let subtitle: String? = topApps.isEmpty ? nil : topApps.joined(separator: "、")
+
+        // Use noon of the day as start, span the total screen time as duration
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        let baseDate = dateFormatter.date(from: dateKey) ?? Date()
+        let calendar = Calendar.current
+        let startOfDay = calendar.startOfDay(for: baseDate)
+        let noon = calendar.date(byAdding: .hour, value: 12, to: startOfDay) ?? startOfDay
+
+        return InferredEvent(
+            id: id,
+            kind: .screenTime,
+            startDate: noon,
+            endDate: noon,
+            confidence: .medium,
+            displayName: displayName,
+            subtitle: subtitle
+        )
+    }
 }

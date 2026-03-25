@@ -11,6 +11,7 @@ enum AppContainer {
     private static let moodRecordStore = SwiftDataMoodRecordStore(container: modelContainer)
     private static let shutterRecordStore = SwiftDataShutterRecordStore(container: modelContainer)
     private static let spendingRecordStore = SwiftDataSpendingRecordStore(container: modelContainer)
+    private static let screenTimeRecordStore = SwiftDataScreenTimeRecordStore(container: modelContainer)
 #if os(iOS)
     static let phoneConnectivityManager = makePhoneConnectivityManager()
 #endif
@@ -56,13 +57,18 @@ enum AppContainer {
         spendingRecordStore
     }
 
+    static func makeScreenTimeRecordStore() -> any ScreenTimeRecordStoring {
+        screenTimeRecordStore
+    }
+
     private static func makeModelContainer() -> ModelContainer {
         do {
             let container = try ModelContainer(
                 for: MoodRecordEntity.self,
                 DayTimelineEntity.self,
                 ShutterRecordEntity.self,
-                SpendingRecordEntity.self
+                SpendingRecordEntity.self,
+                ScreenTimeRecordEntity.self
             )
             migrateLegacyMoodRecordsIfNeeded(into: container)
             return container
