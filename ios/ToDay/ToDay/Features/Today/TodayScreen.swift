@@ -65,6 +65,19 @@ struct TodayScreen: View {
                     viewModel.startMoodRecord(record)
                 }
             }
+            .sheet(isPresented: $viewModel.showSpendingInput) {
+                SpendingInputView { record in
+                    viewModel.addSpendingRecord(record)
+                }
+            }
+            .sheet(isPresented: $viewModel.showScreenTimeInput) {
+                ScreenTimeInputView(
+                    dateKey: viewModel.currentDateKey(),
+                    existingRecord: viewModel.existingScreenTimeRecord()
+                ) { record in
+                    viewModel.saveScreenTimeRecord(record)
+                }
+            }
             .sheet(item: $selectedEvent) { event in
                 EventDetailView(event: event) {
                     selectedEvent = nil
@@ -165,13 +178,45 @@ struct TodayScreen: View {
     }
 
     private var overviewSection: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 10) {
-                ForEach(overviewStats) { stat in
-                    OverviewStatCard(stat: stat)
+        VStack(alignment: .leading, spacing: 10) {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 10) {
+                    ForEach(overviewStats) { stat in
+                        OverviewStatCard(stat: stat)
+                    }
                 }
+                .padding(.vertical, 2)
             }
-            .padding(.vertical, 2)
+
+            HStack(spacing: 10) {
+                Button {
+                    viewModel.showSpendingInput = true
+                } label: {
+                    Label("记一笔", systemImage: "yensign.circle.fill")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(TodayTheme.teal)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 10)
+                        .background(TodayTheme.tealSoft)
+                        .clipShape(Capsule())
+                }
+                .buttonStyle(.plain)
+
+                Button {
+                    viewModel.showScreenTimeInput = true
+                } label: {
+                    Label("屏幕时间", systemImage: "iphone.gen3")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(TodayTheme.blue)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 10)
+                        .background(TodayTheme.blueSoft)
+                        .clipShape(Capsule())
+                }
+                .buttonStyle(.plain)
+
+                Spacer()
+            }
         }
     }
 
