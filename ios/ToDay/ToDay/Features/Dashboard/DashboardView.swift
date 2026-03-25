@@ -24,6 +24,7 @@ struct DashboardView: View {
                 VStack(alignment: .leading, spacing: 24) {
                     headerSection
                     cardGridSection
+                    quickActionsSection
                     insightSection
                     timelinePreviewSection
                 }
@@ -61,6 +62,20 @@ struct DashboardView: View {
             .sheet(isPresented: $todayViewModel.showQuickRecord) {
                 QuickRecordSheet(mode: todayViewModel.quickRecordMode) { record in
                     todayViewModel.startMoodRecord(record)
+                }
+            }
+            .sheet(isPresented: $showManualTimeEntry) {
+                ManualTimeEntrySheet { title, start, end in
+                    let event = InferredEvent(
+                        kind: .userAnnotated,
+                        startDate: start,
+                        endDate: end,
+                        confidence: .high,
+                        displayName: title,
+                        userAnnotation: title
+                    )
+                    todayViewModel.annotateEvent(event, title: title)
+                    showManualTimeEntry = false
                 }
             }
         }
@@ -168,6 +183,72 @@ struct DashboardView: View {
                     .overlay(
                         ProgressView()
                     )
+            }
+        }
+    }
+
+    // MARK: - Quick Actions
+
+    @State private var showManualTimeEntry = false
+
+    private var quickActionsSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            SectionHeader("快速记录")
+
+            HStack(spacing: 12) {
+                // Mood recording button
+                Button {
+                    todayViewModel.showQuickRecord = true
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "heart.fill")
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundStyle(TodayTheme.rose)
+                            .frame(width: 36, height: 36)
+                            .background(TodayTheme.roseSoft)
+                            .clipShape(Circle())
+
+                        Text("记录心情")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundStyle(TodayTheme.ink)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(12)
+                    .background(TodayTheme.card)
+                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                            .stroke(TodayTheme.border, lineWidth: 0.5)
+                    )
+                }
+                .buttonStyle(.plain)
+
+                // Manual time period button
+                Button {
+                    showManualTimeEntry = true
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "clock.badge.fill")
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundStyle(TodayTheme.teal)
+                            .frame(width: 36, height: 36)
+                            .background(TodayTheme.tealSoft)
+                            .clipShape(Circle())
+
+                        Text("添加时段")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundStyle(TodayTheme.ink)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(12)
+                    .background(TodayTheme.card)
+                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                            .stroke(TodayTheme.border, lineWidth: 0.5)
+                    )
+                }
+                .buttonStyle(.plain)
             }
         }
     }
