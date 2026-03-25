@@ -58,24 +58,6 @@ struct AppRootScreen: View {
             .sheet(isPresented: $todayViewModel.showShutterPanel) {
                 ShutterPanel(viewModel: todayViewModel)
             }
-            .fullScreenCover(isPresented: $todayViewModel.isRecordingVoice) {
-                VoiceRecordingOverlay { data, duration in
-                    do {
-                        let filename = try ShutterMediaLibrary.storeVoice(data)
-                        let record = ShutterRecord(
-                            type: .voice,
-                            mediaFilename: filename,
-                            voiceTranscript: nil,
-                            duration: duration
-                        )
-                        todayViewModel.saveShutterRecord(record)
-                    } catch {
-                        // Voice save failed silently
-                    }
-                } onCancel: {
-                    todayViewModel.isRecordingVoice = false
-                }
-            }
         } else {
             OnboardingView {
                 hasCompletedOnboarding = true

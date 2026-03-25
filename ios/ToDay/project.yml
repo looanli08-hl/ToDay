@@ -40,6 +40,7 @@ targets:
         INFOPLIST_KEY_NSPhotoLibraryUsageDescription: ToDay 读取你当天拍摄的照片，将它们匹配到画卷中对应的事件。照片不会上传。
         INFOPLIST_KEY_NSCameraUsageDescription: ToDay 使用相机拍摄照片和视频，快速记录生活碎片。媒体文件仅存储在本地。
         INFOPLIST_KEY_NSMicrophoneUsageDescription: ToDay 使用麦克风录制语音备忘，帮你用最少的操作捕捉灵感。录音仅存储在本地。
+        INFOPLIST_KEY_NSSpeechRecognitionUsageDescription: ToDay 使用语音识别将你的录音转为文字，方便在时间线上快速浏览。识别在设备上完成。
         INFOPLIST_KEY_NSHealthUpdateUsageDescription: ToDay 不会写入任何健康数据，此权限仅用于满足系统要求。
         INFOPLIST_KEY_UISupportedInterfaceOrientations: "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
   ToDayWatch:

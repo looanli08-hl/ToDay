@@ -4,6 +4,7 @@ import SwiftUI
 enum ShutterPanelMode: Equatable {
     case menu
     case text
+    case voice
     case camera(CameraPickerMode)
 }
 
@@ -21,6 +22,8 @@ struct ShutterPanel: View {
                     menuView
                 case .text:
                     textView
+                case .voice:
+                    voiceView
                 case .camera(let cameraMode):
                     cameraView(mode: cameraMode)
                 }
@@ -83,6 +86,17 @@ struct ShutterPanel: View {
                 ) {
                     withAnimation(.easeInOut(duration: 0.2)) {
                         mode = .text
+                    }
+                }
+
+                shutterOption(
+                    icon: "mic.fill",
+                    title: "语音",
+                    subtitle: "说出来，比打字更快",
+                    tint: TodayTheme.purple
+                ) {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        mode = .voice
                     }
                 }
 
@@ -193,6 +207,19 @@ struct ShutterPanel: View {
                 withAnimation(.easeInOut(duration: 0.2)) {
                     mode = .menu
                 }
+            }
+        }
+    }
+
+    // MARK: - Voice View
+
+    private var voiceView: some View {
+        VoiceRecordView { record in
+            viewModel.saveShutterRecord(record)
+            dismiss()
+        } onCancel: {
+            withAnimation(.easeInOut(duration: 0.2)) {
+                mode = .menu
             }
         }
     }

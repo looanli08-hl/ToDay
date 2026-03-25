@@ -29,6 +29,7 @@
 		1FFFAA0C8514E24303967CB7 /* EchoDetailSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F14C7A3268B768EF0F03D8A /* EchoDetailSheet.swift */; };
 		20F2E937AAF9995902DA82FE /* SpendingManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 007407D7872DD5977B34F006 /* SpendingManagerTests.swift */; };
 		217B661C64FC5CEB0B97C471 /* WatchEventInferenceEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32BEE0F42BC7A21E0041FA0A /* WatchEventInferenceEngine.swift */; };
+		245D3BED3385A237029EA270 /* VoiceRecordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBCD4A5F4CC225705F0BF659 /* VoiceRecordView.swift */; };
 		289858661ACDE5B4E2046978 /* ConnectivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88ECC52BFECC7DC8A36A235E /* ConnectivityManager.swift */; };
 		30210498E5579E885DA66A25 /* ScreenTimeInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E5B2A3BE2F159F5638142B6 /* ScreenTimeInputView.swift */; };
 		30B96A14111B663BCF103A95 /* ShutterRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74D702EFABB721E12BCEE68F /* ShutterRecord.swift */; };
@@ -259,6 +260,7 @@
 		B53F7EA6F669B4A9EE7680B1 /* DashboardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardViewModel.swift; sourceTree = "<group>"; };
 		B6F7A5532B5F431CBE77A871 /* ShutterRecordEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShutterRecordEntity.swift; sourceTree = "<group>"; };
 		B728810C7D8A828956EBCC1A /* ShutterManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShutterManager.swift; sourceTree = "<group>"; };
+		BBCD4A5F4CC225705F0BF659 /* VoiceRecordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceRecordView.swift; sourceTree = "<group>"; };
 		BE0830BE171EA285B8947AF0 /* EchoCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoCardView.swift; sourceTree = "<group>"; };
 		CB09FC4279F21A281C6D8DC2 /* AppConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfiguration.swift; sourceTree = "<group>"; };
 		CCCD453022FB7D3DE28EDE60 /* ToDayApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDayApp.swift; sourceTree = "<group>"; };
@@ -401,6 +403,7 @@
 				EC3CD8AA9AC50E8483912BCA /* ShutterPanel.swift */,
 				1AFD9404013D3FA99D633AC6 /* ShutterTextComposer.swift */,
 				EEEC13DBA0C089F713D483CD /* VoiceRecordingOverlay.swift */,
+				BBCD4A5F4CC225705F0BF659 /* VoiceRecordView.swift */,
 			);
 			path = Shutter;
 			sourceTree = "<group>";
@@ -786,6 +789,7 @@
 				C5767BB39D601ADD6EA3AFE5 /* TodayScreen.swift in Sources */,
 				88D47212DD537145F4F5E730 /* TodayTheme.swift in Sources */,
 				9C701A7285E2666EFC829AEF /* TodayViewModel.swift in Sources */,
+				245D3BED3385A237029EA270 /* VoiceRecordView.swift in Sources */,
 				E4E545B69C945B8442BE5936 /* VoiceRecordingOverlay.swift in Sources */,
 				70015EAB0824A09939C59B0C /* WatchMessage.swift in Sources */,
 				7A634F335FAC6E796011DF94 /* WatchSyncHelper.swift in Sources */,
@@ -913,6 +917,7 @@
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "ToDay 记录你到访过的地点，让画卷上的事件有地理上下文。位置数据仅存储在本地。";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "ToDay 使用麦克风录制语音备忘，帮你用最少的操作捕捉灵感。录音仅存储在本地。";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "ToDay 读取你当天拍摄的照片，将它们匹配到画卷中对应的事件。照片不会上传。";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "ToDay 使用语音识别将你的录音转为文字，方便在时间线上快速浏览。识别在设备上完成。";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -996,6 +1001,7 @@
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "ToDay 记录你到访过的地点，让画卷上的事件有地理上下文。位置数据仅存储在本地。";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "ToDay 使用麦克风录制语音备忘，帮你用最少的操作捕捉灵感。录音仅存储在本地。";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "ToDay 读取你当天拍摄的照片，将它们匹配到画卷中对应的事件。照片不会上传。";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "ToDay 使用语音识别将你的录音转为文字，方便在时间线上快速浏览。识别在设备上完成。";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
