@@ -22,55 +22,54 @@ struct SettingsView: View {
 
     var body: some View {
         NavigationStack {
-            Form {
-                Section("Apple Watch") {
-                    watchConnectionRow
-                }
+            List {
+                // MARK: - App Profile Header
+                Section {
+                    VStack(spacing: 6) {
+                        Image(systemName: "circle.hexagongrid.fill")
+                            .font(.system(size: 48))
+                            .foregroundStyle(TodayTheme.teal)
+                            .padding(.bottom, 4)
 
-                Section("数据权限") {
-                    Button {
-                        UIApplication.shared.open(URL(string: "x-apple-health://")!)
-                    } label: {
-                        permissionRow(
-                            title: "健康数据",
-                            detail: healthStatusText,
-                            iconName: healthStatus == .sharingAuthorized
-                                ? "checkmark.circle.fill"
-                                : "exclamationmark.circle.fill",
-                            iconColor: healthStatus == .sharingAuthorized
-                                ? .green
-                                : .orange
-                        )
-                    }
-                    .buttonStyle(.plain)
-
-                    Button {
-                        UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
-                    } label: {
-                        permissionRow(
-                            title: "位置权限",
-                            detail: locationStatusText
-                        )
-                    }
-                    .buttonStyle(.plain)
-
-                    Button {
-                        UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
-                    } label: {
-                        permissionRow(
-                            title: "照片权限",
-                            detail: photoStatusText
-                        )
-                    }
-                    .buttonStyle(.plain)
-                }
-
-                Section("Echo 回响") {
-                    // Global frequency
-                    HStack {
-                        Text("回响频率")
+                        Text("ToDay")
+                            .font(.system(size: 20, weight: .semibold))
                             .foregroundStyle(TodayTheme.ink)
+
+                        Text("Version \(shortVersionText)")
+                            .font(.system(size: 13))
+                            .foregroundStyle(TodayTheme.inkMuted)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
+                }
+
+                // MARK: - 设备与同步
+                Section {
+                    settingsRow(
+                        icon: "applewatch",
+                        iconBackground: TodayTheme.teal,
+                        title: "手表连接",
+                        detail: watchStatusText,
+                        detailColor: watchStatusColor
+                    )
+                } header: {
+                    sectionHeader("设备与同步")
+                }
+
+                // MARK: - Echo 回响
+                Section {
+                    // Frequency picker
+                    HStack(spacing: 12) {
+                        iconBadge(systemName: "bell.badge.fill", background: TodayTheme.purple)
+
+                        Text("回响频率")
+                            .font(.system(size: 16))
+                            .foregroundStyle(TodayTheme.ink)
+
                         Spacer()
+
                         Picker("", selection: Binding(
                             get: { echoViewModel.globalFrequency ?? .medium },
                             set: { echoViewModel.globalFrequency = $0 }
@@ -85,10 +84,15 @@ struct SettingsView: View {
                     }
 
                     // Echo hour
-                    HStack {
+                    HStack(spacing: 12) {
+                        iconBadge(systemName: "clock.fill", background: TodayTheme.orange)
+
                         Text("回响时间")
+                            .font(.system(size: 16))
                             .foregroundStyle(TodayTheme.ink)
+
                         Spacer()
+
                         Picker("", selection: Binding(
                             get: { echoViewModel.echoHour },
                             set: { echoViewModel.echoHour = $0 }
@@ -102,66 +106,162 @@ struct SettingsView: View {
                     }
 
                     // Care nudges toggle
-                    Toggle(isOn: Binding(
-                        get: { echoViewModel.careNudgesEnabled },
-                        set: { echoViewModel.careNudgesEnabled = $0 }
-                    )) {
-                        Text("关怀推送")
-                            .foregroundStyle(TodayTheme.ink)
+                    HStack(spacing: 12) {
+                        iconBadge(systemName: "heart.fill", background: TodayTheme.rose)
+
+                        Toggle(isOn: Binding(
+                            get: { echoViewModel.careNudgesEnabled },
+                            set: { echoViewModel.careNudgesEnabled = $0 }
+                        )) {
+                            Text("关怀推送")
+                                .font(.system(size: 16))
+                                .foregroundStyle(TodayTheme.ink)
+                        }
+                        .tint(TodayTheme.teal)
                     }
-                    .tint(TodayTheme.teal)
+                } header: {
+                    sectionHeader("ECHO 回响")
                 }
 
-                Section("隐私") {
+                // MARK: - 数据权限
+                Section {
+                    Button {
+                        UIApplication.shared.open(URL(string: "x-apple-health://")!)
+                    } label: {
+                        settingsRow(
+                            icon: "heart.text.square.fill",
+                            iconBackground: .red,
+                            title: "健康数据",
+                            detail: healthStatusText,
+                            detailColor: healthStatus == .sharingAuthorized ? .green : TodayTheme.inkMuted,
+                            showChevron: true
+                        )
+                    }
+                    .buttonStyle(.plain)
+
+                    Button {
+                        UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
+                    } label: {
+                        settingsRow(
+                            icon: "location.fill",
+                            iconBackground: TodayTheme.blue,
+                            title: "位置权限",
+                            detail: locationStatusText,
+                            detailColor: locationStatus == .authorizedAlways || locationStatus == .authorizedWhenInUse
+                                ? .green : TodayTheme.inkMuted,
+                            showChevron: true
+                        )
+                    }
+                    .buttonStyle(.plain)
+
+                    Button {
+                        UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
+                    } label: {
+                        settingsRow(
+                            icon: "photo.fill",
+                            iconBackground: TodayTheme.accent,
+                            title: "照片权限",
+                            detail: photoStatusText,
+                            detailColor: photoStatus == .authorized || photoStatus == .limited
+                                ? .green : TodayTheme.inkMuted,
+                            showChevron: true
+                        )
+                    }
+                    .buttonStyle(.plain)
+                } header: {
+                    sectionHeader("数据权限")
+                }
+
+                // MARK: - 隐私与支持
+                Section {
                     if let privacyPolicyURL = AppConfiguration.privacyPolicyURL {
                         Link(destination: privacyPolicyURL) {
-                            simpleRow(title: "隐私政策")
+                            settingsRow(
+                                icon: "hand.raised.fill",
+                                iconBackground: TodayTheme.teal,
+                                title: "隐私政策",
+                                showChevron: true
+                            )
                         }
                     }
 
                     if let termsOfServiceURL = AppConfiguration.termsOfServiceURL {
                         Link(destination: termsOfServiceURL) {
-                            simpleRow(title: "服务条款")
+                            settingsRow(
+                                icon: "doc.text.fill",
+                                iconBackground: TodayTheme.blue,
+                                title: "服务条款",
+                                showChevron: true
+                            )
                         }
                     }
 
-                    NavigationLink("数据说明") {
+                    NavigationLink {
                         DataExplanationView()
-                    }
-                }
+                    } label: {
+                        HStack(spacing: 12) {
+                            iconBadge(systemName: "info.circle.fill", background: TodayTheme.purple)
 
-                Section("关于") {
-                    HStack {
-                        Text("版本")
-                            .foregroundStyle(TodayTheme.ink)
-                        Spacer()
-                        Text(versionText)
-                            .foregroundStyle(TodayTheme.inkMuted)
+                            Text("数据说明")
+                                .font(.system(size: 16))
+                                .foregroundStyle(TodayTheme.ink)
+                        }
                     }
 
                     if let supportEmail = AppConfiguration.supportEmail,
                        let mailURL = URL(string: "mailto:\(supportEmail)") {
                         Link(destination: mailURL) {
-                            simpleRow(title: "联系我们")
+                            settingsRow(
+                                icon: "envelope.fill",
+                                iconBackground: TodayTheme.accent,
+                                title: "联系我们",
+                                showChevron: true
+                            )
                         }
                     }
 
                     if let websiteURL = AppConfiguration.websiteURL {
                         Link(destination: websiteURL) {
-                            simpleRow(title: "官网")
+                            settingsRow(
+                                icon: "globe",
+                                iconBackground: TodayTheme.inkSoft,
+                                title: "官网",
+                                showChevron: true
+                            )
                         }
                     }
+                } header: {
+                    sectionHeader("隐私与支持")
                 }
 
-                Section("数据管理") {
+                // MARK: - 数据管理
+                Section {
                     Button(role: .destructive) {
                         showClearConfirmation = true
                     } label: {
-                        Text("清除所有标注和记录")
-                            .foregroundStyle(Color.red)
+                        HStack(spacing: 12) {
+                            iconBadge(systemName: "trash.fill", background: .red)
+
+                            Text("清除所有标注和记录")
+                                .font(.system(size: 16))
+                                .foregroundStyle(.red)
+                        }
                     }
+                } header: {
+                    sectionHeader("数据管理")
+                }
+
+                // MARK: - Footer Version
+                Section {
+                    Text("ToDay v\(versionText)")
+                        .font(.system(size: 12))
+                        .foregroundStyle(TodayTheme.inkFaint)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .listRowBackground(Color.clear)
+                        .listRowSeparator(.hidden)
                 }
             }
+            .listStyle(.insetGrouped)
             .navigationTitle("设置")
             .scrollContentBackground(.hidden)
             .background(TodayTheme.background)
@@ -195,6 +295,60 @@ struct SettingsView: View {
         }
     }
 
+    // MARK: - Row Components
+
+    @ViewBuilder
+    private func iconBadge(systemName: String, background: Color) -> some View {
+        Image(systemName: systemName)
+            .font(.system(size: 15, weight: .medium))
+            .foregroundStyle(.white)
+            .frame(width: 32, height: 32)
+            .background(background)
+            .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
+    }
+
+    @ViewBuilder
+    private func settingsRow(
+        icon: String,
+        iconBackground: Color,
+        title: String,
+        detail: String? = nil,
+        detailColor: Color = TodayTheme.inkMuted,
+        showChevron: Bool = false
+    ) -> some View {
+        HStack(spacing: 12) {
+            iconBadge(systemName: icon, background: iconBackground)
+
+            Text(title)
+                .font(.system(size: 16))
+                .foregroundStyle(TodayTheme.ink)
+
+            Spacer()
+
+            if let detail {
+                Text(detail)
+                    .font(.system(size: 15))
+                    .foregroundStyle(detailColor)
+            }
+
+            if showChevron {
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(TodayTheme.inkFaint)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func sectionHeader(_ title: String) -> some View {
+        Text(title.uppercased())
+            .font(.system(size: 12, weight: .medium))
+            .foregroundStyle(TodayTheme.inkMuted)
+            .tracking(2.0)
+    }
+
+    // MARK: - Toast
+
     private var successToast: some View {
         HStack(spacing: 8) {
             Image(systemName: "checkmark.circle.fill")
@@ -214,25 +368,16 @@ struct SettingsView: View {
         .shadow(color: Color.black.opacity(0.08), radius: 10, y: 6)
     }
 
+    // MARK: - Computed Properties
+
+    private var shortVersionText: String {
+        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.1.0"
+    }
+
     private var versionText: String {
         let shortVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0"
         let buildVersion = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "0"
         return "\(shortVersion) (\(buildVersion))"
-    }
-
-    private var watchConnectionRow: some View {
-        HStack(spacing: 12) {
-            Text("手表连接")
-                .foregroundStyle(TodayTheme.ink)
-
-            Spacer()
-
-            Text(watchStatusText)
-                .foregroundStyle(TodayTheme.inkMuted)
-
-            Image(systemName: watchStatusIcon)
-                .foregroundStyle(watchStatusColor)
-        }
     }
 
     private var watchStatusText: String {
@@ -306,39 +451,7 @@ struct SettingsView: View {
         }
     }
 
-    @ViewBuilder
-    private func permissionRow(
-        title: String,
-        detail: String,
-        iconName: String? = nil,
-        iconColor: Color = TodayTheme.inkMuted
-    ) -> some View {
-        HStack(spacing: 12) {
-            Text(title)
-                .foregroundStyle(TodayTheme.ink)
-
-            Spacer()
-
-            Text(detail)
-                .foregroundStyle(TodayTheme.inkMuted)
-
-            if let iconName {
-                Image(systemName: iconName)
-                    .foregroundStyle(iconColor)
-            }
-        }
-    }
-
-    private func simpleRow(title: String) -> some View {
-        HStack {
-            Text(title)
-                .foregroundStyle(TodayTheme.ink)
-            Spacer()
-            Image(systemName: "arrow.up.right.square")
-                .font(.system(size: 13, weight: .medium))
-                .foregroundStyle(TodayTheme.inkMuted)
-        }
-    }
+    // MARK: - Actions
 
     private func refreshStatuses() {
         if let heartRateType = HKQuantityType.quantityType(forIdentifier: .heartRate) {
