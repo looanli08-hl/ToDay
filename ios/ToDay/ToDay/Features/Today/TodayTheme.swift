@@ -26,6 +26,10 @@ enum TodayTheme {
     static let workoutOrange = dynamicColor(light: 0xD76F3D, dark: 0xF09B66)
     static let walkGreen = dynamicColor(light: 0x5C9C70, dark: 0x7CC18D)
     static let sleepIndigo = dynamicColor(light: 0x4A5FA9, dark: 0x788DDB)
+    static let purple = dynamicColor(light: 0x9B7BC9, dark: 0xB89BDD)
+    static let purpleSoft = dynamicColor(light: 0xF0E8F9, dark: 0x2E2343)
+    static let orange = dynamicColor(light: 0xD98B4A, dark: 0xE8A96B)
+    static let orangeSoft = dynamicColor(light: 0xFBEEDE, dark: 0x3A2A1A)
     static let glass = Color.white.opacity(0.18)
 }
 
