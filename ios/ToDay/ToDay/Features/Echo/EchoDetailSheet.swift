@@ -9,97 +9,82 @@ struct EchoDetailSheet: View {
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    // Offset label
+            List {
+                // Offset badge
+                Section {
                     HStack {
                         Text(echoItem.offsetLabel)
-                            .font(.system(size: 14, weight: .semibold))
+                            .font(.subheadline.weight(.medium))
                             .foregroundStyle(TodayTheme.teal)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 6)
-                            .background(TodayTheme.tealSoft)
-                            .clipShape(Capsule())
-
                         Spacer()
                     }
+                }
 
-                    if let record = shutterRecord {
-                        // Content
-                        VStack(alignment: .leading, spacing: 12) {
-                            // Type indicator
+                if let record = shutterRecord {
+                    // Type indicator + content
+                    Section {
+                        HStack(spacing: 6) {
+                            Image(systemName: iconName(for: record.type))
+                                .font(.caption)
+                            Text(typeLabel(for: record.type))
+                                .font(.caption)
+                        }
+                        .foregroundStyle(.secondary)
+
+                        if let text = record.textContent, !text.isEmpty {
+                            Text(text)
+                                .font(.body)
+                                .foregroundStyle(.primary)
+                                .lineSpacing(4)
+                        }
+
+                        if let transcript = record.voiceTranscript, !transcript.isEmpty {
+                            Text(transcript)
+                                .font(.body)
+                                .foregroundStyle(.primary)
+                                .lineSpacing(4)
+                        }
+
+                        if record.type == .voice, let duration = record.duration {
                             HStack(spacing: 6) {
-                                Image(systemName: iconName(for: record.type))
-                                    .font(.system(size: 13))
-                                    .foregroundStyle(TodayTheme.inkMuted)
-                                Text(typeLabel(for: record.type))
-                                    .font(.system(size: 13))
-                                    .foregroundStyle(TodayTheme.inkMuted)
+                                Image(systemName: "waveform")
+                                    .font(.caption)
+                                Text(formatDuration(duration))
+                                    .font(.caption)
                             }
-
-                            // Main content
-                            if let text = record.textContent, !text.isEmpty {
-                                Text(text)
-                                    .font(.system(size: 18, weight: .regular))
-                                    .foregroundStyle(TodayTheme.ink)
-                                    .lineSpacing(6)
-                            }
-
-                            if let transcript = record.voiceTranscript, !transcript.isEmpty {
-                                Text(transcript)
-                                    .font(.system(size: 18, weight: .regular))
-                                    .foregroundStyle(TodayTheme.ink)
-                                    .lineSpacing(6)
-                            }
-
-                            if record.type == .voice, let duration = record.duration {
-                                HStack(spacing: 6) {
-                                    Image(systemName: "waveform")
-                                        .font(.system(size: 13))
-                                    Text(formatDuration(duration))
-                                        .font(.system(size: 13))
-                                }
-                                .foregroundStyle(TodayTheme.inkMuted)
-                            }
+                            .foregroundStyle(.secondary)
                         }
+                    }
 
-                        Divider()
-                            .overlay(TodayTheme.border)
-
-                        // Context: when
-                        VStack(alignment: .leading, spacing: 8) {
-                            EyebrowLabel("记录时间")
+                    // Context
+                    Section {
+                        LabeledContent("记录时间") {
                             Text(Self.fullDateFormatter.string(from: record.createdAt))
-                                .font(.system(size: 15))
-                                .foregroundStyle(TodayTheme.ink)
                         }
 
-                        // Context: location (if available)
                         if record.latitude != nil && record.longitude != nil {
-                            VStack(alignment: .leading, spacing: 8) {
-                                EyebrowLabel("位置")
+                            LabeledContent("位置") {
                                 Text("(\(String(format: "%.4f", record.latitude!)), \(String(format: "%.4f", record.longitude!)))")
-                                    .font(.system(size: 15))
-                                    .foregroundStyle(TodayTheme.ink)
                             }
                         }
-                    } else {
-                        // Record deleted
+                    }
+                } else {
+                    // Record deleted
+                    Section {
                         VStack(spacing: 12) {
                             Image(systemName: "doc.questionmark")
-                                .font(.system(size: 32))
-                                .foregroundStyle(TodayTheme.inkFaint)
+                                .font(.largeTitle)
+                                .foregroundStyle(.quaternary)
                             Text("原始记录已被删除")
-                                .font(.system(size: 15))
-                                .foregroundStyle(TodayTheme.inkMuted)
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
                         }
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 40)
+                        .padding(.vertical, 32)
+                        .listRowBackground(Color.clear)
                     }
                 }
-                .padding(20)
             }
-            .background(TodayTheme.background)
             .navigationTitle("回响详情")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -108,7 +93,6 @@ struct EchoDetailSheet: View {
                         onDismiss()
                         dismiss()
                     }
-                    .foregroundStyle(TodayTheme.teal)
                 }
             }
         }

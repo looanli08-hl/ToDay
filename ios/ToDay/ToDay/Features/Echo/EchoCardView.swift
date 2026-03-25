@@ -8,86 +8,77 @@ struct EchoCardView: View {
     let onSnooze: () -> Void
 
     var body: some View {
-        ContentCard {
-            VStack(alignment: .leading, spacing: 12) {
-                // Header: offset label + type badge
-                HStack {
-                    EyebrowLabel(echoItem.offsetLabel.uppercased())
+        VStack(alignment: .leading, spacing: 10) {
+            // Header: offset label + type icon
+            HStack {
+                Text(echoItem.offsetLabel.uppercased())
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
 
-                    Spacer()
+                Spacer()
 
-                    if let record = shutterRecord {
-                        Image(systemName: iconName(for: record.type))
-                            .font(.system(size: 13, weight: .semibold))
-                            .foregroundStyle(TodayTheme.accent)
-                            .frame(width: 32, height: 32)
-                            .background(TodayTheme.accent.opacity(0.12))
-                            .clipShape(Circle())
-                    }
-                }
-
-                // Content preview
                 if let record = shutterRecord {
-                    Text(record.displayText)
-                        .font(.system(size: 16, weight: .medium))
-                        .foregroundStyle(TodayTheme.ink)
-                        .lineLimit(3)
-                } else {
-                    Text("记录已删除")
-                        .font(.system(size: 14))
-                        .foregroundStyle(TodayTheme.inkMuted)
-                        .italic()
-                }
-
-                // Timestamp
-                if let record = shutterRecord {
-                    Text(Self.dateFormatter.string(from: record.createdAt))
-                        .font(.system(size: 12))
-                        .foregroundStyle(TodayTheme.inkFaint)
-                }
-
-                // Action buttons
-                HStack(spacing: 12) {
-                    Button {
-                        onTap()
-                    } label: {
-                        Text("查看")
-                            .font(.system(size: 13, weight: .medium))
-                            .foregroundStyle(TodayTheme.teal)
-                            .padding(.horizontal, 14)
-                            .padding(.vertical, 7)
-                            .background(TodayTheme.tealSoft)
-                            .clipShape(Capsule())
-                    }
-
-                    Button {
-                        onSnooze()
-                    } label: {
-                        Text("明天再看")
-                            .font(.system(size: 13, weight: .medium))
-                            .foregroundStyle(TodayTheme.inkMuted)
-                            .padding(.horizontal, 14)
-                            .padding(.vertical, 7)
-                            .background(TodayTheme.elevatedCard)
-                            .clipShape(Capsule())
-                    }
-
-                    Spacer()
-
-                    Button {
-                        onDismiss()
-                    } label: {
-                        Image(systemName: "xmark")
-                            .font(.system(size: 12, weight: .medium))
-                            .foregroundStyle(TodayTheme.inkFaint)
-                            .frame(width: 28, height: 28)
-                            .background(TodayTheme.elevatedCard)
-                            .clipShape(Circle())
-                    }
+                    Image(systemName: iconName(for: record.type))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
             }
+
+            // Content preview
+            if let record = shutterRecord {
+                Text(record.displayText)
+                    .font(.body)
+                    .foregroundStyle(.primary)
+                    .lineLimit(3)
+            } else {
+                Text("记录已删除")
+                    .font(.subheadline)
+                    .foregroundStyle(.tertiary)
+                    .italic()
+            }
+
+            // Timestamp
+            if let record = shutterRecord {
+                Text(Self.dateFormatter.string(from: record.createdAt))
+                    .font(.caption)
+                    .foregroundStyle(.tertiary)
+            }
+
+            // Action buttons
+            HStack(spacing: 12) {
+                Button {
+                    onTap()
+                } label: {
+                    Text("查看")
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(TodayTheme.teal)
+                }
+                .buttonStyle(.bordered)
+                .tint(TodayTheme.teal)
+
+                Button {
+                    onSnooze()
+                } label: {
+                    Text("明天再看")
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(.secondary)
+                }
+                .buttonStyle(.bordered)
+                .tint(.secondary)
+
+                Spacer()
+
+                Button {
+                    onDismiss()
+                } label: {
+                    Image(systemName: "xmark")
+                        .font(.caption.weight(.medium))
+                        .foregroundStyle(.tertiary)
+                }
+                .buttonStyle(.plain)
+            }
         }
-        .shadow(color: TodayTheme.ink.opacity(0.06), radius: 16, x: 0, y: 4)
+        .padding(.vertical, 4)
     }
 
     private func iconName(for type: ShutterType) -> String {

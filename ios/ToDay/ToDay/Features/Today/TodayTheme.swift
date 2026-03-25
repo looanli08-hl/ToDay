@@ -1,37 +1,46 @@
 import SwiftUI
 
 enum TodayTheme {
-    static let background = dynamicColor(light: 0xFAFAF8, dark: 0x111412)
-    static let card = dynamicColor(light: 0xFFFFFF, dark: 0x1A1E1B)
-    static let elevatedCard = dynamicColor(light: 0xF3EFE7, dark: 0x202622)
-    static let ink = dynamicColor(light: 0x1A1A1A, dark: 0xF4F2ED)
-    static let inkSoft = dynamicColor(light: 0x3D3D3D, dark: 0xD8D3CC)
-    static let inkMuted = dynamicColor(light: 0x8A8A8A, dark: 0xA9A49C)
-    static let inkFaint = dynamicColor(light: 0xB8B8B8, dark: 0x6A6F6A)
-    static let border = dynamicColor(light: 0xE2E0DC, dark: 0x313731)
-    static let accent = dynamicColor(light: 0xC59661, dark: 0xD9B27E)
-    static let accentSoft = dynamicColor(light: 0xF5E9D8, dark: 0x3A2E20)
-    static let teal = dynamicColor(light: 0x5B9A8B, dark: 0x7CC1AF)
-    static let tealSoft = dynamicColor(light: 0xE4F2EE, dark: 0x20352F)
-    static let rose = dynamicColor(light: 0xC97B7B, dark: 0xD89898)
-    static let roseSoft = dynamicColor(light: 0xF7E7E7, dark: 0x392526)
-    static let blue = dynamicColor(light: 0x7B9CC9, dark: 0x9AB7DD)
-    static let blueSoft = dynamicColor(light: 0xE8EFF9, dark: 0x223043)
-    static let scrollNight = dynamicColor(light: 0x202C57, dark: 0x17203F)
-    static let scrollSunrise = dynamicColor(light: 0xD28953, dark: 0xA6633A)
-    static let scrollGold = dynamicColor(light: 0xE9D18B, dark: 0xB39446)
-    static let scrollNoon = dynamicColor(light: 0xBFDDF3, dark: 0x385D7F)
-    static let scrollSunset = dynamicColor(light: 0xE0A16D, dark: 0xA16A44)
-    static let scrollViolet = dynamicColor(light: 0x5F4978, dark: 0x3A2B4C)
-    static let workoutOrange = dynamicColor(light: 0xD76F3D, dark: 0xF09B66)
-    static let walkGreen = dynamicColor(light: 0x5C9C70, dark: 0x7CC18D)
-    static let sleepIndigo = dynamicColor(light: 0x4A5FA9, dark: 0x788DDB)
-    static let purple = dynamicColor(light: 0x9B7BC9, dark: 0xB89BDD)
-    static let purpleSoft = dynamicColor(light: 0xF0E8F9, dark: 0x2E2343)
-    static let orange = dynamicColor(light: 0xD98B4A, dark: 0xE8A96B)
-    static let orangeSoft = dynamicColor(light: 0xFBEEDE, dark: 0x3A2A1A)
+    // MARK: - Core Colors (System)
+    static let background = Color(UIColor.systemGroupedBackground)
+    static let card = Color(UIColor.secondarySystemGroupedBackground)
+    static let elevatedCard = Color(UIColor.tertiarySystemGroupedBackground)
+    static let ink = Color.primary
+    static let inkSoft = Color.secondary
+    static let inkMuted = Color(UIColor.tertiaryLabel)
+    static let inkFaint = Color(UIColor.quaternaryLabel)
+    static let border = Color(UIColor.separator)
+    static let accent = Color.accentColor
+    static let accentSoft = Color.accentColor.opacity(0.12)
+
+    // MARK: - Semantic Colors (Muted, refined)
+    static let teal = Color(red: 0.32, green: 0.58, blue: 0.52)
+    static let tealSoft = teal.opacity(0.10)
+    static let rose = Color(red: 0.72, green: 0.44, blue: 0.44)
+    static let roseSoft = rose.opacity(0.10)
+    static let blue = Color(red: 0.44, green: 0.56, blue: 0.72)
+    static let blueSoft = blue.opacity(0.10)
+    static let purple = Color(red: 0.56, green: 0.44, blue: 0.72)
+    static let purpleSoft = purple.opacity(0.10)
+    static let orange = Color(red: 0.78, green: 0.52, blue: 0.30)
+    static let orangeSoft = orange.opacity(0.10)
+
+    // MARK: - Event-Specific Colors (Muted)
+    static let scrollNight = Color(red: 0.14, green: 0.18, blue: 0.34)
+    static let scrollSunrise = Color(red: 0.76, green: 0.50, blue: 0.32)
+    static let scrollGold = Color(red: 0.84, green: 0.76, blue: 0.50)
+    static let scrollNoon = Color(red: 0.68, green: 0.82, blue: 0.92)
+    static let scrollSunset = Color(red: 0.80, green: 0.58, blue: 0.38)
+    static let scrollViolet = Color(red: 0.34, green: 0.26, blue: 0.44)
+    static let workoutOrange = Color(red: 0.78, green: 0.42, blue: 0.22)
+    static let walkGreen = Color(red: 0.34, green: 0.58, blue: 0.42)
+    static let sleepIndigo = Color(red: 0.28, green: 0.36, blue: 0.64)
+
+    // MARK: - Utility
     static let glass = Color.white.opacity(0.18)
 }
+
+// MARK: - Reusable Components
 
 struct ContentCard<Content: View>: View {
     let background: Color
@@ -46,17 +55,13 @@ struct ContentCard<Content: View>: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: 12) {
             content
         }
-        .padding(18)
+        .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(background)
-        .overlay(
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .stroke(TodayTheme.border, lineWidth: 1)
-        )
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 }
 
@@ -69,9 +74,9 @@ struct EyebrowLabel: View {
 
     var body: some View {
         Text(text)
-            .font(.system(size: 11, weight: .medium, design: .monospaced))
-            .foregroundStyle(TodayTheme.inkMuted)
-            .tracking(2.4)
+            .font(.caption2)
+            .foregroundStyle(.secondary)
+            .textCase(.uppercase)
     }
 }
 
@@ -83,10 +88,10 @@ struct SectionHeader: View {
     }
 
     var body: some View {
-        Text(text.uppercased())
-            .font(.system(size: 12, weight: .medium))
-            .foregroundStyle(TodayTheme.inkMuted)
-            .tracking(2.0)
+        Text(text)
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+            .textCase(.uppercase)
     }
 }
 
@@ -117,37 +122,20 @@ struct FlexibleBadgeRow: View {
 
     private func badge(_ text: String) -> some View {
         Text(text)
-            .font(.system(size: 12, weight: .medium))
-            .foregroundStyle(TodayTheme.inkSoft)
+            .font(.caption)
+            .foregroundStyle(.secondary)
             .padding(.horizontal, 10)
-            .padding(.vertical, 8)
-            .background(background)
+            .padding(.vertical, 6)
+            .background(badgeBackground)
             .clipShape(Capsule())
     }
 
-    private var background: Color {
+    private var badgeBackground: Color {
         switch tone {
         case .accent:
             return TodayTheme.accentSoft
         case .teal:
             return TodayTheme.tealSoft
         }
-    }
-}
-
-private func dynamicColor(light: UInt32, dark: UInt32) -> Color {
-    Color(
-        uiColor: UIColor { traits in
-            UIColor(hex: traits.userInterfaceStyle == .dark ? dark : light)
-        }
-    )
-}
-
-private extension UIColor {
-    convenience init(hex: UInt32) {
-        let red = CGFloat((hex >> 16) & 0xFF) / 255
-        let green = CGFloat((hex >> 8) & 0xFF) / 255
-        let blue = CGFloat(hex & 0xFF) / 255
-        self.init(red: red, green: green, blue: blue, alpha: 1)
     }
 }
