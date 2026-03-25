@@ -27,6 +27,7 @@ final class TodayViewModel: ObservableObject {
     private let spendingManager: SpendingManager
     private let screenTimeStore: any ScreenTimeRecordStoring
     private let annotationStore: AnnotationStore
+    private let echoEngine: EchoEngine?
     private let insightComposer: TodayInsightComposer
     #if os(iOS)
     private let watchSync: WatchSyncHelper
@@ -53,6 +54,7 @@ final class TodayViewModel: ObservableObject {
         spendingRecordStore: (any SpendingRecordStoring)? = nil,
         screenTimeRecordStore: (any ScreenTimeRecordStoring)? = nil,
         insightComposer: TodayInsightComposer = TodayInsightComposer(),
+        echoEngine: EchoEngine? = nil,
         phoneConnectivityManager: PhoneConnectivityManager? = nil,
         modelContainer: ModelContainer,
         calendar: Calendar = .current
@@ -69,6 +71,7 @@ final class TodayViewModel: ObservableObject {
         )
         self.screenTimeStore = screenTimeRecordStore ?? InMemoryScreenTimeRecordStore()
         self.annotationStore = AnnotationStore(calendar: calendar)
+        self.echoEngine = echoEngine
         #if os(iOS)
         self.watchSync = WatchSyncHelper(connectivityManager: phoneConnectivityManager, calendar: calendar)
         #endif
@@ -257,6 +260,7 @@ final class TodayViewModel: ObservableObject {
 
     func saveShutterRecord(_ record: ShutterRecord) {
         shutterManager.save(record)
+        echoEngine?.scheduleEchoes(for: record)
         showShutterPanel = false
         isRecordingVoice = false
         rebuildTimeline(referenceDate: currentBaseTimeline?.date ?? Date())
@@ -264,6 +268,7 @@ final class TodayViewModel: ObservableObject {
 
     func deleteShutterRecord(id: UUID) {
         shutterManager.delete(id: id)
+        echoEngine?.cancelEchoes(forShutterRecordID: id)
         rebuildTimeline(referenceDate: currentBaseTimeline?.date ?? Date())
     }
 

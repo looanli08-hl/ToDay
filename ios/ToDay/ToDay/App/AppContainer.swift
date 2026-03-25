@@ -25,6 +25,7 @@ enum AppContainer {
             shutterRecordStore: makeShutterRecordStore(),
             spendingRecordStore: makeSpendingRecordStore(),
             screenTimeRecordStore: makeScreenTimeRecordStore(),
+            echoEngine: echoEngine,
             phoneConnectivityManager: phoneConnectivityManager,
             modelContainer: modelContainer
         )
