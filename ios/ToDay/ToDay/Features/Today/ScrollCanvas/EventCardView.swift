@@ -202,6 +202,12 @@ extension InferredEvent {
             return TodayTheme.teal.opacity(0.82)
         case .mood:
             return TodayTheme.accent
+        case .shutter:
+            return TodayTheme.scrollGold.opacity(0.86)
+        case .screenTime:
+            return TodayTheme.glass
+        case .spending:
+            return TodayTheme.teal.opacity(0.82)
         }
     }
 
@@ -225,6 +231,12 @@ extension InferredEvent {
             return TodayTheme.teal
         case .mood:
             return TodayTheme.accent
+        case .shutter:
+            return TodayTheme.scrollGold
+        case .screenTime:
+            return TodayTheme.inkFaint
+        case .spending:
+            return TodayTheme.teal
         }
     }
 
@@ -248,6 +260,12 @@ extension InferredEvent {
             return "标注"
         case .mood:
             return "心情"
+        case .shutter:
+            return "快门"
+        case .screenTime:
+            return "屏幕"
+        case .spending:
+            return "消费"
         }
     }
 

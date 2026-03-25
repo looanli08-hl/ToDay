@@ -33,6 +33,7 @@
 		4E0E762B4D92B8C4703F24C0 /* MoodRecordEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 517D081EC92833825D6C1658 /* MoodRecordEntity.swift */; };
 		4FE7ED6B910849760A8ED1BE /* QuickRecordSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90DD0AA794ABBBE1F95F1B7 /* QuickRecordSheet.swift */; };
 		52BA7C5CA039BE601267E41F /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEBA7D34F5C9C73353085631 /* OnboardingView.swift */; };
+		59A62671AC37416B6921E436 /* NewEventKindTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19F6F718AF60064D8B59E602 /* NewEventKindTests.swift */; };
 		5CB385201F226102AFA0885C /* ToDayWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D3FD0290794CC321F5BB45C /* ToDayWidgetBundle.swift */; };
 		6009F788A2DCD8E51F97E8D5 /* AppConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB09FC4279F21A281C6D8DC2 /* AppConfiguration.swift */; };
 		65870246322B8C5135768738 /* AnnotationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C7EEEA30452F0F69063060F /* AnnotationStore.swift */; };
@@ -143,6 +144,7 @@
 		0FE2EF155E1C18E24C5D11D1 /* MockTimelineDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockTimelineDataProvider.swift; sourceTree = "<group>"; };
 		16EB598659DDD263739D3136 /* TodayViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayViewModel.swift; sourceTree = "<group>"; };
 		184A46C9D8BC785476451ADD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		19F6F718AF60064D8B59E602 /* NewEventKindTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewEventKindTests.swift; sourceTree = "<group>"; };
 		1A7313E34ABE1036CAEC076F /* TodayTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayTheme.swift; sourceTree = "<group>"; };
 		21F17A6A8166D55A7885C732 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		248EB0D5C59CF49B72179706 /* HealthKitTimelineDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitTimelineDataProvider.swift; sourceTree = "<group>"; };
@@ -337,6 +339,7 @@
 			isa = PBXGroup;
 			children = (
 				88EB8639525489FF8AD2D7C6 /* EventInferenceEngineTests.swift */,
+				19F6F718AF60064D8B59E602 /* NewEventKindTests.swift */,
 				7FF1B505498DE678D74F9FB8 /* SwiftDataMoodRecordStoreTests.swift */,
 				D5E3EC90284C88262A943A15 /* TodayInsightComposerTests.swift */,
 				FCFF1F5F9574B84A9B5B3ED9 /* TodayViewModelSessionTests.swift */,
@@ -618,6 +621,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				ACC24B7AB60E4669FC048B3D /* EventInferenceEngineTests.swift in Sources */,
+				59A62671AC37416B6921E436 /* NewEventKindTests.swift in Sources */,
 				098D78BFE47A6A0C393D07B5 /* SwiftDataMoodRecordStoreTests.swift in Sources */,
 				A05D3D71F23108D27807DA94 /* TodayInsightComposerTests.swift in Sources */,
 				F15785C5CD541E8A984C1FEB /* TodayViewModelSessionTests.swift in Sources */,

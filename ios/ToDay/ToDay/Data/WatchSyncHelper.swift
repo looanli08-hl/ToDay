@@ -142,6 +142,12 @@ final class WatchSyncHelper {
             case .satisfied: return "checkmark.seal.fill"
             case nil: return "face.smiling"
             }
+        case .shutter:
+            return "camera.fill"
+        case .screenTime:
+            return "iphone"
+        case .spending:
+            return "creditcard.fill"
         }
     }
 }

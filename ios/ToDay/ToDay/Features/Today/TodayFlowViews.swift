@@ -510,6 +510,12 @@ extension EventKind {
             return TodayTheme.inkFaint
         case .mood:
             return TodayTheme.accent
+        case .shutter:
+            return TodayTheme.scrollGold
+        case .screenTime:
+            return TodayTheme.inkFaint
+        case .spending:
+            return TodayTheme.teal
         }
     }
 
@@ -525,6 +531,12 @@ extension EventKind {
             return TodayTheme.elevatedCard
         case .mood:
             return TodayTheme.accentSoft
+        case .shutter:
+            return TodayTheme.accentSoft
+        case .screenTime:
+            return TodayTheme.elevatedCard
+        case .spending:
+            return TodayTheme.tealSoft
         }
     }
 
@@ -542,6 +554,12 @@ extension EventKind {
             return 0.20
         case .mood:
             return 0.48
+        case .shutter:
+            return 0.56
+        case .screenTime:
+            return 0.30
+        case .spending:
+            return 0.52
         }
     }
 
@@ -561,6 +579,12 @@ extension EventKind {
             return "☁️"
         case .mood:
             return "✦"
+        case .shutter:
+            return "📷"
+        case .screenTime:
+            return "📱"
+        case .spending:
+            return "💳"
         }
     }
 }
@@ -606,6 +630,12 @@ private extension InferredEvent {
             return note ?? "这段时间相对平静。"
         case .userAnnotated:
             return note ?? "这是你主动标注的一段时间。"
+        case .shutter:
+            return note ?? "拍摄了一张照片。"
+        case .screenTime:
+            return note ?? "一段屏幕使用时间。"
+        case .spending:
+            return note ?? "记录了一笔消费。"
         }
     }
 

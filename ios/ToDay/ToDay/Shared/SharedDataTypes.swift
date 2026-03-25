@@ -203,6 +203,9 @@ enum EventKind: String, Codable, CaseIterable, Sendable {
     case quietTime
     case userAnnotated
     case mood
+    case shutter
+    case screenTime
+    case spending
 }
 
 enum EventConfidence: Int, Codable, Comparable, Sendable {
