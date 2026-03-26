@@ -27,6 +27,7 @@ struct HistoryScreen: View {
                 ScrollView {
                     selectedDayContent
                 }
+                .background(Color(UIColor.systemGroupedBackground))
             }
             .navigationTitle("回看")
             .navigationBarTitleDisplayMode(.inline)
@@ -118,18 +119,20 @@ struct HistoryScreen: View {
     // MARK: - Selected Day Content
 
     private var selectedDayContent: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 20) {
             // Date header
             Text(selectedDateFormatted)
-                .font(.title3.bold())
+                .font(.title2.bold())
                 .padding(.horizontal, 20)
-                .padding(.top, 16)
+                .padding(.top, 20)
 
             if let timeline = selectedTimeline {
-                // Metrics summary row
-                metricsRow(for: timeline)
+                // Metrics section
+                sectionLabel("数据概览")
+                metricsSection(for: timeline)
 
-                // Event list
+                // Event list section
+                sectionLabel("当日记录")
                 ForEach(timeline.entries.sorted(by: { $0.startDate < $1.startDate })) { event in
                     NavigationLink {
                         HistoryDayDetailScreen(viewModel: viewModel, date: selectedDate)
@@ -144,19 +147,32 @@ struct HistoryScreen: View {
                     .padding(40)
             } else {
                 // Empty state
-                VStack(spacing: 12) {
+                VStack(spacing: 16) {
                     Image(systemName: "calendar.badge.clock")
-                        .font(.title)
+                        .font(.system(size: 40))
                         .foregroundStyle(.quaternary)
+
                     Text("这一天还没有记录")
-                        .font(.subheadline)
+                        .font(.headline)
                         .foregroundStyle(.secondary)
+
+                    Text("戴上手表或用快门记录生活碎片")
+                        .font(.subheadline)
+                        .foregroundStyle(.tertiary)
                 }
                 .frame(maxWidth: .infinity)
-                .padding(40)
+                .padding(60)
             }
         }
         .padding(.bottom, 100) // space for tab bar
+    }
+
+    private func sectionLabel(_ text: String) -> some View {
+        Text(text)
+            .font(.footnote.weight(.medium))
+            .foregroundStyle(.secondary)
+            .textCase(.uppercase)
+            .padding(.horizontal, 20)
     }
 
     private var selectedDateFormatted: String {
@@ -166,49 +182,79 @@ struct HistoryScreen: View {
         return formatter.string(from: selectedDate)
     }
 
-    // MARK: - Metrics Row
+    // MARK: - Metrics Section
 
-    private func metricsRow(for timeline: DayTimeline) -> some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 12) {
-                metricPill(icon: "figure.run", label: "运动", value: exerciseMinutes(timeline))
-                metricPill(icon: "moon.fill", label: "睡眠", value: sleepHoursFormatted(timeline))
-                metricPill(icon: "shoeprints.fill", label: "步数", value: stepCountFormatted(timeline))
-                metricPill(icon: "camera.aperture", label: "快门", value: shutterCount(timeline))
-            }
-            .padding(.horizontal, 20)
+    private func metricsSection(for timeline: DayTimeline) -> some View {
+        LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)], spacing: 12) {
+            metricCard(
+                icon: "flame.fill",
+                iconColor: .orange,
+                label: "运动",
+                value: exerciseMinutes(timeline),
+                detail: "活动时间"
+            )
+            metricCard(
+                icon: "moon.fill",
+                iconColor: AppColor.sleep,
+                label: "睡眠",
+                value: sleepHoursFormatted(timeline),
+                detail: "总睡眠"
+            )
+            metricCard(
+                icon: "figure.walk",
+                iconColor: AppColor.walk,
+                label: "步数",
+                value: stepCountFormatted(timeline),
+                detail: "今日步行"
+            )
+            metricCard(
+                icon: "camera.aperture",
+                iconColor: AppColor.shutter,
+                label: "快门",
+                value: shutterCount(timeline),
+                detail: "捕捉记录"
+            )
         }
+        .padding(.horizontal, 20)
     }
 
-    private func metricPill(icon: String, label: String, value: String) -> some View {
-        HStack(spacing: 8) {
-            Image(systemName: icon)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-            Text(label)
-                .font(.caption)
-                .foregroundStyle(.secondary)
+    private func metricCard(icon: String, iconColor: Color, label: String, value: String, detail: String) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 8) {
+                Image(systemName: icon)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(iconColor)
+                Text(label)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+
             Text(value)
-                .font(.subheadline.bold())
+                .font(.title2.bold())
+                .foregroundStyle(.primary)
+
+            Text(detail)
+                .font(.caption)
+                .foregroundStyle(.tertiary)
         }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 8)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(16)
         .background(Color(UIColor.secondarySystemGroupedBackground))
-        .clipShape(Capsule())
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 
     // MARK: - Event Row
 
     private func eventRow(event: InferredEvent) -> some View {
         HStack(spacing: 12) {
-            // Color indicator
-            RoundedRectangle(cornerRadius: 2)
+            // Left color bar
+            RoundedRectangle(cornerRadius: 2, style: .continuous)
                 .fill(event.cardStroke)
-                .frame(width: 4, height: 40)
+                .frame(width: 4)
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(event.resolvedName)
-                    .font(.body)
+                    .font(.body.weight(.medium))
                     .foregroundStyle(.primary)
                     .lineLimit(1)
 
@@ -220,11 +266,13 @@ struct HistoryScreen: View {
             Spacer()
 
             Text(event.scrollDurationText)
-                .font(.caption.monospacedDigit())
+                .font(.subheadline.monospacedDigit().bold())
                 .foregroundStyle(.secondary)
         }
+        .padding(14)
+        .background(Color(UIColor.secondarySystemGroupedBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         .padding(.horizontal, 20)
-        .padding(.vertical, 8)
     }
 
     // MARK: - Calendar Sheet
