@@ -12,6 +12,7 @@ struct AppRootScreen: View {
     @AppStorage("today.hasCompletedOnboarding") private var hasCompletedOnboarding = false
     @ObservedObject var todayViewModel: TodayViewModel
     @ObservedObject var echoViewModel: EchoViewModel
+    @ObservedObject var echoChatViewModel: EchoChatViewModel
     @State private var selectedTab: AppTab = .home
     @State private var showRecordSheet = false
     @State private var previousTab: AppTab = .home
@@ -48,13 +49,13 @@ struct AppRootScreen: View {
                     }
                     .tag(AppTab.record)
 
-                    EchoScreen(viewModel: echoViewModel)
+                    EchoChatScreen(viewModel: echoChatViewModel, echoViewModel: echoViewModel)
                     .tabItem {
-                        Label("Echo", systemImage: "bell.badge.fill")
+                        Label("Echo", systemImage: "sparkles")
                     }
                     .tag(AppTab.echo)
 
-                    SettingsView(echoViewModel: echoViewModel)
+                    SettingsView(echoViewModel: echoViewModel, echoChatViewModel: echoChatViewModel)
                         .tabItem {
                             Label("设置", systemImage: "gear")
                         }

@@ -27,6 +27,11 @@ enum AppContainer {
         memoryManager: echoMemoryManager,
         promptBuilder: echoPromptBuilder
     )
+    private static let echoScheduler = EchoScheduler(
+        dailySummaryGenerator: echoDailySummaryGenerator,
+        weeklyProfileUpdater: echoWeeklyProfileUpdater,
+        memoryManager: echoMemoryManager
+    )
 #if os(iOS)
     static let phoneConnectivityManager = makePhoneConnectivityManager()
 #endif
@@ -98,6 +103,16 @@ enum AppContainer {
     }
 
     @MainActor
+    static func makeEchoChatViewModel() -> EchoChatViewModel {
+        EchoChatViewModel(
+            aiService: echoAIService,
+            memoryManager: echoMemoryManager,
+            promptBuilder: echoPromptBuilder,
+            container: modelContainer
+        )
+    }
+
+    @MainActor
     static func getEchoEngine() -> EchoEngine {
         echoEngine
     }
@@ -120,6 +135,10 @@ enum AppContainer {
 
     static func getEchoWeeklyProfileUpdater() -> EchoWeeklyProfileUpdater {
         echoWeeklyProfileUpdater
+    }
+
+    static func getEchoScheduler() -> EchoScheduler {
+        echoScheduler
     }
 
     private static func makeModelContainer() -> ModelContainer {
