@@ -9,6 +9,7 @@ import WatchConnectivity
 struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
     @ObservedObject var echoViewModel: EchoViewModel
+    var echoChatViewModel: EchoChatViewModel?
     @ObservedObject private var connectivityManager = PhoneConnectivityManager.shared
     @State private var healthStatus: HKAuthorizationStatus = .notDetermined
     @State private var locationStatus: CLAuthorizationStatus = .notDetermined
@@ -62,6 +63,20 @@ struct SettingsView: View {
                     ))
                 } header: {
                     Text("Echo 回响")
+                }
+
+                // MARK: - Echo AI
+                Section {
+                    EchoPersonalityPicker(
+                        selection: Binding(
+                            get: { echoChatViewModel?.personality ?? .gentle },
+                            set: { echoChatViewModel?.personality = $0 }
+                        )
+                    )
+                } header: {
+                    Text("Echo 性格")
+                } footer: {
+                    Text("选择 Echo 的说话风格，影响所有 AI 对话和洞察的语气。")
                 }
 
                 // MARK: - 数据权限
