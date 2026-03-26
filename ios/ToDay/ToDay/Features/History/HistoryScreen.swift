@@ -7,6 +7,7 @@ struct HistoryScreen: View {
     @State private var showCalendar = false
     @State private var selectedTimeline: DayTimeline?
     @State private var isLoadingSelectedDay = false
+    @State private var selectedEvent: InferredEvent?
     @State private var visibleMonth: Date = {
         let cal = Calendar.current
         return cal.date(from: cal.dateComponents([.year, .month], from: Date())) ?? cal.startOfDay(for: Date())
@@ -33,6 +34,11 @@ struct HistoryScreen: View {
             .navigationBarTitleDisplayMode(.inline)
             .sheet(isPresented: $showCalendar) {
                 calendarSheet
+            }
+            .sheet(item: $selectedEvent) { event in
+                EventDetailView(event: event) {
+                    selectedEvent = nil
+                }
             }
             .task(id: selectedDate) {
                 await loadSelectedDay()
@@ -131,16 +137,18 @@ struct HistoryScreen: View {
                 sectionLabel("数据概览")
                 metricsSection(for: timeline)
 
-                // Event list section
-                sectionLabel("当日记录")
-                ForEach(timeline.entries.sorted(by: { $0.startDate < $1.startDate })) { event in
-                    NavigationLink {
-                        HistoryDayDetailScreen(viewModel: viewModel, date: selectedDate)
-                    } label: {
-                        eventRow(event: event)
-                    }
-                    .buttonStyle(.plain)
-                }
+                // Full timeline
+                sectionLabel("当天时间轴")
+
+                DayScrollView(
+                    timeline: timeline,
+                    onEventTap: { event in
+                        selectedEvent = event
+                    },
+                    onBlankTap: { _ in },
+                    showsCurrentTimeNeedle: calendar.isDateInToday(selectedDate)
+                )
+                .padding(.horizontal, 20)
             } else if isLoadingSelectedDay {
                 ProgressView()
                     .frame(maxWidth: .infinity)
