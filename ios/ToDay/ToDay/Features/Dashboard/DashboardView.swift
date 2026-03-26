@@ -25,7 +25,6 @@ struct DashboardView: View {
                     headerSection
                     cardGridSection
                     insightSection
-                    timelinePreviewSection
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 12)
