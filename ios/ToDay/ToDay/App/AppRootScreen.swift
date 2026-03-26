@@ -97,9 +97,9 @@ struct AppRootScreen: View {
             showRecordSheet = true
         } label: {
             Image(systemName: "plus")
-                .font(.body.weight(.heavy))
+                .font(.title3.weight(.heavy))
                 .foregroundStyle(.white)
-                .frame(width: 48, height: 36)
+                .frame(width: 56, height: 42)
                 .background(
                     LinearGradient(
                         colors: [Color(red: 1.0, green: 0.38, blue: 0.38), Color(red: 1.0, green: 0.52, blue: 0.28)],
