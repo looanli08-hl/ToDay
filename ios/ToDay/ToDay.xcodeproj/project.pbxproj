@@ -116,6 +116,7 @@
 		B0DA015FC2DA8E379F110051 /* ScreenTimeRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85FABA416DD187737B1C6B2F /* ScreenTimeRecord.swift */; };
 		B2FE859DE89B5215AC30DE4E /* EventDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83CAB597D8277AED207D5F76 /* EventDetailView.swift */; };
 		B33E45F230B2871F7424675D /* CareNudge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B9D058A358FBF9BAF60D0E7 /* CareNudge.swift */; };
+		B42EA109C398D41200DA017F /* EchoChatScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46E21D4304420E9DA1D6AC01 /* EchoChatScreen.swift */; };
 		B4A22116264B6182622B67A9 /* EchoDailyInsightCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C29581A49B2103DA33AEBA1 /* EchoDailyInsightCard.swift */; };
 		B4BB5DEC4A1CE5B952F6AEC3 /* AppleLocalAIProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6E5D32F5FECA164D12B849E /* AppleLocalAIProvider.swift */; };
 		B531B511B61D408CA3243A26 /* SpendingRecordStoring.swift in Sources */ = {isa = PBXBuildFile; fileRef = 489A58FAAD7209D2A6CEEF74 /* SpendingRecordStoring.swift */; };
@@ -244,6 +245,7 @@
 		3F769FB96C82A08275CF5355 /* EchoPromptBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoPromptBuilder.swift; sourceTree = "<group>"; };
 		404E8EA06CD9AA4AF4D9231A /* WatchHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchHomeView.swift; sourceTree = "<group>"; };
 		4634CA0E594D74633EA7F9A4 /* DashboardCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardCardView.swift; sourceTree = "<group>"; };
+		46E21D4304420E9DA1D6AC01 /* EchoChatScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoChatScreen.swift; sourceTree = "<group>"; };
 		489A58FAAD7209D2A6CEEF74 /* SpendingRecordStoring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendingRecordStoring.swift; sourceTree = "<group>"; };
 		4ACD2CFDAA30430FC8EBEEE2 /* MoodRecordManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodRecordManager.swift; sourceTree = "<group>"; };
 		4E312027119398AFA5F72886 /* LocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationService.swift; sourceTree = "<group>"; };
@@ -602,6 +604,7 @@
 				BE0830BE171EA285B8947AF0 /* EchoCardView.swift */,
 				D19E63B9B8AD4B1C8C7E3FA7 /* EchoChatBubbleView.swift */,
 				EF457392367DE125D6C2CE7F /* EchoChatInputBar.swift */,
+				46E21D4304420E9DA1D6AC01 /* EchoChatScreen.swift */,
 				971BA31EEBFA383529935160 /* EchoChatViewModel.swift */,
 				1C29581A49B2103DA33AEBA1 /* EchoDailyInsightCard.swift */,
 				2F14C7A3268B768EF0F03D8A /* EchoDetailSheet.swift */,
@@ -828,6 +831,7 @@
 				11BE69FE56B810017E6FD95B /* EchoCardView.swift in Sources */,
 				6F34D956EAD4F7B42A6C7F75 /* EchoChatBubbleView.swift in Sources */,
 				A22057A1CC2B1E7036B38A06 /* EchoChatInputBar.swift in Sources */,
+				B42EA109C398D41200DA017F /* EchoChatScreen.swift in Sources */,
 				ACB5952FC0F8CB92C245AD7F /* EchoChatSession.swift in Sources */,
 				EC5F3AD37F54899586CA41BD /* EchoChatViewModel.swift in Sources */,
 				B4A22116264B6182622B67A9 /* EchoDailyInsightCard.swift in Sources */,
