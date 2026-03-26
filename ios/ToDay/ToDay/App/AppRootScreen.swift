@@ -15,6 +15,12 @@ struct AppRootScreen: View {
     @State private var selectedTab: AppTab = .home
     @State private var showRecordSheet = false
     @State private var previousTab: AppTab = .home
+    @State private var pendingAction: RecordAction?
+
+    enum RecordAction {
+        case shutter
+        case mood
+    }
 
     var body: some View {
         if hasCompletedOnboarding {
@@ -59,13 +65,36 @@ struct AppRootScreen: View {
                 // Center "+" button overlaying the tab bar
                 centerButton
             }
-            .sheet(isPresented: $showRecordSheet) {
+            .sheet(isPresented: $showRecordSheet, onDismiss: {
+                guard let action = pendingAction else { return }
+                pendingAction = nil
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    switch action {
+                    case .shutter:
+                        todayViewModel.showShutterPanel = true
+                    case .mood:
+                        todayViewModel.showQuickRecord = true
+                    }
+                }
+            }) {
                 RecordActionSheet(
                     todayViewModel: todayViewModel,
-                    onDismiss: { showRecordSheet = false }
+                    onDismiss: { showRecordSheet = false },
+                    onAction: { action in
+                        pendingAction = action
+                        showRecordSheet = false
+                    }
                 )
                 .presentationDetents([.medium, .large])
                 .presentationDragIndicator(.visible)
+            }
+            .sheet(isPresented: $todayViewModel.showShutterPanel) {
+                ShutterPanel(viewModel: todayViewModel)
+            }
+            .sheet(isPresented: $todayViewModel.showQuickRecord) {
+                QuickRecordSheet(mode: todayViewModel.quickRecordMode) { record in
+                    todayViewModel.startMoodRecord(record)
+                }
             }
         } else {
             OnboardingView {
@@ -119,18 +148,15 @@ struct AppRootScreen: View {
 private struct RecordActionSheet: View {
     @ObservedObject var todayViewModel: TodayViewModel
     let onDismiss: () -> Void
+    let onAction: (AppRootScreen.RecordAction) -> Void
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         NavigationStack {
             List {
                 Section {
-                    // Shutter options
                     Button {
-                        dismiss()
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                            todayViewModel.showShutterPanel = true
-                        }
+                        onAction(.shutter)
                     } label: {
                         Label {
                             VStack(alignment: .leading, spacing: 2) {
@@ -148,10 +174,7 @@ private struct RecordActionSheet: View {
                     }
 
                     Button {
-                        dismiss()
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                            todayViewModel.showQuickRecord = true
-                        }
+                        onAction(.mood)
                     } label: {
                         Label {
                             VStack(alignment: .leading, spacing: 2) {
