@@ -67,6 +67,31 @@ struct SettingsView: View {
 
                 // MARK: - Echo AI
                 Section {
+                    HStack {
+                        Text("DeepSeek API Key")
+                        Spacer()
+                        if UserDefaults.standard.string(forKey: "today.echo.deepseekAPIKey")?.isEmpty == false {
+                            Text("已配置")
+                                .foregroundStyle(.green)
+                        } else {
+                            Text("未配置")
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+
+                    SecureField("sk-...", text: Binding(
+                        get: { UserDefaults.standard.string(forKey: "today.echo.deepseekAPIKey") ?? "" },
+                        set: { UserDefaults.standard.set($0, forKey: "today.echo.deepseekAPIKey") }
+                    ))
+                    .textContentType(.password)
+                    .autocorrectionDisabled()
+                } header: {
+                    Text("AI 服务")
+                } footer: {
+                    Text("配置 DeepSeek API Key 后，Echo 将使用 AI 进行对话和分析。免费用户可使用 Apple 本地模型。")
+                }
+
+                Section {
                     EchoPersonalityPicker(
                         selection: Binding(
                             get: { echoChatViewModel?.personality ?? .gentle },
