@@ -133,7 +133,9 @@ enum AppContainer {
                 EchoItemEntity.self,
                 UserProfileEntity.self,
                 DailySummaryEntity.self,
-                ConversationMemoryEntity.self
+                ConversationMemoryEntity.self,
+                EchoChatSessionEntity.self,
+                EchoChatMessageEntity.self
             )
             migrateLegacyMoodRecordsIfNeeded(into: container)
             return container
