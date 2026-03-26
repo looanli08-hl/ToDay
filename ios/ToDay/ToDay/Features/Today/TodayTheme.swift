@@ -53,13 +53,13 @@ enum AppColor {
     // 功能色的浅底（用于背景 tint）
     static func soft(_ color: Color) -> Color { color.opacity(0.1) }
 
-    // 时间轴渐变色 — 柔和暖色调，与整体 UI 协调
-    static let timelineNight = Color(red: 0.22, green: 0.24, blue: 0.30)
-    static let timelineSunrise = Color(red: 0.92, green: 0.82, blue: 0.72)
-    static let timelineGold = Color(red: 0.96, green: 0.92, blue: 0.84)
-    static let timelineNoon = Color(red: 0.94, green: 0.95, blue: 0.92)
-    static let timelineSunset = Color(red: 0.94, green: 0.86, blue: 0.78)
-    static let timelineViolet = Color(red: 0.36, green: 0.34, blue: 0.40)
+    // 时间轴渐变色 — 柔和暖色调，过渡自然
+    static let timelineNight = Color(red: 0.82, green: 0.78, blue: 0.74)
+    static let timelineSunrise = Color(red: 0.92, green: 0.87, blue: 0.80)
+    static let timelineGold = Color(red: 0.96, green: 0.93, blue: 0.87)
+    static let timelineNoon = Color(red: 0.97, green: 0.95, blue: 0.91)
+    static let timelineSunset = Color(red: 0.94, green: 0.88, blue: 0.82)
+    static let timelineViolet = Color(red: 0.86, green: 0.82, blue: 0.78)
 }
 
 // MARK: - 🔤 字体 Token
