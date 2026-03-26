@@ -4,7 +4,7 @@ import Foundation
 ///
 /// Falls back to the free provider when the preferred provider is unavailable
 /// (e.g., no API key configured for DeepSeek).
-final class EchoAIService: @unchecked Sendable {
+final class EchoAIService: EchoAIProviding, @unchecked Sendable {
 
     private let freeProvider: any EchoAIProviding
     private let proProvider: any EchoAIProviding
@@ -45,6 +45,10 @@ final class EchoAIService: @unchecked Sendable {
     func generateProfile(prompt: String) async throws -> String {
         let provider = try resolveProvider()
         return try await provider.generateProfile(prompt: prompt)
+    }
+
+    var isAvailable: Bool {
+        activeProvider != nil
     }
 
     /// Returns the active provider, with fallback logic.

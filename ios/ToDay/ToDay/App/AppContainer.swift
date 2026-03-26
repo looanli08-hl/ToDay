@@ -13,6 +13,20 @@ enum AppContainer {
     private static let spendingRecordStore = SwiftDataSpendingRecordStore(container: modelContainer)
     private static let screenTimeRecordStore = SwiftDataScreenTimeRecordStore(container: modelContainer)
     private static let echoItemStore = SwiftDataEchoItemStore(container: modelContainer)
+    // MARK: - Echo AI Infrastructure
+    private static let echoAIService = EchoAIService()
+    private static let echoMemoryManager = EchoMemoryManager(container: modelContainer)
+    private static let echoPromptBuilder = EchoPromptBuilder(memoryManager: echoMemoryManager)
+    private static let echoDailySummaryGenerator = EchoDailySummaryGenerator(
+        aiService: echoAIService,
+        memoryManager: echoMemoryManager,
+        promptBuilder: echoPromptBuilder
+    )
+    private static let echoWeeklyProfileUpdater = EchoWeeklyProfileUpdater(
+        aiService: echoAIService,
+        memoryManager: echoMemoryManager,
+        promptBuilder: echoPromptBuilder
+    )
 #if os(iOS)
     static let phoneConnectivityManager = makePhoneConnectivityManager()
 #endif
@@ -88,6 +102,26 @@ enum AppContainer {
         echoEngine
     }
 
+    static func getEchoAIService() -> EchoAIService {
+        echoAIService
+    }
+
+    static func getEchoMemoryManager() -> EchoMemoryManager {
+        echoMemoryManager
+    }
+
+    static func getEchoPromptBuilder() -> EchoPromptBuilder {
+        echoPromptBuilder
+    }
+
+    static func getEchoDailySummaryGenerator() -> EchoDailySummaryGenerator {
+        echoDailySummaryGenerator
+    }
+
+    static func getEchoWeeklyProfileUpdater() -> EchoWeeklyProfileUpdater {
+        echoWeeklyProfileUpdater
+    }
+
     private static func makeModelContainer() -> ModelContainer {
         do {
             let container = try ModelContainer(
@@ -96,7 +130,10 @@ enum AppContainer {
                 ShutterRecordEntity.self,
                 SpendingRecordEntity.self,
                 ScreenTimeRecordEntity.self,
-                EchoItemEntity.self
+                EchoItemEntity.self,
+                UserProfileEntity.self,
+                DailySummaryEntity.self,
+                ConversationMemoryEntity.self
             )
             migrateLegacyMoodRecordsIfNeeded(into: container)
             return container
