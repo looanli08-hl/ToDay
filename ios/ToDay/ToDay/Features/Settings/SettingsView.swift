@@ -185,6 +185,8 @@ struct SettingsView: View {
                         .frame(maxWidth: .infinity, alignment: .center)
                 }
             }
+            .scrollContentBackground(.hidden)
+            .background(AppColor.background)
             .navigationTitle("设置")
             .confirmationDialog(
                 "确认清除？",

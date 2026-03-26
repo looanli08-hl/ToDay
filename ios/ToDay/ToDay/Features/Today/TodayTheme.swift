@@ -10,10 +10,22 @@ import SwiftUI
 // MARK: - 🎨 颜色 Token
 
 enum AppColor {
-    // 背景
-    static let background = Color(UIColor.systemGroupedBackground)
-    static let surface = Color(UIColor.secondarySystemGroupedBackground)
-    static let surfaceElevated = Color(UIColor.tertiarySystemGroupedBackground)
+    // 背景 — Warm-tinted (subtle warm hue instead of pure gray)
+    static let background = Color(UIColor { trait in
+        trait.userInterfaceStyle == .dark
+            ? UIColor(red: 0.07, green: 0.07, blue: 0.08, alpha: 1) // warm dark
+            : UIColor(red: 0.97, green: 0.96, blue: 0.94, alpha: 1) // warm cream
+    })
+    static let surface = Color(UIColor { trait in
+        trait.userInterfaceStyle == .dark
+            ? UIColor(red: 0.11, green: 0.11, blue: 0.12, alpha: 1)
+            : UIColor(red: 1.0, green: 0.99, blue: 0.97, alpha: 1) // warm white
+    })
+    static let surfaceElevated = Color(UIColor { trait in
+        trait.userInterfaceStyle == .dark
+            ? UIColor(red: 0.15, green: 0.15, blue: 0.16, alpha: 1)
+            : UIColor(red: 0.98, green: 0.97, blue: 0.95, alpha: 1)
+    })
 
     // 文字
     static let label = Color.primary
@@ -91,12 +103,15 @@ struct AppShadow: ViewModifier {
     enum Level { case subtle, elevated }
     let level: Level
 
+    // Warm-tinted shadow instead of neutral gray
+    private static let warmShadowColor = Color(red: 0.4, green: 0.3, blue: 0.2)
+
     func body(content: Content) -> some View {
         switch level {
         case .subtle:
-            content.shadow(color: .primary.opacity(0.04), radius: 8, x: 0, y: 2)
+            content.shadow(color: Self.warmShadowColor.opacity(0.06), radius: 8, x: 0, y: 2)
         case .elevated:
-            content.shadow(color: .primary.opacity(0.08), radius: 16, x: 0, y: 4)
+            content.shadow(color: Self.warmShadowColor.opacity(0.10), radius: 16, x: 0, y: 4)
         }
     }
 }

@@ -28,7 +28,7 @@ struct HistoryScreen: View {
                 ScrollView {
                     selectedDayContent
                 }
-                .background(Color(UIColor.systemGroupedBackground))
+                .background(AppColor.background)
             }
             .navigationTitle("回看")
             .navigationBarTitleDisplayMode(.inline)
@@ -87,7 +87,7 @@ struct HistoryScreen: View {
             .buttonStyle(.plain)
         }
         .padding(.vertical, 8)
-        .background(Color(UIColor.systemBackground))
+        .background(AppColor.surface)
     }
 
     private func dateCell(for date: Date) -> some View {
@@ -102,9 +102,9 @@ struct HistoryScreen: View {
             VStack(spacing: 6) {
                 Text(isToday ? "今" : "\(dayNumber)")
                     .font(.system(size: 16, weight: isSelected ? .bold : .regular))
-                    .foregroundStyle(isSelected ? .white : .primary)
+                    .foregroundStyle(isSelected ? .white : AppColor.label)
                     .frame(width: 40, height: 40)
-                    .background(isSelected ? Color.accentColor : .clear)
+                    .background(isSelected ? AppColor.accent : .clear)
                     .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
 
                 Circle()
@@ -177,8 +177,9 @@ struct HistoryScreen: View {
 
     private func sectionLabel(_ text: String) -> some View {
         Text(text)
-            .font(.footnote.weight(.medium))
-            .foregroundStyle(.secondary)
+            .font(.system(size: 12, weight: .semibold))
+            .foregroundStyle(AppColor.labelTertiary)
+            .tracking(1.5)
             .textCase(.uppercase)
             .padding(.horizontal, 20)
     }
@@ -230,25 +231,26 @@ struct HistoryScreen: View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 8) {
                 Image(systemName: icon)
-                    .font(.subheadline.weight(.semibold))
+                    .font(.system(size: 16, weight: .semibold))
                     .foregroundStyle(iconColor)
                 Text(label)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(AppColor.labelSecondary)
             }
 
             Text(value)
-                .font(.title2.bold())
-                .foregroundStyle(.primary)
+                .font(.system(size: 26, weight: .bold))
+                .foregroundStyle(AppColor.label)
 
             Text(detail)
-                .font(.caption)
-                .foregroundStyle(.tertiary)
+                .font(.system(size: 11, weight: .regular))
+                .foregroundStyle(AppColor.labelTertiary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(16)
-        .background(Color(UIColor.secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .background(AppColor.surface)
+        .clipShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
+        .shadow(color: Color(red: 0.4, green: 0.3, blue: 0.2).opacity(0.06), radius: 8, x: 0, y: 2)
     }
 
     // MARK: - Event Row
@@ -278,8 +280,9 @@ struct HistoryScreen: View {
                 .foregroundStyle(.secondary)
         }
         .padding(14)
-        .background(Color(UIColor.secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .background(AppColor.surface)
+        .clipShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
+        .shadow(color: Color(red: 0.4, green: 0.3, blue: 0.2).opacity(0.06), radius: 8, x: 0, y: 2)
         .padding(.horizontal, 20)
     }
 
@@ -544,7 +547,7 @@ struct HistoryBadgeRow: View {
             .foregroundStyle(.secondary)
             .padding(.horizontal, 10)
             .padding(.vertical, 8)
-            .background(Color(UIColor.secondarySystemGroupedBackground).opacity(0.72))
+            .background(AppColor.surface.opacity(0.72))
             .clipShape(Capsule())
     }
 }

@@ -73,8 +73,11 @@ struct EchoScreen: View {
                         }
                     }
                     .listStyle(.insetGrouped)
+                    .scrollContentBackground(.hidden)
+                    .background(AppColor.background)
                 }
             }
+            .background(AppColor.background)
             .navigationTitle("Echo")
             .sheet(item: $viewModel.selectedEchoItem) { echoItem in
                 EchoDetailSheet(
@@ -94,27 +97,29 @@ struct EchoScreen: View {
     // MARK: - Subviews
 
     private var emptyState: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 16) {
             Image(systemName: "bell.badge")
-                .font(.system(size: 40))
-                .foregroundStyle(.quaternary)
+                .font(.system(size: 44))
+                .foregroundStyle(AppColor.labelQuaternary)
 
             Text("回响")
-                .font(.title3.weight(.semibold))
-                .foregroundStyle(.primary)
+                .font(.system(size: 20, weight: .bold))
+                .foregroundStyle(AppColor.label)
 
             Text("你的灵光一现，会在对的时刻回来找你")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .font(.system(size: 15))
+                .foregroundStyle(AppColor.labelSecondary)
                 .multilineTextAlignment(.center)
 
             Text("使用快门记录生活碎片后，它们会在未来合适的日子重新出现")
-                .font(.caption)
-                .foregroundStyle(.tertiary)
+                .font(.system(size: 13))
+                .foregroundStyle(AppColor.labelTertiary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 40)
+                .lineSpacing(4)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(AppColor.background)
     }
 
     private func historyRow(_ echoItem: EchoItem) -> some View {

@@ -121,6 +121,8 @@ struct AppRootScreen: View {
 
     // MARK: - Center Button (inside tab bar area)
 
+    @State private var isCenterButtonPressed = false
+
     private var centerButton: some View {
         Button {
             showRecordSheet = true
@@ -131,15 +133,21 @@ struct AppRootScreen: View {
                 .frame(width: 56, height: 42)
                 .background(
                     LinearGradient(
-                        colors: [Color(red: 1.0, green: 0.38, blue: 0.38), Color(red: 1.0, green: 0.52, blue: 0.28)],
+                        colors: [Color(red: 0.95, green: 0.45, blue: 0.35), Color(red: 0.98, green: 0.60, blue: 0.38)],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
                 )
                 .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                .shadow(color: Color(red: 0.95, green: 0.45, blue: 0.35).opacity(0.3), radius: 8, x: 0, y: 3)
+                .scaleEffect(isCenterButtonPressed ? 0.92 : 1.0)
+                .animation(.spring(response: 0.25, dampingFraction: 0.7), value: isCenterButtonPressed)
         }
         .buttonStyle(.plain)
         .offset(y: -2)
+        .onLongPressGesture(minimumDuration: .infinity, pressing: { pressing in
+            isCenterButtonPressed = pressing
+        }, perform: {})
     }
 }
 

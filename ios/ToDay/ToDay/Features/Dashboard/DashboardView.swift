@@ -21,18 +21,17 @@ struct DashboardView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 24) {
+                VStack(alignment: .leading, spacing: 28) {
                     headerSection
                     cardGridSection
                     insightSection
                 }
                 .padding(.horizontal, 20)
-                .padding(.top, 12)
+                .padding(.top, 16)
                 .padding(.bottom, 100)
             }
-            .background(Color(UIColor.systemGroupedBackground))
-            .navigationTitle("首页")
-            .navigationBarTitleDisplayMode(.large)
+            .background(AppColor.background)
+            .toolbar(.hidden, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
@@ -76,14 +75,21 @@ struct DashboardView: View {
 
     private var headerSection: some View {
         VStack(alignment: .leading, spacing: 4) {
+            Text("ToDay")
+                .font(.system(size: 14, weight: .medium))
+                .foregroundStyle(AppColor.labelSecondary)
+                .tracking(2)
+                .textCase(.uppercase)
+
             Text(dashboardVM.dateText)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .font(.system(size: 28, weight: .bold))
+                .foregroundStyle(AppColor.label)
 
             if todayViewModel.isLoading && todayViewModel.timeline == nil {
                 Text("正在整理今天的数据...")
                     .font(.footnote)
                     .foregroundStyle(.tertiary)
+                    .padding(.top, 2)
             }
 
             if let errorMessage = todayViewModel.errorMessage, todayViewModel.timeline == nil {
@@ -97,6 +103,7 @@ struct DashboardView: View {
                         .foregroundStyle(.secondary)
                         .lineLimit(2)
                 }
+                .padding(.top, 2)
             }
         }
     }
@@ -106,8 +113,10 @@ struct DashboardView: View {
     private var cardGridSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("今日概览")
-                .font(.footnote)
-                .foregroundStyle(.secondary)
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(AppColor.labelTertiary)
+                .tracking(1.5)
+                .textCase(.uppercase)
 
             if todayViewModel.isLoading && todayViewModel.timeline == nil {
                 cardGridPlaceholder
@@ -124,9 +133,10 @@ struct DashboardView: View {
     private var cardGridPlaceholder: some View {
         LazyVGrid(columns: cardColumns, spacing: 12) {
             ForEach(0..<6, id: \.self) { _ in
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .fill(Color(UIColor.secondarySystemGroupedBackground))
+                RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous)
+                    .fill(AppColor.surface)
                     .aspectRatio(1.0, contentMode: .fit)
+                    .appShadow(.subtle)
                     .overlay(
                         ProgressView()
                     )
@@ -141,8 +151,10 @@ struct DashboardView: View {
     private var quickActionsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("快速记录")
-                .font(.footnote)
-                .foregroundStyle(.secondary)
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(AppColor.labelTertiary)
+                .tracking(1.5)
+                .textCase(.uppercase)
 
             HStack(spacing: 12) {
                 Button {
@@ -159,8 +171,9 @@ struct DashboardView: View {
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(12)
-                    .background(Color(UIColor.secondarySystemGroupedBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    .background(AppColor.surface)
+                    .clipShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
+                    .appShadow(.subtle)
                 }
                 .buttonStyle(.plain)
 
@@ -178,8 +191,9 @@ struct DashboardView: View {
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(12)
-                    .background(Color(UIColor.secondarySystemGroupedBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    .background(AppColor.surface)
+                    .clipShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
+                    .appShadow(.subtle)
                 }
                 .buttonStyle(.plain)
             }
@@ -193,29 +207,32 @@ struct DashboardView: View {
         let vm = dashboardVM
         VStack(alignment: .leading, spacing: 10) {
             Text("今日洞察")
-                .font(.footnote)
-                .foregroundStyle(.secondary)
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(AppColor.labelTertiary)
+                .tracking(1.5)
+                .textCase(.uppercase)
 
-            VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: 14) {
                 HStack(spacing: 8) {
                     Image(systemName: "leaf.fill")
-                        .font(.subheadline)
+                        .font(.system(size: 16, weight: .semibold))
                         .foregroundStyle(TodayTheme.teal)
 
                     Text("生活脉搏")
-                        .font(.headline)
-                        .foregroundStyle(.primary)
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundStyle(AppColor.label)
                 }
 
                 Text(vm.insightText)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .lineSpacing(4)
+                    .font(.system(size: 15))
+                    .foregroundStyle(AppColor.labelSecondary)
+                    .lineSpacing(6)
             }
-            .padding(16)
+            .padding(AppSpacing.md)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color(UIColor.secondarySystemGroupedBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .background(AppColor.surface)
+            .clipShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
+            .appShadow(.subtle)
         }
     }
 
@@ -254,22 +271,23 @@ struct DashboardView: View {
             VStack(spacing: 12) {
                 Image(systemName: "clock")
                     .font(.title)
-                    .foregroundStyle(Color(UIColor.quaternaryLabel))
+                    .foregroundStyle(AppColor.labelQuaternary)
 
                 Text("时间线还是空的")
                     .font(.body.weight(.medium))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(AppColor.labelSecondary)
 
                 Text("戴上 Apple Watch 活动一会儿，或用快门记录生活碎片。")
                     .font(.subheadline)
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(AppColor.labelTertiary)
                     .multilineTextAlignment(.center)
                     .lineSpacing(4)
             }
             .frame(maxWidth: .infinity)
             .padding(20)
-            .background(Color(UIColor.secondarySystemGroupedBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .background(AppColor.surface)
+            .clipShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
+            .appShadow(.subtle)
         }
     }
 }

@@ -54,7 +54,7 @@ struct DashboardCardView: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Image(systemName: card.icon)
-                    .font(.subheadline.weight(.semibold))
+                    .font(.system(size: 18, weight: .semibold))
                     .foregroundStyle(card.tint)
 
                 Spacer()
@@ -69,21 +69,22 @@ struct DashboardCardView: View {
             Spacer()
 
             Text(card.label)
-                .font(.caption)
-                .foregroundStyle(.secondary)
+                .font(.system(size: 12, weight: .medium))
+                .foregroundStyle(AppColor.labelSecondary)
                 .lineLimit(1)
 
             Text(card.value)
-                .font(.title3.weight(.bold))
-                .foregroundStyle(.primary)
+                .font(.system(size: 28, weight: .bold))
+                .foregroundStyle(AppColor.label)
                 .lineLimit(1)
-                .minimumScaleFactor(0.7)
+                .minimumScaleFactor(0.6)
         }
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
         .aspectRatio(1.0, contentMode: .fit)
-        .background(Color(UIColor.secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .background(AppColor.surface)
+        .clipShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
+        .shadow(color: Color(red: 0.4, green: 0.3, blue: 0.2).opacity(0.06), radius: 8, x: 0, y: 2)
     }
 
     private func trendColor(_ trend: TrendDirection) -> Color {
@@ -127,5 +128,5 @@ struct DashboardCardView: View {
         ))
     }
     .padding()
-    .background(Color(UIColor.systemGroupedBackground))
+    .background(AppColor.background)
 }
