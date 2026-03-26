@@ -118,11 +118,11 @@ struct DayVerticalTimelineContent: View {
             VStack(alignment: .trailing, spacing: 2) {
                 Text(formatTime(startTime))
                     .font(.system(size: 11, weight: .medium, design: .monospaced))
-                    .foregroundStyle(Color.white.opacity(0.7))
+                    .foregroundStyle(AppColor.label.opacity(0.6))
 
                 Text(formatTime(endTime))
                     .font(.system(size: 10, weight: .medium, design: .monospaced))
-                    .foregroundStyle(Color.white.opacity(0.4))
+                    .foregroundStyle(AppColor.label.opacity(0.35))
             }
             .frame(width: 44, alignment: .trailing)
 
@@ -132,7 +132,7 @@ struct DayVerticalTimelineContent: View {
                     .frame(width: 8, height: 8)
 
                 Rectangle()
-                    .fill(Color.white.opacity(0.15))
+                    .fill(AppColor.label.opacity(0.1))
                     .frame(width: 1.5)
                     .frame(maxHeight: .infinity)
             }
@@ -156,12 +156,12 @@ struct DayVerticalTimelineContent: View {
         HStack(alignment: .center, spacing: 0) {
             Text(formatTime(startTime))
                 .font(.system(size: 10, weight: .medium, design: .monospaced))
-                .foregroundStyle(Color.white.opacity(0.3))
+                .foregroundStyle(AppColor.label.opacity(0.3))
                 .frame(width: 44, alignment: .trailing)
 
             VStack(spacing: 0) {
                 Rectangle()
-                    .fill(Color.white.opacity(0.1))
+                    .fill(AppColor.label.opacity(0.08))
                     .frame(width: 1, height: gapHeight(durationMinutes))
             }
             .frame(width: 20)
@@ -172,7 +172,7 @@ struct DayVerticalTimelineContent: View {
                 } label: {
                     Text("\(label) · \(durationText(durationMinutes))")
                         .font(.system(size: 12))
-                        .foregroundStyle(Color.white.opacity(0.35))
+                        .foregroundStyle(AppColor.label.opacity(0.3))
                         .italic()
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
@@ -195,7 +195,7 @@ struct DayVerticalTimelineContent: View {
         HStack(alignment: .center, spacing: 0) {
             Text(formatTime(time))
                 .font(.system(size: 10, weight: .medium, design: .monospaced))
-                .foregroundStyle(Color.white.opacity(0.5))
+                .foregroundStyle(AppColor.label.opacity(0.4))
                 .frame(width: 44, alignment: .trailing)
 
             VStack(spacing: 0) {
@@ -204,7 +204,7 @@ struct DayVerticalTimelineContent: View {
                     .frame(width: 7, height: 7)
 
                 Rectangle()
-                    .fill(Color.white.opacity(0.1))
+                    .fill(AppColor.label.opacity(0.08))
                     .frame(width: 1)
                     .frame(maxHeight: .infinity)
             }
@@ -222,12 +222,12 @@ struct DayVerticalTimelineContent: View {
     private var currentTimeIndicator: some View {
         HStack(spacing: 4) {
             Circle()
-                .fill(Color.white)
+                .fill(Color.accentColor)
                 .frame(width: 6, height: 6)
-                .shadow(color: .white.opacity(0.5), radius: 6)
+                .shadow(color: Color.accentColor.opacity(0.4), radius: 6)
 
             Rectangle()
-                .fill(Color.white.opacity(0.6))
+                .fill(AppColor.label.opacity(0.5))
                 .frame(height: 1.5)
         }
         .allowsHitTesting(false)
