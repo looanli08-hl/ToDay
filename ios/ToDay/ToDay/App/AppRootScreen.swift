@@ -90,28 +90,27 @@ struct AppRootScreen: View {
         )
     }
 
-    // MARK: - Center Button
+    // MARK: - Center Button (inside tab bar area)
 
     private var centerButton: some View {
         Button {
             showRecordSheet = true
         } label: {
             Image(systemName: "plus")
-                .font(.title3.weight(.bold))
+                .font(.body.weight(.heavy))
                 .foregroundStyle(.white)
-                .frame(width: 56, height: 56)
+                .frame(width: 48, height: 36)
                 .background(
                     LinearGradient(
-                        colors: [Color(red: 1.0, green: 0.42, blue: 0.42), Color(red: 1.0, green: 0.55, blue: 0.30)],
+                        colors: [Color(red: 1.0, green: 0.38, blue: 0.38), Color(red: 1.0, green: 0.52, blue: 0.28)],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
                 )
-                .clipShape(Circle())
-                .shadow(color: Color(red: 1.0, green: 0.45, blue: 0.35).opacity(0.4), radius: 12, x: 0, y: 6)
+                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
         }
         .buttonStyle(.plain)
-        .offset(y: -26)
+        .offset(y: -2)
     }
 }
 
