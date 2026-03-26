@@ -1,345 +1,394 @@
-import Charts
 import SwiftUI
 
 struct HistoryScreen: View {
     @ObservedObject var viewModel: TodayViewModel
 
-    @State private var selectedPeriod: Period = .week
-    @State private var visibleMonth = Calendar.current.todayMonthAnchor
-    @State private var monthTimelines: [Date: DayTimeline] = [:]
-    @State private var weeklyTimelines: [DayTimeline] = []
-    @State private var isMonthLoading = false
-    @State private var cachedTimelineDates: Set<Date> = []
+    @State private var selectedDate: Date = Calendar.current.startOfDay(for: Date())
+    @State private var showCalendar = false
+    @State private var selectedTimeline: DayTimeline?
+    @State private var isLoadingSelectedDay = false
+    @State private var visibleMonth: Date = {
+        let cal = Calendar.current
+        return cal.date(from: cal.dateComponents([.year, .month], from: Date())) ?? cal.startOfDay(for: Date())
+    }()
 
     private let calendar = Calendar.current
     private let chineseLocale = Locale(identifier: "zh_CN")
 
-    private enum Period: String, CaseIterable {
-        case day = "日"
-        case week = "周"
-        case month = "月"
-    }
-
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: AppSpacing.lg) {
-                    periodPicker
+            VStack(spacing: 0) {
+                // 1. Date strip (sticky at top)
+                dateStripSection
 
-                    if selectedPeriod != .day {
-                        summaryCards
-                    }
+                Divider()
 
-                    calendarSection
+                // 2. Selected day content (scrollable)
+                ScrollView {
+                    selectedDayContent
                 }
-                .padding(.vertical, AppSpacing.md)
             }
-            .background(AppColor.background)
             .navigationTitle("回看")
-            .task {
-                await loadWeeklyInsights()
+            .navigationBarTitleDisplayMode(.inline)
+            .sheet(isPresented: $showCalendar) {
+                calendarSheet
             }
-            .task(id: visibleMonth) {
-                await loadMonthTimelines()
+            .task(id: selectedDate) {
+                await loadSelectedDay()
             }
         }
     }
 
-    // MARK: - Period Picker
+    // MARK: - Date Strip
 
-    private var periodPicker: some View {
-        Picker("时间范围", selection: $selectedPeriod) {
-            ForEach(Period.allCases, id: \.self) { period in
-                Text(period.rawValue).tag(period)
-            }
-        }
-        .pickerStyle(.segmented)
-        .padding(.horizontal, AppSpacing.md)
-    }
-
-    // MARK: - Summary Cards
-
-    private var summaryCards: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: AppSpacing.sm) {
-                summaryCard(
-                    icon: "figure.run",
-                    iconColor: AppColor.workout,
-                    label: "运动",
-                    value: formattedActiveMinutes,
-                    unit: "",
-                    trend: movementTrend
-                )
-                summaryCard(
-                    icon: "bed.double.fill",
-                    iconColor: AppColor.sleep,
-                    label: "睡眠",
-                    value: formattedSleepHours,
-                    unit: "",
-                    trend: sleepTrend
-                )
-                summaryCard(
-                    icon: "figure.walk",
-                    iconColor: AppColor.walk,
-                    label: "步数",
-                    value: formattedStepCount,
-                    unit: "",
-                    trend: stepsTrend
-                )
-            }
-            .padding(.horizontal, AppSpacing.md)
-        }
-    }
-
-    private func summaryCard(
-        icon: String,
-        iconColor: Color,
-        label: String,
-        value: String,
-        unit: String,
-        trend: [SparklinePoint]
-    ) -> some View {
-        VStack(alignment: .leading, spacing: AppSpacing.xs) {
-            HStack(spacing: AppSpacing.xxs) {
-                Image(systemName: icon)
-                    .font(.caption)
-                    .foregroundStyle(iconColor)
-                Text(label)
-                    .font(AppFont.caption)
-                    .foregroundStyle(AppColor.labelSecondary)
-            }
-
-            Text(value)
-                .font(.title2.bold())
-                .foregroundStyle(AppColor.label)
-
-            Chart(trend) { point in
-                AreaMark(
-                    x: .value("日", point.index),
-                    y: .value("值", point.value)
-                )
-                .interpolationMethod(.catmullRom)
-                .foregroundStyle(
-                    LinearGradient(
-                        colors: [iconColor.opacity(0.4), iconColor.opacity(0.05)],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                )
-
-                LineMark(
-                    x: .value("日", point.index),
-                    y: .value("值", point.value)
-                )
-                .interpolationMethod(.catmullRom)
-                .lineStyle(StrokeStyle(lineWidth: 1.5, lineCap: .round))
-                .foregroundStyle(iconColor)
-            }
-            .chartXAxis(.hidden)
-            .chartYAxis(.hidden)
-            .chartLegend(.hidden)
-            .frame(height: 36)
-        }
-        .padding(AppSpacing.md)
-        .frame(width: 160, alignment: .leading)
-        .background(AppColor.surface)
-        .clipShape(RoundedRectangle(cornerRadius: AppRadius.md))
-    }
-
-    // MARK: - Calendar Section
-
-    private var calendarSection: some View {
-        VStack(spacing: AppSpacing.md) {
-            // Month navigation header
-            HStack {
-                Button {
-                    shiftMonth(by: -1)
-                } label: {
-                    Image(systemName: "chevron.left")
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(AppColor.labelSecondary)
+    private var dateStripSection: some View {
+        HStack(spacing: 0) {
+            ScrollViewReader { proxy in
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 4) {
+                        ForEach(last30Days, id: \.self) { date in
+                            dateCell(for: date)
+                                .id(date)
+                        }
+                    }
+                    .padding(.horizontal, 16)
                 }
-                .buttonStyle(.plain)
-
-                Spacer()
-
-                Text(monthTitle)
-                    .font(AppFont.headline)
-                    .foregroundStyle(AppColor.label)
-
-                Spacer()
-
-                Button {
-                    shiftMonth(by: 1)
-                } label: {
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(canAdvanceMonth ? AppColor.labelSecondary : AppColor.labelQuaternary)
+                .onAppear {
+                    proxy.scrollTo(selectedDate, anchor: .center)
                 }
-                .buttonStyle(.plain)
-                .disabled(!canAdvanceMonth)
-            }
-            .padding(.horizontal, AppSpacing.md)
-
-            // Weekday headers
-            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 0), count: 7), spacing: AppSpacing.xs) {
-                ForEach(weekdayTitles, id: \.self) { title in
-                    Text(title)
-                        .font(AppFont.caption)
-                        .foregroundStyle(AppColor.labelTertiary)
-                        .frame(maxWidth: .infinity)
-                }
-
-                ForEach(Array(monthGrid.enumerated()), id: \.offset) { _, day in
-                    if let day {
-                        dayCell(for: day)
-                    } else {
-                        Color.clear
-                            .frame(height: 50)
+                .onChange(of: selectedDate) { _, newValue in
+                    withAnimation {
+                        proxy.scrollTo(newValue, anchor: .center)
                     }
                 }
             }
-            .padding(.horizontal, AppSpacing.md)
 
-            if isMonthLoading {
-                ProgressView()
-                    .frame(maxWidth: .infinity)
-                    .padding(.top, AppSpacing.xs)
-                    .tint(AppColor.accent)
+            // Expand button
+            Button {
+                showCalendar = true
+            } label: {
+                VStack(spacing: 2) {
+                    Text("展开")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                    Image(systemName: "chevron.down")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+                .frame(width: 44)
             }
+            .buttonStyle(.plain)
         }
+        .padding(.vertical, 8)
+        .background(Color(UIColor.systemBackground))
     }
 
-    private func dayCell(for date: Date) -> some View {
-        let selectable = isSelectable(date)
+    private func dateCell(for date: Date) -> some View {
+        let isSelected = calendar.isDate(date, inSameDayAs: selectedDate)
+        let isToday = calendar.isDateInToday(date)
         let dayNumber = calendar.component(.day, from: date)
         let hasData = hasDayData(for: date)
+
+        return Button {
+            selectedDate = calendar.startOfDay(for: date)
+        } label: {
+            VStack(spacing: 6) {
+                Text(isToday ? "今" : "\(dayNumber)")
+                    .font(.system(size: 16, weight: isSelected ? .bold : .regular))
+                    .foregroundStyle(isSelected ? .white : .primary)
+                    .frame(width: 40, height: 40)
+                    .background(isSelected ? Color.accentColor : .clear)
+                    .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+
+                Circle()
+                    .fill(hasData ? Color.accentColor : .clear)
+                    .frame(width: 5, height: 5)
+            }
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var last30Days: [Date] {
+        let today = calendar.startOfDay(for: Date())
+        return (0..<30).reversed().compactMap { offset in
+            calendar.date(byAdding: .day, value: -offset, to: today)
+        }
+    }
+
+    // MARK: - Selected Day Content
+
+    private var selectedDayContent: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            // Date header
+            Text(selectedDateFormatted)
+                .font(.title3.bold())
+                .padding(.horizontal, 20)
+                .padding(.top, 16)
+
+            if let timeline = selectedTimeline {
+                // Metrics summary row
+                metricsRow(for: timeline)
+
+                // Event list
+                ForEach(timeline.entries.sorted(by: { $0.startDate < $1.startDate })) { event in
+                    NavigationLink {
+                        HistoryDayDetailScreen(viewModel: viewModel, date: selectedDate)
+                    } label: {
+                        eventRow(event: event)
+                    }
+                    .buttonStyle(.plain)
+                }
+            } else if isLoadingSelectedDay {
+                ProgressView()
+                    .frame(maxWidth: .infinity)
+                    .padding(40)
+            } else {
+                // Empty state
+                VStack(spacing: 12) {
+                    Image(systemName: "calendar.badge.clock")
+                        .font(.title)
+                        .foregroundStyle(.quaternary)
+                    Text("这一天还没有记录")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(40)
+            }
+        }
+        .padding(.bottom, 100) // space for tab bar
+    }
+
+    private var selectedDateFormatted: String {
+        let formatter = DateFormatter()
+        formatter.locale = chineseLocale
+        formatter.dateFormat = "M月d日 EEEE"
+        return formatter.string(from: selectedDate)
+    }
+
+    // MARK: - Metrics Row
+
+    private func metricsRow(for timeline: DayTimeline) -> some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 12) {
+                metricPill(icon: "figure.run", label: "运动", value: exerciseMinutes(timeline))
+                metricPill(icon: "moon.fill", label: "睡眠", value: sleepHoursFormatted(timeline))
+                metricPill(icon: "shoeprints.fill", label: "步数", value: stepCountFormatted(timeline))
+                metricPill(icon: "camera.aperture", label: "快门", value: shutterCount(timeline))
+            }
+            .padding(.horizontal, 20)
+        }
+    }
+
+    private func metricPill(icon: String, label: String, value: String) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: icon)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            Text(label)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            Text(value)
+                .font(.subheadline.bold())
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 8)
+        .background(Color(UIColor.secondarySystemGroupedBackground))
+        .clipShape(Capsule())
+    }
+
+    // MARK: - Event Row
+
+    private func eventRow(event: InferredEvent) -> some View {
+        HStack(spacing: 12) {
+            // Color indicator
+            RoundedRectangle(cornerRadius: 2)
+                .fill(event.cardStroke)
+                .frame(width: 4, height: 40)
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(event.resolvedName)
+                    .font(.body)
+                    .foregroundStyle(.primary)
+                    .lineLimit(1)
+
+                Text(eventTimeText(event))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Spacer()
+
+            Text(event.scrollDurationText)
+                .font(.caption.monospacedDigit())
+                .foregroundStyle(.secondary)
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 8)
+    }
+
+    // MARK: - Calendar Sheet
+
+    private var calendarSheet: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: 16) {
+                    // Month navigation header
+                    HStack {
+                        Button {
+                            shiftMonth(by: -1)
+                        } label: {
+                            Image(systemName: "chevron.left")
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundStyle(.secondary)
+                        }
+                        .buttonStyle(.plain)
+
+                        Spacer()
+
+                        Text(monthTitle)
+                            .font(.headline)
+                            .foregroundStyle(.primary)
+
+                        Spacer()
+
+                        Button {
+                            shiftMonth(by: 1)
+                        } label: {
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundStyle(canAdvanceMonth ? .secondary : .quaternary)
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(!canAdvanceMonth)
+                    }
+                    .padding(.horizontal, 20)
+
+                    // Weekday headers
+                    LazyVGrid(
+                        columns: Array(repeating: GridItem(.flexible(), spacing: 0), count: 7),
+                        spacing: 8
+                    ) {
+                        ForEach(weekdayTitles, id: \.self) { title in
+                            Text(title)
+                                .font(.caption)
+                                .foregroundStyle(.tertiary)
+                                .frame(maxWidth: .infinity)
+                        }
+
+                        ForEach(Array(monthGrid.enumerated()), id: \.offset) { _, day in
+                            if let day {
+                                calendarDayCell(for: day)
+                            } else {
+                                Color.clear
+                                    .frame(height: 50)
+                            }
+                        }
+                    }
+                    .padding(.horizontal, 20)
+                }
+                .padding(.top, 16)
+            }
+            .navigationTitle("选择日期")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("关闭") { showCalendar = false }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("回到今日") {
+                        selectedDate = calendar.startOfDay(for: Date())
+                        showCalendar = false
+                    }
+                }
+            }
+        }
+        .presentationDetents([.large])
+    }
+
+    private func calendarDayCell(for date: Date) -> some View {
+        let isSelected = calendar.isDate(date, inSameDayAs: selectedDate)
         let isToday = calendar.isDateInToday(date)
+        let dayNumber = calendar.component(.day, from: date)
+        let hasData = hasDayData(for: date)
         let isInFuture = date > Date()
 
-        return Group {
-            if selectable {
-                NavigationLink {
-                    HistoryDayDetailScreen(viewModel: viewModel, date: date)
-                } label: {
-                    HistoryCalendarDayCell(
-                        dayNumber: dayNumber,
-                        hasData: hasData,
-                        isToday: isToday,
-                        isInFuture: isInFuture
+        return Button {
+            selectedDate = calendar.startOfDay(for: date)
+            showCalendar = false
+        } label: {
+            VStack(spacing: 4) {
+                Text("\(dayNumber)")
+                    .font(.body)
+                    .fontWeight(isToday ? .bold : .regular)
+                    .foregroundStyle(
+                        isSelected ? Color.white :
+                            (isInFuture ? Color(UIColor.quaternaryLabel) : Color.primary)
                     )
-                }
-                .buttonStyle(.plain)
-            } else {
-                HistoryCalendarDayCell(
-                    dayNumber: dayNumber,
-                    hasData: hasData,
-                    isToday: isToday,
-                    isInFuture: isInFuture
-                )
+                    .frame(width: 36, height: 36)
+                    .background(isSelected ? Color.accentColor : (isToday ? Color.accentColor.opacity(0.15) : Color.clear))
+                    .clipShape(Circle())
+
+                Circle()
+                    .fill(hasData ? Color.accentColor : .clear)
+                    .frame(width: 6, height: 6)
+            }
+            .frame(height: 50)
+        }
+        .buttonStyle(.plain)
+        .disabled(isInFuture)
+    }
+
+    // MARK: - Metric Helpers
+
+    private func exerciseMinutes(_ timeline: DayTimeline) -> String {
+        let minutes = timeline.entries.reduce(0.0) { partial, event in
+            switch event.kind {
+            case .workout, .activeWalk, .commute, .userAnnotated:
+                return partial + max(event.duration / 60, 1)
+            default:
+                return partial
             }
         }
-    }
-
-    // MARK: - Data Helpers
-
-    private func hasDayData(for date: Date) -> Bool {
-        let day = calendar.startOfDay(for: date)
-        if monthTimelines[day] != nil { return true }
-        if cachedTimelineDates.contains(day) { return true }
-        if viewModel.historyDigests.first(where: { calendar.isDate($0.date, inSameDayAs: day) }) != nil { return true }
-        return false
-    }
-
-    private var timelineLookup: [Date: DayTimeline] {
-        Dictionary(uniqueKeysWithValues: weeklyTimelines.map { (calendar.startOfDay(for: $0.date), $0) })
-    }
-
-    private var referenceDate: Date {
-        calendar.startOfDay(for: weeklyTimelines.last?.date ?? Date())
-    }
-
-    private var currentWeekDates: [Date] {
-        (-6...0).compactMap { offset in
-            calendar.date(byAdding: .day, value: offset, to: referenceDate)
-        }
-    }
-
-    private var currentWeek: [DayTimeline] {
-        currentWeekDates.compactMap { timelineLookup[$0] }
-    }
-
-    // Trend computations
-
-    private var movementTrend: [SparklinePoint] {
-        currentWeekDates.enumerated().map { index, date in
-            SparklinePoint(
-                index: index,
-                value: timelineLookup[date].map { totalActiveMinutes(in: [$0]) } ?? 0
-            )
-        }
-    }
-
-    private var sleepTrend: [SparklinePoint] {
-        currentWeekDates.enumerated().map { index, date in
-            SparklinePoint(
-                index: index,
-                value: timelineLookup[date].map { sleepHours(in: $0) } ?? 0
-            )
-        }
-    }
-
-    private var stepsTrend: [SparklinePoint] {
-        currentWeekDates.enumerated().map { index, date in
-            SparklinePoint(
-                index: index,
-                value: Double(totalSteps(in: timelineLookup[date]))
-            )
-        }
-    }
-
-    // Formatted values
-
-    private var formattedActiveMinutes: String {
-        let minutes = totalActiveMinutes(in: currentWeek)
         let rounded = max(Int(minutes.rounded()), 0)
-        let hours = rounded / 60
-        let remainder = rounded % 60
-        if hours > 0 {
-            return remainder == 0 ? "\(hours) \u{5c0f}\u{65f6}" : "\(hours) \u{5c0f}\u{65f6} \(remainder) \u{5206}\u{949f}"
+        if rounded >= 60 {
+            let hours = rounded / 60
+            let remainder = rounded % 60
+            return remainder == 0 ? "\(hours)h" : "\(hours)h\(remainder)m"
         }
-        return "\(rounded) \u{5206}\u{949f}"
+        return "\(rounded)m"
     }
 
-    private var formattedSleepHours: String {
-        let hours = averageSleepHours(in: currentWeek)
-        guard hours > 0 else { return "-- \u{5c0f}\u{65f6}" }
-        return String(format: "%.1f \u{5c0f}\u{65f6}", hours)
+    private func sleepHoursFormatted(_ timeline: DayTimeline) -> String {
+        let hours = sleepHours(in: timeline)
+        guard hours > 0 else { return "--" }
+        return String(format: "%.1fh", hours)
     }
 
-    private var formattedStepCount: String {
-        let total = currentWeek.reduce(0) { $0 + totalSteps(in: $1) }
-        let daily = currentWeek.isEmpty ? 0 : total / currentWeek.count
-        if daily >= 10000 {
-            return String(format: "%.1f \u{4e07}", Double(daily) / 10000)
+    private func stepCountFormatted(_ timeline: DayTimeline) -> String {
+        let total = totalSteps(in: timeline)
+        guard total > 0 else { return "--" }
+        if total >= 10000 {
+            return String(format: "%.1f万", Double(total) / 10000)
         }
-        return "\(daily)"
+        return "\(total)"
     }
 
-    // Metric computation
-
-    private func totalActiveMinutes(in timelines: [DayTimeline]) -> Double {
-        timelines.reduce(0) { partial, timeline in
-            partial + timeline.entries.reduce(0) { subtotal, event in
-                switch event.kind {
-                case .workout, .activeWalk, .commute, .userAnnotated:
-                    return subtotal + max(event.duration / 60, 1)
-                default:
-                    return subtotal
-                }
-            }
+    private func shutterCount(_ timeline: DayTimeline) -> String {
+        let count = timeline.entries.reduce(0) { partial, event in
+            partial + (event.associatedMetrics?.photos?.count ?? 0)
         }
+        guard count > 0 else { return "--" }
+        return "\(count)"
     }
+
+    private func eventTimeText(_ event: InferredEvent) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+        return "\(formatter.string(from: event.startDate)) - \(formatter.string(from: event.endDate))"
+    }
+
+    // MARK: - Existing Metric Computation
 
     private func sleepHours(in timeline: DayTimeline) -> Double {
         timeline.entries
@@ -347,18 +396,29 @@ struct HistoryScreen: View {
             .reduce(0.0) { $0 + $1.duration / 3600 }
     }
 
-    private func averageSleepHours(in timelines: [DayTimeline]) -> Double {
-        let sleepDurations = timelines.map(sleepHours(in:))
-        let validDurations = sleepDurations.filter { $0 > 0 }
-        guard !validDurations.isEmpty else { return 0 }
-        return validDurations.reduce(0, +) / Double(validDurations.count)
-    }
-
     private func totalSteps(in timeline: DayTimeline?) -> Int {
         guard let timeline else { return 0 }
         return timeline.entries.reduce(0) { partial, event in
             partial + (event.associatedMetrics?.stepCount ?? 0)
         }
+    }
+
+    // MARK: - Data Helpers
+
+    private func hasDayData(for date: Date) -> Bool {
+        let day = calendar.startOfDay(for: date)
+        if viewModel.historyDigests.first(where: { calendar.isDate($0.date, inSameDayAs: day) }) != nil {
+            return true
+        }
+        return false
+    }
+
+    // MARK: - Data Loading
+
+    private func loadSelectedDay() async {
+        isLoadingSelectedDay = true
+        defer { isLoadingSelectedDay = false }
+        selectedTimeline = await viewModel.loadTimeline(for: selectedDate)
     }
 
     // MARK: - Calendar Helpers
@@ -386,7 +446,7 @@ struct HistoryScreen: View {
     }
 
     private var weekdayTitles: [String] {
-        ["\u{65e5}", "\u{4e00}", "\u{4e8c}", "\u{4e09}", "\u{56db}", "\u{4e94}", "\u{516d}"]
+        ["日", "一", "二", "三", "四", "五", "六"]
     }
 
     private var canAdvanceMonth: Bool {
@@ -398,71 +458,6 @@ struct HistoryScreen: View {
         if month <= calendar.todayMonthAnchor {
             visibleMonth = month
         }
-    }
-
-    private func isSelectable(_ date: Date) -> Bool {
-        let day = calendar.startOfDay(for: date)
-        if day > calendar.startOfDay(for: Date()) {
-            return false
-        }
-
-        return monthTimelines[day] != nil || cachedTimelineDates.contains(day) || viewModel.historyDetail(for: date) != nil
-    }
-
-    // MARK: - Data Loading
-
-    private func loadWeeklyInsights() async {
-        let dates = (0..<14).compactMap { offset in
-            calendar.date(byAdding: .day, value: -13 + offset, to: calendar.startOfDay(for: Date()))
-        }
-        weeklyTimelines = await viewModel.loadTimelines(for: dates)
-    }
-
-    private func loadMonthTimelines() async {
-        isMonthLoading = true
-        defer { isMonthLoading = false }
-
-        guard let monthInterval = calendar.dateInterval(of: .month, for: visibleMonth) else { return }
-        let monthDates = calendar.enumeratedDays(in: monthInterval)
-            .filter { $0 <= Date() }
-        let loadedTimelines = await viewModel.loadTimelines(for: monthDates)
-        monthTimelines = Dictionary(uniqueKeysWithValues: loadedTimelines.map { (calendar.startOfDay(for: $0.date), $0) })
-        cachedTimelineDates = Set(loadedTimelines.map { calendar.startOfDay(for: $0.date) })
-    }
-}
-
-// MARK: - Sparkline Data
-
-private struct SparklinePoint: Identifiable {
-    let index: Int
-    let value: Double
-
-    var id: Int { index }
-}
-
-// MARK: - Day Cell
-
-private struct HistoryCalendarDayCell: View {
-    let dayNumber: Int
-    let hasData: Bool
-    let isToday: Bool
-    let isInFuture: Bool
-
-    var body: some View {
-        VStack(spacing: 4) {
-            Text("\(dayNumber)")
-                .font(.body)
-                .fontWeight(isToday ? .bold : .regular)
-                .foregroundStyle(isToday ? Color.white : (isInFuture ? Color(UIColor.quaternaryLabel) : Color.primary))
-                .frame(width: 36, height: 36)
-                .background(isToday ? Color.accentColor : Color.clear)
-                .clipShape(Circle())
-
-            Circle()
-                .fill(hasData ? Color.accentColor : .clear)
-                .frame(width: 6, height: 6)
-        }
-        .frame(height: 50)
     }
 }
 
