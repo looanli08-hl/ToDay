@@ -137,6 +137,9 @@ struct HistoryScreen: View {
                 sectionLabel("数据概览")
                 metricsSection(for: timeline)
 
+                // Insight section
+                insightSection(for: timeline)
+
                 // Full timeline
                 sectionLabel("当天时间轴")
 
@@ -182,6 +185,42 @@ struct HistoryScreen: View {
             .tracking(1.5)
             .textCase(.uppercase)
             .padding(.horizontal, 20)
+    }
+
+    // MARK: - Insight Section
+
+    private func insightSection(for timeline: DayTimeline) -> some View {
+        let vm = DashboardViewModel(timeline: timeline)
+        return VStack(alignment: .leading, spacing: 10) {
+            Text("今日洞察")
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(AppColor.labelTertiary)
+                .tracking(1.5)
+                .textCase(.uppercase)
+
+            VStack(alignment: .leading, spacing: 14) {
+                HStack(spacing: 8) {
+                    Image(systemName: "leaf.fill")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(TodayTheme.teal)
+
+                    Text("生活脉搏")
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundStyle(AppColor.label)
+                }
+
+                Text(vm.insightText)
+                    .font(.system(size: 15))
+                    .foregroundStyle(AppColor.labelSecondary)
+                    .lineSpacing(6)
+            }
+            .padding(AppSpacing.md)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(AppColor.surface)
+            .clipShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
+            .appShadow(.subtle)
+        }
+        .padding(.horizontal, 20)
     }
 
     private var selectedDateFormatted: String {

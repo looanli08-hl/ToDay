@@ -2,7 +2,7 @@ import SwiftUI
 
 private enum AppTab: Hashable {
     case home
-    case timeline
+    case shutter
     case record // placeholder for center button
     case echo
     case settings
@@ -27,20 +27,17 @@ struct AppRootScreen: View {
         if hasCompletedOnboarding {
             ZStack(alignment: .bottom) {
                 TabView(selection: tabSelection) {
-                    DashboardView(
-                        todayViewModel: todayViewModel,
-                        onOpenTimeline: { selectedTab = .timeline }
-                    )
+                    HistoryScreen(viewModel: todayViewModel)
                     .tabItem {
-                        Label("首页", systemImage: "square.grid.2x2.fill")
+                        Label("首页", systemImage: "house.fill")
                     }
                     .tag(AppTab.home)
 
-                    HistoryScreen(viewModel: todayViewModel)
+                    ShutterAlbumScreen(viewModel: todayViewModel)
                     .tabItem {
-                        Label("时间线", systemImage: "clock.fill")
+                        Label("快门", systemImage: "camera.aperture")
                     }
-                    .tag(AppTab.timeline)
+                    .tag(AppTab.shutter)
 
                     // Invisible placeholder — the center button overlay handles taps
                     Color.clear

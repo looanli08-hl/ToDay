@@ -78,6 +78,7 @@
 		6C147BA314EBBA6048E66F60 /* CareNudgeCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23B9997DEF7C92757AB78EB2 /* CareNudgeCardView.swift */; };
 		6CA276BE75D088298ACEB76E /* ScreenTimeRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85FABA416DD187737B1C6B2F /* ScreenTimeRecord.swift */; };
 		6F34D956EAD4F7B42A6C7F75 /* EchoChatBubbleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D19E63B9B8AD4B1C8C7E3FA7 /* EchoChatBubbleView.swift */; };
+		6F4538DDFDC14B77A6BD1285 /* ShutterAlbumScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB8DA7204B6240813D93640 /* ShutterAlbumScreen.swift */; };
 		6F5A4DD0ADB0320753D8C263 /* WeeklyInsightView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D394589F8B025A30D507181 /* WeeklyInsightView.swift */; };
 		70015EAB0824A09939C59B0C /* WatchMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24EB665732263021672AC442 /* WatchMessage.swift */; };
 		723D366EAA81299AAE974B38 /* EchoItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BA3E49C07FADC203D03F932 /* EchoItem.swift */; };
@@ -256,6 +257,7 @@
 		5747760BE406B15979C4D0D9 /* CurrentEventSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentEventSnapshot.swift; sourceTree = "<group>"; };
 		58552F8BAC9DB54DD43EC5B6 /* ToDayWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDayWatchApp.swift; sourceTree = "<group>"; };
 		5990A8C0CD443E744B0EC3E1 /* ShutterMediaLibraryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShutterMediaLibraryTests.swift; sourceTree = "<group>"; };
+		5BB8DA7204B6240813D93640 /* ShutterAlbumScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShutterAlbumScreen.swift; sourceTree = "<group>"; };
 		5D394589F8B025A30D507181 /* WeeklyInsightView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyInsightView.swift; sourceTree = "<group>"; };
 		5D612B7371CBAC2D72C59FB2 /* ScrollShareService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollShareService.swift; sourceTree = "<group>"; };
 		5DA68A1791C5F24214D3E41B /* DashboardViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardViewModelTests.swift; sourceTree = "<group>"; };
@@ -474,6 +476,7 @@
 			isa = PBXGroup;
 			children = (
 				135714D8D6077AE1FDE8D69D /* CameraPickerView.swift */,
+				5BB8DA7204B6240813D93640 /* ShutterAlbumScreen.swift */,
 				7AA54DE50AA5352485CC47C2 /* ShutterFloatingButton.swift */,
 				EC3CD8AA9AC50E8483912BCA /* ShutterPanel.swift */,
 				1AFD9404013D3FA99D633AC6 /* ShutterTextComposer.swift */,
@@ -878,6 +881,7 @@
 				347C2C0A0BE952A9E9C93A3C /* ScrollShareService.swift in Sources */,
 				B9A386B68A436EFF2D0C3248 /* SettingsView.swift in Sources */,
 				CE56C4D6613B3C81A22038C6 /* SharedDataTypes.swift in Sources */,
+				6F4538DDFDC14B77A6BD1285 /* ShutterAlbumScreen.swift in Sources */,
 				62454FB0EE44B3CC284C2C47 /* ShutterFloatingButton.swift in Sources */,
 				DC87F570223C41ADCC36B0A5 /* ShutterManager.swift in Sources */,
 				568C42F2CFFDC620FA62FF39 /* ShutterMediaLibrary.swift in Sources */,
