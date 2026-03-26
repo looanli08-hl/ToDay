@@ -4,6 +4,7 @@ struct ShutterAlbumScreen: View {
     @ObservedObject var viewModel: TodayViewModel
 
     @State private var selectedFilter: ShutterFilter = .all
+    @State private var selectedGroup: String? = nil // nil = 全部分组
 
     enum ShutterFilter: String, CaseIterable {
         case all = "全部"
@@ -24,15 +25,41 @@ struct ShutterAlbumScreen: View {
     }
 
     private var filteredRecords: [ShutterRecord] {
-        let all = viewModel.shutterRecords.sorted { $0.createdAt > $1.createdAt }
-        guard let type = selectedFilter.shutterType else { return all }
-        return all.filter { $0.type == type }
+        var result = viewModel.shutterRecords.sorted { $0.createdAt > $1.createdAt }
+
+        // Filter by type
+        if let type = selectedFilter.shutterType {
+            result = result.filter { $0.type == type }
+        }
+
+        // Filter by group
+        if let group = selectedGroup {
+            if group == "未分组" {
+                result = result.filter { $0.group == nil }
+            } else {
+                result = result.filter { $0.group == group }
+            }
+        }
+
+        return result
+    }
+
+    private var availableGroups: [String] {
+        var groups = viewModel.savedShutterGroups
+        let recordGroups = Set(viewModel.shutterRecords.compactMap(\.group))
+        for g in recordGroups where !groups.contains(g) {
+            groups.append(g)
+        }
+        return groups.sorted()
     }
 
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
                 filterChips
+                if !availableGroups.isEmpty {
+                    groupChips
+                }
                 Divider()
                 ScrollView {
                     if filteredRecords.isEmpty {
@@ -80,6 +107,65 @@ struct ShutterAlbumScreen: View {
             .padding(.horizontal, AppSpacing.md)
         }
         .padding(.vertical, AppSpacing.sm)
+        .background(AppColor.surface)
+    }
+
+    private var groupChips: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: AppSpacing.xs) {
+                // "全部" option
+                Button {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        selectedGroup = nil
+                    }
+                } label: {
+                    Text("全部分组")
+                        .font(.system(size: 13, weight: selectedGroup == nil ? .semibold : .regular))
+                        .foregroundStyle(selectedGroup == nil ? .white : AppColor.labelSecondary)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(selectedGroup == nil ? AppColor.echo : AppColor.surfaceElevated)
+                        .clipShape(Capsule())
+                }
+                .buttonStyle(.plain)
+
+                // "未分组"
+                Button {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        selectedGroup = "未分组"
+                    }
+                } label: {
+                    Text("未分组")
+                        .font(.system(size: 13, weight: selectedGroup == "未分组" ? .semibold : .regular))
+                        .foregroundStyle(selectedGroup == "未分组" ? .white : AppColor.labelSecondary)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(selectedGroup == "未分组" ? AppColor.echo : AppColor.surfaceElevated)
+                        .clipShape(Capsule())
+                }
+                .buttonStyle(.plain)
+
+                // Each group
+                ForEach(availableGroups, id: \.self) { group in
+                    Button {
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            selectedGroup = group
+                        }
+                    } label: {
+                        Text(group)
+                            .font(.system(size: 13, weight: selectedGroup == group ? .semibold : .regular))
+                            .foregroundStyle(selectedGroup == group ? .white : AppColor.labelSecondary)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(selectedGroup == group ? AppColor.echo : AppColor.surfaceElevated)
+                            .clipShape(Capsule())
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(.horizontal, AppSpacing.md)
+        }
+        .padding(.vertical, 6)
         .background(AppColor.surface)
     }
 
