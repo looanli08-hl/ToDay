@@ -7,6 +7,8 @@ final class ShutterManager {
     private let recordStore: any ShutterRecordStoring
     private let calendar: Calendar
 
+    static let groupsKey = "today.shutter.groups"
+
     init(recordStore: any ShutterRecordStoring, calendar: Calendar = .current) {
         self.recordStore = recordStore
         self.calendar = calendar
@@ -23,6 +25,26 @@ final class ShutterManager {
 
     func inferredEvents(on date: Date) -> [InferredEvent] {
         records(on: date).map { $0.toInferredEvent() }
+    }
+
+    /// All unique group names from existing records
+    var allGroups: [String] {
+        Array(Set(records.compactMap(\.group))).sorted()
+    }
+
+    // MARK: - Group Persistence
+
+    var savedGroups: [String] {
+        get { UserDefaults.standard.stringArray(forKey: Self.groupsKey) ?? [] }
+        set { UserDefaults.standard.set(newValue, forKey: Self.groupsKey) }
+    }
+
+    func addGroup(_ name: String) {
+        var groups = savedGroups
+        if !groups.contains(name) {
+            groups.append(name)
+            savedGroups = groups
+        }
     }
 
     // MARK: - Mutations

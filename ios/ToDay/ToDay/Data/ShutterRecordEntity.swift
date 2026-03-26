@@ -13,6 +13,7 @@ final class ShutterRecordEntity {
     var latitude: Double?
     var longitude: Double?
     var echoConfigData: Data
+    var group: String?
 
     init(record: ShutterRecord) {
         id = record.id
@@ -25,6 +26,7 @@ final class ShutterRecordEntity {
         latitude = record.latitude
         longitude = record.longitude
         echoConfigData = (try? JSONEncoder().encode(record.echoConfig)) ?? Data()
+        group = record.group
     }
 
     func update(from record: ShutterRecord) {
@@ -37,6 +39,7 @@ final class ShutterRecordEntity {
         latitude = record.latitude
         longitude = record.longitude
         echoConfigData = (try? JSONEncoder().encode(record.echoConfig)) ?? Data()
+        group = record.group
     }
 
     func toShutterRecord() -> ShutterRecord {
@@ -51,7 +54,8 @@ final class ShutterRecordEntity {
             duration: duration,
             latitude: latitude,
             longitude: longitude,
-            echoConfig: echoConfig
+            echoConfig: echoConfig,
+            group: group
         )
     }
 }

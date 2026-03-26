@@ -254,6 +254,12 @@ final class TodayViewModel: ObservableObject {
 
     var shutterRecords: [ShutterRecord] { shutterManager.records }
 
+    var savedShutterGroups: [String] { shutterManager.savedGroups }
+
+    func addShutterGroup(_ name: String) {
+        shutterManager.addGroup(name)
+    }
+
     func todayShutterCount(on date: Date? = nil) -> Int {
         shutterManager.records(on: date ?? timeline?.date ?? Date()).count
     }

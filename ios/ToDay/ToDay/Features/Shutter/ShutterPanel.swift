@@ -12,6 +12,9 @@ struct ShutterPanel: View {
     @ObservedObject var viewModel: TodayViewModel
     @State private var mode: ShutterPanelMode = .menu
     @State private var showCameraUnavailableAlert = false
+    @State private var selectedGroup: String?
+    @State private var showNewGroupAlert = false
+    @State private var newGroupName = ""
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -59,6 +62,18 @@ struct ShutterPanel: View {
             } message: {
                 Text("当前设备没有可用的相机，请在真机上使用此功能。")
             }
+            .alert("新建分组", isPresented: $showNewGroupAlert) {
+                TextField("分组名称", text: $newGroupName)
+                Button("创建") {
+                    let name = newGroupName.trimmingCharacters(in: .whitespacesAndNewlines)
+                    if !name.isEmpty {
+                        viewModel.addShutterGroup(name)
+                        selectedGroup = name
+                        newGroupName = ""
+                    }
+                }
+                Button("取消", role: .cancel) { newGroupName = "" }
+            }
         }
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
@@ -79,11 +94,42 @@ struct ShutterPanel: View {
     private var menuView: some View {
         List {
             Section {
-                Text("捕捉此刻的灵光一现，不用分类、不用打标签。")
+                Text("捕捉此刻的灵光一现")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .listRowBackground(Color.clear)
                     .listRowInsets(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 20))
+            }
+
+            Section {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        groupChip(name: "未分组", isSelected: selectedGroup == nil) {
+                            selectedGroup = nil
+                        }
+
+                        ForEach(viewModel.savedShutterGroups, id: \.self) { group in
+                            groupChip(name: group, isSelected: selectedGroup == group) {
+                                selectedGroup = group
+                            }
+                        }
+
+                        Button {
+                            showNewGroupAlert = true
+                        } label: {
+                            Image(systemName: "plus")
+                                .font(.caption.bold())
+                                .foregroundStyle(.secondary)
+                                .frame(width: 32, height: 32)
+                                .background(AppColor.surfaceElevated)
+                                .clipShape(Circle())
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    .padding(.horizontal, 16)
+                }
+                .listRowInsets(EdgeInsets())
+                .listRowBackground(Color.clear)
             }
 
             Section {
@@ -176,6 +222,19 @@ struct ShutterPanel: View {
         }
     }
 
+    private func groupChip(name: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(name)
+                .font(.caption.weight(.medium))
+                .foregroundStyle(isSelected ? .white : .primary)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 8)
+                .background(isSelected ? Color.accentColor : AppColor.surface)
+                .clipShape(Capsule())
+        }
+        .buttonStyle(.plain)
+    }
+
     // MARK: - Text View
 
     private var textView: some View {
@@ -189,7 +248,7 @@ struct ShutterPanel: View {
             Spacer()
 
             ShutterTextComposer { text in
-                let record = ShutterRecord(type: .text, textContent: text)
+                let record = ShutterRecord(type: .text, textContent: text, group: selectedGroup)
                 viewModel.saveShutterRecord(record)
                 dismiss()
             } onCancel: {
@@ -204,7 +263,9 @@ struct ShutterPanel: View {
 
     private var voiceView: some View {
         VoiceRecordView { record in
-            viewModel.saveShutterRecord(record)
+            var recordWithGroup = record
+            recordWithGroup.group = selectedGroup
+            viewModel.saveShutterRecord(recordWithGroup)
             dismiss()
         } onCancel: {
             withAnimation(.easeInOut(duration: 0.2)) {
@@ -231,7 +292,7 @@ struct ShutterPanel: View {
         case .photo(let data):
             do {
                 let filename = try ShutterMediaLibrary.storePhoto(data)
-                let record = ShutterRecord(type: .photo, mediaFilename: filename)
+                let record = ShutterRecord(type: .photo, mediaFilename: filename, group: selectedGroup)
                 viewModel.saveShutterRecord(record)
                 dismiss()
             } catch {
@@ -247,7 +308,8 @@ struct ShutterPanel: View {
                 let record = ShutterRecord(
                     type: .video,
                     mediaFilename: filename,
-                    duration: duration.isFinite ? duration : nil
+                    duration: duration.isFinite ? duration : nil,
+                    group: selectedGroup
                 )
                 viewModel.saveShutterRecord(record)
                 dismiss()

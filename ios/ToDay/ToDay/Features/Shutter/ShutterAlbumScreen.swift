@@ -131,6 +131,8 @@ struct ShutterAlbumScreen: View {
 
                     Spacer()
 
+                    groupBadge(for: record)
+
                     if record.type == .video {
                         Label("视频", systemImage: "video.fill")
                             .font(.system(size: 11, weight: .medium))
@@ -211,6 +213,8 @@ struct ShutterAlbumScreen: View {
                             .font(.system(size: 11))
                             .foregroundStyle(AppColor.labelTertiary)
                     }
+
+                    groupBadge(for: record)
                 }
             }
 
@@ -259,6 +263,8 @@ struct ShutterAlbumScreen: View {
                             .font(.system(size: 11))
                             .foregroundStyle(AppColor.labelTertiary)
                     }
+
+                    groupBadge(for: record)
                 }
             }
 
@@ -298,6 +304,21 @@ struct ShutterAlbumScreen: View {
         }
         .frame(maxWidth: .infinity)
         .padding(60)
+    }
+
+    // MARK: - Group Badge
+
+    @ViewBuilder
+    private func groupBadge(for record: ShutterRecord) -> some View {
+        if let group = record.group {
+            Text(group)
+                .font(.system(size: 11, weight: .medium))
+                .foregroundStyle(AppColor.labelSecondary)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 3)
+                .background(AppColor.soft(AppColor.accent))
+                .clipShape(Capsule())
+        }
     }
 
     // MARK: - Formatting Helpers

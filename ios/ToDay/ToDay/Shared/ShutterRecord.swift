@@ -41,6 +41,7 @@ struct ShutterRecord: Codable, Identifiable, Hashable, Sendable {
     var latitude: Double?
     var longitude: Double?
     var echoConfig: EchoConfig
+    var group: String?  // nil = 未分组
 
     init(
         id: UUID = UUID(),
@@ -52,7 +53,8 @@ struct ShutterRecord: Codable, Identifiable, Hashable, Sendable {
         duration: TimeInterval? = nil,
         latitude: Double? = nil,
         longitude: Double? = nil,
-        echoConfig: EchoConfig = .default
+        echoConfig: EchoConfig = .default,
+        group: String? = nil
     ) {
         self.id = id
         self.createdAt = createdAt
@@ -64,6 +66,7 @@ struct ShutterRecord: Codable, Identifiable, Hashable, Sendable {
         self.latitude = latitude
         self.longitude = longitude
         self.echoConfig = echoConfig
+        self.group = group
     }
 
     /// Display text for timeline: content preview or type label
