@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ToDay 服务条款</title>
+  <style>
+    :root {
+      --bg: #f4efe6;
+      --card: rgba(255, 251, 246, 0.88);
+      --ink: #2f312f;
+      --muted: #6f726f;
+      --accent: #5b9a8b;
+      --border: rgba(54, 59, 54, 0.12);
+      --shadow: 0 18px 50px rgba(46, 50, 46, 0.08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(238, 204, 149, 0.2), transparent 24rem),
+        var(--bg);
+    }
+    .page {
+      width: min(860px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 32px 0 64px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      padding: 28px;
+    }
+    .nav {
+      display: flex;
+      gap: 14px;
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 18px;
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-family: "Iowan Old Style", "Times New Roman", serif;
+      font-size: 42px;
+      font-style: italic;
+      font-weight: 400;
+    }
+    .meta {
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 28px;
+    }
+    h2 {
+      margin: 28px 0 10px;
+      font-size: 20px;
+    }
+    p, li {
+      font-size: 15px;
+      line-height: 1.8;
+      color: var(--ink);
+    }
+    ul { padding-left: 20px; }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <nav class="nav" aria-label="面包屑导航">
+      <a href="./index.html">首页</a>
+      <span>·</span>
+      <a href="./privacy.html">隐私政策</a>
+    </nav>
+
+    <article class="card">
+      <h1>服务条款</h1>
+      <div class="meta">最后更新：2026 年 3 月 14 日</div>
+
+      <h2>1. 产品性质</h2>
+      <p>ToDay 是一款用于生活记录、事件回看与可视化整理的工具。它会基于你授权的健康、位置、照片与手动输入信息，在本地生成每日生活时间轴。</p>
+
+      <h2>2. 使用前提</h2>
+      <p>你需要拥有兼容的 Apple 设备，并根据需要授权健康、位置、照片等系统权限。拒绝某些权限不会阻止应用启动，但会影响部分功能完整性。</p>
+
+      <h2>3. 用户责任</h2>
+      <ul>
+        <li>你应确保自己输入的备注、标注和照片内容合法且不侵犯他人权益。</li>
+        <li>你应妥善保管设备和系统账号，避免他人在未授权情况下查看你的本地数据。</li>
+        <li>请勿将 ToDay 作为医疗诊断、急救判断或法律证据的唯一依据。</li>
+      </ul>
+
+      <h2>4. 数据与隐私</h2>
+      <p>ToDay 当前版本默认仅在本地处理和存储数据，不提供公共社交发布能力，也不会主动上传你的个人记录。更多内容请查看<a href="./privacy.html">隐私政策</a>。</p>
+
+      <h2>5. 功能更新</h2>
+      <p>我们可能持续更新界面、推理算法、手表端体验与分享能力。为了提升稳定性或兼容性，某些功能可能被调整、替换或下线。</p>
+
+      <h2>6. 免责声明</h2>
+      <p>ToDay 提供的是生活回看和自我整理工具，不保证事件推理始终准确。系统推断出的“活动类型”“留白”“地点关联”等结果仅供个人参考。</p>
+
+      <h2>7. 终止使用</h2>
+      <p>你可以随时停止使用 ToDay，并在应用内或系统设置中删除本地数据与权限。若后续版本提供同步能力，将以新的政策和条款为准。</p>
+
+      <h2>8. 联系方式</h2>
+      <p>如有问题、建议或合作需求，请联系：<a href="mailto:looanli08@gmail.com">looanli08@gmail.com</a></p>
+    </article>
+  </main>
+</body>
+</html>

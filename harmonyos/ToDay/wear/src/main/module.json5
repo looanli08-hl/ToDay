@@ -1,0 +1,30 @@
+{
+  "module": {
+    "name": "wear",
+    "type": "entry",
+    "description": "$string:module_desc",
+    "mainElement": "WatchEntryAbility",
+    "deviceTypes": [ "wearable" ],
+    "deliveryWithInstall": true,
+    "installationFree": false,
+    "pages": "$profile:main_pages",
+    "abilities": [
+      {
+        "name": "WatchEntryAbility",
+        "srcEntry": "./ets/entryability/WatchEntryAbility.ets",
+        "description": "$string:EntryAbility_desc",
+        "icon": "$media:app_icon",
+        "label": "$string:app_name",
+        "startWindowIcon": "$media:app_icon",
+        "startWindowBackground": "$color:start_window_background",
+        "exported": true,
+        "skills": [
+          {
+            "entities": [ "entity.system.home" ],
+            "actions": [ "action.system.home" ]
+          }
+        ]
+      }
+    ]
+  }
+}

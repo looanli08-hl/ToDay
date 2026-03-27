@@ -1,0 +1,28 @@
+{
+  "string": [
+    {
+      "name": "app_name",
+      "value": "ToDay"
+    },
+    {
+      "name": "module_desc",
+      "value": "ToDay HarmonyOS NEXT 模块"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "ToDay 主入口"
+    },
+    {
+      "name": "health_permission_reason",
+      "value": "用于读取健康数据并生成今日节律时间轴"
+    },
+    {
+      "name": "location_permission_reason",
+      "value": "用于补充天气和地点上下文，完善当天记录"
+    },
+    {
+      "name": "media_permission_reason",
+      "value": "用于读取相册内容并生成当天记忆卡片"
+    }
+  ]
+}

@@ -1,8 +1,8 @@
 .DS_Store
-*.xcuserstate
-xcuserdata/
-DerivedData/
 .build/
-*.ipa
-*.dSYM.zip
-*.dSYM
+build/
+DerivedData/
+xcuserdata/
+*.xcuserdata
+*.xcuserstate
+*.xcworkspace/xcuserdata/

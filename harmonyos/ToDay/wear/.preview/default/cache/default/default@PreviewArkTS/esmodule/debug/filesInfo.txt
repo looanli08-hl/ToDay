@@ -1,0 +1,2 @@
+/Users/looanli/Projects/ToDay/harmonyos/ToDay/wear/.preview/default/cache/default/default@PreviewArkTS/esmodule/debug/wear/src/main/ets/entryability/WatchEntryAbility.ts;com.looanli.today/wear/ets/entryability/WatchEntryAbility;esm;wear|wear|1.0.0|src/main/ets/entryability/WatchEntryAbility.ts;wear;false;ets
+/Users/looanli/Projects/ToDay/harmonyos/ToDay/wear/.preview/default/cache/default/default@PreviewArkTS/esmodule/debug/wear/src/main/ets/pages/Index.ts;com.looanli.today/wear/ets/pages/Index;esm;wear|wear|1.0.0|src/main/ets/pages/Index.ts;wear;false;ets

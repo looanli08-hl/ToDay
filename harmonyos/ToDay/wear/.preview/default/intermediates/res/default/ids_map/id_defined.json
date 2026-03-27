@@ -1,0 +1,27 @@
+{
+	"record":	[{
+			"type":	"media",
+			"name":	"app_icon",
+			"id":	"0x02000000"
+		}, {
+			"type":	"string",
+			"name":	"EntryAbility_desc",
+			"id":	"0x02000001"
+		}, {
+			"type":	"string",
+			"name":	"app_name",
+			"id":	"0x02000002"
+		}, {
+			"type":	"string",
+			"name":	"module_desc",
+			"id":	"0x02000003"
+		}, {
+			"type":	"profile",
+			"name":	"main_pages",
+			"id":	"0x02000004"
+		}, {
+			"type":	"color",
+			"name":	"start_window_background",
+			"id":	"0x02000005"
+		}]
+}

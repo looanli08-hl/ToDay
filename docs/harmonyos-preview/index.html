@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ToDay HarmonyOS NEXT Preview</title>
+  <style>
+    :root {
+      --background: #fafaf8;
+      --card: #ffffff;
+      --elevated: #f3efe7;
+      --ink: #1a1a1a;
+      --ink-soft: #3d3d3d;
+      --ink-muted: #8a8a8a;
+      --ink-faint: #b8b8b8;
+      --border: #e2e0dc;
+      --accent: #c59661;
+      --accent-soft: #f5e9d8;
+      --teal: #5b9a8b;
+      --teal-soft: #e4f2ee;
+      --rose: #c97b7b;
+      --rose-soft: #f7e7e7;
+      --blue: #7b9cc9;
+      --blue-soft: #e8eff9;
+      --workout: #d76f3d;
+      --walk: #5c9c70;
+      --sleep: #4a5fa9;
+      --night: #202c57;
+      --sunrise: #d28953;
+      --gold: #e9d18b;
+      --noon: #bfddf3;
+      --sunset: #e0a16d;
+      --violet: #5f4978;
+      --shell: #1f2327;
+      --shadow: 0 22px 70px rgba(24, 26, 29, 0.14);
+      --shadow-soft: 0 16px 40px rgba(24, 26, 29, 0.09);
+      --radius-shell: 40px;
+      --radius-card: 28px;
+      --radius-inner: 20px;
+      --radius-small: 16px;
+      --font-sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "SF Pro Display", "Helvetica Neue", sans-serif;
+      --font-serif: "Iowan Old Style", "Baskerville", "Times New Roman", serif;
+      --font-mono: "SF Mono", "Menlo", "JetBrains Mono", monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: var(--font-sans);
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(233, 209, 139, 0.35), transparent 24rem),
+        radial-gradient(circle at 80% 0%, rgba(191, 221, 243, 0.48), transparent 26rem),
+        radial-gradient(circle at bottom right, rgba(91, 154, 139, 0.22), transparent 28rem),
+        #f4f1eb;
+    }
+
+    body[data-view="today"] .phone-shell:not(.today),
+    body[data-view="history"] .phone-shell:not(.history),
+    body[data-view="settings"] .phone-shell:not(.settings) {
+      display: none;
+    }
+
+    body[data-view="today"] .hero,
+    body[data-view="history"] .hero,
+    body[data-view="settings"] .hero,
+    body[data-view="today"] .footer-note,
+    body[data-view="history"] .footer-note,
+    body[data-view="settings"] .footer-note {
+      display: none;
+    }
+
+    body[data-view="today"] .deck,
+    body[data-view="history"] .deck,
+    body[data-view="settings"] .deck {
+      justify-content: center;
+    }
+
+    body[data-view="today"] .page,
+    body[data-view="history"] .page,
+    body[data-view="settings"] .page {
+      width: 100%;
+      padding: 18px 0 18px;
+    }
+
+    .page {
+      width: min(1560px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 36px 0 56px;
+    }
+
+    .hero {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      align-items: flex-end;
+      padding: 0 4px 36px;
+    }
+
+    .hero-copy {
+      max-width: 840px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      color: var(--ink-muted);
+      font-size: 11px;
+      font-family: var(--font-mono);
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      box-shadow: var(--shadow-soft);
+    }
+
+    h1 {
+      margin: 18px 0 12px;
+      font-family: var(--font-serif);
+      font-size: clamp(44px, 7vw, 82px);
+      line-height: 0.92;
+      font-style: italic;
+      font-weight: 400;
+      letter-spacing: -0.04em;
+    }
+
+    .hero-copy p {
+      margin: 0;
+      max-width: 780px;
+      font-size: 17px;
+      line-height: 1.78;
+      color: var(--ink-soft);
+    }
+
+    .hero-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-end;
+      max-width: 420px;
+    }
+
+    .hero-chip {
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.76);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      color: var(--ink-soft);
+      font-size: 13px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .deck {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .phone-shell {
+      width: 388px;
+      padding: 12px;
+      background: linear-gradient(180deg, #2e3339, #111417);
+      border-radius: var(--radius-shell);
+      box-shadow: var(--shadow);
+    }
+
+    .phone-frame {
+      position: relative;
+      overflow: hidden;
+      border-radius: 30px;
+      background: var(--background);
+      min-height: 812px;
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .phone-frame::before {
+      content: "";
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 142px;
+      height: 28px;
+      background: rgba(12, 13, 14, 0.94);
+      border-radius: 999px;
+      z-index: 5;
+    }
+
+    .status-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 18px 0;
+      font-size: 12px;
+      font-family: var(--font-mono);
+      color: rgba(0, 0, 0, 0.64);
+    }
+
+    .screen {
+      position: relative;
+      min-height: 812px;
+      padding: 24px 20px 106px;
+      background:
+        radial-gradient(circle at top left, rgba(233, 209, 139, 0.15), transparent 12rem),
+        linear-gradient(180deg, rgba(255,255,255,0.28), rgba(255,255,255,0) 30%),
+        var(--background);
+    }
+
+    .screen h2,
+    .screen h3,
+    .screen p {
+      margin: 0;
+    }
+
+    .top-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .date-label {
+      color: var(--ink-muted);
+      font-size: 11px;
+      font-family: var(--font-mono);
+      letter-spacing: 0.12em;
+    }
+
+    .screen-title {
+      margin-top: 10px;
+      font-family: var(--font-serif);
+      font-size: 35px;
+      line-height: 0.94;
+      font-style: italic;
+      letter-spacing: -0.04em;
+      color: var(--ink);
+    }
+
+    .icon-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .icon-button {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      background: rgba(255,255,255,0.88);
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      color: var(--ink-soft);
+      font-size: 18px;
+      box-shadow: 0 10px 20px rgba(32, 37, 41, 0.06);
+    }
+
+    .intro {
+      margin-top: 12px;
+      font-size: 14px;
+      line-height: 1.68;
+      color: var(--ink-muted);
+    }
+
+    .stats-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px;
+      overflow: hidden;
+    }
+
+    .stat-tile {
+      flex: 1;
+      min-width: 0;
+      padding: 14px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(0,0,0,0.05);
+      box-shadow: 0 8px 20px rgba(32, 37, 41, 0.05);
+    }
+
+    .stat-tile small {
+      display: block;
+      color: var(--ink-muted);
+      font-size: 11px;
+      margin-bottom: 6px;
+    }
+
+    .stat-tile strong {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .card {
+      margin-top: 18px;
+      padding: 18px;
+      border-radius: 22px;
+      background: rgba(255,255,255,0.88);
+      border: 1px solid var(--border);
+      box-shadow: 0 12px 28px rgba(32, 37, 41, 0.06);
+      backdrop-filter: blur(18px);
+    }
+
+    .card.teal {
+      background: linear-gradient(180deg, rgba(228,242,238,0.92), rgba(255,255,255,0.9));
+    }
+
+    .card-title {
+      margin-top: 8px;
+      font-family: var(--font-serif);
+      font-size: 24px;
+      line-height: 0.96;
+      font-style: italic;
+      color: var(--ink);
+    }
+
+    .card-copy {
+      margin-top: 10px;
+      font-size: 14px;
+      line-height: 1.66;
+      color: var(--ink-muted);
+    }
+
+    .mini-eyebrow {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      letter-spacing: 0.14em;
+      color: var(--ink-muted);
+    }
+
+    .flow-bars {
+      display: flex;
+      gap: 6px;
+      align-items: end;
+      height: 78px;
+      margin-top: 14px;
+    }
+
+    .flow-segment {
+      flex: 1;
+      position: relative;
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(0, 0, 0, 0.05);
+    }
+
+    .flow-segment span {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: 999px;
+    }
+
+    .flow-scale {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 12px;
+      color: var(--ink-faint);
+      font-size: 10px;
+      font-family: var(--font-mono);
+    }
+
+    .timeline-canvas {
+      margin-top: 14px;
+      padding: 16px 14px 18px;
+      border-radius: 22px;
+      background:
+        linear-gradient(180deg, var(--night) 0%, var(--night) 20%, var(--sunrise) 30%, var(--gold) 50%, var(--noon) 58%, var(--sunset) 75%, var(--violet) 85%, var(--night) 100%);
+      color: rgba(255,255,255,0.92);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.16);
+    }
+
+    .timeline-item {
+      display: grid;
+      grid-template-columns: 46px 14px 1fr;
+      gap: 10px;
+      align-items: start;
+      margin-bottom: 12px;
+    }
+
+    .timeline-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .timeline-time {
+      padding-top: 10px;
+      font-size: 11px;
+      font-family: var(--font-mono);
+      color: rgba(255,255,255,0.84);
+    }
+
+    .timeline-dot {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 6px;
+    }
+
+    .timeline-dot::before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.92);
+      box-shadow: 0 0 0 3px rgba(255,255,255,0.08);
+    }
+
+    .timeline-dot::after {
+      content: "";
+      width: 2px;
+      flex: 1;
+      margin-top: 4px;
+      background: rgba(255,255,255,0.18);
+    }
+
+    .timeline-item:last-child .timeline-dot::after {
+      display: none;
+    }
+
+    .event-card {
+      padding: 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.14);
+      backdrop-filter: blur(14px);
+    }
+
+    .event-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: baseline;
+    }
+
+    .event-head strong {
+      font-size: 15px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.96);
+    }
+
+    .event-head span {
+      font-size: 12px;
+      font-family: var(--font-mono);
+      color: rgba(255,255,255,0.76);
+    }
+
+    .badge {
+      display: inline-flex;
+      padding: 3px 8px;
+      border-radius: 999px;
+      margin-bottom: 8px;
+      font-size: 10px;
+      font-family: var(--font-mono);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .badge.sleep { color: #d7defb; background: rgba(74,95,169,0.28); }
+    .badge.commute { color: #daf4e2; background: rgba(92,156,112,0.28); }
+    .badge.mood { color: #fff1da; background: rgba(197,150,97,0.28); }
+    .badge.workout { color: #ffe5d8; background: rgba(215,111,61,0.28); }
+    .badge.blank { color: rgba(255,255,255,0.75); background: rgba(255,255,255,0.12); }
+
+    .event-copy {
+      margin-top: 6px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: rgba(255,255,255,0.74);
+    }
+
+    .sleep-ribbon {
+      display: grid;
+      grid-template-columns: 1.2fr 1.1fr 0.8fr 0.3fr;
+      gap: 3px;
+      margin-top: 10px;
+    }
+
+    .sleep-ribbon span {
+      height: 6px;
+      border-radius: 999px;
+    }
+
+    .summary-lead {
+      margin-top: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--ink-soft);
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .pill {
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      color: var(--ink-soft);
+      background: var(--accent-soft);
+    }
+
+    .pill.teal {
+      background: var(--teal-soft);
+    }
+
+    .recent-item {
+      margin-top: 12px;
+      padding: 14px;
+      border-radius: 16px;
+      background: var(--background);
+      border: 1px solid rgba(0,0,0,0.04);
+    }
+
+    .recent-item strong {
+      display: block;
+      font-size: 14px;
+      color: var(--ink-soft);
+      margin-bottom: 8px;
+    }
+
+    .recent-item p {
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--ink-muted);
+    }
+
+    .floating-bar {
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      bottom: 72px;
+      padding: 16px;
+      border-radius: 22px;
+      background: rgba(243, 239, 231, 0.94);
+      border: 1px solid var(--border);
+      box-shadow: 0 16px 34px rgba(26, 26, 26, 0.12);
+      backdrop-filter: blur(18px);
+    }
+
+    .floating-bar .bar-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .floating-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: var(--teal-soft);
+      color: var(--teal);
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .floating-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .floating-button {
+      flex: 1;
+      padding: 12px 10px;
+      border-radius: 16px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      background: white;
+      color: var(--ink-soft);
+    }
+
+    .floating-button.teal {
+      background: var(--teal);
+      border-color: transparent;
+      color: white;
+    }
+
+    .tab-bar {
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: 12px;
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 12px;
+      border-radius: 22px;
+      background: rgba(255,255,255,0.88);
+      border: 1px solid rgba(0,0,0,0.05);
+      box-shadow: 0 10px 24px rgba(32, 37, 41, 0.08);
+    }
+
+    .tab-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: var(--ink-faint);
+      font-size: 10px;
+    }
+
+    .tab-item.active {
+      color: var(--teal);
+    }
+
+    .tab-item span:first-child {
+      font-size: 16px;
+    }
+
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 12px;
+    }
+
+    .calendar-arrows {
+      display: flex;
+      gap: 8px;
+    }
+
+    .arrow {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      background: var(--background);
+      border: 1px solid rgba(0,0,0,0.04);
+      color: var(--ink-soft);
+    }
+
+    .weekday-row,
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .weekday-row span {
+      text-align: center;
+      font-size: 10px;
+      color: var(--ink-muted);
+      font-family: var(--font-mono);
+    }
+
+    .day-cell {
+      min-height: 68px;
+      padding: 8px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.82);
+      border: 1px solid rgba(0,0,0,0.03);
+      font-size: 12px;
+      color: var(--ink-soft);
+    }
+
+    .day-cell.today {
+      background: var(--accent-soft);
+      border-color: rgba(197, 150, 97, 0.38);
+    }
+
+    .day-cell.faded {
+      opacity: 0.4;
+    }
+
+    .day-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .day-track {
+      display: flex;
+      gap: 2px;
+      align-items: center;
+    }
+
+    .day-track span {
+      flex: 1;
+      height: 5px;
+      border-radius: 999px;
+    }
+
+    .detail-sheet {
+      margin-top: 16px;
+      padding: 16px;
+      border-radius: 18px;
+      background: rgba(243, 239, 231, 0.88);
+      border: 1px solid var(--border);
+    }
+
+    .detail-sheet h4 {
+      margin: 0 0 6px;
+      font-size: 16px;
+      color: var(--ink);
+    }
+
+    .detail-sheet p {
+      font-size: 13px;
+      line-height: 1.62;
+      color: var(--ink-muted);
+    }
+
+    .setting-block + .setting-block {
+      margin-top: 16px;
+    }
+
+    .setting-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .setting-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 15px;
+      border-radius: 16px;
+      background: var(--background);
+      border: 1px solid rgba(0,0,0,0.04);
+    }
+
+    .setting-row strong {
+      font-size: 14px;
+      color: var(--ink-soft);
+      font-weight: 600;
+    }
+
+    .setting-row span {
+      font-size: 12px;
+      color: var(--ink-muted);
+    }
+
+    .theme-toggle {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .theme-button {
+      padding: 14px 12px;
+      border-radius: 16px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 600;
+      background: var(--background);
+      border: 1px solid rgba(0,0,0,0.04);
+      color: var(--ink-soft);
+    }
+
+    .theme-button.active.light {
+      background: var(--accent);
+      border-color: transparent;
+      color: white;
+    }
+
+    .theme-button.active.dark {
+      background: var(--teal);
+      border-color: transparent;
+      color: white;
+    }
+
+    .danger {
+      background: linear-gradient(180deg, #d99595, #c97b7b);
+      color: white;
+      text-align: center;
+      padding: 15px;
+      border-radius: 18px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-top: 14px;
+    }
+
+    .footer-note {
+      margin-top: 24px;
+      text-align: center;
+      color: var(--ink-muted);
+      font-size: 13px;
+    }
+
+    @media (max-width: 1280px) {
+      .hero {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .hero-chips {
+        justify-content: flex-start;
+        max-width: none;
+      }
+    }
+  </style>
+</head>
+<body data-view="all">
+  <div class="page">
+    <section class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow">ToDay · HarmonyOS NEXT 手机端预览</div>
+        <h1>华为版 ToDay<br>已经进入可展示首版</h1>
+        <p>
+          这一版先把手机端体验做成“今天画卷 + 回看月历 + 设置管理”的闭环，用共享 design tokens 保持和 iOS 同一套视觉语言，
+          同时用更真实的 Mock 数据把最近 14 天的节律、情绪、运动和留白都铺开。下面三张手机界面，分别对应 Today、History、Settings。
+        </p>
+      </div>
+      <div class="hero-chips">
+        <div class="hero-chip">共享 Token 已落地</div>
+        <div class="hero-chip">HarmonyOS NEXT 目录已搭好</div>
+        <div class="hero-chip">今日 / 回看 / 设置三屏齐全</div>
+        <div class="hero-chip">Mock 数据按日期变化</div>
+        <div class="hero-chip">Health Kit 接口预留完成</div>
+      </div>
+    </section>
+
+    <section class="deck">
+      <article class="phone-shell today">
+        <div class="phone-frame">
+          <div class="status-bar">
+            <span>9:41</span>
+            <span>5G · 87%</span>
+          </div>
+          <div class="screen">
+            <div class="top-row">
+              <div>
+                <div class="date-label">2026 · 03 · 15 周日</div>
+                <div class="screen-title">今日画卷</div>
+              </div>
+              <div class="icon-actions">
+                <div class="icon-button">❤</div>
+                <div class="icon-button">↗</div>
+                <div class="icon-button">↻</div>
+              </div>
+            </div>
+            <p class="intro">今天先从 7.3 小时睡眠开始，傍晚有一段户外跑步，最后用 ☺️ 满足 收尾。</p>
+
+            <div class="stats-row">
+              <div class="stat-tile" style="background: var(--blue-soft);">
+                <small>片段数</small>
+                <strong style="color: var(--blue);">9</strong>
+              </div>
+              <div class="stat-tile" style="background: var(--teal-soft);">
+                <small>记录数</small>
+                <strong style="color: var(--teal);">2</strong>
+              </div>
+              <div class="stat-tile" style="background: var(--rose-soft);">
+                <small>备注数</small>
+                <strong style="color: var(--rose);">2</strong>
+              </div>
+              <div class="stat-tile" style="background: var(--accent-soft);">
+                <small>来源</small>
+                <strong style="color: var(--accent);">Mock</strong>
+              </div>
+            </div>
+
+            <section class="card">
+              <div class="mini-eyebrow">今日脉络</div>
+              <div class="card-title">今日脉络</div>
+              <div class="card-copy">把一天里的起伏、停顿和推进压成一条流线，先看今天的流向，再回到具体片段。</div>
+              <div class="flow-bars">
+                <div class="flow-segment" style="height: 38px;"><span style="height: 70%; background: #4a5fa9;"></span></div>
+                <div class="flow-segment" style="height: 42px;"><span style="height: 60%; background: #7b9cc9;"></span></div>
+                <div class="flow-segment" style="height: 30px;"><span style="height: 46%; background: #c59661;"></span></div>
+                <div class="flow-segment" style="height: 34px;"><span style="height: 38%; background: #b8b8b8;"></span></div>
+                <div class="flow-segment" style="height: 56px;"><span style="height: 86%; background: #5c9c70;"></span></div>
+                <div class="flow-segment" style="height: 78px;"><span style="height: 92%; background: #d76f3d;"></span></div>
+                <div class="flow-segment" style="height: 44px;"><span style="height: 58%; background: #c59661;"></span></div>
+              </div>
+              <div class="flow-scale">
+                <span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>24:00</span>
+              </div>
+            </section>
+
+            <section class="card" style="padding-bottom: 16px;">
+              <div class="mini-eyebrow">今日时间轴</div>
+              <div class="card-title">今日时间轴</div>
+              <div class="card-copy">从凌晨到夜里，一天的起伏与留白。</div>
+              <div class="timeline-canvas">
+                <div class="timeline-item">
+                  <div class="timeline-time">00:15</div>
+                  <div class="timeline-dot"></div>
+                  <div class="event-card">
+                    <div class="badge sleep">睡眠</div>
+                    <div class="event-head">
+                      <strong>睡眠</strong>
+                      <span>7 小时 20 分钟</span>
+                    </div>
+                    <div class="event-copy">深睡 2 小时 16 分, 浅睡 2 小时 57 分, 快眼动 1 小时 47 分, 清醒 14 分</div>
+                    <div class="sleep-ribbon">
+                      <span style="background:#4a5fa9;"></span>
+                      <span style="background:#788ddb;"></span>
+                      <span style="background:#d28953;"></span>
+                      <span style="background:#e9d18b;"></span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="timeline-item">
+                  <div class="timeline-time">07:42</div>
+                  <div class="timeline-dot"></div>
+                  <div class="event-card">
+                    <div class="badge commute">通勤</div>
+                    <div class="event-head">
+                      <strong>通勤路上</strong>
+                      <span>43 分钟</span>
+                    </div>
+                    <div class="event-copy">2034 步 · 平均 96 次/分 · 工作室 · 多云 15°</div>
+                  </div>
+                </div>
+
+                <div class="timeline-item">
+                  <div class="timeline-time">09:20</div>
+                  <div class="timeline-dot"></div>
+                  <div class="event-card">
+                    <div class="badge mood">心情</div>
+                    <div class="event-head">
+                      <strong>🎯 专注</strong>
+                      <span>瞬时记录</span>
+                    </div>
+                    <div class="event-copy">上午开会前进入状态很快。</div>
+                  </div>
+                </div>
+
+                <div class="timeline-item">
+                  <div class="timeline-time">18:28</div>
+                  <div class="timeline-dot"></div>
+                  <div class="event-card">
+                    <div class="badge workout">运动</div>
+                    <div class="event-head">
+                      <strong>户外跑步</strong>
+                      <span>44 分钟</span>
+                    </div>
+                    <div class="event-copy">44 分钟 · 322 千卡 · 5.7 公里 · 滨江步道</div>
+                  </div>
+                </div>
+
+                <div class="timeline-item">
+                  <div class="timeline-time">20:10</div>
+                  <div class="timeline-dot"></div>
+                  <div class="event-card">
+                    <div class="badge blank">留白</div>
+                    <div class="event-head">
+                      <strong>夜晚留白</strong>
+                      <span>1 小时 26 分钟</span>
+                    </div>
+                    <div class="event-copy">可继续补充打点或标注这段时间。</div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="card">
+              <div class="mini-eyebrow">今日总结</div>
+              <div class="card-title">今日自动总结</div>
+              <div class="summary-lead">活跃的一天，完成 1 段训练</div>
+              <div class="card-copy">你把 83 分钟的移动和 7.3 小时的休息都留了下来，画卷里既有推进也有停顿。</div>
+              <div class="badge-row">
+                <span class="pill">9 个片段</span>
+                <span class="pill">83 分钟移动</span>
+                <span class="pill">7.3 小时睡眠</span>
+              </div>
+            </section>
+
+            <section class="card teal">
+              <div class="mini-eyebrow">七日节律</div>
+              <div class="card-title">最近 7 天</div>
+              <div class="summary-lead">本周节律稳定而有推进</div>
+              <div class="card-copy">最近 7 天平均每天 7640 步，训练 4 次，睡眠 6.9 小时。历史页已经能看出不同天的节奏差异。</div>
+              <div class="badge-row">
+                <span class="pill teal">日均 7640 步</span>
+                <span class="pill teal">运动 4 次</span>
+                <span class="pill teal">睡眠 6.9 小时</span>
+              </div>
+            </section>
+
+            <section class="card">
+              <div class="top-row" style="align-items: end;">
+                <div>
+                  <div class="mini-eyebrow">最近几天</div>
+                  <div class="card-title">最近记录</div>
+                </div>
+                <div style="font-size:13px;color:var(--teal);font-weight:600;">查看全部</div>
+              </div>
+              <div class="recent-item">
+                <strong>2026 · 03 · 14 周六 · 🙏 感恩</strong>
+                <p>早骑结束后，整天节奏都很顺。最近历史页已经能显示更丰富的情绪和运动分布，不再是重复的一天。</p>
+              </div>
+            </section>
+
+            <div class="floating-bar">
+              <div class="bar-head">
+                <div>
+                  <div class="floating-status">● 进行中</div>
+                  <div style="margin-top:8px;font-size:15px;font-weight:700;color:var(--ink);">进行中的状态</div>
+                  <div style="margin-top:4px;font-size:12px;color:var(--ink-muted);">20:36 开始 · 夜里做完训练还有余力</div>
+                </div>
+              </div>
+              <div class="floating-actions">
+                <div class="floating-button">补一个打点</div>
+                <div class="floating-button teal">结束这段状态</div>
+              </div>
+            </div>
+
+            <nav class="tab-bar">
+              <div class="tab-item active"><span>☀️</span><span>今日</span></div>
+              <div class="tab-item"><span>🗓</span><span>回看</span></div>
+              <div class="tab-item"><span>⚙️</span><span>设置</span></div>
+            </nav>
+          </div>
+        </div>
+      </article>
+
+      <article class="phone-shell history">
+        <div class="phone-frame">
+          <div class="status-bar">
+            <span>9:41</span>
+            <span>5G · 87%</span>
+          </div>
+          <div class="screen">
+            <div class="top-row">
+              <div>
+                <div class="date-label">最近 14 天</div>
+                <div class="screen-title">回看月历</div>
+              </div>
+              <div class="icon-actions">
+                <div class="icon-button">↺</div>
+              </div>
+            </div>
+            <p class="intro">现在历史页已经不只是一个空月历，而是能看最近 7 天洞察、当月事件分布，以及点进单日详情。</p>
+
+            <section class="card teal">
+              <div class="mini-eyebrow">七日节律</div>
+              <div class="card-title">最近 7 天</div>
+              <div class="summary-lead">本周节律稳定而有推进</div>
+              <div class="card-copy">最近 7 天平均每天 7640 步，训练 4 次，睡眠 6.9 小时。情绪状态也从专注、感恩到兴奋逐渐展开。</div>
+              <div class="badge-row">
+                <span class="pill teal">日均 7640 步</span>
+                <span class="pill teal">训练 4 次</span>
+                <span class="pill teal">睡眠 6.9 小时</span>
+              </div>
+            </section>
+
+            <section class="card">
+              <div class="mini-eyebrow">回看月历</div>
+              <div class="calendar-header">
+                <div class="card-title" style="margin-top:0;">2026 年 3 月</div>
+                <div class="calendar-arrows">
+                  <div class="arrow">‹</div>
+                  <div class="arrow">›</div>
+                </div>
+              </div>
+
+              <div class="weekday-row">
+                <span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span>
+              </div>
+
+              <div class="calendar-grid">
+                <div class="day-cell faded"><div class="day-top"><span>23</span><span></span></div></div>
+                <div class="day-cell faded"><div class="day-top"><span>24</span><span></span></div></div>
+                <div class="day-cell faded"><div class="day-top"><span>25</span><span></span></div></div>
+                <div class="day-cell faded"><div class="day-top"><span>26</span><span></span></div></div>
+                <div class="day-cell faded"><div class="day-top"><span>27</span><span></span></div></div>
+                <div class="day-cell faded"><div class="day-top"><span>28</span><span></span></div></div>
+                <div class="day-cell"><div class="day-top"><span>1</span><span>🌿</span></div><div class="day-track"><span style="background:#4a5fa9"></span><span style="background:#5c9c70"></span><span style="background:#c59661"></span></div></div>
+
+                <div class="day-cell"><div class="day-top"><span>2</span><span>🎯</span></div><div class="day-track"><span style="background:#4a5fa9"></span><span style="background:#7b9cc9"></span><span style="background:#c97b7b"></span></div></div>
+                <div class="day-cell"><div class="day-top"><span>3</span><span>😴</span></div><div class="day-track"><span style="background:#4a5fa9"></span><span style="background:#b8b8b8"></span><span style="background:#c59661"></span></div></div>
+                <div class="day-cell"><div class="day-top"><span>4</span><span>🤩</span></div><div class="day-track"><span style="background:#5c9c70"></span><span style="background:#d76f3d"></span><span style="background:#c59661"></span></div></div>
+                <div class="day-cell"><div class="day-top"><span>5</span><span>🙏</span></div><div class="day-track"><span style="background:#4a5fa9"></span><span style="background:#5c9c70"></span><span style="background:#7b9cc9"></span></div></div>
+                <div class="day-cell"><div class="day-top"><span>6</span><span>😊</span></div><div class="day-track"><span style="background:#d76f3d"></span><span style="background:#5c9c70"></span><span style="background:#c59661"></span></div></div>
+                <div class="day-cell"><div class="day-top"><span>7</span><span>🌿</span></div><div class="day-track"><span style="background:#4a5fa9"></span><span style="background:#b8b8b8"></span><span style="background:#c59661"></span></div></div>
+                <div class="day-cell"><div class="day-top"><span>8</span><span>🎯</span></div><div class="day-track"><span style="background:#4a5fa9"></span><span style="background:#7b9cc9"></span><span style="background:#d76f3d"></span></div></div>
+
+                <div class="day-cell"><div class="day-top"><span>9</span><span>😴</span></div><div class="day-track"><span style="background:#4a5fa9"></span><span style="background:#c59661"></span><span style="background:#b8b8b8"></span></div></div>
+                <div class="day-cell"><div class="day-top"><span>10</span><span>😊</span></div><div class="day-track"><span style="background:#5c9c70"></span><span style="background:#d76f3d"></span><span style="background:#c59661"></span></div></div>
+                <div class="day-cell"><div class="day-top"><span>11</span><span>🙏</span></div><div class="day-track"><span style="background:#4a5fa9"></span><span style="background:#7b9cc9"></span><span style="background:#c59661"></span></div></div>
+                <div class="day-cell"><div class="day-top"><span>12</span><span>🌿</span></div><div class="day-track"><span style="background:#4a5fa9"></span><span style="background:#5c9c70"></span><span style="background:#c59661"></span></div></div>
+                <div class="day-cell"><div class="day-top"><span>13</span><span>😊</span></div><div class="day-track"><span style="background:#d76f3d"></span><span style="background:#c59661"></span><span style="background:#5c9c70"></span></div></div>
+                <div class="day-cell"><div class="day-top"><span>14</span><span>🙏</span></div><div class="day-track"><span style="background:#4a5fa9"></span><span style="background:#5c9c70"></span><span style="background:#7b9cc9"></span></div></div>
+                <div class="day-cell today"><div class="day-top"><span>15</span><span>☺️</span></div><div class="day-track"><span style="background:#4a5fa9"></span><span style="background:#5c9c70"></span><span style="background:#d76f3d"></span></div></div>
+
+                <div class="day-cell"><div class="day-top"><span>16</span><span></span></div></div>
+                <div class="day-cell"><div class="day-top"><span>17</span><span></span></div></div>
+                <div class="day-cell"><div class="day-top"><span>18</span><span></span></div></div>
+                <div class="day-cell"><div class="day-top"><span>19</span><span></span></div></div>
+                <div class="day-cell"><div class="day-top"><span>20</span><span></span></div></div>
+                <div class="day-cell"><div class="day-top"><span>21</span><span></span></div></div>
+                <div class="day-cell"><div class="day-top"><span>22</span><span></span></div></div>
+
+                <div class="day-cell"><div class="day-top"><span>23</span><span></span></div></div>
+                <div class="day-cell"><div class="day-top"><span>24</span><span></span></div></div>
+                <div class="day-cell"><div class="day-top"><span>25</span><span></span></div></div>
+                <div class="day-cell"><div class="day-top"><span>26</span><span></span></div></div>
+                <div class="day-cell"><div class="day-top"><span>27</span><span></span></div></div>
+                <div class="day-cell"><div class="day-top"><span>28</span><span></span></div></div>
+                <div class="day-cell"><div class="day-top"><span>29</span><span></span></div></div>
+
+                <div class="day-cell"><div class="day-top"><span>30</span><span></span></div></div>
+                <div class="day-cell"><div class="day-top"><span>31</span><span></span></div></div>
+                <div class="day-cell faded"><div class="day-top"><span>1</span><span></span></div></div>
+                <div class="day-cell faded"><div class="day-top"><span>2</span><span></span></div></div>
+                <div class="day-cell faded"><div class="day-top"><span>3</span><span></span></div></div>
+                <div class="day-cell faded"><div class="day-top"><span>4</span><span></span></div></div>
+                <div class="day-cell faded"><div class="day-top"><span>5</span><span></span></div></div>
+              </div>
+
+              <div class="detail-sheet">
+                <h4>03 月 15 日 · 单日详情</h4>
+                <p>今天先从 7.3 小时睡眠开始，傍晚有一段户外跑步，最后用 ☺️ 满足 收尾。点击日期后会进入单日详情层，复用今日页的片段卡片和统计。</p>
+              </div>
+            </section>
+
+            <nav class="tab-bar">
+              <div class="tab-item"><span>☀️</span><span>今日</span></div>
+              <div class="tab-item active"><span>🗓</span><span>回看</span></div>
+              <div class="tab-item"><span>⚙️</span><span>设置</span></div>
+            </nav>
+          </div>
+        </div>
+      </article>
+
+      <article class="phone-shell settings">
+        <div class="phone-frame">
+          <div class="status-bar">
+            <span>9:41</span>
+            <span>5G · 87%</span>
+          </div>
+          <div class="screen">
+            <div class="top-row">
+              <div>
+                <div class="date-label">配置与数据</div>
+                <div class="screen-title">设置</div>
+              </div>
+            </div>
+            <p class="intro">设置页现在已经覆盖权限状态、主题模式、隐私入口、版本说明和本地数据清理，不再只是占位。</p>
+
+            <section class="card setting-block">
+              <div class="mini-eyebrow">数据权限</div>
+              <div class="card-title">权限状态</div>
+              <div class="setting-list">
+                <div class="setting-row">
+                  <div><strong>健康数据</strong><span>后续接入 Huawei Health Kit</span></div>
+                  <div style="color:var(--teal);font-weight:700;">Mock</div>
+                </div>
+                <div class="setting-row">
+                  <div><strong>位置权限</strong><span>用于天气与地点摘要</span></div>
+                  <div style="color:var(--blue);font-weight:700;">Mock</div>
+                </div>
+                <div class="setting-row">
+                  <div><strong>照片权限</strong><span>用于事件详情中的回忆照片</span></div>
+                  <div style="color:var(--accent);font-weight:700;">预留</div>
+                </div>
+              </div>
+            </section>
+
+            <section class="card setting-block">
+              <div class="mini-eyebrow">显示模式</div>
+              <div class="card-title">主题预览</div>
+              <div class="theme-toggle">
+                <div class="theme-button active light">浅色</div>
+                <div class="theme-button">深色</div>
+              </div>
+            </section>
+
+            <section class="card setting-block">
+              <div class="mini-eyebrow">隐私与协议</div>
+              <div class="card-title">文档入口</div>
+              <div class="setting-list">
+                <div class="setting-row"><strong>隐私政策</strong><span>待接入</span></div>
+                <div class="setting-row"><strong>服务条款</strong><span>待接入</span></div>
+                <div class="setting-row"><strong>数据说明</strong><span>待接入</span></div>
+              </div>
+            </section>
+
+            <section class="card setting-block">
+              <div class="mini-eyebrow">关于</div>
+              <div class="card-title">ToDay HarmonyOS NEXT</div>
+              <div class="card-copy">版本 1.0.0 · 当前为华为手机端首版，已完成共享 Token、三主页面、Mock 数据、事件推断和主要弹层结构。</div>
+            </section>
+
+            <section class="card setting-block">
+              <div class="mini-eyebrow">数据管理</div>
+              <div class="card-title">本地数据</div>
+              <div class="card-copy">会清除当前华为端首版中的本地心情记录、缓存时间轴和标注。后续接正式持久化时，这一块会保留相同的信息架构。</div>
+              <div class="danger">清除所有标注和记录</div>
+            </section>
+
+            <nav class="tab-bar">
+              <div class="tab-item"><span>☀️</span><span>今日</span></div>
+              <div class="tab-item"><span>🗓</span><span>回看</span></div>
+              <div class="tab-item active"><span>⚙️</span><span>设置</span></div>
+            </nav>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <div class="footer-note">预览基于当前 HarmonyOS 代码和共享 design tokens 生成，用于直接展示华为版 ToDay 的完成态。</div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const view = params.get('view');
+    if (view === 'today' || view === 'history' || view === 'settings') {
+      document.body.dataset.view = view;
+    }
+  </script>
+</body>
+</html>

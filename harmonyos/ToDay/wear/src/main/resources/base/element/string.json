@@ -1,0 +1,16 @@
+{
+  "string": [
+    {
+      "name": "app_name",
+      "value": "ToDay Watch"
+    },
+    {
+      "name": "module_desc",
+      "value": "ToDay 手表模块"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "ToDay 手表入口"
+    }
+  ]
+}

@@ -1,0 +1,124 @@
+<h2>快门 (Shutter) 交互设计</h2>
+<p class="subtitle">从点击到记录，不超过 2 步</p>
+
+<div class="split" style="gap: 32px; align-items: start;">
+
+  <!-- 左侧：时间线中的浮动按钮 -->
+  <div class="mockup">
+    <div class="mockup-header">状态一：浮动按钮（常驻）</div>
+    <div class="mockup-body" style="background: #1a1a2e; color: #e0e0e0; min-height: 400px; position: relative; padding: 16px;">
+
+      <!-- 模拟时间线 -->
+      <div style="opacity: 0.6; font-size: 13px;">
+        <div style="padding: 12px 0; border-bottom: 1px solid #333;">
+          <span style="color: #888;">08:00</span> &nbsp; 🏃 晨跑 35min
+        </div>
+        <div style="padding: 12px 0; border-bottom: 1px solid #333;">
+          <span style="color: #888;">09:30</span> &nbsp; 💻 屏幕时间 2h
+        </div>
+        <div style="padding: 12px 0; border-bottom: 1px solid #333;">
+          <span style="color: #888;">12:00</span> &nbsp; 🍜 午餐 ¥35
+        </div>
+        <div style="padding: 12px 0; border-bottom: 1px solid #333;">
+          <span style="color: #888;">14:00</span> &nbsp; 😌 安静的下午
+        </div>
+        <div style="padding: 12px 0; border-bottom: 1px solid #333;">
+          <span style="color: #888;">15:30</span> &nbsp; ☕ 星巴克
+        </div>
+      </div>
+
+      <!-- 浮动快门按钮 -->
+      <div style="position: absolute; bottom: 20px; right: 20px; width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(102,126,234,0.4); cursor: pointer;">
+        <div style="width: 24px; height: 24px; border: 3px solid white; border-radius: 50;"></div>
+        <span style="color: white; font-size: 20px;">⊙</span>
+      </div>
+
+      <div style="position: absolute; bottom: 85px; right: 12px; font-size: 11px; color: #888; text-align: center;">
+        单击：打开面板<br>长按：语音速记
+      </div>
+    </div>
+  </div>
+
+  <!-- 右侧：快门面板展开 -->
+  <div class="mockup">
+    <div class="mockup-header">状态二：快门面板（展开）</div>
+    <div class="mockup-body" style="background: #1a1a2e; color: #e0e0e0; min-height: 400px; position: relative; padding: 16px;">
+
+      <!-- 模糊背景时间线 -->
+      <div style="opacity: 0.2; font-size: 13px;">
+        <div style="padding: 12px 0; border-bottom: 1px solid #333;">
+          <span style="color: #888;">08:00</span> &nbsp; 🏃 晨跑 35min
+        </div>
+        <div style="padding: 12px 0; border-bottom: 1px solid #333;">
+          <span style="color: #888;">09:30</span> &nbsp; 💻 屏幕时间 2h
+        </div>
+        <div style="padding: 12px 0;">
+          <span style="color: #888;">12:00</span> &nbsp; 🍜 午餐 ¥35
+        </div>
+      </div>
+
+      <!-- 快门面板 -->
+      <div style="position: absolute; bottom: 0; left: 0; right: 0; background: #2a2a3e; border-radius: 20px 20px 0 0; padding: 20px;">
+
+        <!-- 拖拽条 -->
+        <div style="width: 40px; height: 4px; background: #555; border-radius: 2px; margin: 0 auto 20px;"></div>
+
+        <div style="text-align: center; margin-bottom: 16px; font-size: 14px; color: #aaa;">捕捉此刻</div>
+
+        <!-- 四个选项 -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; max-width: 280px; margin: 0 auto;">
+
+          <div style="background: #3a3a50; border-radius: 16px; padding: 20px; text-align: center; cursor: pointer;">
+            <div style="font-size: 28px; margin-bottom: 8px;">✏️</div>
+            <div style="font-size: 13px; color: #ccc;">文字</div>
+          </div>
+
+          <div style="background: #3a3a50; border-radius: 16px; padding: 20px; text-align: center; cursor: pointer;">
+            <div style="font-size: 28px; margin-bottom: 8px;">🎙️</div>
+            <div style="font-size: 13px; color: #ccc;">语音</div>
+          </div>
+
+          <div style="background: #3a3a50; border-radius: 16px; padding: 20px; text-align: center; cursor: pointer;">
+            <div style="font-size: 28px; margin-bottom: 8px;">📷</div>
+            <div style="font-size: 13px; color: #ccc;">拍照</div>
+          </div>
+
+          <div style="background: #3a3a50; border-radius: 16px; padding: 20px; text-align: center; cursor: pointer;">
+            <div style="font-size: 28px; margin-bottom: 8px;">🎬</div>
+            <div style="font-size: 13px; color: #ccc;">视频</div>
+          </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 16px; font-size: 12px; color: #666;">下滑关闭</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 交互流程 -->
+<div style="margin-top: 32px;">
+  <h3>交互流程</h3>
+  <div style="display: flex; gap: 16px; flex-wrap: wrap; margin-top: 12px;">
+    <div style="flex: 1; min-width: 200px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 16px;">
+      <div style="font-weight: 600; margin-bottom: 8px;">📝 文字速记</div>
+      <div style="font-size: 13px; color: var(--text-secondary);">
+        点击 → 键盘弹出 → 输入 → 发送<br>
+        <strong>2 步完成</strong>
+      </div>
+    </div>
+    <div style="flex: 1; min-width: 200px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 16px;">
+      <div style="font-weight: 600; margin-bottom: 8px;">🎙️ 语音速记</div>
+      <div style="font-size: 13px; color: var(--text-secondary);">
+        长按浮动按钮 → 说话 → 松手完成<br>
+        <strong>1 步完成</strong>（跳过面板）
+      </div>
+    </div>
+    <div style="flex: 1; min-width: 200px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 16px;">
+      <div style="font-weight: 600; margin-bottom: 8px;">📷 拍照 / 🎬 视频</div>
+      <div style="font-size: 13px; color: var(--text-secondary);">
+        点击 → 选拍照/视频 → 拍摄 → 自动保存<br>
+        <strong>2 步完成</strong>，可选加一句话
+      </div>
+    </div>
+  </div>
+</div>
