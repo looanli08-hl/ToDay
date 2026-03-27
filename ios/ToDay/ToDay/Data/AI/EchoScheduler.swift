@@ -14,6 +14,7 @@ final class EchoScheduler: @unchecked Sendable {
     private let dailySummaryGenerator: EchoDailySummaryGenerator
     private let weeklyProfileUpdater: EchoWeeklyProfileUpdater
     private let memoryManager: EchoMemoryManager
+    private var messageManager: EchoMessageManager?
 
     /// UserDefaults key for last daily summary date (stored as "yyyy-MM-dd")
     private static let lastDailySummaryKey = "today.echo.lastDailySummaryDate"
@@ -42,6 +43,12 @@ final class EchoScheduler: @unchecked Sendable {
         self.dailySummaryGenerator = dailySummaryGenerator
         self.weeklyProfileUpdater = weeklyProfileUpdater
         self.memoryManager = memoryManager
+    }
+
+    /// Set the message manager. Called after AppContainer wires everything up
+    /// (to break the circular dependency between scheduler and manager).
+    func setMessageManager(_ manager: EchoMessageManager) {
+        self.messageManager = manager
     }
 
     // MARK: - Daily Summary
@@ -95,6 +102,29 @@ final class EchoScheduler: @unchecked Sendable {
             // Mark as completed for today
             UserDefaults.standard.set(todayKey, forKey: Self.lastDailySummaryKey)
 
+            // Create a dailyInsight message in the message center
+            if let manager = messageManager {
+                let summary = memoryManager.loadSummary(forDateKey: todayKey)
+                let insightText = summary?.summaryText ?? "今天的数据已整理好"
+                let preview = String(insightText.prefix(60))
+
+                let sourceData = EchoSourceData(
+                    type: .todayData,
+                    sourceDescription: "今日数据"
+                )
+
+                await MainActor.run {
+                    try? manager.generateMessage(
+                        type: .dailyInsight,
+                        title: "今日洞察",
+                        preview: preview,
+                        sourceDescription: "来自：今日数据",
+                        sourceData: sourceData,
+                        initialEchoMessage: insightText
+                    )
+                }
+            }
+
             // Also prune old summaries (keep 30 days)
             try memoryManager.pruneOldSummaries(olderThanDays: 30)
         } catch {
@@ -108,6 +138,29 @@ final class EchoScheduler: @unchecked Sendable {
     func onAppLaunch() async {
         do {
             try await weeklyProfileUpdater.updateIfNeeded()
+
+            // Check if profile was just updated (by looking at profile update timestamp)
+            if let profile = memoryManager.loadUserProfile() {
+                let calendar = Calendar.current
+                if calendar.isDateInToday(profile.lastUpdatedAt),
+                   let manager = messageManager {
+                    let preview = String(profile.profileText.prefix(60))
+                    let sourceData = EchoSourceData(
+                        type: .userProfile,
+                        sourceDescription: "你的生活画像"
+                    )
+                    await MainActor.run {
+                        try? manager.generateMessage(
+                            type: .mirrorUpdate,
+                            title: "我对你有了新的了解",
+                            preview: preview,
+                            sourceDescription: "来自：你的生活画像",
+                            sourceData: sourceData,
+                            initialEchoMessage: profile.profileText
+                        )
+                    }
+                }
+            }
         } catch {
             print("[EchoScheduler] Weekly profile update failed: \(error)")
         }
@@ -134,6 +187,29 @@ final class EchoScheduler: @unchecked Sendable {
                 moodNotes: moodNotes,
                 isEmotionTriggered: true
             )
+
+            // Create an emotion care message
+            if let manager = messageManager {
+                let summary = memoryManager.loadSummary(forDateKey: todayKey)
+                let insightText = summary?.summaryText ?? "看起来你现在心情有些起伏"
+                let preview = String(insightText.prefix(60))
+
+                let sourceData = EchoSourceData(
+                    type: .moodTrend,
+                    sourceDescription: "近期心情趋势"
+                )
+
+                await MainActor.run {
+                    try? manager.generateMessage(
+                        type: .emotionCare,
+                        title: "Echo 想跟你说",
+                        preview: preview,
+                        sourceDescription: "来自：近期心情趋势",
+                        sourceData: sourceData,
+                        initialEchoMessage: insightText
+                    )
+                }
+            }
         } catch {
             print("[EchoScheduler] Emotion-triggered summary failed: \(error)")
         }

@@ -32,6 +32,7 @@ enum AppContainer {
         weeklyProfileUpdater: echoWeeklyProfileUpdater,
         memoryManager: echoMemoryManager
     )
+    private static let echoMessageStore = SwiftDataEchoMessageStore(container: modelContainer)
 #if os(iOS)
     static let phoneConnectivityManager = makePhoneConnectivityManager()
 #endif
@@ -141,6 +142,32 @@ enum AppContainer {
         echoScheduler
     }
 
+    @MainActor
+    static let echoMessageManager: EchoMessageManager = {
+        let manager = EchoMessageManager(store: echoMessageStore, container: modelContainer)
+        echoScheduler.setMessageManager(manager)
+        return manager
+    }()
+
+    @MainActor
+    static func getEchoMessageManager() -> EchoMessageManager {
+        echoMessageManager
+    }
+
+    @MainActor
+    static func makeEchoThreadViewModel(for message: EchoMessageEntity) -> EchoThreadViewModel {
+        EchoThreadViewModel(
+            threadId: message.threadId,
+            sourceData: message.sourceData,
+            messageType: message.messageType,
+            sourceDescription: message.sourceData?.sourceDescription ?? "",
+            aiService: echoAIService,
+            memoryManager: echoMemoryManager,
+            promptBuilder: echoPromptBuilder,
+            container: modelContainer
+        )
+    }
+
     private static func makeModelContainer() -> ModelContainer {
         do {
             let container = try ModelContainer(
@@ -154,7 +181,8 @@ enum AppContainer {
                 DailySummaryEntity.self,
                 ConversationMemoryEntity.self,
                 EchoChatSessionEntity.self,
-                EchoChatMessageEntity.self
+                EchoChatMessageEntity.self,
+                EchoMessageEntity.self
             )
             migrateLegacyMoodRecordsIfNeeded(into: container)
             return container

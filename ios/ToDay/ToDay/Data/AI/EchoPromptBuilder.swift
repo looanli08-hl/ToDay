@@ -42,6 +42,99 @@ final class EchoPromptBuilder: @unchecked Sendable {
         return messages
     }
 
+    // MARK: - Thread Message Assembly
+
+    /// Build the full message array for a thread-specific chat.
+    /// Includes source data context so Echo knows what triggered this conversation.
+    func buildThreadMessages(
+        userInput: String,
+        personality: EchoPersonality,
+        sourceData: EchoSourceData?,
+        sourceDescription: String,
+        messageType: EchoMessageType,
+        conversationHistory: [EchoChatMessage] = []
+    ) -> [EchoChatMessage] {
+        var messages: [EchoChatMessage] = []
+
+        // System message with full context + source-specific context
+        let systemContent = buildThreadSystemPrompt(
+            personality: personality,
+            sourceData: sourceData,
+            sourceDescription: sourceDescription,
+            messageType: messageType
+        )
+        messages.append(EchoChatMessage(role: .system, content: systemContent))
+
+        // Append conversation history (prior turns)
+        messages.append(contentsOf: conversationHistory)
+
+        // Current user input
+        messages.append(EchoChatMessage(role: .user, content: userInput))
+
+        return messages
+    }
+
+    /// Build system prompt for a thread, including source-specific context.
+    private func buildThreadSystemPrompt(
+        personality: EchoPersonality,
+        sourceData: EchoSourceData?,
+        sourceDescription: String,
+        messageType: EchoMessageType
+    ) -> String {
+        var parts: [String] = []
+
+        // 1. Personality
+        parts.append(personality.systemPromptPrefix)
+
+        // 2. Thread context instruction
+        let typeLabel: String
+        switch messageType {
+        case .dailyInsight:  typeLabel = "今日洞察"
+        case .shutterEcho:   typeLabel = "快门回响"
+        case .thoughtOrg:    typeLabel = "想法整理"
+        case .emotionCare:   typeLabel = "情绪关怀"
+        case .todoReminder:  typeLabel = "待办提醒"
+        case .mirrorUpdate:  typeLabel = "画像更新"
+        case .freeChat:      typeLabel = "自由对话"
+        }
+        parts.append("【当前对话主题】\n这是一个「\(typeLabel)」类型的对话。\(sourceDescription)")
+
+        // 3. Source-specific data
+        if let source = sourceData {
+            var sourceContext = "【来源数据】\n类型：\(source.type.rawValue)\n描述：\(source.sourceDescription)"
+            if let ids = source.shutterRecordIDs, !ids.isEmpty {
+                sourceContext += "\n关联快门记录数量：\(ids.count)"
+            }
+            if let start = source.dateRangeStart, let end = source.dateRangeEnd {
+                let formatter = DateFormatter()
+                formatter.dateFormat = "M月d日"
+                sourceContext += "\n时间范围：\(formatter.string(from: start)) - \(formatter.string(from: end))"
+            }
+            parts.append(sourceContext)
+        }
+
+        // 4. User Profile (Layer 1)
+        if let profile = memoryManager.loadUserProfile(),
+           !profile.profileText.isEmpty {
+            parts.append("【用户画像】\n\(profile.profileText)")
+        }
+
+        // 5. Recent Summaries (Layer 2)
+        let summaries = memoryManager.loadRecentSummaries(days: 7)
+        if !summaries.isEmpty {
+            let summaryTexts = summaries.map { "\($0.dateKey): \($0.summaryText)" }
+            parts.append("【近期动态】\n\(summaryTexts.joined(separator: "\n"))")
+        }
+
+        // 6. Conversation Memory (Layer 4)
+        if let memory = memoryManager.loadConversationMemory(),
+           !memory.memorySummary.isEmpty {
+            parts.append("【对话记忆】\n\(memory.memorySummary)")
+        }
+
+        return parts.joined(separator: "\n\n")
+    }
+
     // MARK: - System Prompt
 
     func buildSystemPrompt(

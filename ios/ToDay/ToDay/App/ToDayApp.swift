@@ -6,7 +6,7 @@ import UIKit
 struct ToDayApp: App {
     @StateObject private var viewModel = AppContainer.makeTodayViewModel()
     @StateObject private var echoViewModel = AppContainer.makeEchoViewModel()
-    @StateObject private var echoChatViewModel = AppContainer.makeEchoChatViewModel()
+    @StateObject private var echoMessageManager = AppContainer.getEchoMessageManager()
     @Environment(\.scenePhase) private var scenePhase
     private let locationService = LocationService.shared
     private let echoScheduler = AppContainer.getEchoScheduler()
@@ -16,7 +16,7 @@ struct ToDayApp: App {
             AppRootScreen(
                 todayViewModel: viewModel,
                 echoViewModel: echoViewModel,
-                echoChatViewModel: echoChatViewModel
+                echoMessageManager: echoMessageManager
             )
             .task {
                 _ = locationService

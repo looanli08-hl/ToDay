@@ -9,7 +9,6 @@ import WatchConnectivity
 struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
     @ObservedObject var echoViewModel: EchoViewModel
-    var echoChatViewModel: EchoChatViewModel?
     @ObservedObject private var connectivityManager = PhoneConnectivityManager.shared
     @State private var healthStatus: HKAuthorizationStatus = .notDetermined
     @State private var locationStatus: CLAuthorizationStatus = .notDetermined
@@ -94,8 +93,15 @@ struct SettingsView: View {
                 Section {
                     EchoPersonalityPicker(
                         selection: Binding(
-                            get: { echoChatViewModel?.personality ?? .gentle },
-                            set: { echoChatViewModel?.personality = $0 }
+                            get: {
+                                guard let raw = UserDefaults.standard.string(forKey: "today.echo.personality") else {
+                                    return .gentle
+                                }
+                                return EchoPersonality(rawValue: raw) ?? .gentle
+                            },
+                            set: {
+                                UserDefaults.standard.set($0.rawValue, forKey: "today.echo.personality")
+                            }
                         )
                     )
                 } header: {
