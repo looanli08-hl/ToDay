@@ -22,7 +22,7 @@ struct HealthKitEventInferenceEngine: EventInferring {
         var intervalEvents: [InferredEvent] = []
 
         let highCandidates = buildSleepEvents(from: rawData.sleepSamples, in: dayInterval) +
-            buildWorkoutEvents(from: rawData.workouts, in: dayInterval)
+            buildWorkoutEvents(from: rawData.workouts, heartRateSamples: rawData.heartRateSamples, in: dayInterval)
 
         for candidate in highCandidates.sorted(by: eventSortOrder) {
             for fragment in subtract(candidateInterval(for: candidate), by: occupied) {
@@ -37,6 +37,7 @@ struct HealthKitEventInferenceEngine: EventInferring {
         let mediumCandidates = buildMovementEvents(
             from: rawData.stepSamples,
             heartRateSamples: rawData.heartRateSamples,
+            locationVisits: rawData.locationVisits,
             in: dayInterval,
             excluding: occupied
         )
@@ -55,7 +56,8 @@ struct HealthKitEventInferenceEngine: EventInferring {
         let quietEvents = buildQuietTimeEvents(
             in: dayInterval,
             excluding: occupied,
-            heartRateSamples: rawData.heartRateSamples
+            heartRateSamples: rawData.heartRateSamples,
+            locationVisits: rawData.locationVisits
         )
 
         intervalEvents.append(contentsOf: quietEvents)
@@ -116,20 +118,90 @@ struct HealthKitEventInferenceEngine: EventInferring {
                     stage: sample.stage
                 )
             }
+            let qualityScore = computeSleepQualityScore(stages: sleepStages)
+            let qualityLabel = sleepQualityLabel(score: qualityScore)
+            let baseSubtitle = sleepSubtitle(for: group) ?? ""
+            let subtitle = baseSubtitle.isEmpty
+                ? "睡眠质量 \(qualityScore) 分 · \(qualityLabel)"
+                : "\(baseSubtitle) · 质量 \(qualityScore) 分"
             return InferredEvent(
                 kind: .sleep,
                 startDate: first.interval.start,
                 endDate: last.interval.end,
                 confidence: .high,
                 displayName: "睡眠",
-                subtitle: sleepSubtitle(for: group),
-                associatedMetrics: EventMetrics(sleepStages: sleepStages)
+                subtitle: subtitle,
+                associatedMetrics: EventMetrics(
+                    sleepStages: sleepStages,
+                    sleepQualityScore: qualityScore
+                )
             )
         }
     }
 
-    private func buildWorkoutEvents(from workouts: [WorkoutSample], in dayInterval: DateInterval) -> [InferredEvent] {
-        workouts
+    // MARK: - Sleep Quality Scoring
+
+    /// Score 0-100: deep sleep ratio (40%) + duration target (30%) + continuity (30%).
+    private func computeSleepQualityScore(stages: [SleepStageSegment]) -> Int {
+        guard !stages.isEmpty else { return 0 }
+
+        let durations = Dictionary(grouping: stages, by: \.stage)
+            .mapValues { $0.reduce(0.0) { $0 + $1.end.timeIntervalSince($1.start) } }
+
+        let totalDuration = durations.values.reduce(0, +)
+        guard totalDuration > 0 else { return 0 }
+
+        // 1. Deep sleep ratio (target: 20%+) → 40 points
+        let deepDuration = durations[.deep] ?? 0
+        let deepRatio = deepDuration / totalDuration
+        let deepScore = min(deepRatio / 0.20, 1.0) * 40.0
+
+        // 2. Total duration target (7-9 hours is 100%) → 30 points
+        let hours = totalDuration / 3600
+        let durationScore: Double
+        if hours >= 7 && hours <= 9 {
+            durationScore = 30.0
+        } else if hours >= 6 && hours < 7 {
+            durationScore = 20.0
+        } else if hours >= 5 && hours < 6 {
+            durationScore = 10.0
+        } else if hours > 9 && hours <= 10 {
+            durationScore = 25.0
+        } else {
+            durationScore = 5.0
+        }
+
+        // 3. Continuity: fewer awake interruptions → 30 points
+        let awakeSessions = stages.filter { $0.stage == .awake }.count
+        let continuityScore: Double
+        switch awakeSessions {
+        case 0: continuityScore = 30.0
+        case 1: continuityScore = 25.0
+        case 2: continuityScore = 18.0
+        case 3: continuityScore = 10.0
+        default: continuityScore = 5.0
+        }
+
+        return min(100, max(0, Int((deepScore + durationScore + continuityScore).rounded())))
+    }
+
+    private func sleepQualityLabel(score: Int) -> String {
+        switch score {
+        case 85...100: return "优秀"
+        case 70..<85: return "良好"
+        case 50..<70: return "一般"
+        default: return "待改善"
+        }
+    }
+
+    private func buildWorkoutEvents(
+        from workouts: [WorkoutSample],
+        heartRateSamples: [DateValueSample],
+        in dayInterval: DateInterval
+    ) -> [InferredEvent] {
+        let restingHR = restingHeartRateBaseline(from: heartRateSamples)
+
+        return workouts
             .compactMap { workout -> InferredEvent? in
                 let interval = DateInterval(start: workout.startDate, end: workout.endDate)
                 guard let clipped = interval.intersection(with: dayInterval), clipped.duration > 0 else {
@@ -137,11 +209,24 @@ struct HealthKitEventInferenceEngine: EventInferring {
                 }
 
                 let durationMinutes = max(Int(clipped.duration / 60), 1)
-                let subtitleParts = [
+
+                // Compute workout intensity from heart rate
+                let workoutHR = self.heartRateSamples(
+                    overlapping: clipped,
+                    samples: heartRateSamples
+                )
+                let avgHR = workoutHR.isEmpty ? nil : workoutHR.map(\.value).reduce(0, +) / Double(workoutHR.count)
+                let intensity = computeWorkoutIntensity(averageHR: avgHR, restingHR: restingHR)
+
+                var subtitleParts = [
                     "\(durationMinutes) 分钟",
                     workout.activeEnergy.map { "\(Int($0.rounded())) 千卡" },
                     workout.distance.map { formatDistance($0) }
                 ].compactMap { $0 }
+
+                if let intensity {
+                    subtitleParts.append(intensity.label)
+                }
 
                 return InferredEvent(
                     kind: .workout,
@@ -149,15 +234,32 @@ struct HealthKitEventInferenceEngine: EventInferring {
                     endDate: clipped.end,
                     confidence: .high,
                     displayName: workout.displayName,
-                    subtitle: subtitleParts.isEmpty ? nil : subtitleParts.joined(separator: " · ")
+                    subtitle: subtitleParts.isEmpty ? nil : subtitleParts.joined(separator: " · "),
+                    associatedMetrics: EventMetrics(workoutIntensity: intensity)
                 )
             }
             .sorted(by: eventSortOrder)
     }
 
+    // MARK: - Workout Intensity (Heart Rate Reserve)
+
+    /// Computes intensity using Karvonen formula: intensity% = (avgHR - restingHR) / (maxHR - restingHR).
+    /// Assumes maxHR ≈ 220 - age (defaults to 190 if age unknown).
+    private func computeWorkoutIntensity(averageHR: Double?, restingHR: Double?) -> WorkoutIntensity? {
+        guard let avgHR = averageHR, let restHR = restingHR else { return nil }
+        let estimatedMaxHR: Double = 190 // conservative default
+        let hrr = (avgHR - restHR) / max(estimatedMaxHR - restHR, 1)
+        switch hrr {
+        case ..<0.40: return .light
+        case 0.40..<0.70: return .moderate
+        default: return .high
+        }
+    }
+
     private func buildMovementEvents(
         from stepSamples: [DateValueSample],
         heartRateSamples samples: [DateValueSample],
+        locationVisits: [LocationVisit],
         in dayInterval: DateInterval,
         excluding occupied: [DateInterval]
     ) -> [InferredEvent] {
@@ -228,6 +330,12 @@ struct HealthKitEventInferenceEngine: EventInferring {
             }
             let isHighCadence = cadencePerMinute > 60
 
+            // Detect transport mode from location data
+            let transportMode = detectTransportMode(
+                interval: interval,
+                locationVisits: locationVisits
+            )
+
             let classification: (kind: EventKind, confidence: EventConfidence)? = {
                 if isHighHeartRate, isHighCadence {
                     return (.activeWalk, .high)
@@ -241,6 +349,18 @@ struct HealthKitEventInferenceEngine: EventInferring {
                     return (.activeWalk, .medium)
                 }
 
+                // Use transport mode to classify
+                if let mode = transportMode {
+                    switch mode {
+                    case .driving, .cycling:
+                        return (.commute, .medium)
+                    case .walking:
+                        return (.activeWalk, .medium)
+                    case .stationary:
+                        return nil
+                    }
+                }
+
                 let fallbackKind = classifyMovementEvent(startDate: interval.start, duration: interval.duration)
                 return fallbackKind == .commute || fallbackKind == .activeWalk
                     ? (fallbackKind, .medium)
@@ -250,21 +370,29 @@ struct HealthKitEventInferenceEngine: EventInferring {
             guard let classification else { return nil }
 
             let title: String
-            switch classification.kind {
-            case .commute:
+            switch (classification.kind, transportMode) {
+            case (.commute, .cycling?):
+                title = "骑行通勤"
+            case (.commute, .driving?):
+                title = "驾车/乘车"
+            case (.commute, _):
                 title = "步行通勤"
-            case .activeWalk:
+            case (.activeWalk, _):
                 title = "活跃步行"
-            case .quietTime:
+            case (.quietTime, _):
                 title = quietTimeName(for: interval.start)
             default:
                 title = "活动"
             }
 
-            let subtitleParts = [
+            var subtitleParts = [
                 "\(max(totalSteps, 1)) 步",
                 averageHeartRate.map { "平均 \(Int($0.rounded())) 次/分" }
             ].compactMap { $0 }
+
+            if let mode = transportMode, mode != .stationary {
+                subtitleParts.append(mode.label)
+            }
 
             return InferredEvent(
                 kind: classification.kind,
@@ -272,7 +400,8 @@ struct HealthKitEventInferenceEngine: EventInferring {
                 endDate: interval.end,
                 confidence: classification.confidence,
                 displayName: title,
-                subtitle: subtitleParts.joined(separator: " · ")
+                subtitle: subtitleParts.joined(separator: " · "),
+                associatedMetrics: EventMetrics(transportMode: transportMode)
             )
         }
     }
@@ -280,7 +409,8 @@ struct HealthKitEventInferenceEngine: EventInferring {
     private func buildQuietTimeEvents(
         in dayInterval: DateInterval,
         excluding occupied: [DateInterval],
-        heartRateSamples: [DateValueSample]
+        heartRateSamples: [DateValueSample],
+        locationVisits: [LocationVisit]
     ) -> [InferredEvent] {
         let gaps = complement(of: dayInterval, occupied: occupied)
         let boundaries = quietTimeBoundaries(for: dayInterval.start)
@@ -293,14 +423,14 @@ struct HealthKitEventInferenceEngine: EventInferring {
             for boundary in boundaries where boundary > cursor && boundary < gapEnd {
                 let interval = DateInterval(start: cursor, end: boundary)
                 if interval.duration > 0 {
-                    segments.append(makeQuietEvent(for: interval))
+                    segments.append(makeQuietEvent(for: interval, locationVisits: locationVisits))
                 }
                 cursor = boundary
             }
 
             let finalInterval = DateInterval(start: cursor, end: gapEnd)
             if finalInterval.duration > 0 {
-                segments.append(makeQuietEvent(for: finalInterval))
+                segments.append(makeQuietEvent(for: finalInterval, locationVisits: locationVisits))
             }
 
             return segments
@@ -417,14 +547,59 @@ struct HealthKitEventInferenceEngine: EventInferring {
         return quietEvent
     }
 
-    private func makeQuietEvent(for interval: DateInterval) -> InferredEvent {
-        InferredEvent(
+    private func makeQuietEvent(for interval: DateInterval, locationVisits: [LocationVisit] = []) -> InferredEvent {
+        let category = classifyQuietTime(interval: interval, locationVisits: locationVisits)
+        let displayName = category.label.isEmpty ? quietTimeName(for: interval.start) : category.label
+        let confidence: EventConfidence = category == .unknown ? .low : .medium
+        return InferredEvent(
             kind: .quietTime,
             startDate: interval.start,
             endDate: interval.end,
-            confidence: .low,
-            displayName: quietTimeName(for: interval.start)
+            confidence: confidence,
+            displayName: displayName,
+            associatedMetrics: EventMetrics(quietTimeCategory: category)
         )
+    }
+
+    // MARK: - Smart Quiet Time Classification
+
+    /// Classify quiet time based on time of day + location context.
+    private func classifyQuietTime(interval: DateInterval, locationVisits: [LocationVisit]) -> QuietTimeCategory {
+        let hour = calendar.component(.hour, from: interval.start)
+        let durationMinutes = Int(interval.duration / 60)
+
+        // Check if location changed during this period (= not at same place)
+        let overlappingVisit = locationVisits.first { visit in
+            let visitInterval = DateInterval(start: visit.arrivalDate, end: visit.departureDate)
+            return visitInterval.intersection(with: interval) != nil
+        }
+        let hasLocationContext = overlappingVisit != nil
+
+        // Time-based classification with location hints
+        switch hour {
+        case 5..<8:
+            return .morning
+        case 8..<12:
+            return .work
+        case 12..<14:
+            if durationMinutes <= 90 {
+                return .lunch
+            }
+            return .rest
+        case 14..<18:
+            return .work
+        case 18..<20:
+            // Evening: if at a location with a name (restaurant/café), likely social
+            if let visit = overlappingVisit, let name = visit.placeName,
+               !name.isEmpty {
+                return .socialDining
+            }
+            return .leisure
+        case 20..<23:
+            return .leisure
+        default:
+            return .unknown
+        }
     }
 
     private func averageHeartRate(for event: InferredEvent, heartRateSamples samples: [DateValueSample]) -> Double? {
@@ -447,6 +622,58 @@ struct HealthKitEventInferenceEngine: EventInferring {
         let isCommuteHour = (7..<9).contains(hour) || (17..<19).contains(hour)
         let isCommuteDuration = (15 * 60)...(60 * 60) ~= duration
         return isCommuteHour && isCommuteDuration ? .commute : .activeWalk
+    }
+
+    // MARK: - Transport Mode Detection
+
+    /// Estimate transport mode from location visits overlapping a time interval.
+    /// Uses distance / time to compute speed in km/h.
+    private func detectTransportMode(
+        interval: DateInterval,
+        locationVisits: [LocationVisit]
+    ) -> TransportMode? {
+        // Find visits that overlap or are adjacent to the interval
+        let relevantVisits = locationVisits
+            .filter { visit in
+                let visitInterval = DateInterval(start: visit.arrivalDate, end: visit.departureDate)
+                return visitInterval.intersection(with: interval) != nil ||
+                    abs(visit.departureDate.timeIntervalSince(interval.start)) < 300 ||
+                    abs(visit.arrivalDate.timeIntervalSince(interval.end)) < 300
+            }
+            .sorted { $0.arrivalDate < $1.arrivalDate }
+
+        guard relevantVisits.count >= 2 else { return nil }
+
+        // Calculate distance between first and last visit
+        let first = relevantVisits.first!
+        let last = relevantVisits.last!
+        let distanceMeters = haversineDistance(
+            lat1: first.coordinate.latitude, lon1: first.coordinate.longitude,
+            lat2: last.coordinate.latitude, lon2: last.coordinate.longitude
+        )
+
+        guard distanceMeters > 50 else { return .stationary } // < 50m = no real movement
+
+        let durationHours = max(interval.duration / 3600, 0.01)
+        let speedKmh = (distanceMeters / 1000) / durationHours
+
+        switch speedKmh {
+        case ..<6: return .walking
+        case 6..<25: return .cycling
+        default: return .driving
+        }
+    }
+
+    /// Haversine formula for great-circle distance in meters.
+    private func haversineDistance(lat1: Double, lon1: Double, lat2: Double, lon2: Double) -> Double {
+        let r = 6371000.0 // Earth radius in meters
+        let dLat = (lat2 - lat1) * .pi / 180
+        let dLon = (lon2 - lon1) * .pi / 180
+        let a = sin(dLat / 2) * sin(dLat / 2) +
+            cos(lat1 * .pi / 180) * cos(lat2 * .pi / 180) *
+            sin(dLon / 2) * sin(dLon / 2)
+        let c = 2 * atan2(sqrt(a), sqrt(1 - a))
+        return r * c
     }
 
     private func candidateInterval(for event: InferredEvent) -> DateInterval {

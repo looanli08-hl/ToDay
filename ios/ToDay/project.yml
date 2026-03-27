@@ -29,9 +29,16 @@ targets:
         com.apple.developer.weatherkit: true
         com.apple.security.application-groups:
           - group.com.looanli.today
+    info:
+      path: ToDay/Info.plist
+      properties:
+        BGTaskSchedulerPermittedIdentifiers:
+          - com.looanli.today.refresh
+          - com.looanli.today.processing
     settings:
       base:
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        INFOPLIST_KEY_UIBackgroundModes: "fetch processing"
         DEVELOPMENT_ASSET_PATHS: "\"ToDay/Preview Content\""
         ENABLE_PREVIEWS: YES
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.lifestyle

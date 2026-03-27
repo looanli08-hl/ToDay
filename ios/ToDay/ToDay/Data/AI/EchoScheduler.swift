@@ -1,4 +1,5 @@
 import Foundation
+import SwiftData
 
 /// Manages auto-generation timing for Echo's background AI tasks.
 ///
@@ -87,6 +88,14 @@ final class EchoScheduler: @unchecked Sendable {
     ) async {
         guard shouldGenerateDailySummary() && isAfterDailySummaryHour() else { return }
 
+        // If no summary was passed, try to load from persisted timeline
+        let effectiveSummary: String
+        if todayDataSummary.isEmpty {
+            effectiveSummary = loadTodayTimelineSummary()
+        } else {
+            effectiveSummary = todayDataSummary
+        }
+
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
         let todayKey = formatter.string(from: Date())
@@ -94,7 +103,7 @@ final class EchoScheduler: @unchecked Sendable {
         do {
             try await dailySummaryGenerator.generateDailySummary(
                 dateKey: todayKey,
-                todayDataSummary: todayDataSummary,
+                todayDataSummary: effectiveSummary,
                 shutterTexts: shutterTexts,
                 moodNotes: moodNotes
             )
@@ -130,6 +139,31 @@ final class EchoScheduler: @unchecked Sendable {
         } catch {
             print("[EchoScheduler] Daily summary generation failed: \(error)")
         }
+    }
+
+    // MARK: - Timeline Data Loading
+
+    /// Load today's persisted timeline and format as text summary for Echo.
+    private func loadTodayTimelineSummary() -> String {
+        let context = ModelContext(AppContainer.modelContainer)
+        let today = Calendar.current.startOfDay(for: Date())
+        let key = DayTimelineEntity.dateKey(for: today)
+        var descriptor = FetchDescriptor<DayTimelineEntity>(predicate: #Predicate { $0.dateKey == key })
+        descriptor.fetchLimit = 1
+
+        guard let entity = try? context.fetch(descriptor).first else { return "" }
+        let timeline = entity.toDayTimeline()
+
+        return timeline.entries
+            .filter { $0.kind != .mood }
+            .map { event in
+                var line = "\(event.kindBadgeTitle): \(event.resolvedName) (\(event.scrollDurationText))"
+                if let subtitle = event.subtitle {
+                    line += " - \(subtitle)"
+                }
+                return line
+            }
+            .joined(separator: "\n")
     }
 
     // MARK: - Weekly Profile

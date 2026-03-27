@@ -236,6 +236,66 @@ struct EventMetrics: Codable, Hashable, Sendable {
     var activeEnergy: Double?
     var distance: Double?
     var workoutType: String?
+    /// Sleep quality score (0-100). Deep sleep ratio × 40 + duration target × 30 + continuity × 30.
+    var sleepQualityScore: Int?
+    /// Workout intensity level based on heart rate reserve.
+    var workoutIntensity: WorkoutIntensity?
+    /// Detected transport mode for movement events.
+    var transportMode: TransportMode?
+    /// Smart classification for quiet time events.
+    var quietTimeCategory: QuietTimeCategory?
+}
+
+enum WorkoutIntensity: String, Codable, Hashable, Sendable {
+    case light    // < 40% HRR
+    case moderate // 40-70% HRR
+    case high     // > 70% HRR
+
+    var label: String {
+        switch self {
+        case .light: return "轻度"
+        case .moderate: return "中等"
+        case .high: return "高强度"
+        }
+    }
+}
+
+enum TransportMode: String, Codable, Hashable, Sendable {
+    case walking    // < 6 km/h
+    case cycling    // 6-25 km/h
+    case driving    // > 25 km/h
+    case stationary // no significant movement
+
+    var label: String {
+        switch self {
+        case .walking: return "步行"
+        case .cycling: return "骑行"
+        case .driving: return "驾车/公交"
+        case .stationary: return "原地"
+        }
+    }
+}
+
+enum QuietTimeCategory: String, Codable, Hashable, Sendable {
+    case work
+    case lunch
+    case rest
+    case leisure
+    case socialDining
+    case morning
+    case unknown
+
+    var label: String {
+        switch self {
+        case .work: return "工作"
+        case .lunch: return "午餐"
+        case .rest: return "午休"
+        case .leisure: return "休闲"
+        case .socialDining: return "社交/用餐"
+        case .morning: return "晨间"
+        case .unknown: return "安静时光"
+        }
+    }
 }
 
 struct InferredEvent: Codable, Identifiable, Hashable, Sendable {

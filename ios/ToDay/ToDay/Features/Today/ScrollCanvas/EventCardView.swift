@@ -312,13 +312,23 @@ extension InferredEvent {
     }
 
     var compactDetailLine: String? {
-        let parts = [
+        var parts = [
             cardSubtitle,
             associatedMetrics?.location?.placeName,
             associatedMetrics?.weather?.compactDetailText
         ]
         .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
         .filter { !$0.isEmpty }
+
+        // Add workout intensity badge
+        if let intensity = associatedMetrics?.workoutIntensity {
+            parts.insert(intensity.label, at: 0)
+        }
+
+        // Add sleep quality score
+        if let score = associatedMetrics?.sleepQualityScore {
+            parts.insert("质量 \(score)分", at: 0)
+        }
 
         return parts.isEmpty ? nil : parts.joined(separator: " · ")
     }

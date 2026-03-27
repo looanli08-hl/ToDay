@@ -10,6 +10,11 @@ struct ToDayApp: App {
     @Environment(\.scenePhase) private var scenePhase
     private let locationService = LocationService.shared
     private let echoScheduler = AppContainer.getEchoScheduler()
+    private let backgroundTaskManager = BackgroundTaskManager.shared
+
+    init() {
+        backgroundTaskManager.registerTasks()
+    }
 
     var body: some Scene {
         WindowGroup {
@@ -20,18 +25,32 @@ struct ToDayApp: App {
             )
             .task {
                 _ = locationService
-                // Weekly profile check on launch
                 await echoScheduler.onAppLaunch()
             }
             .onChange(of: scenePhase) { _, newPhase in
-                if newPhase == .background {
+                switch newPhase {
+                case .background:
+                    // Schedule background timeline generation
+                    backgroundTaskManager.scheduleAppRefresh()
+                    backgroundTaskManager.scheduleProcessing()
+                    // Update today's event count for the recording indicator
+                    if let count = viewModel.timeline?.entries.count {
+                        BackgroundTaskManager.updateTodayEventCount(count)
+                    }
                     Task {
                         await echoScheduler.onAppBackground(
-                            todayDataSummary: "",
-                            shutterTexts: [],
-                            moodNotes: []
+                            todayDataSummary: viewModel.timelineDataSummary,
+                            shutterTexts: viewModel.todayShutterTexts,
+                            moodNotes: viewModel.todayMoodNotes
                         )
                     }
+                case .active:
+                    // Refresh timeline when coming back to foreground
+                    Task {
+                        await viewModel.load(forceReload: true)
+                    }
+                default:
+                    break
                 }
             }
         }

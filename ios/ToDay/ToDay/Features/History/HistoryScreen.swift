@@ -8,6 +8,7 @@ struct HistoryScreen: View {
     @State private var selectedTimeline: DayTimeline?
     @State private var isLoadingSelectedDay = false
     @State private var selectedEvent: InferredEvent?
+    @State private var annotatingEvent: InferredEvent?
     @State private var visibleMonth: Date = {
         let cal = Calendar.current
         return cal.date(from: cal.dateComponents([.year, .month], from: Date())) ?? cal.startOfDay(for: Date())
@@ -19,6 +20,9 @@ struct HistoryScreen: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
+                // 0. Recording status indicator
+                recordingStatusBar
+
                 // 1. Date strip (sticky at top)
                 dateStripSection
 
@@ -40,9 +44,88 @@ struct HistoryScreen: View {
                     selectedEvent = nil
                 }
             }
+            .sheet(item: $annotatingEvent) { event in
+                EventAnnotationSheet(event: event) { title in
+                    viewModel.annotateEvent(event, title: title)
+                    annotatingEvent = nil
+                    // Reload the selected day to reflect annotation
+                    Task { await loadSelectedDay() }
+                }
+                .presentationDetents([.medium, .large])
+            }
             .task(id: selectedDate) {
                 await loadSelectedDay()
             }
+        }
+    }
+
+    // MARK: - Recording Status
+
+    @State private var pulseAnimation = false
+
+    private var recordingStatusBar: some View {
+        let isToday = calendar.isDateInToday(selectedDate)
+        let eventCount = viewModel.timeline?.entries.filter { $0.kind != .mood }.count ?? 0
+        let lastRecorded = BackgroundTaskManager.lastRecordedDate
+
+        return HStack(spacing: 10) {
+            // Pulse dot
+            Circle()
+                .fill(Color.green)
+                .frame(width: 8, height: 8)
+                .scaleEffect(pulseAnimation ? 1.3 : 1.0)
+                .opacity(pulseAnimation ? 0.6 : 1.0)
+                .animation(
+                    .easeInOut(duration: 1.5).repeatForever(autoreverses: true),
+                    value: pulseAnimation
+                )
+
+            if isToday {
+                Text("正在记录")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(.green)
+
+                Text("·")
+                    .foregroundStyle(.tertiary)
+
+                Text("今天已记录 \(eventCount) 个时刻")
+                    .font(.system(size: 12))
+                    .foregroundStyle(.secondary)
+            } else if let lastRecorded {
+                Text("自动记录中")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(.green)
+
+                Text("·")
+                    .foregroundStyle(.tertiary)
+
+                Text("上次记录 \(relativeTimeText(from: lastRecorded))")
+                    .font(.system(size: 12))
+                    .foregroundStyle(.secondary)
+            } else {
+                Text("等待首次记录")
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(.secondary)
+            }
+
+            Spacer()
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 8)
+        .background(AppColor.surface)
+        .onAppear { pulseAnimation = true }
+    }
+
+    private func relativeTimeText(from date: Date) -> String {
+        let interval = Date().timeIntervalSince(date)
+        if interval < 60 {
+            return "刚刚"
+        } else if interval < 3600 {
+            return "\(Int(interval / 60)) 分钟前"
+        } else if interval < 86400 {
+            return "\(Int(interval / 3600)) 小时前"
+        } else {
+            return "\(Int(interval / 86400)) 天前"
         }
     }
 
@@ -148,7 +231,9 @@ struct HistoryScreen: View {
                     onEventTap: { event in
                         selectedEvent = event
                     },
-                    onBlankTap: { _ in },
+                    onBlankTap: { event in
+                        annotatingEvent = event
+                    },
                     showsCurrentTimeNeedle: calendar.isDateInToday(selectedDate)
                 )
                 .padding(.horizontal, 20)

@@ -478,6 +478,35 @@ final class TodayViewModel: ObservableObject {
         rebuildTimeline(referenceDate: currentBaseTimeline?.date ?? Date())
     }
 
+    // MARK: - Data Summaries (for Echo / Background)
+
+    /// Formatted summary of today's timeline for Echo prompts.
+    var timelineDataSummary: String {
+        guard let timeline else { return "" }
+        let events = timeline.entries.filter { $0.kind != .mood && $0.kind != .shutter }
+        if events.isEmpty { return "" }
+        return events.map { "\($0.kindBadgeTitle): \($0.resolvedName) (\($0.scrollDurationText))" }
+            .joined(separator: "\n")
+    }
+
+    /// Today's shutter record texts for Echo context.
+    var todayShutterTexts: [String] {
+        let date = currentBaseTimeline?.date ?? Date()
+        return shutterManager.records(on: date).compactMap { record in
+            let content = record.textContent ?? record.voiceTranscript ?? ""
+            return content.isEmpty ? nil : content
+        }
+    }
+
+    /// Today's mood notes for Echo context.
+    var todayMoodNotes: [String] {
+        let date = currentBaseTimeline?.date ?? Date()
+        return recordManager.records(on: date).compactMap { record in
+            let note = record.note.trimmingCharacters(in: .whitespacesAndNewlines)
+            return note.isEmpty ? "\(record.mood.rawValue)" : "\(record.mood.rawValue): \(note)"
+        }
+    }
+
     // MARK: - Formatters
 
     static let clockFormatter: DateFormatter = {

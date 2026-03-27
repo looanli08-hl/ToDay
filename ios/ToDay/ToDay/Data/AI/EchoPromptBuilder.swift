@@ -1,4 +1,5 @@
 import Foundation
+import SwiftData
 
 /// Assembles the full prompt sent to an AI provider by combining:
 /// - Personality template (system prompt prefix)
@@ -159,6 +160,12 @@ final class EchoPromptBuilder: @unchecked Sendable {
             parts.append("【近期动态】\n\(summaryTexts.joined(separator: "\n"))")
         }
 
+        // 3.5. Historical timeline data from persistence
+        let timelineHistory = loadRecentTimelineSummaries(days: 7)
+        if !timelineHistory.isEmpty {
+            parts.append("【近期生活时间线】\n\(timelineHistory)")
+        }
+
         // 4. Conversation Memory (Layer 4)
         if let memory = memoryManager.loadConversationMemory(),
            !memory.memorySummary.isEmpty {
@@ -171,6 +178,39 @@ final class EchoPromptBuilder: @unchecked Sendable {
         }
 
         return parts.joined(separator: "\n\n")
+    }
+
+    // MARK: - Historical Timeline Loading
+
+    /// Load recent days' timeline summaries from SwiftData persistence.
+    private func loadRecentTimelineSummaries(days: Int) -> String {
+        let context = ModelContext(AppContainer.modelContainer)
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+
+        var summaries: [String] = []
+
+        for offset in 1...days {
+            guard let date = calendar.date(byAdding: .day, value: -offset, to: today) else { continue }
+            let key = DayTimelineEntity.dateKey(for: date)
+            var descriptor = FetchDescriptor<DayTimelineEntity>(predicate: #Predicate { $0.dateKey == key })
+            descriptor.fetchLimit = 1
+
+            guard let entity = try? context.fetch(descriptor).first else { continue }
+            let timeline = entity.toDayTimeline()
+            let eventSummary = timeline.entries
+                .filter { $0.kind != .mood }
+                .map { "\($0.kindBadgeTitle) \($0.resolvedName) (\($0.scrollDurationText))" }
+                .joined(separator: ", ")
+
+            if !eventSummary.isEmpty {
+                let formatter = DateFormatter()
+                formatter.dateFormat = "M月d日"
+                summaries.append("\(formatter.string(from: date)): \(eventSummary)")
+            }
+        }
+
+        return summaries.joined(separator: "\n")
     }
 
     // MARK: - Daily Summary Prompt
