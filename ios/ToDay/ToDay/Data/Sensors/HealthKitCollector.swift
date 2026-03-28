@@ -75,3 +75,37 @@ final class HealthKitCollector: SensorCollecting, @unchecked Sendable {
         return try await descriptor.result(for: healthStore)
     }
 }
+
+// MARK: - HealthAuthorizationGate
+
+actor HealthAuthorizationGate {
+    private enum State {
+        case idle
+        case inFlight(Task<Void, Error>)
+        case authorized
+    }
+
+    private var state: State = .idle
+
+    func authorizeIfNeeded(_ operation: @escaping @Sendable () async throws -> Void) async throws {
+        switch state {
+        case .authorized:
+            return
+        case let .inFlight(task):
+            try await task.value
+        case .idle:
+            let task = Task {
+                try await operation()
+            }
+            state = .inFlight(task)
+
+            do {
+                try await task.value
+                state = .authorized
+            } catch {
+                state = .idle
+                throw error
+            }
+        }
+    }
+}
