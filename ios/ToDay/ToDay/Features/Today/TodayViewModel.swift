@@ -105,11 +105,11 @@ final class TodayViewModel: ObservableObject {
         do {
             let base = try await loadBaseTimeline(for: Date(), forceReload: forceReload)
             currentBaseTimeline = base
-            rebuildTimeline(referenceDate: base.date)
-            hasLoadedOnce = true
         } catch {
-            errorMessage = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+            // HealthKit unavailable — still show mood/shutter records
         }
+        rebuildTimeline(referenceDate: currentBaseTimeline?.date ?? Date())
+        hasLoadedOnce = true
 
         isLoading = false
     }
@@ -294,12 +294,16 @@ final class TodayViewModel: ObservableObject {
     }
 
     func loadTimeline(for date: Date, forceReload: Bool = false) async -> DayTimeline? {
+        let day = calendar.startOfDay(for: date)
+        let base: DayTimeline
         do {
-            let base = try await loadBaseTimeline(for: calendar.startOfDay(for: date), forceReload: forceReload)
-            return mergedTimeline(base: base)
+            base = try await loadBaseTimeline(for: day, forceReload: forceReload)
         } catch {
-            return nil
+            // HealthKit unavailable (no Apple Watch etc.) — use empty base
+            // so mood/shutter/annotation records still appear on the timeline.
+            base = DayTimeline(date: day, summary: "", source: .healthKit, stats: [], entries: [])
         }
+        return mergedTimeline(base: base)
     }
 
     func loadTimelines(for dates: [Date], forceReload: Bool = false) async -> [DayTimeline] {
@@ -369,13 +373,9 @@ final class TodayViewModel: ObservableObject {
     }
 
     private func rebuildTimeline(referenceDate: Date) {
-        if let currentBaseTimeline {
-            timeline = mergedTimeline(base: currentBaseTimeline)
-            refreshDerivedState(referenceDate: currentBaseTimeline.date)
-        } else {
-            timeline = nil
-            refreshDerivedState(referenceDate: referenceDate)
-        }
+        let base = currentBaseTimeline ?? DayTimeline(date: calendar.startOfDay(for: referenceDate), summary: "", source: .healthKit, stats: [], entries: [])
+        timeline = mergedTimeline(base: base)
+        refreshDerivedState(referenceDate: base.date)
 
         #if os(iOS)
         let records = recordManager.records(on: referenceDate)

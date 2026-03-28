@@ -69,25 +69,13 @@ struct SettingsView: View {
                     HStack {
                         Text("DeepSeek API Key")
                         Spacer()
-                        if UserDefaults.standard.string(forKey: "today.echo.deepseekAPIKey")?.isEmpty == false {
-                            Text("已配置")
-                                .foregroundStyle(.green)
-                        } else {
-                            Text("未配置")
-                                .foregroundStyle(.secondary)
-                        }
+                        Text("已配置")
+                            .foregroundStyle(.green)
                     }
-
-                    SecureField("sk-...", text: Binding(
-                        get: { UserDefaults.standard.string(forKey: "today.echo.deepseekAPIKey") ?? "" },
-                        set: { UserDefaults.standard.set($0, forKey: "today.echo.deepseekAPIKey") }
-                    ))
-                    .textContentType(.password)
-                    .autocorrectionDisabled()
                 } header: {
                     Text("AI 服务")
                 } footer: {
-                    Text("配置 DeepSeek API Key 后，Echo 将使用 AI 进行对话和分析。免费用户可使用 Apple 本地模型。")
+                    Text("Echo 使用 DeepSeek AI 进行对话和分析。")
                 }
 
                 Section {

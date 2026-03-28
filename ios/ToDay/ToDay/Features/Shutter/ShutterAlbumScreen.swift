@@ -5,6 +5,8 @@ struct ShutterAlbumScreen: View {
 
     @State private var selectedFilter: ShutterFilter = .all
     @State private var selectedGroup: String? = nil // nil = 全部分组
+    @State private var showNewGroupAlert = false
+    @State private var newGroupName = ""
 
     enum ShutterFilter: String, CaseIterable {
         case all = "全部"
@@ -57,9 +59,7 @@ struct ShutterAlbumScreen: View {
         NavigationStack {
             VStack(spacing: 0) {
                 filterChips
-                if !availableGroups.isEmpty {
-                    groupChips
-                }
+                groupChips
                 Divider()
                 ScrollView {
                     if filteredRecords.isEmpty {
@@ -162,11 +162,35 @@ struct ShutterAlbumScreen: View {
                     }
                     .buttonStyle(.plain)
                 }
+
+                // "+" 新建分组
+                Button {
+                    newGroupName = ""
+                    showNewGroupAlert = true
+                } label: {
+                    Image(systemName: "plus")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(AppColor.labelSecondary)
+                        .frame(width: 28, height: 28)
+                        .background(AppColor.surfaceElevated)
+                        .clipShape(Circle())
+                }
+                .buttonStyle(.plain)
             }
             .padding(.horizontal, AppSpacing.md)
         }
         .padding(.vertical, 6)
         .background(AppColor.surface)
+        .alert("新建分组", isPresented: $showNewGroupAlert) {
+            TextField("分组名称", text: $newGroupName)
+            Button("取消", role: .cancel) { }
+            Button("创建") {
+                let name = newGroupName.trimmingCharacters(in: .whitespacesAndNewlines)
+                if !name.isEmpty {
+                    viewModel.addShutterGroup(name)
+                }
+            }
+        }
     }
 
     // MARK: - Record Cards
