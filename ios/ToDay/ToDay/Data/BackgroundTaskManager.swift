@@ -1,6 +1,5 @@
 import BackgroundTasks
 import Foundation
-import HealthKit
 import SwiftData
 
 /// Manages background timeline generation using BGTaskScheduler.
@@ -105,11 +104,9 @@ final class BackgroundTaskManager {
 
     // MARK: - Timeline Generation
 
-    /// Generate today's timeline from HealthKit and persist it.
+    /// Generate today's timeline and persist it.
     private func generateTodayTimeline() async {
-        guard HKHealthStore.isHealthDataAvailable() else { return }
-
-        let provider = HealthKitTimelineDataProvider()
+        let provider = AppContainer.makeTimelineProvider()
         let today = calendar.startOfDay(for: Date())
 
         do {
@@ -124,9 +121,7 @@ final class BackgroundTaskManager {
 
     /// Backfill any missing timelines for the past 7 days.
     private func backfillRecentTimelines() async {
-        guard HKHealthStore.isHealthDataAvailable() else { return }
-
-        let provider = HealthKitTimelineDataProvider()
+        let provider = AppContainer.makeTimelineProvider()
         let today = calendar.startOfDay(for: Date())
 
         for offset in 1...7 {
@@ -145,6 +140,11 @@ final class BackgroundTaskManager {
             } catch {
                 print("[BGTask] Failed to backfill \(DayTimelineEntity.dateKey(for: date)): \(error)")
             }
+        }
+
+        // Purge old sensor readings (keep 30 days)
+        try? await MainActor.run {
+            try AppContainer.getSensorDataStore().purge(olderThan: 30)
         }
     }
 

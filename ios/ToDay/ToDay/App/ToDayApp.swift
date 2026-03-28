@@ -8,7 +8,6 @@ struct ToDayApp: App {
     @StateObject private var echoViewModel = AppContainer.makeEchoViewModel()
     @StateObject private var echoMessageManager = AppContainer.getEchoMessageManager()
     @Environment(\.scenePhase) private var scenePhase
-    private let locationService = LocationService.shared
     private let echoScheduler = AppContainer.getEchoScheduler()
     private let backgroundTaskManager = BackgroundTaskManager.shared
 
@@ -24,7 +23,8 @@ struct ToDayApp: App {
                 echoMessageManager: echoMessageManager
             )
             .task {
-                _ = locationService
+                AppContainer.getDeviceStateCollector().startMonitoring()
+                AppContainer.getLocationCollector().startMonitoring()
                 await echoScheduler.onAppLaunch()
             }
             .onChange(of: scenePhase) { _, newPhase in
