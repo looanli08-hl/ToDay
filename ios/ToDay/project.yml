@@ -8,7 +8,7 @@ settings:
     DEVELOPMENT_TEAM: G89F57S8M3
     CODE_SIGN_STYLE: Automatic
     SWIFT_VERSION: 5.0
-    CURRENT_PROJECT_VERSION: "4"
+    CURRENT_PROJECT_VERSION: "5"
     MARKETING_VERSION: "0.4.0"
     GENERATE_INFOPLIST_FILE: YES
     INFOPLIST_KEY_CFBundleDisplayName: ToDay
@@ -48,6 +48,7 @@ targets:
         INFOPLIST_KEY_NSCameraUsageDescription: ToDay 使用相机拍摄照片和视频，快速记录生活碎片。媒体文件仅存储在本地。
         INFOPLIST_KEY_NSMicrophoneUsageDescription: ToDay 使用麦克风录制语音备忘，帮你用最少的操作捕捉灵感。录音仅存储在本地。
         INFOPLIST_KEY_NSSpeechRecognitionUsageDescription: ToDay 使用语音识别将你的录音转为文字，方便在时间线上快速浏览。识别在设备上完成。
+        ITSAppUsesNonExemptEncryption: false
         INFOPLIST_KEY_NSHealthUpdateUsageDescription: ToDay 不会写入任何健康数据，此权限仅用于满足系统要求。
         INFOPLIST_KEY_NSMotionUsageDescription: "用于识别你的运动状态（步行、跑步、骑车等），自动记录你的活动"
         INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription: "用于自动记录你的位置变化和常去地点，即使 App 在后台也能记录"
