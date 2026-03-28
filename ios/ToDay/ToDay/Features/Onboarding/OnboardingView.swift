@@ -1,3 +1,4 @@
+import CoreLocation
 import HealthKit
 import SwiftUI
 
@@ -132,6 +133,7 @@ struct OnboardingView: View {
             try? await store.requestAuthorization(toShare: [], read: types)
         }
 
-        _ = await LocationService.shared.requestAuthorization()
+        let locationManager = CLLocationManager()
+        locationManager.requestAlwaysAuthorization()
     }
 }

@@ -14,6 +14,9 @@ final class DeepSeekAIProvider: EchoAIProviding, @unchecked Sendable {
     /// UserDefaults key where the user's DeepSeek API key is stored.
     static let apiKeyDefaultsKey = "today.echo.deepseekAPIKey"
 
+    /// Built-in default API key so users don't need to configure it.
+    private static let defaultAPIKey = "sk-94d311f460e54b4cac9c216ed8d5af36"
+
     init(session: URLSession = .shared) {
         self.session = session
     }
@@ -21,7 +24,9 @@ final class DeepSeekAIProvider: EchoAIProviding, @unchecked Sendable {
     // MARK: - API Key
 
     var apiKey: String? {
-        UserDefaults.standard.string(forKey: Self.apiKeyDefaultsKey)
+        let stored = UserDefaults.standard.string(forKey: Self.apiKeyDefaultsKey)
+        if let stored, !stored.isEmpty { return stored }
+        return Self.defaultAPIKey
     }
 
     // MARK: - EchoAIProviding

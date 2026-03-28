@@ -49,62 +49,9 @@ targets:
         INFOPLIST_KEY_NSMicrophoneUsageDescription: ToDay 使用麦克风录制语音备忘，帮你用最少的操作捕捉灵感。录音仅存储在本地。
         INFOPLIST_KEY_NSSpeechRecognitionUsageDescription: ToDay 使用语音识别将你的录音转为文字，方便在时间线上快速浏览。识别在设备上完成。
         INFOPLIST_KEY_NSHealthUpdateUsageDescription: ToDay 不会写入任何健康数据，此权限仅用于满足系统要求。
+        INFOPLIST_KEY_NSMotionUsageDescription: "用于识别你的运动状态（步行、跑步、骑车等），自动记录你的活动"
+        INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription: "用于自动记录你的位置变化和常去地点，即使 App 在后台也能记录"
         INFOPLIST_KEY_UISupportedInterfaceOrientations: "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
-  ToDayWatch:
-    type: application
-    platform: watchOS
-    deploymentTarget: "10.0"
-    sources:
-      - path: ToDayWatch
-        excludes:
-          - Complication/**
-      - path: ToDay/Shared
-      - path: ToDay/Data/HealthKitEventInferenceEngine.swift
-    info:
-      path: ToDayWatch/Info.plist
-      properties:
-        CFBundleDisplayName: ToDay Watch
-        NSHealthShareUsageDescription: ToDay 读取手表上的运动、心率和睡眠数据，用来补全每日生活画卷。所有数据仅存储在本地。
-        WKApplication: true
-        WKCompanionAppBundleIdentifier: com.looanli.today
-    entitlements:
-      path: ToDayWatch/ToDayWatch.entitlements
-      properties:
-        com.apple.developer.healthkit: true
-        com.apple.security.application-groups:
-          - group.com.looanli.today
-    dependencies:
-      - target: ToDayWatchWidgets
-        embed: true
-    settings:
-      base:
-        PRODUCT_NAME: ToDayWatch
-        PRODUCT_BUNDLE_IDENTIFIER: com.looanli.today.watchkitapp
-        TARGETED_DEVICE_FAMILY: 4
-  ToDayWatchWidgets:
-    type: app-extension
-    platform: watchOS
-    deploymentTarget: "10.0"
-    sources:
-      - path: ToDayWatch/Complication
-      - path: ToDay/Shared
-    info:
-      path: ToDayWatch/Complication/Info.plist
-      properties:
-        CFBundleDisplayName: ToDay Widgets
-        NSExtension:
-          NSExtensionPointIdentifier: com.apple.widgetkit-extension
-    entitlements:
-      path: ToDayWatch/Complication/ToDayWatchWidgets.entitlements
-      properties:
-        com.apple.security.application-groups:
-          - group.com.looanli.today
-    settings:
-      base:
-        PRODUCT_NAME: ToDayWatchWidgets
-        PRODUCT_BUNDLE_IDENTIFIER: com.looanli.today.watchkitapp.widgets
-        TARGETED_DEVICE_FAMILY: 4
-        SKIP_INSTALL: YES
   ToDayTests:
     type: bundle.unit-test
     platform: iOS
@@ -127,15 +74,6 @@ schemes:
       config: Debug
       targets:
         - ToDayTests
-    run:
-      config: Debug
-    archive:
-      config: Release
-  ToDayWatch:
-    build:
-      targets:
-        ToDayWatch: all
-        ToDayWatchWidgets: all
     run:
       config: Debug
     archive:

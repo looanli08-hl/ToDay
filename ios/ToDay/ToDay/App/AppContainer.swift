@@ -13,6 +13,12 @@ enum AppContainer {
     private static let spendingRecordStore = SwiftDataSpendingRecordStore(container: modelContainer)
     private static let screenTimeRecordStore = SwiftDataScreenTimeRecordStore(container: modelContainer)
     private static let echoItemStore = SwiftDataEchoItemStore(container: modelContainer)
+    // MARK: - Sensor Infrastructure
+    private static let sensorDataStore = SensorDataStore(container: modelContainer)
+    private static let placeManager = PlaceManager()
+    private static let phoneInferenceEngine = PhoneInferenceEngine()
+    private static let deviceStateCollector = DeviceStateCollector(store: sensorDataStore)
+    private static let locationCollector = LocationCollector(store: sensorDataStore)
     // MARK: - Echo AI Infrastructure
     private static let echoAIService = EchoAIService()
     private static let echoMemoryManager = EchoMemoryManager(container: modelContainer)
@@ -53,6 +59,24 @@ enum AppContainer {
         return viewModel
     }
 
+    static func availableCollectors() -> [any SensorCollecting] {
+        var collectors: [any SensorCollecting] = [
+            MotionCollector(),
+            PedometerCollector(),
+            deviceStateCollector,
+            locationCollector,
+        ]
+        let hkCollector = HealthKitCollector()
+        if hkCollector.isAvailable {
+            collectors.append(hkCollector)
+        }
+        return collectors
+    }
+
+    static func getDeviceStateCollector() -> DeviceStateCollector { deviceStateCollector }
+    static func getLocationCollector() -> LocationCollector { locationCollector }
+    static func getSensorDataStore() -> SensorDataStore { sensorDataStore }
+
     static func makeTimelineProvider() -> any TimelineDataProviding {
         let environment = ProcessInfo.processInfo.environment
         if environment["TODAY_USE_MOCK"] == "1" {
@@ -62,10 +86,12 @@ enum AppContainer {
         #if targetEnvironment(simulator)
         return MockTimelineDataProvider()
         #else
-        if HKHealthStore.isHealthDataAvailable() {
-            return HealthKitTimelineDataProvider()
-        }
-        return MockTimelineDataProvider()
+        return PhoneTimelineDataProvider(
+            collectors: availableCollectors(),
+            store: sensorDataStore,
+            inferenceEngine: phoneInferenceEngine,
+            placeManager: placeManager
+        )
         #endif
     }
 
@@ -182,7 +208,8 @@ enum AppContainer {
                 ConversationMemoryEntity.self,
                 EchoChatSessionEntity.self,
                 EchoChatMessageEntity.self,
-                EchoMessageEntity.self
+                EchoMessageEntity.self,
+                SensorReadingEntity.self
             )
             migrateLegacyMoodRecordsIfNeeded(into: container)
             return container

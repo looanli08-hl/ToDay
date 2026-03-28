@@ -201,6 +201,8 @@ struct TodayInsightComposer {
                         return "模拟轨迹"
                     case .healthKit:
                         return "生活轨迹"
+                    case .phone:
+                        return "生活轨迹"
                     }
                 }()
                 let detailParts = [
