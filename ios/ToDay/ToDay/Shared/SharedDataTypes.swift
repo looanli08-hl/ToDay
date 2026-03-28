@@ -431,6 +431,7 @@ struct DayTimeline: Codable, Sendable {
 enum TimelineSource: String, Codable, Sendable {
     case mock
     case healthKit
+    case phone
 
     var badgeTitle: String {
         switch self {
@@ -438,6 +439,8 @@ enum TimelineSource: String, Codable, Sendable {
             return "模拟"
         case .healthKit:
             return "HealthKit"
+        case .phone:
+            return "手机"
         }
     }
 
@@ -447,6 +450,8 @@ enum TimelineSource: String, Codable, Sendable {
             return "当前是模拟模式，适合先把记录、回看和付费路径做顺。"
         case .healthKit:
             return "正在读取这台设备上的 HealthKit 数据。"
+        case .phone:
+            return "正在从手机传感器实时感知你的一天。"
         }
     }
 }
