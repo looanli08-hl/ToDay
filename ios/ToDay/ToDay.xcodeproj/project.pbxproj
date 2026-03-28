@@ -50,7 +50,6 @@
 		374BB5B8024D43DEEB781C2D /* EchoDailySummaryGeneratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F90D7BD80D380B9E483FF65 /* EchoDailySummaryGeneratorTests.swift */; };
 		3EDD590CF25E429FB8186758 /* ToDayApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCCD453022FB7D3DE28EDE60 /* ToDayApp.swift */; };
 		3FD248DEB5BDF808804ABA6C /* PhotoService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A50CAC68CF65C166C6C84DED /* PhotoService.swift */; };
-		4250A250313DBA68A83F130E /* WeatherService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE6AEF94FAE90C7F469449EE /* WeatherService.swift */; };
 		42E9331811E33CBD40E88723 /* DayTimelineEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED5E4D5563AC71A0747FEA41 /* DayTimelineEntity.swift */; };
 		44823975A98302AEB5069E00 /* HistoryScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = E41D5FDB97C97E39345EF797 /* HistoryScreen.swift */; };
 		4489F5BA8EE15449F8F1C9DE /* SensorCollecting.swift in Sources */ = {isa = PBXBuildFile; fileRef = E55BD79449543E2EDA158B48 /* SensorCollecting.swift */; };
@@ -264,7 +263,6 @@
 		A50CAC68CF65C166C6C84DED /* PhotoService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoService.swift; sourceTree = "<group>"; };
 		A85359B05BB8B7D012EB8DB8 /* EchoMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoMessage.swift; sourceTree = "<group>"; };
 		AD8F9694BC13B76959CA8639 /* ToDay.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ToDay.entitlements; sourceTree = "<group>"; };
-		AE6AEF94FAE90C7F469449EE /* WeatherService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherService.swift; sourceTree = "<group>"; };
 		AEC64CECC175AC21CE8B9ACC /* EchoMemoryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoMemoryManager.swift; sourceTree = "<group>"; };
 		AEDA481460C51058C7DB4FE2 /* PedometerCollector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PedometerCollector.swift; sourceTree = "<group>"; };
 		B200FA9169D89E482820B450 /* LocationCollectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationCollectorTests.swift; sourceTree = "<group>"; };
@@ -572,7 +570,6 @@
 				489A58FAAD7209D2A6CEEF74 /* SpendingRecordStoring.swift */,
 				7D72C488C5C21014C1FAB59A /* TimelineDataProviding.swift */,
 				55D650DDA109D6FBA6EFD2C4 /* WatchSyncHelper.swift */,
-				AE6AEF94FAE90C7F469449EE /* WeatherService.swift */,
 				69129B3B9854812A22C0D389 /* AI */,
 				C293996C7402D3670B7127E0 /* Sensors */,
 			);
@@ -855,7 +852,6 @@
 				E4E545B69C945B8442BE5936 /* VoiceRecordingOverlay.swift in Sources */,
 				70015EAB0824A09939C59B0C /* WatchMessage.swift in Sources */,
 				7A634F335FAC6E796011DF94 /* WatchSyncHelper.swift in Sources */,
-				4250A250313DBA68A83F130E /* WeatherService.swift in Sources */,
 				6F5A4DD0ADB0320753D8C263 /* WeeklyInsightView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -26,7 +26,6 @@ targets:
       path: ToDay/ToDay.entitlements
       properties:
         com.apple.developer.healthkit: true
-        com.apple.developer.weatherkit: true
         com.apple.security.application-groups:
           - group.com.looanli.today
     info:
