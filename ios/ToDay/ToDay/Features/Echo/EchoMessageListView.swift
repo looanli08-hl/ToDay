@@ -1,10 +1,15 @@
 import SwiftUI
+import SwiftData
 
 /// The new Echo tab root view — a message center showing all Echo-initiated messages.
 /// Each message links to an independent conversation thread.
 struct EchoMessageListView: View {
     @ObservedObject var messageManager: EchoMessageManager
     let threadViewModelFactory: (EchoMessageEntity) -> EchoThreadViewModel
+    @Environment(\.modelContext) private var modelContext
+    @State private var renamingMessage: EchoMessageEntity?
+    @State private var renameText = ""
+    @State private var showRenameAlert = false
 
     var body: some View {
         NavigationStack {
@@ -20,6 +25,14 @@ struct EchoMessageListView: View {
                             }
                             .buttonStyle(.plain)
                             .contextMenu {
+                                Button {
+                                    renamingMessage = message
+                                    renameText = message.displayTitle
+                                    showRenameAlert = true
+                                } label: {
+                                    Label("重命名", systemImage: "pencil")
+                                }
+
                                 Button(role: .destructive) {
                                     try? messageManager.deleteMessage(id: message.id)
                                 } label: {
@@ -52,6 +65,16 @@ struct EchoMessageListView: View {
             }
             .refreshable {
                 messageManager.refresh()
+            }
+            .alert("重命名对话", isPresented: $showRenameAlert) {
+                TextField("对话名称", text: $renameText)
+                Button("保存") {
+                    if let msg = renamingMessage {
+                        msg.customTitle = renameText.isEmpty ? nil : renameText
+                        try? modelContext.save()
+                    }
+                }
+                Button("取消", role: .cancel) {}
             }
         }
     }
