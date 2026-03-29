@@ -253,34 +253,68 @@ struct QuickRecordSheet: View {
 
     private var actionBar: some View {
         HStack(spacing: 10) {
-            Button(mode == .pointOnly ? "保存打点" : "打点") {
+            Button {
                 guard let record = createRecord(isSession: false) else { return }
                 submit(record)
+            } label: {
+                Group {
+                    if mode == .pointOnly {
+                        // Primary action in pointOnly mode — gradient fill
+                        Text("保存打点")
+                            .font(.headline)
+                            .foregroundStyle(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 14)
+                            .background(
+                                LinearGradient(
+                                    colors: [Color(red: 0.95, green: 0.45, blue: 0.35), Color(red: 0.98, green: 0.60, blue: 0.38)],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                            .shadow(color: Color(red: 0.95, green: 0.45, blue: 0.35).opacity(0.25), radius: 8, x: 0, y: 3)
+                    } else {
+                        // Secondary action in flexible mode — light border
+                        Text("打点")
+                            .font(.headline)
+                            .foregroundStyle(AppColor.label)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 14)
+                            .background(AppColor.surface)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                    .stroke(AppColor.labelQuaternary, lineWidth: 1)
+                            )
+                            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    }
+                }
             }
-            .font(.system(size: 15, weight: .semibold))
-            .foregroundStyle(mode == .pointOnly ? .white : .secondary)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 14)
-            .background(mode == .pointOnly ? TodayTheme.teal : Color(UIColor.secondarySystemGroupedBackground))
-            .overlay(
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .stroke(mode == .pointOnly ? Color.clear : Color(UIColor.separator), lineWidth: 1)
-            )
-            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .buttonStyle(.plain)
             .disabled(selectedMood == nil || isSubmitting)
             .opacity(selectedMood == nil || isSubmitting ? 0.45 : 1)
 
             if mode == .flexible {
-                Button("开始一段") {
+                Button {
                     guard let record = createRecord(isSession: true) else { return }
                     submit(record)
+                } label: {
+                    Text("开始一段")
+                        .font(.headline)
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                        .background(
+                            LinearGradient(
+                                colors: [Color(red: 0.95, green: 0.45, blue: 0.35), Color(red: 0.98, green: 0.60, blue: 0.38)],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                        .shadow(color: Color(red: 0.95, green: 0.45, blue: 0.35).opacity(0.25), radius: 8, x: 0, y: 3)
                 }
-                .font(.system(size: 15, weight: .semibold))
-                .foregroundStyle(.white)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 14)
-                .background(Color.accentColor)
-                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                .buttonStyle(.plain)
                 .disabled(selectedMood == nil || isSubmitting)
                 .opacity(selectedMood == nil || isSubmitting ? 0.45 : 1)
             }
