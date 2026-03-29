@@ -64,7 +64,7 @@ struct DashboardViewModel {
         }
 
         if parts.isEmpty {
-            return "今天还没有可展示的维度数据，戴上 Apple Watch 活动一下吧。"
+            return "今天还没有可展示的维度数据，保持 ToDay 在后台运行，数据会自动积累。"
         }
 
         let entryCount = timeline.entries.count
@@ -169,6 +169,12 @@ struct DashboardViewModel {
     }
 
     private var totalSteps: Int {
+        // First try stats from PhoneTimelineDataProvider (pedometer-based)
+        if let stepStat = timeline?.stats.first(where: { $0.id == "steps" }),
+           let steps = Int(stepStat.value) {
+            return steps
+        }
+        // Fallback to entry-level metrics (HealthKit-based)
         guard let entries = timeline?.entries else { return 0 }
         return entries.compactMap { $0.associatedMetrics?.stepCount }.reduce(0, +)
     }

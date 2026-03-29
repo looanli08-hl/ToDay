@@ -277,7 +277,7 @@ struct DashboardView: View {
                     .font(.body.weight(.medium))
                     .foregroundStyle(AppColor.labelSecondary)
 
-                Text("戴上 Apple Watch 活动一会儿，或用快门记录生活碎片。")
+                Text("保持 ToDay 在后台运行，会自动记录你的一天。也可以用快门记录生活碎片。")
                     .font(.subheadline)
                     .foregroundStyle(AppColor.labelTertiary)
                     .multilineTextAlignment(.center)

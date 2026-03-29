@@ -36,60 +36,27 @@ final class MockAIProvider: EchoAIProviding, @unchecked Sendable {
 // MARK: - Tests
 
 final class EchoAIServiceTests: XCTestCase {
-    private var freeProvider: MockAIProvider!
-    private var proProvider: MockAIProvider!
+    private var mockProvider: MockAIProvider!
     private var service: EchoAIService!
 
     override func setUp() {
         super.setUp()
-        freeProvider = MockAIProvider()
-        proProvider = MockAIProvider()
-        service = EchoAIService(
-            freeProvider: freeProvider,
-            proProvider: proProvider
-        )
+        mockProvider = MockAIProvider()
+        service = EchoAIService(provider: mockProvider)
     }
 
-    func testFreeUserUsesLocalProvider() async throws {
-        service.currentTier = .free
-        freeProvider.respondResult = "local answer"
+    func testRespondCallsProvider() async throws {
+        mockProvider.respondResult = "hello"
 
         let messages = [EchoChatMessage(role: .user, content: "你好")]
         let result = try await service.respond(messages: messages)
 
-        XCTAssertEqual(result, "local answer")
-        XCTAssertEqual(freeProvider.respondCallCount, 1)
-        XCTAssertEqual(proProvider.respondCallCount, 0)
+        XCTAssertEqual(result, "hello")
+        XCTAssertEqual(mockProvider.respondCallCount, 1)
     }
 
-    func testProUserUsesDeepSeekProvider() async throws {
-        service.currentTier = .pro
-        proProvider.respondResult = "pro answer"
-
-        let messages = [EchoChatMessage(role: .user, content: "你好")]
-        let result = try await service.respond(messages: messages)
-
-        XCTAssertEqual(result, "pro answer")
-        XCTAssertEqual(proProvider.respondCallCount, 1)
-        XCTAssertEqual(freeProvider.respondCallCount, 0)
-    }
-
-    func testFallbackWhenPreferredProviderUnavailable() async throws {
-        service.currentTier = .pro
-        proProvider.isAvailable = false
-        freeProvider.respondResult = "fallback answer"
-
-        let messages = [EchoChatMessage(role: .user, content: "你好")]
-        let result = try await service.respond(messages: messages)
-
-        XCTAssertEqual(result, "fallback answer")
-        XCTAssertEqual(freeProvider.respondCallCount, 1)
-    }
-
-    func testThrowsWhenNoProviderAvailable() async {
-        service.currentTier = .pro
-        proProvider.isAvailable = false
-        freeProvider.isAvailable = false
+    func testThrowsWhenProviderUnavailable() async {
+        mockProvider.isAvailable = false
 
         let messages = [EchoChatMessage(role: .user, content: "你好")]
         do {
@@ -100,21 +67,19 @@ final class EchoAIServiceTests: XCTestCase {
         }
     }
 
-    func testSummarizeRoutesToCorrectProvider() async throws {
-        service.currentTier = .free
-        freeProvider.summarizeResult = "today was good"
+    func testSummarizeCallsProvider() async throws {
+        mockProvider.summarizeResult = "today was good"
 
         let result = try await service.summarize(prompt: "summarize today")
         XCTAssertEqual(result, "today was good")
-        XCTAssertEqual(freeProvider.summarizeCallCount, 1)
+        XCTAssertEqual(mockProvider.summarizeCallCount, 1)
     }
 
-    func testGenerateProfileRoutesToCorrectProvider() async throws {
-        service.currentTier = .pro
-        proProvider.profileResult = "user likes running"
+    func testGenerateProfileCallsProvider() async throws {
+        mockProvider.profileResult = "user likes running"
 
         let result = try await service.generateProfile(prompt: "generate profile")
         XCTAssertEqual(result, "user likes running")
-        XCTAssertEqual(proProvider.profileCallCount, 1)
+        XCTAssertEqual(mockProvider.profileCallCount, 1)
     }
 }

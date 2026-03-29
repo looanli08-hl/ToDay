@@ -47,35 +47,12 @@ struct SettingsView: View {
                         Text("关闭").tag(EchoFrequency.off)
                     }
 
-                    Picker("回响时间", selection: Binding(
-                        get: { echoViewModel.echoHour },
-                        set: { echoViewModel.echoHour = $0 }
-                    )) {
-                        ForEach(6..<23, id: \.self) { hour in
-                            Text(String(format: "%02d:00", hour)).tag(hour)
-                        }
-                    }
-
                     Toggle("关怀推送", isOn: Binding(
                         get: { echoViewModel.careNudgesEnabled },
                         set: { echoViewModel.careNudgesEnabled = $0 }
                     ))
                 } header: {
                     Text("Echo 回响")
-                }
-
-                // MARK: - Echo AI
-                Section {
-                    HStack {
-                        Text("DeepSeek API Key")
-                        Spacer()
-                        Text("已配置")
-                            .foregroundStyle(.green)
-                    }
-                } header: {
-                    Text("AI 服务")
-                } footer: {
-                    Text("Echo 使用 DeepSeek AI 进行对话和分析。")
                 }
 
                 Section {
