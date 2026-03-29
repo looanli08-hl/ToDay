@@ -130,7 +130,7 @@ export default function ConnectorsPage() {
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
-          <Blocks className="h-6 w-6 text-primary" />
+          <Blocks className="h-6 w-6 text-muted-foreground" strokeWidth={1.5} />
           <h1 className="text-2xl font-semibold tracking-tight">连接器</h1>
         </div>
         <p className="text-sm text-muted-foreground">
@@ -199,9 +199,7 @@ export default function ConnectorsPage() {
 
           {/* "开发连接器" card */}
           <Card className="flex flex-col items-center justify-center border border-dashed border-border/60 bg-transparent p-8 hover:bg-card/50 transition-colors cursor-pointer group">
-            <div className="rounded-full bg-muted p-3 mb-3 group-hover:bg-primary/10 transition-colors">
-              <Plus className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
-            </div>
+            <Plus className="h-5 w-5 text-muted-foreground/50 mb-3 group-hover:text-muted-foreground transition-colors" strokeWidth={1.5} />
             <p className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors">
               开发连接器
             </p>

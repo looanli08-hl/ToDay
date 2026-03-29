@@ -1,14 +1,11 @@
 import { Card } from "@/components/ui/card";
 import {
-  Footprints,
   Moon,
   Layers,
-  Palette,
   Sparkles,
   TrendingUp,
   Clock,
   Zap,
-  MapPin,
   Heart,
   ArrowUpRight,
   Activity,
@@ -26,45 +23,17 @@ function getGreeting(): string {
 }
 
 const statCards = [
-  {
-    label: "活动时间",
-    value: "--",
-    sub: "运动 · 步行",
-    icon: Zap,
-    tintClass: "from-orange-500/10 to-orange-400/5 ring-orange-500/10",
-    iconColor: "text-orange-500",
-  },
-  {
-    label: "睡眠",
-    value: "--",
-    sub: "昨晚",
-    icon: Moon,
-    tintClass: "from-indigo-500/10 to-indigo-400/5 ring-indigo-500/10",
-    iconColor: "text-indigo-500",
-  },
-  {
-    label: "屏幕时间",
-    value: "--",
-    sub: "今日总计",
-    icon: Layers,
-    tintClass: "from-violet-500/10 to-violet-400/5 ring-violet-500/10",
-    iconColor: "text-violet-500",
-  },
-  {
-    label: "心情",
-    value: "😊",
-    sub: "开心 · 2 条记录",
-    icon: Palette,
-    tintClass: "from-rose-500/10 to-rose-400/5 ring-rose-500/10",
-    iconColor: "text-rose-500",
-  },
+  { label: "活动时间", value: "--", sub: "运动 · 步行", icon: Zap },
+  { label: "睡眠", value: "--", sub: "昨晚", icon: Moon },
+  { label: "屏幕时间", value: "--", sub: "今日总计", icon: Layers },
+  { label: "心情", value: "😊", sub: "开心 · 2 条记录", icon: Heart },
 ];
 
 const recentActivities = [
-  { time: "09:30", label: "到达 公司", icon: MapPin, color: "text-blue-500" },
-  { time: "10:15", label: "步行 12 分钟", icon: Footprints, color: "text-green-500" },
-  { time: "11:00", label: "屏幕时间 · 效率工具 45m", icon: Monitor, color: "text-purple-500" },
-  { time: "12:30", label: "记录心情 · 开心", icon: Heart, color: "text-rose-500" },
+  { time: "09:30", label: "到达 公司" },
+  { time: "10:15", label: "步行 12 分钟" },
+  { time: "11:00", label: "屏幕时间 · 效率工具 45m" },
+  { time: "12:30", label: "记录心情 · 开心" },
 ];
 
 const weeklyData = [
@@ -111,11 +80,9 @@ export default function DashboardPage() {
                 <div className="space-y-3">
                   <p className="text-[13px] font-medium text-muted-foreground">{card.label}</p>
                   <p className="text-[28px] font-bold tracking-tight text-foreground/90">{card.value}</p>
-                  <p className="text-[12px] text-muted-foreground/70">{card.sub}</p>
+                  <p className="text-[12px] text-muted-foreground/60">{card.sub}</p>
                 </div>
-                <div className={`rounded-xl p-2.5 bg-gradient-to-br ${card.tintClass} ring-1`}>
-                  <card.icon className={`h-[18px] w-[18px] ${card.iconColor}`} strokeWidth={1.8} />
-                </div>
+                <card.icon className="h-5 w-5 text-muted-foreground/30" strokeWidth={1.5} />
               </div>
             </Card>
           ))}
@@ -142,7 +109,7 @@ export default function DashboardPage() {
                 <div key={i} className="flex items-center gap-4 py-3 border-b border-border/40 last:border-0">
                   <span className="text-[13px] font-mono text-muted-foreground w-12">{activity.time}</span>
                   <div className="relative">
-                    <div className={`h-2 w-2 rounded-full ${activity.color.replace('text-', 'bg-')}`} />
+                    <div className="h-2 w-2 rounded-full bg-muted-foreground/30" />
                     {i < recentActivities.length - 1 && (
                       <div className="absolute top-3 left-[3px] h-8 w-px bg-border/60" />
                     )}
@@ -167,7 +134,7 @@ export default function DashboardPage() {
             {/* Echo AI */}
             <Card className="border-0 bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]">
               <div className="flex items-center gap-2 mb-4">
-                <Sparkles className="h-[15px] w-[15px] text-[#e8734a]" />
+                <Sparkles className="h-[15px] w-[15px] text-muted-foreground" />
                 <h2 className="text-[15px] font-semibold text-foreground/90">Echo</h2>
               </div>
               <div className="rounded-xl bg-[var(--background)] p-4 mb-3">
@@ -215,10 +182,8 @@ export default function DashboardPage() {
 
             {/* Life Pulse */}
             <Card className="border-0 bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]">
-              <div className="flex items-center gap-2.5 mb-3">
-                <div className="rounded-lg p-1.5 bg-emerald-500/8">
-                  <Activity className="h-4 w-4 text-emerald-500" strokeWidth={1.8} />
-                </div>
+              <div className="flex items-center gap-2 mb-3">
+                <Activity className="h-[15px] w-[15px] text-muted-foreground" strokeWidth={1.5} />
                 <h2 className="text-[15px] font-semibold text-foreground/90">生活脉搏</h2>
               </div>
               <p className="text-[13px] leading-relaxed text-muted-foreground">
@@ -243,7 +208,7 @@ export default function DashboardPage() {
                 key={action.label}
                 className="flex items-center gap-2 rounded-full border border-border/60 px-4 py-2 text-[13px] text-foreground/70 hover:bg-accent hover:text-foreground transition-all duration-150 hover:shadow-sm"
               >
-                <action.icon className="h-3.5 w-3.5" />
+                <action.icon className="h-3.5 w-3.5 text-muted-foreground" strokeWidth={1.5} />
                 {action.label}
               </button>
             ))}

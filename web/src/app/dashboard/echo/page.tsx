@@ -50,12 +50,12 @@ interface Conversation {
 // ---------------------------------------------------------------------------
 
 const SUGGESTED_PROMPTS = [
-  { label: "帮我回顾今天做了什么", icon: ClipboardList, color: "text-blue-500", bg: "bg-blue-500/8" },
-  { label: "分析一下我最近的作息", icon: Moon, color: "text-indigo-500", bg: "bg-indigo-500/8" },
-  { label: "我有点累了，聊聊天吧", icon: Coffee, color: "text-amber-600", bg: "bg-amber-500/8" },
-  { label: "帮我规划明天的安排", icon: Calendar, color: "text-emerald-500", bg: "bg-emerald-500/8" },
-  { label: "记录一个灵感想法", icon: Lightbulb, color: "text-yellow-500", bg: "bg-yellow-500/8" },
-  { label: "给我一些正能量", icon: Sparkles, color: "text-rose-500", bg: "bg-rose-500/8" },
+  { label: "帮我回顾今天做了什么", icon: ClipboardList },
+  { label: "分析一下我最近的作息", icon: Moon },
+  { label: "我有点累了，聊聊天吧", icon: Coffee },
+  { label: "帮我规划明天的安排", icon: Calendar },
+  { label: "记录一个灵感想法", icon: Lightbulb },
+  { label: "给我一些正能量", icon: Sparkles },
 ];
 
 // ---------------------------------------------------------------------------
@@ -589,11 +589,9 @@ export default function EchoPage() {
                     key={prompt.label}
                     onClick={() => sendMessage(prompt.label)}
                     disabled={isStreaming}
-                    className="group flex items-center gap-3 rounded-2xl border border-border/50 bg-white px-4 py-3.5 text-left transition-all duration-200 hover:border-primary/20 hover:shadow-[0_2px_12px_rgba(0,0,0,0.04)] active:scale-[0.98] disabled:opacity-50"
+                    className="group flex items-center gap-3 rounded-2xl border border-border/50 bg-white px-4 py-3.5 text-left transition-all duration-200 hover:border-border hover:shadow-[0_2px_8px_rgba(0,0,0,0.04)] active:scale-[0.98] disabled:opacity-50"
                   >
-                    <div className={`rounded-lg p-2 ${prompt.bg} transition-colors`}>
-                      <prompt.icon className={`h-4 w-4 ${prompt.color}`} strokeWidth={1.8} />
-                    </div>
+                    <prompt.icon className="h-[18px] w-[18px] text-muted-foreground/40 group-hover:text-muted-foreground/60 transition-colors" strokeWidth={1.5} />
                     <span className="text-[13px] text-foreground/60 group-hover:text-foreground/80 transition-colors">
                       {prompt.label}
                     </span>

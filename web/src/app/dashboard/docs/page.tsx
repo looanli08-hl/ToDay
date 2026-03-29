@@ -54,7 +54,7 @@ export default function DocsPage() {
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
-          <BookMarked className="h-6 w-6 text-primary" />
+          <BookMarked className="h-6 w-6 text-muted-foreground" strokeWidth={1.5} />
           <h1 className="text-2xl font-semibold tracking-tight">
             开发者文档
           </h1>
@@ -72,7 +72,7 @@ export default function DocsPage() {
             className="border-0 bg-card p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]"
           >
             <div className="flex items-center gap-2.5 mb-3">
-              <section.icon className="h-[18px] w-[18px] text-primary" />
+              <section.icon className="h-[18px] w-[18px] text-muted-foreground" strokeWidth={1.5} />
               <h2 className="text-[15px] font-semibold">{section.title}</h2>
             </div>
             <p className="text-[13px] text-muted-foreground mb-4">
@@ -95,9 +95,7 @@ export default function DocsPage() {
             rel="noopener noreferrer"
             className="flex items-center gap-3 rounded-xl border border-border/60 p-4 hover:bg-accent transition-colors group"
           >
-            <div className="rounded-lg bg-muted p-2">
-              <Code2 className="h-4 w-4 text-foreground/70" />
-            </div>
+            <Code2 className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
             <div className="flex-1">
               <p className="text-sm font-medium">GitHub</p>
               <p className="text-[12px] text-muted-foreground">
@@ -110,9 +108,7 @@ export default function DocsPage() {
             href="#"
             className="flex items-center gap-3 rounded-xl border border-border/60 p-4 hover:bg-accent transition-colors group"
           >
-            <div className="rounded-lg bg-muted p-2">
-              <Terminal className="h-4 w-4 text-foreground/70" />
-            </div>
+            <Terminal className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
             <div className="flex-1">
               <p className="text-sm font-medium">Discord</p>
               <p className="text-[12px] text-muted-foreground">

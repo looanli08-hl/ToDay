@@ -95,7 +95,7 @@ export function Sidebar() {
                   : "text-muted-foreground hover:bg-accent/60 hover:text-foreground/80"
               )}
             >
-              <item.icon className="h-4 w-4" strokeWidth={1.8} />
+              <item.icon className="h-4 w-4" strokeWidth={1.5} />
               {item.label}
             </Link>
           );
@@ -117,7 +117,7 @@ export function Sidebar() {
                   : "text-muted-foreground hover:bg-accent/60 hover:text-foreground/80"
               )}
             >
-              <item.icon className="h-4 w-4" strokeWidth={1.8} />
+              <item.icon className="h-4 w-4" strokeWidth={1.5} />
               {item.label}
             </Link>
           );
