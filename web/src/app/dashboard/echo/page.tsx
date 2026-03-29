@@ -24,8 +24,8 @@ import {
   MessageSquare,
   Trash2,
   X,
-  Bot,
 } from "lucide-react";
+import { EchoSymbol, EchoAvatar } from "@/components/echo-symbol";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -155,20 +155,7 @@ function TypingIndicator() {
   );
 }
 
-function EchoAvatar({ size = "sm" }: { size?: "sm" | "md" }) {
-  const dim = size === "sm" ? "h-7 w-7" : "h-9 w-9";
-  const iconSize = size === "sm" ? "h-3.5 w-3.5" : "h-4 w-4";
-  return (
-    <div
-      className={cn(
-        dim,
-        "flex-shrink-0 flex items-center justify-center rounded-lg bg-gradient-to-br from-[#D4864A] to-[#E8A06A]"
-      )}
-    >
-      <Bot className={cn(iconSize, "text-white")} strokeWidth={2} />
-    </div>
-  );
-}
+// EchoAvatar is imported from @/components/echo-symbol
 
 function EchoMessageContent({ content }: { content: string }) {
   return (
@@ -568,9 +555,7 @@ export default function EchoPage() {
               <div className="mb-8 text-center">
                 <div className="mb-5 flex justify-center">
                   <div className="relative">
-                    <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-[#D4864A] to-[#E8A06A] flex items-center justify-center shadow-lg shadow-[#D4864A]/15">
-                      <Bot className="h-6 w-6 text-white" strokeWidth={1.8} />
-                    </div>
+                    <EchoAvatar size="lg" />
                     <div className="absolute -bottom-0.5 -right-0.5 h-4 w-4 rounded-full bg-emerald-400 border-[2.5px] border-background" />
                   </div>
                 </div>

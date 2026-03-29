@@ -2,7 +2,6 @@ import { Card } from "@/components/ui/card";
 import {
   Moon,
   Layers,
-  Sparkles,
   TrendingUp,
   Clock,
   Zap,
@@ -11,6 +10,7 @@ import {
   Activity,
   Monitor,
 } from "lucide-react";
+import { EchoSymbol } from "@/components/echo-symbol";
 
 function getGreeting(): string {
   const hour = new Date().getHours();
@@ -134,7 +134,7 @@ export default function DashboardPage() {
             {/* Echo AI */}
             <Card className="border-0 bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]">
               <div className="flex items-center gap-2 mb-4">
-                <Sparkles className="h-[15px] w-[15px] text-muted-foreground" />
+                <EchoSymbol size={15} className="text-[#D4864A]" />
                 <h2 className="text-[15px] font-semibold text-foreground/90">Echo</h2>
               </div>
               <div className="rounded-xl bg-[var(--background)] p-4 mb-3">
@@ -201,7 +201,7 @@ export default function DashboardPage() {
               { icon: Heart, label: "记录心情" },
               { icon: Clock, label: "补充时段" },
               { icon: Monitor, label: "查看屏幕时间" },
-              { icon: Sparkles, label: "跟 Echo 聊天" },
+              { icon: Heart, label: "跟 Echo 聊天" },
               { icon: TrendingUp, label: "周报分析" },
             ].map((action) => (
               <button
