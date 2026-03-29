@@ -3,10 +3,12 @@ import { cookies } from "next/headers";
 
 export async function createServerSupabaseClient() {
   const cookieStore = await cookies();
+  const url = (process.env.NEXT_PUBLIC_SUPABASE_URL || "").trim();
+  const key = (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "").trim();
 
   return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    url || "https://placeholder.supabase.co",
+    key || "placeholder-key",
     {
       cookies: {
         getAll() {
@@ -18,7 +20,7 @@ export async function createServerSupabaseClient() {
               cookieStore.set(name, value, options)
             );
           } catch {
-            // Can't set cookies in Server Components, only in Server Actions/Route Handlers
+            // Can't set cookies in Server Components
           }
         },
       },

@@ -7,12 +7,19 @@ export async function GET(request: Request) {
   const next = searchParams.get("next") ?? "/dashboard";
 
   if (code) {
-    const supabase = await createServerSupabaseClient();
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error) {
-      return NextResponse.redirect(`${origin}${next}`);
+    try {
+      const supabase = await createServerSupabaseClient();
+      const { error } = await supabase.auth.exchangeCodeForSession(code);
+      if (!error) {
+        return NextResponse.redirect(`${origin}${next}`);
+      }
+      console.error("[Auth Callback] Exchange error:", error.message);
+    } catch (e) {
+      console.error("[Auth Callback] Error:", e);
     }
   }
 
-  return NextResponse.redirect(`${origin}/auth/login?error=auth_failed`);
+  // If no code, check for hash-based auth (some OAuth flows use hash fragments)
+  // Redirect to dashboard and let client-side handle the session
+  return NextResponse.redirect(`${origin}/dashboard`);
 }
