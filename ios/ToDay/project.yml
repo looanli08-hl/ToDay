@@ -74,12 +74,12 @@ targets:
     deploymentTarget: "17.0"
     sources:
       - path: ToDayScreenTimeReport
+    info:
+      path: ToDayScreenTimeReport/Info.plist
     settings:
       base:
         PRODUCT_NAME: ToDayScreenTimeReport
         PRODUCT_BUNDLE_IDENTIFIER: com.looanli.today.screentimereport
-        GENERATE_INFOPLIST_FILE: YES
-        INFOPLIST_KEY_NSExtension_NSExtensionPointIdentifier: com.apple.deviceactivityui.report
         DEVELOPMENT_TEAM: G89F57S8M3
         CODE_SIGN_STYLE: Automatic
         SWIFT_VERSION: 5.0
