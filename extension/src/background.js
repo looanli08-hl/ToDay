@@ -213,13 +213,14 @@ async function syncToServer() {
   }
 }
 
-// ─── Data Cleanup ───
-// Remove sessions older than 7 days to prevent storage bloat
+// ─── Local Cache Cleanup ───
+// Remove LOCAL cache older than 30 days to free chrome.storage space.
+// Historical data is preserved permanently in Supabase (synced every minute).
 
 async function cleanup() {
   const state = await getState();
   const cutoff = new Date();
-  cutoff.setDate(cutoff.getDate() - 7);
+  cutoff.setDate(cutoff.getDate() - 30);
   const cutoffKey = cutoff.toISOString().split("T")[0];
 
   const cleaned = {};
