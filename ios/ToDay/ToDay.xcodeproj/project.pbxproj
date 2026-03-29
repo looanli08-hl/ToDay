@@ -335,6 +335,7 @@
 		DD8682A65FCDD7B5B3365527 /* DeviceStateCollectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceStateCollectorTests.swift; sourceTree = "<group>"; };
 		DEBA7D34F5C9C73353085631 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		DF6A95A9011E79D975662199 /* ManagedSettings.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ManagedSettings.framework; path = System/Library/Frameworks/ManagedSettings.framework; sourceTree = SDKROOT; };
+		E085DFF9AC4CEF2113F83BE3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		E0B2EE8138EE16EC7078C00E /* LocationCollector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationCollector.swift; sourceTree = "<group>"; };
 		E18A951C7A88BE1CC9883050 /* EchoMirrorSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoMirrorSheet.swift; sourceTree = "<group>"; };
 		E24C90EDAC237C756CCF04F9 /* SpendingRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendingRecord.swift; sourceTree = "<group>"; };
@@ -393,6 +394,7 @@
 		154F37BD2988F93F9FB9D282 /* ToDayScreenTimeReport */ = {
 			isa = PBXGroup;
 			children = (
+				E085DFF9AC4CEF2113F83BE3 /* Info.plist */,
 				C21C9E109566FA529B09263C /* ToDayScreenTimeReport.entitlements */,
 				C986D79040F461443BC4D64D /* TotalActivityReport.swift */,
 			);
@@ -1038,8 +1040,7 @@
 				CODE_SIGN_ENTITLEMENTS = ToDayScreenTimeReport/ToDayScreenTimeReport.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = G89F57S8M3;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSExtension_NSExtensionPointIdentifier = com.apple.deviceactivityui.report;
+				INFOPLIST_FILE = ToDayScreenTimeReport/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1111,8 +1112,7 @@
 				CODE_SIGN_ENTITLEMENTS = ToDayScreenTimeReport/ToDayScreenTimeReport.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = G89F57S8M3;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSExtension_NSExtensionPointIdentifier = com.apple.deviceactivityui.report;
+				INFOPLIST_FILE = ToDayScreenTimeReport/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1213,7 +1213,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = G89F57S8M3;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -1236,7 +1236,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = ToDay;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				MARKETING_VERSION = 0.4.0;
+				MARKETING_VERSION = 0.5.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -1285,7 +1285,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = G89F57S8M3;
 				ENABLE_NS_ASSERTIONS = NO;
@@ -1302,7 +1302,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = ToDay;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				MARKETING_VERSION = 0.4.0;
+				MARKETING_VERSION = 0.5.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.looanli.today;
