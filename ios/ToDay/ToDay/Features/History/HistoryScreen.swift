@@ -2,6 +2,7 @@ import SwiftUI
 
 struct HistoryScreen: View {
     @ObservedObject var viewModel: TodayViewModel
+    @StateObject private var activityProvider = CurrentActivityProvider()
 
     @State private var selectedDate: Date = Calendar.current.startOfDay(for: Date())
     @State private var showCalendar = false
@@ -22,6 +23,22 @@ struct HistoryScreen: View {
             VStack(spacing: 0) {
                 // 0. Recording status indicator
                 recordingStatusBar
+
+                // 0.5. Real-time activity status
+                if !activityProvider.statusText.isEmpty {
+                    HStack(spacing: 6) {
+                        Image(systemName: activityProvider.statusIcon)
+                            .font(.caption2)
+                            .foregroundStyle(AppColor.labelTertiary)
+                        Text(activityProvider.statusText)
+                            .font(.caption)
+                            .foregroundStyle(AppColor.labelSecondary)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 6)
+                    .background(AppColor.surface)
+                }
 
                 // 1. Date strip (sticky at top)
                 dateStripSection
@@ -55,6 +72,12 @@ struct HistoryScreen: View {
             }
             .task(id: selectedDate) {
                 await loadSelectedDay()
+            }
+            .onAppear {
+                activityProvider.refresh()
+            }
+            .onReceive(Timer.publish(every: 30, on: .main, in: .common).autoconnect()) { _ in
+                activityProvider.refresh()
             }
         }
     }
