@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ToDay</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      width: 320px;
+      font-family: Inter, system-ui, -apple-system, sans-serif;
+      background: #F5F1EB;
+      color: #2C2418;
+    }
+
+    .header {
+      padding: 16px 20px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-family: ui-serif, Georgia, serif;
+      font-size: 18px;
+      font-weight: normal;
+    }
+
+    .logo-dot { color: #C4713E; }
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: #8A7D6B;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #10b981;
+    }
+
+    .summary {
+      padding: 0 20px 16px;
+    }
+
+    .total-time {
+      font-family: ui-serif, Georgia, serif;
+      font-size: 32px;
+      font-weight: normal;
+      letter-spacing: -0.5px;
+    }
+
+    .total-label {
+      font-size: 12px;
+      color: #8A7D6B;
+      margin-top: 2px;
+    }
+
+    .divider {
+      height: 1px;
+      background: #E6DFD3;
+      margin: 0 20px;
+    }
+
+    .categories {
+      padding: 16px 20px;
+    }
+
+    .categories-title {
+      font-size: 12px;
+      color: #8A7D6B;
+      margin-bottom: 12px;
+      font-weight: 500;
+    }
+
+    .category-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+    }
+
+    .category-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .category-bar {
+      width: 3px;
+      height: 20px;
+      border-radius: 2px;
+      background: #C4713E;
+      opacity: 0.6;
+    }
+
+    .category-name {
+      font-size: 13px;
+    }
+
+    .category-time {
+      font-size: 12px;
+      color: #8A7D6B;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .sites {
+      padding: 0 20px 16px;
+    }
+
+    .sites-title {
+      font-size: 12px;
+      color: #8A7D6B;
+      margin-bottom: 12px;
+      font-weight: 500;
+    }
+
+    .site-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 0;
+    }
+
+    .site-name {
+      font-size: 12px;
+      color: #2C2418;
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .site-time {
+      font-size: 11px;
+      color: #8A7D6B;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .footer {
+      padding: 12px 20px;
+      border-top: 1px solid #E6DFD3;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-text {
+      font-size: 11px;
+      color: #8A7D6B;
+    }
+
+    .dashboard-link {
+      font-size: 11px;
+      color: #C4713E;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .dashboard-link:hover {
+      text-decoration: underline;
+    }
+
+    .empty-state {
+      padding: 32px 20px;
+      text-align: center;
+    }
+
+    .empty-state p {
+      font-size: 13px;
+      color: #8A7D6B;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <span class="logo">ToDay<span class="logo-dot">.</span></span>
+    <div class="status">
+      <div class="status-dot"></div>
+      <span>记录中</span>
+    </div>
+  </div>
+
+  <div class="summary">
+    <div class="total-time" id="totalTime">0m</div>
+    <div class="total-label">今日屏幕时间</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="sites">
+    <div class="sites-title">今日访问</div>
+    <div id="siteList"></div>
+  </div>
+
+  <div class="footer">
+    <span class="footer-text">ToDay Browser Extension</span>
+    <a class="dashboard-link" id="dashboardLink">打开 Dashboard →</a>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
