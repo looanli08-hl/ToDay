@@ -26,7 +26,7 @@ const statCards = [
   { label: "活动时间", value: "--", sub: "运动 · 步行", icon: Zap },
   { label: "睡眠", value: "--", sub: "昨晚", icon: Moon },
   { label: "屏幕时间", value: "--", sub: "今日总计", icon: Layers },
-  { label: "心情", value: "😊", sub: "开心 · 2 条记录", icon: Heart },
+  { label: "心情", value: "--", sub: "2 条记录", icon: Heart },
 ];
 
 const recentActivities = [
@@ -58,31 +58,28 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <div className="px-10 pt-12 pb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="h-1 w-8 rounded-full bg-gradient-to-r from-[#D4864A] to-[#E8A06A]" />
-          <h1 className="text-[32px] font-semibold tracking-tight text-foreground/90">
-            {greeting}，Looan
-          </h1>
-        </div>
-        <p className="text-[15px] text-muted-foreground ml-11">{dateStr}</p>
+      <div className="px-12 pt-16 pb-10">
+        <h1 className="font-display text-[36px] font-normal tracking-tight text-foreground">
+          {greeting}，Looan
+        </h1>
+        <p className="text-[15px] text-muted-foreground mt-2">{dateStr}</p>
       </div>
 
-      <div className="px-10 pb-10 space-y-6">
+      <div className="px-12 pb-12 space-y-8">
         {/* Stat Cards */}
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {statCards.map((card) => (
             <Card
               key={card.label}
-              className="group relative overflow-hidden border-0 bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)] transition-all duration-300"
+              className="border border-border/40 bg-card p-6 hover:shadow-sm transition-shadow duration-300"
             >
               <div className="flex items-start justify-between">
-                <div className="space-y-3">
-                  <p className="text-[13px] font-medium text-muted-foreground">{card.label}</p>
-                  <p className="text-[28px] font-bold tracking-tight text-foreground/90">{card.value}</p>
-                  <p className="text-[12px] text-muted-foreground/60">{card.sub}</p>
+                <div>
+                  <p className="text-[13px] text-muted-foreground">{card.label}</p>
+                  <p className="font-display text-[32px] font-normal text-foreground mt-2">{card.value}</p>
+                  <p className="text-[12px] text-muted-foreground/60 mt-1">{card.sub}</p>
                 </div>
-                <card.icon className="h-5 w-5 text-muted-foreground/30" strokeWidth={1.5} />
+                <card.icon className="h-5 w-5 text-muted-foreground/25" strokeWidth={1.5} />
               </div>
             </Card>
           ))}
@@ -91,11 +88,11 @@ export default function DashboardPage() {
         {/* Main Grid */}
         <div className="grid gap-6 xl:grid-cols-3">
           {/* Timeline */}
-          <Card className="xl:col-span-2 border-0 bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]">
+          <Card className="xl:col-span-2 border border-border/40 bg-card p-6">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2.5">
                 <Activity className="h-[15px] w-[15px] text-muted-foreground" />
-                <h2 className="text-[15px] font-semibold text-foreground/90">今日时间线</h2>
+                <h2 className="font-display text-[17px] text-foreground">今日时间线</h2>
               </div>
               <div className="flex items-center gap-1.5 text-[12px] text-muted-foreground">
                 <div className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
@@ -132,14 +129,14 @@ export default function DashboardPage() {
           {/* Right Column */}
           <div className="space-y-6">
             {/* Echo AI */}
-            <Card className="border-0 bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]">
+            <Card className="border border-border/40 bg-card p-5">
               <div className="flex items-center gap-2 mb-4">
-                <EchoSymbol size={15} className="text-[#D4864A]" />
-                <h2 className="text-[15px] font-semibold text-foreground/90">Echo</h2>
+                <EchoSymbol size={15} className="text-[#C4713E]" />
+                <h2 className="font-display text-[17px] text-foreground">Echo</h2>
               </div>
               <div className="rounded-xl bg-[var(--background)] p-4 mb-3">
                 <p className="text-[13px] text-foreground/70 leading-relaxed">
-                  「今天看起来很充实。下午记得休息一下眼睛 ☕」
+                  「今天看起来很充实。下午记得休息一下眼睛」
                 </p>
                 <p className="mt-2 text-[11px] text-muted-foreground">Echo · 刚刚</p>
               </div>
@@ -147,20 +144,20 @@ export default function DashboardPage() {
                 <input
                   type="text"
                   placeholder="跟 Echo 说点什么..."
-                  className="flex-1 rounded-xl border-0 bg-[var(--background)] px-3.5 py-2.5 text-[13px] outline-none placeholder:text-muted-foreground/50 focus:ring-1 focus:ring-[#e8734a]/30"
+                  className="flex-1 rounded-xl border border-border/40 bg-[var(--background)] px-3.5 py-2.5 text-[13px] outline-none placeholder:text-muted-foreground/50 focus:ring-1 focus:ring-[#C4713E]/30"
                 />
-                <button className="rounded-xl bg-gradient-to-r from-[#e8734a] to-[#f59e6c] px-3.5 py-2.5 text-[12px] font-medium text-white shadow-sm hover:shadow transition-shadow">
+                <button className="rounded-xl bg-[#C4713E] hover:bg-[#B5633A] px-3.5 py-2.5 text-[12px] font-medium text-white transition-colors">
                   发送
                 </button>
               </div>
             </Card>
 
             {/* Weekly Activity */}
-            <Card className="border-0 bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]">
+            <Card className="border border-border/40 bg-card p-5">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                   <TrendingUp className="h-[15px] w-[15px] text-muted-foreground" />
-                  <h2 className="text-[15px] font-semibold text-foreground/90">本周活跃度</h2>
+                  <h2 className="font-display text-[17px] text-foreground">本周活跃度</h2>
                 </div>
                 <button className="text-[12px] text-muted-foreground hover:text-foreground flex items-center gap-0.5 transition-colors">
                   详情 <ArrowUpRight className="h-3 w-3" />
@@ -171,7 +168,7 @@ export default function DashboardPage() {
                 {weeklyData.map((d) => (
                   <div key={d.day} className="flex flex-col items-center gap-1.5 flex-1">
                     <div
-                      className="w-full rounded-md bg-gradient-to-t from-[#e8734a]/80 to-[#f59e6c]/60 transition-all duration-500"
+                      className="w-full rounded-md bg-[#C4713E]/70 transition-all duration-500"
                       style={{ height: `${d.value}%` }}
                     />
                     <span className="text-[11px] text-muted-foreground">{d.day}</span>
@@ -181,10 +178,10 @@ export default function DashboardPage() {
             </Card>
 
             {/* Life Pulse */}
-            <Card className="border-0 bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]">
+            <Card className="border border-border/40 bg-card p-5">
               <div className="flex items-center gap-2 mb-3">
                 <Activity className="h-[15px] w-[15px] text-muted-foreground" strokeWidth={1.5} />
-                <h2 className="text-[15px] font-semibold text-foreground/90">生活脉搏</h2>
+                <h2 className="font-display text-[17px] text-foreground">生活脉搏</h2>
               </div>
               <p className="text-[13px] leading-relaxed text-muted-foreground">
                 连接你的手机和电脑后，ToDay 会自动分析你的生活节奏，给出个性化的洞察。
@@ -193,8 +190,8 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Quick Actions — Claude-style buttons */}
-        <Card className="border-0 bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]">
+        {/* Quick Actions */}
+        <Card className="border border-border/40 bg-card p-6">
           <p className="text-[13px] text-muted-foreground mb-3">快速操作</p>
           <div className="flex flex-wrap gap-2">
             {[
@@ -206,9 +203,9 @@ export default function DashboardPage() {
             ].map((action) => (
               <button
                 key={action.label}
-                className="flex items-center gap-2 rounded-full border border-border/60 px-4 py-2 text-[13px] text-foreground/70 hover:bg-accent hover:text-foreground transition-all duration-150 hover:shadow-sm"
+                className="flex items-center gap-2 rounded-full border border-border/50 px-4 py-2 text-[13px] text-muted-foreground hover:text-foreground hover:border-border transition-all duration-200"
               >
-                <action.icon className="h-3.5 w-3.5 text-muted-foreground" strokeWidth={1.5} />
+                <action.icon className="h-3.5 w-3.5" strokeWidth={1.5} />
                 {action.label}
               </button>
             ))}

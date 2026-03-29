@@ -159,7 +159,7 @@ function TypingIndicator() {
 
 function EchoMessageContent({ content }: { content: string }) {
   return (
-    <div className="prose prose-sm max-w-none text-foreground/85 leading-relaxed [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&_p]:my-1.5 [&_ul]:my-1.5 [&_ol]:my-1.5 [&_li]:my-0.5 [&_code]:bg-muted [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded-md [&_code]:text-[13px] [&_code]:font-mono [&_pre]:bg-[#2D2417] [&_pre]:text-[#F7F3ED] [&_pre]:rounded-xl [&_pre]:p-4 [&_pre]:my-3 [&_pre_code]:bg-transparent [&_pre_code]:p-0 [&_blockquote]:border-l-primary/40 [&_blockquote]:text-muted-foreground [&_a]:text-primary [&_a]:no-underline hover:[&_a]:underline [&_h1]:text-base [&_h2]:text-[15px] [&_h3]:text-[14px] [&_strong]:text-foreground/90">
+    <div className="prose prose-sm max-w-none text-foreground/85 leading-relaxed [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&_p]:my-1.5 [&_ul]:my-1.5 [&_ol]:my-1.5 [&_li]:my-0.5 [&_code]:bg-muted [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded-md [&_code]:text-[13px] [&_code]:font-mono [&_pre]:bg-[#2C2418] [&_pre]:text-[#F5F1EB] [&_pre]:rounded-xl [&_pre]:p-4 [&_pre]:my-3 [&_pre_code]:bg-transparent [&_pre_code]:p-0 [&_blockquote]:border-l-primary/40 [&_blockquote]:text-muted-foreground [&_a]:text-primary [&_a]:no-underline hover:[&_a]:underline [&_h1]:text-base [&_h2]:text-[15px] [&_h3]:text-[14px] [&_strong]:text-foreground/90">
       <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
     </div>
   );
@@ -434,7 +434,7 @@ export default function EchoPage() {
       {/* ----------------------------------------------------------------- */}
       <aside
         className={cn(
-          "flex flex-col border-r border-border/50 bg-[#F2EDE6] transition-all duration-300 ease-in-out",
+          "flex flex-col border-r border-border/50 bg-[#EFEBE4] transition-all duration-300 ease-in-out",
           sidebarOpen ? "w-[280px] min-w-[280px]" : "w-0 min-w-0 overflow-hidden"
         )}
       >
@@ -534,7 +534,7 @@ export default function EchoPage() {
           <div className="flex items-center gap-2">
             <EchoAvatar size="sm" />
             <div>
-              <h1 className="text-[14px] font-semibold text-foreground/90">
+              <h1 className="font-display text-[15px] text-foreground">
                 Echo
               </h1>
               <p className="text-[11px] text-muted-foreground/60">
@@ -559,10 +559,10 @@ export default function EchoPage() {
                     <div className="absolute -bottom-0.5 -right-0.5 h-4 w-4 rounded-full bg-emerald-400 border-[2.5px] border-background" />
                   </div>
                 </div>
-                <h2 className="text-[22px] font-semibold text-foreground/90 mb-2">
+                <h2 className="font-display text-[28px] font-normal text-foreground mb-2">
                   Echo 在这里
                 </h2>
-                <p className="text-[14px] text-muted-foreground max-w-sm">
+                <p className="text-[15px] text-muted-foreground max-w-sm">
                   {getGreeting()}
                 </p>
               </div>
@@ -574,10 +574,10 @@ export default function EchoPage() {
                     key={prompt.label}
                     onClick={() => sendMessage(prompt.label)}
                     disabled={isStreaming}
-                    className="group flex items-center gap-3 rounded-2xl border border-border/50 bg-white px-4 py-3.5 text-left transition-all duration-200 hover:border-border hover:shadow-[0_2px_8px_rgba(0,0,0,0.04)] active:scale-[0.98] disabled:opacity-50"
+                    className="group flex items-center gap-3 rounded-xl border border-border/50 bg-card px-4 py-3 text-left transition-all duration-200 hover:border-border active:scale-[0.99] disabled:opacity-50"
                   >
-                    <prompt.icon className="h-[18px] w-[18px] text-muted-foreground/40 group-hover:text-muted-foreground/60 transition-colors" strokeWidth={1.5} />
-                    <span className="text-[13px] text-foreground/60 group-hover:text-foreground/80 transition-colors">
+                    <prompt.icon className="h-4 w-4 text-muted-foreground/40" strokeWidth={1.5} />
+                    <span className="text-[13px] text-muted-foreground group-hover:text-foreground transition-colors">
                       {prompt.label}
                     </span>
                   </button>
@@ -602,7 +602,7 @@ export default function EchoPage() {
                     className={cn(
                       "max-w-[85%]",
                       msg.role === "user"
-                        ? "bg-[#2D2417] text-white rounded-2xl rounded-br-sm px-4 py-3"
+                        ? "bg-[#2C2418] text-white rounded-2xl rounded-br-sm px-4 py-3"
                         : "pt-0.5"
                     )}
                   >
@@ -652,7 +652,7 @@ export default function EchoPage() {
             onSubmit={handleSubmit}
             className="mx-auto max-w-3xl"
           >
-            <div className="relative flex items-end gap-2 rounded-2xl border border-border/60 bg-white px-4 py-2.5 shadow-[0_1px_4px_rgba(0,0,0,0.04)] transition-all duration-200 focus-within:border-primary/40 focus-within:shadow-[0_2px_12px_rgba(212,134,74,0.1)]">
+            <div className="relative flex items-end gap-2 rounded-2xl border border-border/60 bg-white px-4 py-2.5 shadow-[0_1px_4px_rgba(0,0,0,0.04)] transition-all duration-200 focus-within:border-primary/40 focus-within:shadow-[0_2px_12px_rgba(196,113,62,0.1)]">
               <textarea
                 ref={textareaRef}
                 value={inputValue}
@@ -669,7 +669,7 @@ export default function EchoPage() {
                 className={cn(
                   "flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl transition-all duration-200",
                   inputValue.trim() && !isStreaming
-                    ? "bg-gradient-to-r from-[#e8734a] to-[#f59e6c] text-white shadow-sm hover:shadow-md active:scale-95"
+                    ? "bg-[#C4713E] hover:bg-[#B5633A] text-white active:scale-95"
                     : "bg-muted text-muted-foreground/40"
                 )}
               >

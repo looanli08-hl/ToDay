@@ -49,39 +49,38 @@
 }
 
 :root {
-  /* Warm cream palette — inspired by Claude & Flint */
-  --background: #F7F3ED;
-  --foreground: #2D2417;
+  --background: #F5F1EB;
+  --foreground: #2C2418;
   --card: #FFFFFF;
-  --card-foreground: #2D2417;
+  --card-foreground: #2C2418;
   --popover: #FFFFFF;
-  --popover-foreground: #2D2417;
-  --primary: #D4864A;
-  --primary-foreground: #FEFCFA;
-  --secondary: #F0EAE0;
-  --secondary-foreground: #3D2E1F;
-  --muted: #EDE7DD;
-  --muted-foreground: #8C7B6B;
-  --accent: #EDE7DD;
-  --accent-foreground: #3D2E1F;
-  --destructive: #D94F4F;
-  --border: #E5DDD1;
-  --input: #E5DDD1;
-  --ring: #D4864A;
-  --chart-1: #D4864A;
-  --chart-2: #7C9885;
-  --chart-3: #B8860B;
+  --popover-foreground: #2C2418;
+  --primary: #C4713E;
+  --primary-foreground: #FEFAF7;
+  --secondary: #EFEBE4;
+  --secondary-foreground: #3D3121;
+  --muted: #EAE5DC;
+  --muted-foreground: #8A7D6B;
+  --accent: #EAE5DC;
+  --accent-foreground: #3D3121;
+  --destructive: #C94A4A;
+  --border: #E6DFD3;
+  --input: #E6DFD3;
+  --ring: #C4713E;
+  --chart-1: #C4713E;
+  --chart-2: #7A9E87;
+  --chart-3: #B0924E;
   --chart-4: #8B7355;
   --chart-5: #6B8E9B;
-  --radius: 0.75rem;
-  --sidebar: #F2EDE6;
-  --sidebar-foreground: #2D2417;
-  --sidebar-primary: #D4864A;
-  --sidebar-primary-foreground: #FEFCFA;
-  --sidebar-accent: #EAE3D8;
-  --sidebar-accent-foreground: #2D2417;
-  --sidebar-border: #E0D8CC;
-  --sidebar-ring: #D4864A;
+  --radius: 0.625rem;
+  --sidebar: #EFEBE4;
+  --sidebar-foreground: #2C2418;
+  --sidebar-primary: #C4713E;
+  --sidebar-primary-foreground: #FEFAF7;
+  --sidebar-accent: #E6E0D6;
+  --sidebar-accent-foreground: #2C2418;
+  --sidebar-border: #DDD6C9;
+  --sidebar-ring: #C4713E;
 }
 
 .dark {
@@ -128,4 +127,8 @@
   html {
     @apply font-sans;
   }
+}
+
+.font-display {
+  font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
 }

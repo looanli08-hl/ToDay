@@ -50,12 +50,12 @@ dataTypes: [steps, sleep]
 
 export default function DocsPage() {
   return (
-    <div className="p-10 max-w-4xl">
+    <div className="p-12 max-w-4xl">
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
           <BookMarked className="h-6 w-6 text-muted-foreground" strokeWidth={1.5} />
-          <h1 className="text-2xl font-semibold tracking-tight">
+          <h1 className="font-display text-2xl tracking-tight text-foreground">
             开发者文档
           </h1>
         </div>
@@ -69,11 +69,11 @@ export default function DocsPage() {
         {sections.map((section) => (
           <Card
             key={section.title}
-            className="border-0 bg-card p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]"
+            className="border border-border/40 bg-card p-6"
           >
             <div className="flex items-center gap-2.5 mb-3">
               <section.icon className="h-[18px] w-[18px] text-muted-foreground" strokeWidth={1.5} />
-              <h2 className="text-[15px] font-semibold">{section.title}</h2>
+              <h2 className="font-display text-[17px] text-foreground">{section.title}</h2>
             </div>
             <p className="text-[13px] text-muted-foreground mb-4">
               {section.description}
@@ -86,8 +86,8 @@ export default function DocsPage() {
       </div>
 
       {/* Community Links */}
-      <Card className="mt-8 border-0 bg-card p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]">
-        <h2 className="text-[15px] font-semibold mb-4">加入社区</h2>
+      <Card className="mt-8 border border-border/40 bg-card p-6">
+        <h2 className="font-display text-[17px] text-foreground mb-4">加入社区</h2>
         <div className="grid gap-3 sm:grid-cols-2">
           <a
             href="https://github.com/looanli08-hl/ToDay"

@@ -53,11 +53,11 @@ const devices: Device[] = [
 
 function DeviceCard({ device }: { device: Device }) {
   return (
-    <Card className="border-0 bg-card p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]">
+    <Card className="border border-border/40 bg-card p-6">
       <div className="flex items-center gap-3 mb-5">
         <span className="text-2xl">{device.icon}</span>
         <div>
-          <h3 className="text-[15px] font-semibold text-foreground/90">
+          <h3 className="font-display text-[15px] text-foreground">
             {device.name}
           </h3>
           <p className="text-[12px] text-muted-foreground">
@@ -126,12 +126,12 @@ export default function ConnectorsPage() {
   });
 
   return (
-    <div className="p-10">
+    <div className="p-12">
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
           <Blocks className="h-6 w-6 text-muted-foreground" strokeWidth={1.5} />
-          <h1 className="text-2xl font-semibold tracking-tight">连接器</h1>
+          <h1 className="font-display text-2xl tracking-tight text-foreground">连接器</h1>
         </div>
         <p className="text-sm text-muted-foreground">
           安装连接器，让 ToDay 自动从不同平台收集你的生活数据
@@ -142,7 +142,7 @@ export default function ConnectorsPage() {
       <div className="mb-10">
         <div className="flex items-center gap-2 mb-4">
           <Laptop className="h-[15px] w-[15px] text-muted-foreground" />
-          <h2 className="text-[15px] font-semibold text-foreground/90">
+          <h2 className="font-display text-[17px] text-foreground">
             我的设备
           </h2>
         </div>
@@ -157,7 +157,7 @@ export default function ConnectorsPage() {
       <div>
         <div className="flex items-center gap-2 mb-4">
           <Blocks className="h-[15px] w-[15px] text-muted-foreground" />
-          <h2 className="text-[15px] font-semibold text-foreground/90">
+          <h2 className="font-display text-[17px] text-foreground">
             连接器市场
           </h2>
         </div>
@@ -230,7 +230,7 @@ function ConnectorCard({ connector }: { connector: Connector }) {
   const status = statusConfig[connector.status];
 
   return (
-    <Card className="border-0 bg-card p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)] transition-all duration-200 group">
+    <Card className="border border-border/40 bg-card p-5 hover:shadow-sm transition-all duration-200 group">
       <div className="flex items-start gap-4">
         <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-muted text-xl">
           {connector.icon}

@@ -71,7 +71,7 @@ export function EchoAvatar({ size = "sm" }: { size?: "sm" | "md" | "lg" }) {
       className={cn(
         config.dim,
         config.rounded,
-        "flex-shrink-0 flex items-center justify-center bg-gradient-to-br from-[#D4864A] to-[#E8A06A]"
+        "flex-shrink-0 flex items-center justify-center bg-[#C4713E]"
       )}
     >
       <EchoSymbol size={config.symbol} color="white" />

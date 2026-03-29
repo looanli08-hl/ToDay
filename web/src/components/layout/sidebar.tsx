@@ -56,10 +56,10 @@ export function Sidebar() {
       {/* Logo + Actions */}
       <div className="flex items-center justify-between px-4 pt-4 pb-2">
         <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-[#D4864A] to-[#E8A06A] shadow-sm shadow-[#D4864A]/20">
-            <span className="text-[13px] font-bold text-white tracking-tight">T</span>
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#C4713E]">
+            <span className="text-[11px] font-semibold text-white">T</span>
           </div>
-          <span className="text-[15px] font-semibold tracking-tight text-foreground/90">ToDay</span>
+          <span className="font-display text-[16px] text-foreground">ToDay</span>
         </div>
       </div>
 
@@ -127,7 +127,7 @@ export function Sidebar() {
       {/* User Profile */}
       <div className="border-t border-border/50 px-3 py-3">
         <div className="flex items-center gap-2.5 rounded-lg px-2 py-1.5 hover:bg-accent/60 transition-colors cursor-pointer">
-          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[#e8734a]/20 to-[#f59e6c]/20 text-[#e8734a]">
+          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#C4713E]/15 text-[#C4713E]">
             <span className="text-xs font-semibold">
               {userName.charAt(0).toUpperCase()}
             </span>
