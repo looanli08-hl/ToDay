@@ -293,9 +293,24 @@ export default function TimelinePage() {
     fetchBrowsingSessions(dateStr).then(setBrowsingSessions);
   }, [selectedDate]);
 
-  // For now, only show mock timeline events for "today"; other dates show empty state
-  // Real browsing data appears in its own section below
-  const events = isToday ? mockEvents : [];
+  // Merge browsing sessions into the timeline as real events
+  // Mock events are used as placeholder for non-browser data (phone, sensors)
+  const phoneEvents = isToday ? mockEvents : [];
+
+  // Convert browsing sessions to timeline events
+  const browsingEvents: TimelineEvent[] = browsingSessions.map((s, i) => ({
+    id: `browse-${i}`,
+    time: formatTimeFromTimestamp(s.startTime),
+    label: s.title && s.title !== s.domain ? `${s.label} · ${s.title}` : s.label || s.domain,
+    icon: Monitor,
+    duration: formatDuration(s.duration),
+    type: "screen" as const,
+  }));
+
+  // Merge and sort all events by time
+  const events = [...phoneEvents, ...browsingEvents].sort((a, b) =>
+    a.time.localeCompare(b.time)
+  );
 
   const dateStr = selectedDate.toLocaleDateString("zh-CN", {
     year: "numeric",
@@ -380,52 +395,35 @@ export default function TimelinePage() {
           )}
         </div>
 
-        {/* Browsing Sessions */}
+        {/* Browsing Detail — collapsible summary */}
         {browsingSessions.length > 0 && (
           <div className="border border-border/40 bg-card rounded-xl p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <Monitor
-                className="h-4 w-4 text-muted-foreground"
-                strokeWidth={1.5}
-              />
-              <h2 className="font-display text-lg text-foreground">
-                浏览记录
-              </h2>
-              <span className="text-xs text-muted-foreground ml-auto">
-                来自浏览器扩展
-              </span>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Monitor className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
+                <h2 className="font-display text-lg text-foreground">浏览详情</h2>
+              </div>
+              <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                <span>{browsingSessions.length} 个时段</span>
+                <span className="font-mono">{formatDuration(browsingSessions.reduce((sum, s) => sum + s.duration, 0))}</span>
+              </div>
             </div>
             <div>
-              {browsingSessions.map((session, i) => {
-                const isLast = i === browsingSessions.length - 1;
-                return (
-                  <div key={i} className="flex items-start gap-4">
-                    <span className="w-24 text-xs font-mono text-muted-foreground pt-0.5 text-right shrink-0">
-                      {formatTimeFromTimestamp(session.startTime)} - {formatTimeFromTimestamp(session.endTime)}
-                    </span>
-                    <div className="relative flex flex-col items-center shrink-0">
-                      <div className="h-2 w-2 rounded-full bg-muted-foreground/30 mt-1.5" />
-                      {!isLast && <div className="w-px flex-1 bg-border/60 mt-1" />}
-                    </div>
-                    <div className="flex-1 pb-5 flex items-start justify-between">
-                      <span className="text-sm text-foreground">
-                        {session.label || session.domain}
-                      </span>
-                      <span className="text-xs text-muted-foreground font-mono shrink-0">
-                        {formatDuration(session.duration)}
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-            <div className="mt-2 pt-3 border-t border-border/30 flex justify-between">
-              <span className="text-xs text-muted-foreground">
-                {browsingSessions.length} 个时段
-              </span>
-              <span className="text-xs text-muted-foreground font-mono">
-                {formatDuration(browsingSessions.reduce((sum, s) => sum + s.duration, 0))}
-              </span>
+              {browsingSessions.map((session, i) => (
+                <div key={i} className="flex items-center gap-4 py-2 border-b border-border/30 last:border-0">
+                  <span className="w-24 text-[11px] font-mono text-muted-foreground shrink-0">
+                    {formatTimeFromTimestamp(session.startTime)} - {formatTimeFromTimestamp(session.endTime)}
+                  </span>
+                  <span className="text-sm text-foreground flex-1 truncate">
+                    {session.title && session.title !== session.domain
+                      ? `${session.label} · ${session.title}`
+                      : session.label || session.domain}
+                  </span>
+                  <span className="text-xs text-muted-foreground font-mono shrink-0">
+                    {formatDuration(session.duration)}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
         )}
