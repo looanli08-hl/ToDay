@@ -106,6 +106,7 @@ final class BackgroundTaskManager {
 
     /// Generate today's timeline and persist it.
     private func generateTodayTimeline() async {
+        guard UserDefaults.standard.bool(forKey: "today.smartRecording.enabled") else { return }
         let provider = AppContainer.makeTimelineProvider()
         let today = calendar.startOfDay(for: Date())
 
@@ -121,6 +122,7 @@ final class BackgroundTaskManager {
 
     /// Backfill any missing timelines for the past 7 days.
     private func backfillRecentTimelines() async {
+        guard UserDefaults.standard.bool(forKey: "today.smartRecording.enabled") else { return }
         let provider = AppContainer.makeTimelineProvider()
         let today = calendar.startOfDay(for: Date())
 

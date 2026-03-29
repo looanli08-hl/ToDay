@@ -12,6 +12,7 @@ struct ToDayApp: App {
     private let backgroundTaskManager = BackgroundTaskManager.shared
 
     init() {
+        UserDefaults.standard.register(defaults: ["today.smartRecording.enabled": true])
         backgroundTaskManager.registerTasks()
     }
 

@@ -35,6 +35,20 @@ struct SettingsView: View {
                     Text("设备与同步")
                 }
 
+                // MARK: - 智能记录
+                Section {
+                    Toggle("智能记录", isOn: Binding(
+                        get: { UserDefaults.standard.bool(forKey: "today.smartRecording.enabled") },
+                        set: { newValue in
+                            UserDefaults.standard.set(newValue, forKey: "today.smartRecording.enabled")
+                        }
+                    ))
+                } header: {
+                    Text("智能记录")
+                } footer: {
+                    Text("开启后，ToDay 会在后台自动感知你的运动、位置和作息，生成每日时间线。推荐开启。")
+                }
+
                 // MARK: - Echo 回响
                 Section {
                     Picker("回响频率", selection: Binding(
