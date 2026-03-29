@@ -1,8 +1,10 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { createClient } from "@/lib/supabase/client";
 import {
   LayoutDashboard,
   Clock,
@@ -35,6 +37,20 @@ const bottomNav = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const [userName, setUserName] = useState("...");
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) {
+        setUserName(
+          user.user_metadata?.display_name ||
+            user.email?.split("@")[0] ||
+            "用户"
+        );
+      }
+    });
+  }, []);
 
   return (
     <aside className="flex h-screen w-[260px] flex-col bg-[var(--sidebar)]">
@@ -113,10 +129,14 @@ export function Sidebar() {
       <div className="border-t border-border/50 px-3 py-3">
         <div className="flex items-center gap-2.5 rounded-lg px-2 py-1.5 hover:bg-accent/60 transition-colors cursor-pointer">
           <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[#e8734a]/20 to-[#f59e6c]/20 text-[#e8734a]">
-            <span className="text-xs font-semibold">L</span>
+            <span className="text-xs font-semibold">
+              {userName.charAt(0).toUpperCase()}
+            </span>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-[13px] font-medium text-foreground/90 truncate">Looan</p>
+            <p className="text-[13px] font-medium text-foreground/90 truncate">
+              {userName}
+            </p>
             <p className="text-[11px] text-muted-foreground">免费版</p>
           </div>
         </div>
