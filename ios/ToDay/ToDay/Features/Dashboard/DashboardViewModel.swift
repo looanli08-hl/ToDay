@@ -105,6 +105,24 @@ struct DashboardViewModel {
     }
 
     private var screenTimeCard: DashboardCardData {
+        // Try real DeviceActivity data from shared UserDefaults first
+        if let data = UserDefaults(suiteName: SharedAppGroup.identifier)?.data(forKey: "today.screenTime.summary"),
+           let summary = try? JSONDecoder().decode(ScreenTimeSummary.self, from: data),
+           Calendar.current.isDateInToday(summary.date),
+           summary.totalDuration > 0 {
+            let hours = Int(summary.totalDuration) / 3600
+            let minutes = (Int(summary.totalDuration) % 3600) / 60
+            let value = hours > 0 ? "\(hours)h \(minutes)m" : "\(minutes)m"
+            return DashboardCardData(
+                id: "screenTime",
+                icon: "iphone",
+                label: "屏幕时间",
+                value: value,
+                tint: TodayTheme.purple
+            )
+        }
+
+        // Fallback to existing logic
         let screenTimeStat = timeline?.stats.first { $0.title == "屏幕时间" }
         let value = screenTimeStat?.value ?? screenTimeFromEntries ?? "--"
         return DashboardCardData(

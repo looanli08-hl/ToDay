@@ -1,4 +1,5 @@
 import CoreLocation
+import FamilyControls
 import HealthKit
 import Photos
 import SwiftData
@@ -123,6 +124,24 @@ struct SettingsView: View {
                                 .foregroundStyle(.primary)
                             Spacer()
                             Text(photoStatusText)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+
+                    Button {
+                        Task {
+                            do {
+                                try await AuthorizationCenter.shared.requestAuthorization(for: .individual)
+                            } catch {
+                                print("Screen Time authorization failed: \(error)")
+                            }
+                        }
+                    } label: {
+                        HStack {
+                            Text("屏幕时间")
+                                .foregroundStyle(.primary)
+                            Spacer()
+                            Text(screenTimeAuthStatus)
                                 .foregroundStyle(.secondary)
                         }
                     }
@@ -325,6 +344,10 @@ struct SettingsView: View {
         @unknown default:
             return "未知"
         }
+    }
+
+    private var screenTimeAuthStatus: String {
+        return AuthorizationCenter.shared.authorizationStatus == .approved ? "已授权" : "未授权"
     }
 
     // MARK: - Actions

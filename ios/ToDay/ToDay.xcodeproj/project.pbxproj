@@ -115,6 +115,7 @@
 		AB5F6A399EE781C4F3B21BC6 /* EchoWeeklyProfileUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE82260DB517A82DAD2783A3 /* EchoWeeklyProfileUpdater.swift */; };
 		ABCA0EF892CA47271A8C8022 /* FamilyControls.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E4F86AADDBC49C09C487C0A9 /* FamilyControls.framework */; };
 		ACB5952FC0F8CB92C245AD7F /* EchoChatSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF883384B93C9EE573AAA35 /* EchoChatSession.swift */; };
+		AE531BB04C22C7BBA1783205 /* ScreenTimeCollector.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD8E3035B4B04B72100D9BE9 /* ScreenTimeCollector.swift */; };
 		AFB0264365F2546579D2F53A /* MoodRecordStoring.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E53E00BCF5527A4FE8FD775 /* MoodRecordStoring.swift */; };
 		B1FE8264ADB9954A55A2426D /* EchoMessageStoring.swift in Sources */ = {isa = PBXBuildFile; fileRef = 858B86D76A9DD048BF71A74A /* EchoMessageStoring.swift */; };
 		B2FE859DE89B5215AC30DE4E /* EventDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83CAB597D8277AED207D5F76 /* EventDetailView.swift */; };
@@ -312,6 +313,7 @@
 		BBCD4A5F4CC225705F0BF659 /* VoiceRecordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceRecordView.swift; sourceTree = "<group>"; };
 		BBFA94CCF4D730B27A3ADECE /* PhoneInferenceEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneInferenceEngineTests.swift; sourceTree = "<group>"; };
 		BCF883384B93C9EE573AAA35 /* EchoChatSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoChatSession.swift; sourceTree = "<group>"; };
+		BD8E3035B4B04B72100D9BE9 /* ScreenTimeCollector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenTimeCollector.swift; sourceTree = "<group>"; };
 		BE0830BE171EA285B8947AF0 /* EchoCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoCardView.swift; sourceTree = "<group>"; };
 		C21C9E109566FA529B09263C /* ToDayScreenTimeReport.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ToDayScreenTimeReport.entitlements; sourceTree = "<group>"; };
 		C300C973775E007521F18167 /* CurrentActivityProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentActivityProvider.swift; sourceTree = "<group>"; };
@@ -608,6 +610,7 @@
 				3DF36EFDDCA82F9755D1A41B /* PhoneInferenceEngine.swift */,
 				F9F156F37B272E8665520A41 /* PhoneTimelineDataProvider.swift */,
 				B585761B8625E14B1B08A4E1 /* PlaceManager.swift */,
+				BD8E3035B4B04B72100D9BE9 /* ScreenTimeCollector.swift */,
 				E55BD79449543E2EDA158B48 /* SensorCollecting.swift */,
 				44311ECA1B0B67F057B402DF /* SensorDataStore.swift */,
 				25E947A917714BEAF2DC6239 /* SensorTypes.swift */,
@@ -923,6 +926,7 @@
 				8893776CB6689D8D24789DB3 /* PlaceManager.swift in Sources */,
 				4FE7ED6B910849760A8ED1BE /* QuickRecordSheet.swift in Sources */,
 				66C0C027922CF1FE1E1BE8AA /* RecordPanel.swift in Sources */,
+				AE531BB04C22C7BBA1783205 /* ScreenTimeCollector.swift in Sources */,
 				30210498E5579E885DA66A25 /* ScreenTimeInputView.swift in Sources */,
 				6CA276BE75D088298ACEB76E /* ScreenTimeRecord.swift in Sources */,
 				E1CC38BB3BCDDACCB868173E /* ScreenTimeRecordEntity.swift in Sources */,
