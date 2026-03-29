@@ -50,11 +50,11 @@ dataTypes: [steps, sleep]
 
 export default function DocsPage() {
   return (
-    <div className="p-12 max-w-4xl">
+    <div className="px-12 pt-12 pb-12 max-w-4xl">
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
-          <BookMarked className="h-6 w-6 text-muted-foreground" strokeWidth={1.5} />
+          <BookMarked className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
           <h1 className="font-display text-2xl tracking-tight text-foreground">
             开发者文档
           </h1>
@@ -69,16 +69,16 @@ export default function DocsPage() {
         {sections.map((section) => (
           <Card
             key={section.title}
-            className="border border-border/40 bg-card p-6"
+            className="border border-border/40 bg-card rounded-xl p-6"
           >
             <div className="flex items-center gap-2.5 mb-3">
-              <section.icon className="h-[18px] w-[18px] text-muted-foreground" strokeWidth={1.5} />
-              <h2 className="font-display text-[17px] text-foreground">{section.title}</h2>
+              <section.icon className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
+              <h2 className="font-display text-lg text-foreground">{section.title}</h2>
             </div>
-            <p className="text-[13px] text-muted-foreground mb-4">
+            <p className="text-sm text-muted-foreground mb-4">
               {section.description}
             </p>
-            <pre className="rounded-xl bg-[#1a1a2e] p-4 text-[12px] text-[#e0e0e0] font-mono leading-relaxed overflow-x-auto">
+            <pre className="bg-foreground text-background rounded-xl p-4 text-xs font-mono leading-relaxed overflow-x-auto">
               {section.content}
             </pre>
           </Card>
@@ -86,8 +86,8 @@ export default function DocsPage() {
       </div>
 
       {/* Community Links */}
-      <Card className="mt-8 border border-border/40 bg-card p-6">
-        <h2 className="font-display text-[17px] text-foreground mb-4">加入社区</h2>
+      <Card className="mt-8 border border-border/40 bg-card rounded-xl p-6">
+        <h2 className="font-display text-lg text-foreground mb-4">加入社区</h2>
         <div className="grid gap-3 sm:grid-cols-2">
           <a
             href="https://github.com/looanli08-hl/ToDay"
@@ -98,11 +98,11 @@ export default function DocsPage() {
             <Code2 className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
             <div className="flex-1">
               <p className="text-sm font-medium">GitHub</p>
-              <p className="text-[12px] text-muted-foreground">
+              <p className="text-xs text-muted-foreground">
                 源码 &middot; Issues &middot; PR
               </p>
             </div>
-            <ExternalLink className="h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground transition-colors" />
+            <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
           </a>
           <a
             href="#"
@@ -111,11 +111,11 @@ export default function DocsPage() {
             <Terminal className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
             <div className="flex-1">
               <p className="text-sm font-medium">Discord</p>
-              <p className="text-[12px] text-muted-foreground">
+              <p className="text-xs text-muted-foreground">
                 讨论 &middot; 求助 &middot; 分享
               </p>
             </div>
-            <ExternalLink className="h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground transition-colors" />
+            <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
           </a>
         </div>
       </Card>

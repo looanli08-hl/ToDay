@@ -38,28 +38,28 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#F5F1EB]">
+    <div className="flex min-h-screen items-center justify-center bg-background">
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="flex items-center justify-center gap-2.5 mb-8">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#C4713E]">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
             <span className="text-sm font-semibold text-white">T</span>
           </div>
-          <span className="font-display text-xl text-[#2C2418]">
+          <span className="font-display text-xl text-foreground">
             ToDay
           </span>
         </div>
 
         {/* Card */}
-        <div className="rounded-2xl bg-white p-8 border border-[#E6DFD3]">
-          <h1 className="font-display text-xl text-[#2C2418] mb-1">
+        <div className="rounded-xl bg-white p-8 border border-border">
+          <h1 className="font-display text-xl text-foreground mb-1">
             创建账户
           </h1>
-          <p className="text-sm text-[#8A7D6B] mb-6">开始记录你的生活</p>
+          <p className="text-sm text-muted-foreground mb-6">开始记录你的生活</p>
 
           <form onSubmit={handleRegister} className="space-y-4">
             <div>
-              <label className="block text-[13px] font-medium text-[#2C2418] mb-1.5">
+              <label className="block text-sm font-medium text-foreground mb-1.5">
                 名字
               </label>
               <input
@@ -68,11 +68,11 @@ export default function RegisterPage() {
                 onChange={(e) => setName(e.target.value)}
                 placeholder="你的名字"
                 required
-                className="w-full rounded-xl border border-[#E6DFD3] bg-[#F5F1EB] px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#C4713E]/20 focus:border-[#C4713E] transition-all"
+                className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm placeholder:text-muted-foreground/50 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all"
               />
             </div>
             <div>
-              <label className="block text-[13px] font-medium text-[#2C2418] mb-1.5">
+              <label className="block text-sm font-medium text-foreground mb-1.5">
                 邮箱
               </label>
               <input
@@ -81,11 +81,11 @@ export default function RegisterPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="your@email.com"
                 required
-                className="w-full rounded-xl border border-[#E6DFD3] bg-[#F5F1EB] px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#C4713E]/20 focus:border-[#C4713E] transition-all"
+                className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm placeholder:text-muted-foreground/50 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all"
               />
             </div>
             <div>
-              <label className="block text-[13px] font-medium text-[#2C2418] mb-1.5">
+              <label className="block text-sm font-medium text-foreground mb-1.5">
                 密码
               </label>
               <input
@@ -95,7 +95,7 @@ export default function RegisterPage() {
                 placeholder="至少 6 位"
                 required
                 minLength={6}
-                className="w-full rounded-xl border border-[#E6DFD3] bg-[#F5F1EB] px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#C4713E]/20 focus:border-[#C4713E] transition-all"
+                className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm placeholder:text-muted-foreground/50 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all"
               />
             </div>
 
@@ -108,18 +108,18 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-xl bg-[#C4713E] hover:bg-[#B5633A] py-2.5 text-sm font-medium text-white transition-colors disabled:opacity-50"
+              className="w-full bg-primary text-primary-foreground rounded-lg px-4 py-2.5 text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
             >
               {loading ? "注册中..." : "注册"}
             </button>
           </form>
         </div>
 
-        <p className="text-center text-[13px] text-[#8A7D6B] mt-4">
+        <p className="text-center text-sm text-muted-foreground mt-4">
           已有账户？{" "}
           <Link
             href="/auth/login"
-            className="text-[#C4713E] font-medium hover:underline"
+            className="text-primary font-medium hover:underline"
           >
             登录
           </Link>

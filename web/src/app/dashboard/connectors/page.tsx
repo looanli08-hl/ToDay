@@ -53,14 +53,14 @@ const devices: Device[] = [
 
 function DeviceCard({ device }: { device: Device }) {
   return (
-    <Card className="border border-border/40 bg-card p-6">
+    <Card className="border border-border/40 bg-card rounded-xl p-6">
       <div className="flex items-center gap-3 mb-5">
         <span className="text-2xl">{device.icon}</span>
         <div>
-          <h3 className="font-display text-[15px] text-foreground">
+          <h3 className="font-display text-base text-foreground">
             {device.name}
           </h3>
-          <p className="text-[12px] text-muted-foreground">
+          <p className="text-xs text-muted-foreground">
             {device.connectors.filter((c) => c.connected).length}/
             {device.connectors.length} 已连接
           </p>
@@ -72,14 +72,14 @@ function DeviceCard({ device }: { device: Device }) {
           <div key={conn.name} className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
               <div
-                className={`h-2 w-2 rounded-full ${conn.connected ? "bg-green-400" : "bg-gray-300"}`}
+                className={`h-2 w-2 rounded-full ${conn.connected ? "bg-emerald-500" : "bg-muted-foreground/30"}`}
               />
-              <span className="text-[13px] text-foreground/80">
+              <span className="text-sm text-foreground/80">
                 {conn.name}
               </span>
             </div>
             {conn.connected ? (
-              <span className="text-[11px] text-green-600 font-medium">
+              <span className="text-[11px] text-emerald-600 font-medium">
                 已连接
               </span>
             ) : conn.action ? (
@@ -97,7 +97,7 @@ function DeviceCard({ device }: { device: Device }) {
         <div className="flex items-center gap-1.5">
           {device.lastSync ? (
             <>
-              <div className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
+              <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
               <span className="text-[11px] text-muted-foreground">
                 最后同步：{device.lastSync}
               </span>
@@ -126,11 +126,11 @@ export default function ConnectorsPage() {
   });
 
   return (
-    <div className="p-12">
+    <div className="px-12 pt-12 pb-12">
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
-          <Blocks className="h-6 w-6 text-muted-foreground" strokeWidth={1.5} />
+          <Blocks className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
           <h1 className="font-display text-2xl tracking-tight text-foreground">连接器</h1>
         </div>
         <p className="text-sm text-muted-foreground">
@@ -141,8 +141,8 @@ export default function ConnectorsPage() {
       {/* Devices Section */}
       <div className="mb-10">
         <div className="flex items-center gap-2 mb-4">
-          <Laptop className="h-[15px] w-[15px] text-muted-foreground" />
-          <h2 className="font-display text-[17px] text-foreground">
+          <Laptop className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
+          <h2 className="font-display text-lg text-foreground">
             我的设备
           </h2>
         </div>
@@ -156,8 +156,8 @@ export default function ConnectorsPage() {
       {/* Marketplace Section */}
       <div>
         <div className="flex items-center gap-2 mb-4">
-          <Blocks className="h-[15px] w-[15px] text-muted-foreground" />
-          <h2 className="font-display text-[17px] text-foreground">
+          <Blocks className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
+          <h2 className="font-display text-lg text-foreground">
             连接器市场
           </h2>
         </div>
@@ -171,7 +171,7 @@ export default function ConnectorsPage() {
               placeholder="搜索连接器..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-xl border border-border bg-card pl-10 pr-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20 transition-shadow"
+              className="w-full rounded-lg border border-border bg-background pl-10 pr-4 py-2.5 text-sm placeholder:text-muted-foreground/50 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all"
             />
           </div>
           <div className="flex gap-2">
@@ -179,9 +179,9 @@ export default function ConnectorsPage() {
               <button
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
-                className={`rounded-full px-4 py-1.5 text-[13px] font-medium transition-all ${
+                className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
                   activeCategory === cat.id
-                    ? "bg-foreground text-background shadow-sm"
+                    ? "bg-foreground text-background"
                     : "bg-card text-muted-foreground hover:bg-accent border border-border/60"
                 }`}
               >
@@ -198,8 +198,8 @@ export default function ConnectorsPage() {
           ))}
 
           {/* "开发连接器" card */}
-          <Card className="flex flex-col items-center justify-center border border-dashed border-border/60 bg-transparent p-8 hover:bg-card/50 transition-colors cursor-pointer group">
-            <Plus className="h-5 w-5 text-muted-foreground/50 mb-3 group-hover:text-muted-foreground transition-colors" strokeWidth={1.5} />
+          <Card className="flex flex-col items-center justify-center border border-dashed border-border/60 bg-transparent rounded-xl p-6 hover:bg-card/50 transition-colors cursor-pointer group">
+            <Plus className="h-4 w-4 text-muted-foreground/50 mb-3 group-hover:text-muted-foreground transition-colors" strokeWidth={1.5} />
             <p className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors">
               开发连接器
             </p>
@@ -215,7 +215,7 @@ function ConnectorCard({ connector }: { connector: Connector }) {
   const statusConfig = {
     available: {
       label: "可用",
-      className: "bg-green-50 text-green-700 border-green-200",
+      className: "bg-emerald-50 text-emerald-700 border-emerald-200",
     },
     coming_soon: {
       label: "即将推出",
@@ -230,7 +230,7 @@ function ConnectorCard({ connector }: { connector: Connector }) {
   const status = statusConfig[connector.status];
 
   return (
-    <Card className="border border-border/40 bg-card p-5 hover:shadow-sm transition-all duration-200 group">
+    <Card className="border border-border/40 bg-card rounded-xl p-6 hover:shadow-sm transition-all duration-200 group">
       <div className="flex items-start gap-4">
         <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-muted text-xl">
           {connector.icon}
@@ -241,12 +241,12 @@ function ConnectorCard({ connector }: { connector: Connector }) {
               {connector.name}
             </h3>
             <span
-              className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium border ${status.className}`}
+              className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium border ${status.className}`}
             >
               {status.label}
             </span>
           </div>
-          <p className="text-[12px] text-muted-foreground leading-relaxed mb-3">
+          <p className="text-xs text-muted-foreground leading-relaxed mb-3">
             {connector.description}
           </p>
           <div className="flex items-center justify-between">
@@ -254,14 +254,14 @@ function ConnectorCard({ connector }: { connector: Connector }) {
               {connector.dataTypes.slice(0, 3).map((type) => (
                 <span
                   key={type}
-                  className="rounded-md bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground"
+                  className="rounded-lg bg-muted px-1.5 py-0.5 text-[11px] text-muted-foreground"
                 >
                   {type}
                 </span>
               ))}
             </div>
             <button
-              className={`rounded-lg px-3 py-1.5 text-[12px] font-medium transition-all ${
+              className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
                 connector.status === "available"
                   ? "bg-foreground text-background hover:opacity-90"
                   : "bg-muted text-muted-foreground cursor-not-allowed"

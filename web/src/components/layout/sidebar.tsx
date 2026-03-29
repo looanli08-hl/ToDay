@@ -56,10 +56,10 @@ export function Sidebar() {
       {/* Logo + Actions */}
       <div className="flex items-center justify-between px-4 pt-4 pb-2">
         <div className="flex items-center gap-2.5">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#C4713E]">
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary">
             <span className="text-[11px] font-semibold text-white">T</span>
           </div>
-          <span className="font-display text-[16px] text-foreground">ToDay</span>
+          <span className="font-display text-base text-foreground">ToDay</span>
         </div>
       </div>
 
@@ -89,9 +89,9 @@ export function Sidebar() {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] font-medium transition-all duration-150",
+                "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-150",
                 isActive
-                  ? "bg-accent text-foreground shadow-[0_1px_2px_rgba(0,0,0,0.04)]"
+                  ? "bg-accent text-foreground"
                   : "text-muted-foreground hover:bg-accent/60 hover:text-foreground/80"
               )}
             >
@@ -111,7 +111,7 @@ export function Sidebar() {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] font-medium transition-colors",
+                "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                 isActive
                   ? "bg-accent text-foreground"
                   : "text-muted-foreground hover:bg-accent/60 hover:text-foreground/80"
@@ -127,13 +127,13 @@ export function Sidebar() {
       {/* User Profile */}
       <div className="border-t border-border/50 px-3 py-3">
         <div className="flex items-center gap-2.5 rounded-lg px-2 py-1.5 hover:bg-accent/60 transition-colors cursor-pointer">
-          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#C4713E]/15 text-[#C4713E]">
+          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/15 text-primary">
             <span className="text-xs font-semibold">
               {userName.charAt(0).toUpperCase()}
             </span>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-[13px] font-medium text-foreground/90 truncate">
+            <p className="text-sm font-medium text-foreground/90 truncate">
               {userName}
             </p>
             <p className="text-[11px] text-muted-foreground">免费版</p>

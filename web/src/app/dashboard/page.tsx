@@ -58,11 +58,11 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <div className="px-12 pt-16 pb-10">
-        <h1 className="font-display text-[36px] font-normal tracking-tight text-foreground">
+      <div className="px-12 pt-12 pb-10">
+        <h1 className="font-display text-4xl font-normal tracking-tight text-foreground">
           {greeting}，Looan
         </h1>
-        <p className="text-[15px] text-muted-foreground mt-2">{dateStr}</p>
+        <p className="text-base text-muted-foreground mt-2">{dateStr}</p>
       </div>
 
       <div className="px-12 pb-12 space-y-8">
@@ -71,15 +71,15 @@ export default function DashboardPage() {
           {statCards.map((card) => (
             <Card
               key={card.label}
-              className="border border-border/40 bg-card p-6 hover:shadow-sm transition-shadow duration-300"
+              className="border border-border/40 bg-card rounded-xl p-6 hover:shadow-sm transition-shadow duration-300"
             >
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-[13px] text-muted-foreground">{card.label}</p>
-                  <p className="font-display text-[32px] font-normal text-foreground mt-2">{card.value}</p>
-                  <p className="text-[12px] text-muted-foreground/60 mt-1">{card.sub}</p>
+                  <p className="text-sm text-muted-foreground">{card.label}</p>
+                  <p className="font-display text-2xl font-normal text-foreground mt-2">{card.value}</p>
+                  <p className="text-xs text-muted-foreground/60 mt-1">{card.sub}</p>
                 </div>
-                <card.icon className="h-5 w-5 text-muted-foreground/25" strokeWidth={1.5} />
+                <card.icon className="h-4 w-4 text-muted-foreground/25" strokeWidth={1.5} />
               </div>
             </Card>
           ))}
@@ -88,14 +88,14 @@ export default function DashboardPage() {
         {/* Main Grid */}
         <div className="grid gap-6 xl:grid-cols-3">
           {/* Timeline */}
-          <Card className="xl:col-span-2 border border-border/40 bg-card p-6">
+          <Card className="xl:col-span-2 border border-border/40 bg-card rounded-xl p-6">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2.5">
-                <Activity className="h-[15px] w-[15px] text-muted-foreground" />
-                <h2 className="font-display text-[17px] text-foreground">今日时间线</h2>
+                <Activity className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
+                <h2 className="font-display text-lg text-foreground">今日时间线</h2>
               </div>
-              <div className="flex items-center gap-1.5 text-[12px] text-muted-foreground">
-                <div className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 实时
               </div>
             </div>
@@ -104,7 +104,7 @@ export default function DashboardPage() {
             <div className="space-y-0">
               {recentActivities.map((activity, i) => (
                 <div key={i} className="flex items-center gap-4 py-3 border-b border-border/40 last:border-0">
-                  <span className="text-[13px] font-mono text-muted-foreground w-12">{activity.time}</span>
+                  <span className="text-sm font-mono text-muted-foreground w-12">{activity.time}</span>
                   <div className="relative">
                     <div className="h-2 w-2 rounded-full bg-muted-foreground/30" />
                     {i < recentActivities.length - 1 && (
@@ -112,7 +112,7 @@ export default function DashboardPage() {
                     )}
                   </div>
                   <div className="flex-1">
-                    <p className="text-[13px] text-foreground/80">{activity.label}</p>
+                    <p className="text-sm text-foreground/80">{activity.label}</p>
                   </div>
                 </div>
               ))}
@@ -120,7 +120,7 @@ export default function DashboardPage() {
 
             {/* Empty state when no data */}
             <div className="mt-4 rounded-xl border border-dashed border-border/50 p-6 text-center">
-              <p className="text-[13px] text-muted-foreground">
+              <p className="text-sm text-muted-foreground">
                 连接数据源后，更多活动会自动出现在这里
               </p>
             </div>
@@ -129,13 +129,13 @@ export default function DashboardPage() {
           {/* Right Column */}
           <div className="space-y-6">
             {/* Echo AI */}
-            <Card className="border border-border/40 bg-card p-5">
+            <Card className="border border-border/40 bg-card rounded-xl p-6">
               <div className="flex items-center gap-2 mb-4">
-                <EchoSymbol size={15} className="text-[#C4713E]" />
-                <h2 className="font-display text-[17px] text-foreground">Echo</h2>
+                <EchoSymbol size={15} className="text-primary" />
+                <h2 className="font-display text-lg text-foreground">Echo</h2>
               </div>
-              <div className="rounded-xl bg-[var(--background)] p-4 mb-3">
-                <p className="text-[13px] text-foreground/70 leading-relaxed">
+              <div className="rounded-xl bg-background p-4 mb-3">
+                <p className="text-sm text-foreground/70 leading-relaxed">
                   「今天看起来很充实。下午记得休息一下眼睛」
                 </p>
                 <p className="mt-2 text-[11px] text-muted-foreground">Echo · 刚刚</p>
@@ -144,22 +144,22 @@ export default function DashboardPage() {
                 <input
                   type="text"
                   placeholder="跟 Echo 说点什么..."
-                  className="flex-1 rounded-xl border border-border/40 bg-[var(--background)] px-3.5 py-2.5 text-[13px] outline-none placeholder:text-muted-foreground/50 focus:ring-1 focus:ring-[#C4713E]/30"
+                  className="flex-1 rounded-lg border border-border bg-background px-4 py-2.5 text-sm placeholder:text-muted-foreground/50 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all"
                 />
-                <button className="rounded-xl bg-[#C4713E] hover:bg-[#B5633A] px-3.5 py-2.5 text-[12px] font-medium text-white transition-colors">
+                <button className="bg-primary text-primary-foreground rounded-lg px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity">
                   发送
                 </button>
               </div>
             </Card>
 
             {/* Weekly Activity */}
-            <Card className="border border-border/40 bg-card p-5">
+            <Card className="border border-border/40 bg-card rounded-xl p-6">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <TrendingUp className="h-[15px] w-[15px] text-muted-foreground" />
-                  <h2 className="font-display text-[17px] text-foreground">本周活跃度</h2>
+                  <TrendingUp className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
+                  <h2 className="font-display text-lg text-foreground">本周活跃度</h2>
                 </div>
-                <button className="text-[12px] text-muted-foreground hover:text-foreground flex items-center gap-0.5 transition-colors">
+                <button className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-0.5 transition-colors">
                   详情 <ArrowUpRight className="h-3 w-3" />
                 </button>
               </div>
@@ -168,7 +168,7 @@ export default function DashboardPage() {
                 {weeklyData.map((d) => (
                   <div key={d.day} className="flex flex-col items-center gap-1.5 flex-1">
                     <div
-                      className="w-full rounded-md bg-[#C4713E]/70 transition-all duration-500"
+                      className="w-full rounded-lg bg-primary/70 transition-all duration-500"
                       style={{ height: `${d.value}%` }}
                     />
                     <span className="text-[11px] text-muted-foreground">{d.day}</span>
@@ -178,12 +178,12 @@ export default function DashboardPage() {
             </Card>
 
             {/* Life Pulse */}
-            <Card className="border border-border/40 bg-card p-5">
+            <Card className="border border-border/40 bg-card rounded-xl p-6">
               <div className="flex items-center gap-2 mb-3">
-                <Activity className="h-[15px] w-[15px] text-muted-foreground" strokeWidth={1.5} />
-                <h2 className="font-display text-[17px] text-foreground">生活脉搏</h2>
+                <Activity className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
+                <h2 className="font-display text-lg text-foreground">生活脉搏</h2>
               </div>
-              <p className="text-[13px] leading-relaxed text-muted-foreground">
+              <p className="text-sm leading-relaxed text-muted-foreground">
                 连接你的手机和电脑后，ToDay 会自动分析你的生活节奏，给出个性化的洞察。
               </p>
             </Card>
@@ -191,8 +191,8 @@ export default function DashboardPage() {
         </div>
 
         {/* Quick Actions */}
-        <Card className="border border-border/40 bg-card p-6">
-          <p className="text-[13px] text-muted-foreground mb-3">快速操作</p>
+        <Card className="border border-border/40 bg-card rounded-xl p-6">
+          <p className="text-sm text-muted-foreground mb-3">快速操作</p>
           <div className="flex flex-wrap gap-2">
             {[
               { icon: Heart, label: "记录心情" },
@@ -203,9 +203,9 @@ export default function DashboardPage() {
             ].map((action) => (
               <button
                 key={action.label}
-                className="flex items-center gap-2 rounded-full border border-border/50 px-4 py-2 text-[13px] text-muted-foreground hover:text-foreground hover:border-border transition-all duration-200"
+                className="flex items-center gap-2 rounded-full border border-border/50 px-4 py-2 text-sm text-muted-foreground hover:text-foreground hover:border-border transition-colors"
               >
-                <action.icon className="h-3.5 w-3.5" strokeWidth={1.5} />
+                <action.icon className="h-4 w-4" strokeWidth={1.5} />
                 {action.label}
               </button>
             ))}

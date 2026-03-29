@@ -159,7 +159,7 @@ function TypingIndicator() {
 
 function EchoMessageContent({ content }: { content: string }) {
   return (
-    <div className="prose prose-sm max-w-none text-foreground/85 leading-relaxed [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&_p]:my-1.5 [&_ul]:my-1.5 [&_ol]:my-1.5 [&_li]:my-0.5 [&_code]:bg-muted [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded-md [&_code]:text-[13px] [&_code]:font-mono [&_pre]:bg-[#2C2418] [&_pre]:text-[#F5F1EB] [&_pre]:rounded-xl [&_pre]:p-4 [&_pre]:my-3 [&_pre_code]:bg-transparent [&_pre_code]:p-0 [&_blockquote]:border-l-primary/40 [&_blockquote]:text-muted-foreground [&_a]:text-primary [&_a]:no-underline hover:[&_a]:underline [&_h1]:text-base [&_h2]:text-[15px] [&_h3]:text-[14px] [&_strong]:text-foreground/90">
+    <div className="prose prose-sm max-w-none text-foreground/85 leading-relaxed [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&_p]:my-1.5 [&_ul]:my-1.5 [&_ol]:my-1.5 [&_li]:my-0.5 [&_code]:bg-muted [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded-lg [&_code]:text-sm [&_code]:font-mono [&_pre]:bg-foreground [&_pre]:text-background [&_pre]:rounded-xl [&_pre]:p-4 [&_pre]:my-3 [&_pre_code]:bg-transparent [&_pre_code]:p-0 [&_blockquote]:border-l-primary/40 [&_blockquote]:text-muted-foreground [&_a]:text-primary [&_a]:no-underline hover:[&_a]:underline [&_h1]:text-base [&_h2]:text-base [&_h3]:text-sm [&_strong]:text-foreground/90">
       <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
     </div>
   );
@@ -434,13 +434,13 @@ export default function EchoPage() {
       {/* ----------------------------------------------------------------- */}
       <aside
         className={cn(
-          "flex flex-col border-r border-border/50 bg-[#EFEBE4] transition-all duration-300 ease-in-out",
+          "flex flex-col border-r border-border/50 bg-[var(--sidebar)] transition-all duration-300 ease-in-out",
           sidebarOpen ? "w-[280px] min-w-[280px]" : "w-0 min-w-0 overflow-hidden"
         )}
       >
         {/* Sidebar header */}
         <div className="flex items-center justify-between px-4 pt-5 pb-3">
-          <h2 className="text-[14px] font-semibold text-foreground/80">对话</h2>
+          <h2 className="text-sm font-semibold text-foreground/80">对话</h2>
           <button
             onClick={() => {
               createConversation();
@@ -456,13 +456,13 @@ export default function EchoPage() {
         {/* Search */}
         <div className="px-3 pb-2">
           <div className="relative">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/60" />
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60" />
             <input
               type="text"
               placeholder="搜索对话…"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-lg bg-white/60 border border-border/40 py-1.5 pl-8 pr-3 text-[13px] text-foreground placeholder:text-muted-foreground/50 outline-none focus:border-primary/30 focus:bg-white transition-colors"
+              className="w-full rounded-lg bg-white/60 border border-border/40 py-1.5 pl-8 pr-3 text-sm text-foreground placeholder:text-muted-foreground/50 outline-none focus:border-primary/30 focus:bg-white transition-colors"
             />
           </div>
         </div>
@@ -472,7 +472,7 @@ export default function EchoPage() {
           {filteredConversations.length === 0 && (
             <div className="px-3 py-8 text-center">
               <MessageSquare className="h-8 w-8 mx-auto text-muted-foreground/30 mb-2" />
-              <p className="text-[12px] text-muted-foreground/60">
+              <p className="text-xs text-muted-foreground/60">
                 {searchQuery ? "没有找到匹配的对话" : "开始你的第一次对话吧"}
               </p>
             </div>
@@ -483,7 +483,7 @@ export default function EchoPage() {
               className={cn(
                 "group relative flex items-center gap-2.5 rounded-lg px-3 py-2.5 cursor-pointer transition-all duration-150",
                 conv.id === activeId
-                  ? "bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04)] text-foreground"
+                  ? "bg-white text-foreground"
                   : "text-foreground/70 hover:bg-white/50"
               )}
               onClick={() => {
@@ -491,9 +491,9 @@ export default function EchoPage() {
                 setErrorMessage(null);
               }}
             >
-              <MessageSquare className="h-3.5 w-3.5 flex-shrink-0 text-muted-foreground/50" />
+              <MessageSquare className="h-4 w-4 flex-shrink-0 text-muted-foreground/50" />
               <div className="flex-1 min-w-0">
-                <p className="text-[13px] font-medium truncate">{conv.title}</p>
+                <p className="text-sm font-medium truncate">{conv.title}</p>
                 <p className="text-[11px] text-muted-foreground/60 mt-0.5">
                   {formatTime(conv.updatedAt)}
                   {conv.messages.length > 0 &&
@@ -505,7 +505,7 @@ export default function EchoPage() {
                   e.stopPropagation();
                   deleteConversation(conv.id);
                 }}
-                className="opacity-0 group-hover:opacity-100 flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground/50 hover:text-destructive hover:bg-destructive/10 transition-all"
+                className="opacity-0 group-hover:opacity-100 flex h-6 w-6 items-center justify-center rounded-lg text-muted-foreground/50 hover:text-destructive hover:bg-destructive/10 transition-all"
                 title="删除对话"
               >
                 <Trash2 className="h-3 w-3" />
@@ -534,7 +534,7 @@ export default function EchoPage() {
           <div className="flex items-center gap-2">
             <EchoAvatar size="sm" />
             <div>
-              <h1 className="font-display text-[15px] text-foreground">
+              <h1 className="font-display text-base text-foreground">
                 Echo
               </h1>
               <p className="text-[11px] text-muted-foreground/60">
@@ -556,13 +556,13 @@ export default function EchoPage() {
                 <div className="mb-5 flex justify-center">
                   <div className="relative">
                     <EchoAvatar size="lg" />
-                    <div className="absolute -bottom-0.5 -right-0.5 h-4 w-4 rounded-full bg-emerald-400 border-[2.5px] border-background" />
+                    <div className="absolute -bottom-0.5 -right-0.5 h-4 w-4 rounded-full bg-emerald-500 border-[2.5px] border-background" />
                   </div>
                 </div>
-                <h2 className="font-display text-[28px] font-normal text-foreground mb-2">
+                <h2 className="font-display text-2xl font-normal text-foreground mb-2">
                   Echo 在这里
                 </h2>
-                <p className="text-[15px] text-muted-foreground max-w-sm">
+                <p className="text-base text-muted-foreground max-w-sm">
                   {getGreeting()}
                 </p>
               </div>
@@ -577,7 +577,7 @@ export default function EchoPage() {
                     className="group flex items-center gap-3 rounded-xl border border-border/50 bg-card px-4 py-3 text-left transition-all duration-200 hover:border-border active:scale-[0.99] disabled:opacity-50"
                   >
                     <prompt.icon className="h-4 w-4 text-muted-foreground/40" strokeWidth={1.5} />
-                    <span className="text-[13px] text-muted-foreground group-hover:text-foreground transition-colors">
+                    <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">
                       {prompt.label}
                     </span>
                   </button>
@@ -602,12 +602,12 @@ export default function EchoPage() {
                     className={cn(
                       "max-w-[85%]",
                       msg.role === "user"
-                        ? "bg-[#2C2418] text-white rounded-2xl rounded-br-sm px-4 py-3"
+                        ? "bg-foreground text-background rounded-xl rounded-br-lg px-4 py-3"
                         : "pt-0.5"
                     )}
                   >
                     {msg.role === "user" ? (
-                      <p className="text-[14px] leading-relaxed whitespace-pre-wrap">
+                      <p className="text-sm leading-relaxed whitespace-pre-wrap">
                         {msg.content}
                       </p>
                     ) : (
@@ -634,7 +634,7 @@ export default function EchoPage() {
               {/* Error message */}
               {errorMessage && (
                 <div className="flex justify-center">
-                  <div className="inline-flex items-center gap-2 rounded-lg bg-destructive/10 px-4 py-2 text-[13px] text-destructive">
+                  <div className="inline-flex items-center gap-2 rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">
                     <span>⚠</span>
                     {errorMessage}
                   </div>
@@ -652,7 +652,7 @@ export default function EchoPage() {
             onSubmit={handleSubmit}
             className="mx-auto max-w-3xl"
           >
-            <div className="relative flex items-end gap-2 rounded-2xl border border-border/60 bg-white px-4 py-2.5 shadow-[0_1px_4px_rgba(0,0,0,0.04)] transition-all duration-200 focus-within:border-primary/40 focus-within:shadow-[0_2px_12px_rgba(196,113,62,0.1)]">
+            <div className="relative flex items-end gap-2 rounded-xl border border-border/60 bg-white px-4 py-2.5 transition-all duration-200 focus-within:border-primary/40">
               <textarea
                 ref={textareaRef}
                 value={inputValue}
@@ -661,19 +661,19 @@ export default function EchoPage() {
                 placeholder="跟 Echo 说点什么…"
                 disabled={isStreaming}
                 rows={1}
-                className="flex-1 resize-none bg-transparent text-[14px] text-foreground leading-relaxed placeholder:text-muted-foreground/50 outline-none disabled:opacity-50 max-h-[160px]"
+                className="flex-1 resize-none bg-transparent text-sm text-foreground leading-relaxed placeholder:text-muted-foreground/50 outline-none disabled:opacity-50 max-h-[160px]"
               />
               <button
                 type="submit"
                 disabled={!inputValue.trim() || isStreaming}
                 className={cn(
-                  "flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl transition-all duration-200",
+                  "flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg transition-all duration-200",
                   inputValue.trim() && !isStreaming
-                    ? "bg-[#C4713E] hover:bg-[#B5633A] text-white active:scale-95"
+                    ? "bg-primary text-primary-foreground hover:opacity-90 active:scale-95"
                     : "bg-muted text-muted-foreground/40"
                 )}
               >
-                <Send className="h-3.5 w-3.5" />
+                <Send className="h-4 w-4" />
               </button>
             </div>
             <div className="flex items-center justify-between mt-1.5 px-1">
