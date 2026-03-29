@@ -11,11 +11,13 @@ struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
     @ObservedObject var echoViewModel: EchoViewModel
     @ObservedObject private var connectivityManager = PhoneConnectivityManager.shared
+    @ObservedObject private var authManager = SupabaseAuthManager.shared
     @State private var healthStatus: HKAuthorizationStatus = .notDetermined
     @State private var locationStatus: CLAuthorizationStatus = .notDetermined
     @State private var photoStatus: PHAuthorizationStatus = .notDetermined
     @State private var showClearConfirmation = false
     @State private var showClearSuccess = false
+    @State private var showAuthSheet = false
 
     private let healthStore = HKHealthStore()
     private let locationManager = CLLocationManager()
@@ -34,6 +36,32 @@ struct SettingsView: View {
                     }
                 } header: {
                     Text("设备与同步")
+                }
+
+                // MARK: - 云同步
+                Section {
+                    if authManager.isAuthenticated {
+                        HStack {
+                            Text("账户")
+                            Spacer()
+                            Text(authManager.userEmail ?? "")
+                                .foregroundStyle(.secondary)
+                        }
+                        Button("退出登录") {
+                            Task {
+                                try? await authManager.signOut()
+                            }
+                        }
+                        .foregroundStyle(.red)
+                    } else {
+                        Button("登录以同步数据") {
+                            showAuthSheet = true
+                        }
+                    }
+                } header: {
+                    Text("云同步")
+                } footer: {
+                    Text("登录后，你的数据会自动同步到云端，可在 Web Dashboard 查看。")
                 }
 
                 // MARK: - 智能记录
@@ -232,6 +260,9 @@ struct SettingsView: View {
             .scrollContentBackground(.hidden)
             .background(AppColor.background)
             .navigationTitle("设置")
+            .sheet(isPresented: $showAuthSheet) {
+                SupabaseAuthView()
+            }
             .confirmationDialog(
                 "确认清除？",
                 isPresented: $showClearConfirmation,

@@ -73,6 +73,7 @@
 		65870246322B8C5135768738 /* AnnotationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C7EEEA30452F0F69063060F /* AnnotationStore.swift */; };
 		6632D141410E33E7CE3039C4 /* PhoneInferenceEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBFA94CCF4D730B27A3ADECE /* PhoneInferenceEngineTests.swift */; };
 		66C0C027922CF1FE1E1BE8AA /* RecordPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86F28285B24C4702D611376D /* RecordPanel.swift */; };
+		68CC71244115892EB4DAF8E3 /* SupabaseAuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4137017F55EEBD6FA77E0E03 /* SupabaseAuthView.swift */; };
 		6914C2521B42CB3E9C653E79 /* EchoEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C552B16ADC952C8292BD75C /* EchoEngineTests.swift */; };
 		6AC3AB88E918C8DB60B7E125 /* SpendingRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = E24C90EDAC237C756CCF04F9 /* SpendingRecord.swift */; };
 		6B9F1A79530FF8267B634B8C /* SensorDataStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C2B564C4E128F7FFAAF4CE4 /* SensorDataStoreTests.swift */; };
@@ -110,6 +111,7 @@
 		A22057A1CC2B1E7036B38A06 /* EchoChatInputBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF457392367DE125D6C2CE7F /* EchoChatInputBar.swift */; };
 		A23C1B92188A5ADCBF4E3B82 /* TotalActivityReport.swift in Sources */ = {isa = PBXBuildFile; fileRef = C986D79040F461443BC4D64D /* TotalActivityReport.swift */; };
 		A2F668A004169259C19C90A3 /* TodayInsightComposer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D40EA4B5DE92A1C04FEF877 /* TodayInsightComposer.swift */; };
+		A41006E6B59191A7AA036995 /* SupabaseAuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 447E0C973D4440142247A158 /* SupabaseAuthManager.swift */; };
 		A6DC40FEE40A9E9F17E212CA /* EchoMessageManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 657E7CB2585EACE47FFE1613 /* EchoMessageManagerTests.swift */; };
 		AB5F6A399EE781C4F3B21BC6 /* EchoWeeklyProfileUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE82260DB517A82DAD2783A3 /* EchoWeeklyProfileUpdater.swift */; };
 		ABCA0EF892CA47271A8C8022 /* FamilyControls.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E4F86AADDBC49C09C487C0A9 /* FamilyControls.framework */; };
@@ -230,7 +232,9 @@
 		3DF36EFDDCA82F9755D1A41B /* PhoneInferenceEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneInferenceEngine.swift; sourceTree = "<group>"; };
 		3E53E00BCF5527A4FE8FD775 /* MoodRecordStoring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodRecordStoring.swift; sourceTree = "<group>"; };
 		3F769FB96C82A08275CF5355 /* EchoPromptBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoPromptBuilder.swift; sourceTree = "<group>"; };
+		4137017F55EEBD6FA77E0E03 /* SupabaseAuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseAuthView.swift; sourceTree = "<group>"; };
 		44311ECA1B0B67F057B402DF /* SensorDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorDataStore.swift; sourceTree = "<group>"; };
+		447E0C973D4440142247A158 /* SupabaseAuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseAuthManager.swift; sourceTree = "<group>"; };
 		4634CA0E594D74633EA7F9A4 /* DashboardCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardCardView.swift; sourceTree = "<group>"; };
 		46E21D4304420E9DA1D6AC01 /* EchoChatScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoChatScreen.swift; sourceTree = "<group>"; };
 		489A58FAAD7209D2A6CEEF74 /* SpendingRecordStoring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendingRecordStoring.swift; sourceTree = "<group>"; };
@@ -449,6 +453,7 @@
 			isa = PBXGroup;
 			children = (
 				9B9DD90DF89F6720E2277DFD /* CloudSyncService.swift */,
+				447E0C973D4440142247A158 /* SupabaseAuthManager.swift */,
 				DAA1AEBA35421B881AC45209 /* SupabaseClient.swift */,
 			);
 			path = Sync;
@@ -514,6 +519,7 @@
 		95EBEDFD5034E1C9DD03ED72 /* Features */ = {
 			isa = PBXGroup;
 			children = (
+				B3A72A691CB2A449F4AAEB7F /* Auth */,
 				95AF2016323CE338C3D33B9A /* Dashboard */,
 				DF0FBF52A98B17AB46E5BD5F /* Echo */,
 				FA5F7307AB8CE7799D63CA0E /* History */,
@@ -548,6 +554,14 @@
 				CCCD453022FB7D3DE28EDE60 /* ToDayApp.swift */,
 			);
 			path = App;
+			sourceTree = "<group>";
+		};
+		B3A72A691CB2A449F4AAEB7F /* Auth */ = {
+			isa = PBXGroup;
+			children = (
+				4137017F55EEBD6FA77E0E03 /* SupabaseAuthView.swift */,
+			);
+			path = Auth;
 			sourceTree = "<group>";
 		};
 		BC4957CD8636026C582CA4C6 /* Onboarding */ = {
@@ -959,6 +973,8 @@
 				6AC3AB88E918C8DB60B7E125 /* SpendingRecord.swift in Sources */,
 				DAF34DD17432AFB08D540B5C /* SpendingRecordEntity.swift in Sources */,
 				B531B511B61D408CA3243A26 /* SpendingRecordStoring.swift in Sources */,
+				A41006E6B59191A7AA036995 /* SupabaseAuthManager.swift in Sources */,
+				68CC71244115892EB4DAF8E3 /* SupabaseAuthView.swift in Sources */,
 				C2A1498D46BE0E7DD85269CF /* SupabaseClient.swift in Sources */,
 				D7DF86B1EC7D5D82B3201C1C /* TimelineDataProviding.swift in Sources */,
 				3EDD590CF25E429FB8186758 /* ToDayApp.swift in Sources */,

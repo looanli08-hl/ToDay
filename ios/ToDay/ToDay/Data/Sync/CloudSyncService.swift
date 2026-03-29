@@ -32,6 +32,8 @@ final class CloudSyncService: @unchecked Sendable {
 
     private func syncTimelineEvents(context: ModelContext) async {
         do {
+            let userId = await SupabaseAuthManager.shared.userId
+
             let descriptor = FetchDescriptor<DayTimelineEntity>(
                 sortBy: [SortDescriptor(\.date, order: .reverse)]
             )
@@ -42,6 +44,7 @@ final class CloudSyncService: @unchecked Sendable {
 
                 for event in dayTimeline.entries {
                     let dataPoint = DataPointInsert(
+                        user_id: userId,
                         source: "iphone",
                         type: event.kind.rawValue,
                         value: TimelineEventValue(
@@ -71,6 +74,8 @@ final class CloudSyncService: @unchecked Sendable {
 
     private func syncMoodRecords(context: ModelContext) async {
         do {
+            let userId = await SupabaseAuthManager.shared.userId
+
             let descriptor = FetchDescriptor<MoodRecordEntity>(
                 sortBy: [SortDescriptor(\.createdAt, order: .reverse)]
             )
@@ -80,6 +85,7 @@ final class CloudSyncService: @unchecked Sendable {
                 let record = entity.toMoodRecord()
 
                 let dataPoint = DataPointInsert(
+                    user_id: userId,
                     source: "iphone",
                     type: "mood",
                     value: MoodValue(
@@ -107,6 +113,7 @@ final class CloudSyncService: @unchecked Sendable {
 
 /// Top-level row inserted into `data_points`.
 private struct DataPointInsert<V: Encodable>: Encodable {
+    let user_id: String?
     let source: String
     let type: String
     let value: V
