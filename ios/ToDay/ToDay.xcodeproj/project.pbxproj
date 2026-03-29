@@ -80,6 +80,7 @@
 		6F5A4DD0ADB0320753D8C263 /* WeeklyInsightView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D394589F8B025A30D507181 /* WeeklyInsightView.swift */; };
 		70015EAB0824A09939C59B0C /* WatchMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24EB665732263021672AC442 /* WatchMessage.swift */; };
 		723D366EAA81299AAE974B38 /* EchoItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BA3E49C07FADC203D03F932 /* EchoItem.swift */; };
+		7260F0F2253D14767F40FCCE /* SmartRecordingPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56DAC09E7FDEFC7430732EFB /* SmartRecordingPage.swift */; };
 		73CD0B0F7DA44910D5615E71 /* TimelineMergeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 972FFB482663BAB579AC42BB /* TimelineMergeTests.swift */; };
 		76D22AE6FF2D1C7E9B79AAB9 /* DayScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04A70AC6E3B59988B44AA384 /* DayScrollView.swift */; };
 		77456618EA4515D492DA9DDA /* EchoMessageStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9817F02122CC8D53A1DB307D /* EchoMessageStoreTests.swift */; };
@@ -113,7 +114,6 @@
 		B2FE859DE89B5215AC30DE4E /* EventDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83CAB597D8277AED207D5F76 /* EventDetailView.swift */; };
 		B42EA109C398D41200DA017F /* EchoChatScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46E21D4304420E9DA1D6AC01 /* EchoChatScreen.swift */; };
 		B4A22116264B6182622B67A9 /* EchoDailyInsightCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C29581A49B2103DA33AEBA1 /* EchoDailyInsightCard.swift */; };
-		B4BB5DEC4A1CE5B952F6AEC3 /* AppleLocalAIProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6E5D32F5FECA164D12B849E /* AppleLocalAIProvider.swift */; };
 		B531B511B61D408CA3243A26 /* SpendingRecordStoring.swift in Sources */ = {isa = PBXBuildFile; fileRef = 489A58FAAD7209D2A6CEEF74 /* SpendingRecordStoring.swift */; };
 		B6E9D4AD5B22FFBCF77A2B04 /* ScreenTimeRecordStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54001F95F02028DE07D797B1 /* ScreenTimeRecordStoreTests.swift */; };
 		B77D211F12FE7EBB9023B98B /* MoodRecordManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4ACD2CFDAA30430FC8EBEEE2 /* MoodRecordManager.swift */; };
@@ -225,6 +225,7 @@
 		517D081EC92833825D6C1658 /* MoodRecordEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodRecordEntity.swift; sourceTree = "<group>"; };
 		54001F95F02028DE07D797B1 /* ScreenTimeRecordStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenTimeRecordStoreTests.swift; sourceTree = "<group>"; };
 		55D650DDA109D6FBA6EFD2C4 /* WatchSyncHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchSyncHelper.swift; sourceTree = "<group>"; };
+		56DAC09E7FDEFC7430732EFB /* SmartRecordingPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartRecordingPage.swift; sourceTree = "<group>"; };
 		5747760BE406B15979C4D0D9 /* CurrentEventSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentEventSnapshot.swift; sourceTree = "<group>"; };
 		5990A8C0CD443E744B0EC3E1 /* ShutterMediaLibraryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShutterMediaLibraryTests.swift; sourceTree = "<group>"; };
 		5BB8DA7204B6240813D93640 /* ShutterAlbumScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShutterAlbumScreen.swift; sourceTree = "<group>"; };
@@ -312,7 +313,6 @@
 		EF457392367DE125D6C2CE7F /* EchoChatInputBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoChatInputBar.swift; sourceTree = "<group>"; };
 		F4E8F6DA02ABE5F983DFB6F7 /* EchoAIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoAIService.swift; sourceTree = "<group>"; };
 		F6A3F794D097A4967859A150 /* EchoThreadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoThreadView.swift; sourceTree = "<group>"; };
-		F6E5D32F5FECA164D12B849E /* AppleLocalAIProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleLocalAIProvider.swift; sourceTree = "<group>"; };
 		F728CBFA275E061CC33D4193 /* TodayScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayScreen.swift; sourceTree = "<group>"; };
 		F79F49220A3F6F99493D9E9D /* EchoItemStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoItemStoreTests.swift; sourceTree = "<group>"; };
 		F9F156F37B272E8665520A41 /* PhoneTimelineDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneTimelineDataProvider.swift; sourceTree = "<group>"; };
@@ -390,7 +390,6 @@
 		69129B3B9854812A22C0D389 /* AI */ = {
 			isa = PBXGroup;
 			children = (
-				F6E5D32F5FECA164D12B849E /* AppleLocalAIProvider.swift */,
 				FB415E05ECA0AC896968765F /* DeepSeekAIProvider.swift */,
 				B966BAB4E0499F555A2D3115 /* EchoAIProviding.swift */,
 				F4E8F6DA02ABE5F983DFB6F7 /* EchoAIService.swift */,
@@ -478,6 +477,7 @@
 			isa = PBXGroup;
 			children = (
 				DEBA7D34F5C9C73353085631 /* OnboardingView.swift */,
+				56DAC09E7FDEFC7430732EFB /* SmartRecordingPage.swift */,
 			);
 			path = Onboarding;
 			sourceTree = "<group>";
@@ -744,7 +744,6 @@
 				6009F788A2DCD8E51F97E8D5 /* AppConfiguration.swift in Sources */,
 				DD042D446979BF714A91C923 /* AppContainer.swift in Sources */,
 				0DAC5BEFCDEF75F998B00E5C /* AppRootScreen.swift in Sources */,
-				B4BB5DEC4A1CE5B952F6AEC3 /* AppleLocalAIProvider.swift in Sources */,
 				1F7639143D07656F69CCFBC1 /* BackgroundTaskManager.swift in Sources */,
 				30C39A83C9F9FF52DC497842 /* CameraPickerView.swift in Sources */,
 				EDFD26E03B1856D6D7A420AB /* CareNudge.swift in Sources */,
@@ -836,6 +835,7 @@
 				E7B379DD078FB929AC5EA79E /* ShutterRecordEntity.swift in Sources */,
 				8EEF3BA4E94A5A74DF48F286 /* ShutterRecordStoring.swift in Sources */,
 				1E7582D9AB7FACBDE7D94F65 /* ShutterTextComposer.swift in Sources */,
+				7260F0F2253D14767F40FCCE /* SmartRecordingPage.swift in Sources */,
 				0F1E646198BCE59860F5307D /* SpendingInputView.swift in Sources */,
 				F346BBFAA7FC97C885825090 /* SpendingManager.swift in Sources */,
 				6AC3AB88E918C8DB60B7E125 /* SpendingRecord.swift in Sources */,
