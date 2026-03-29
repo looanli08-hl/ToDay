@@ -15,6 +15,10 @@ settings:
     INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
     INFOPLIST_KEY_UILaunchScreen_Generation: YES
     TARGETED_DEVICE_FAMILY: 1
+packages:
+  Supabase:
+    url: https://github.com/supabase/supabase-swift
+    from: "2.0.0"
 targets:
   ToDay:
     type: application
@@ -22,6 +26,9 @@ targets:
     deploymentTarget: "17.0"
     sources:
       - path: ToDay
+    dependencies:
+      - package: Supabase
+        product: Supabase
     entitlements:
       path: ToDay/ToDay.entitlements
       properties:

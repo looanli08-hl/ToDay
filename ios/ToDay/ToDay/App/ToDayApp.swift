@@ -50,6 +50,10 @@ struct ToDayApp: App {
                     Task {
                         await viewModel.load(forceReload: true)
                     }
+                    // Sync local data to Supabase for web dashboard
+                    Task {
+                        await CloudSyncService.shared.syncAll(modelContainer: AppContainer.modelContainer)
+                    }
                 default:
                     break
                 }

@@ -67,7 +67,6 @@
 		578F43A4F42F7DF8633BED13 /* EchoMessageListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 178E944715EC8339B4296F34 /* EchoMessageListView.swift */; };
 		59A62671AC37416B6921E436 /* NewEventKindTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19F6F718AF60064D8B59E602 /* NewEventKindTests.swift */; };
 		5AE1B8C4C97B3FDD1AC06675 /* PedometerCollectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3373AE9894FB26E97C58C1FA /* PedometerCollectorTests.swift */; };
-		5E075C9CFEABC25E63E681E7 /* ToDayScreenTimeReport.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = D549ED87C76853C3B4ADF091 /* ToDayScreenTimeReport.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		6009F788A2DCD8E51F97E8D5 /* AppConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB09FC4279F21A281C6D8DC2 /* AppConfiguration.swift */; };
 		62454FB0EE44B3CC284C2C47 /* ShutterFloatingButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AA54DE50AA5352485CC47C2 /* ShutterFloatingButton.swift */; };
 		656215E5648898D4FDA75DCD /* PhoneTimelineDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F156F37B272E8665520A41 /* PhoneTimelineDataProvider.swift */; };
@@ -130,17 +129,20 @@
 		BEDA014AA6E5FDD10EB52BB8 /* DeviceActivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 210FDE8BD7637E4361659A24 /* DeviceActivity.framework */; };
 		C07D139F3CA70857CEFE0C05 /* EchoMemoryManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FEC7FAC9DA97A938455A2C5 /* EchoMemoryManagerTests.swift */; };
 		C0DC99D502C57FEBBF8D2597 /* EchoMessageEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A61345F7366DF2B6CA4DC3 /* EchoMessageEntity.swift */; };
+		C2A1498D46BE0E7DD85269CF /* SupabaseClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAA1AEBA35421B881AC45209 /* SupabaseClient.swift */; };
 		C5767BB39D601ADD6EA3AFE5 /* TodayScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = F728CBFA275E061CC33D4193 /* TodayScreen.swift */; };
 		C73B5E5049C1FE5A70D5CF6F /* LocationCollectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B200FA9169D89E482820B450 /* LocationCollectorTests.swift */; };
 		C788B6CCA454A039ECC6BB00 /* CustomMoodEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 133A14B66E9CA697B58313CB /* CustomMoodEntity.swift */; };
 		C8D4B957327922E04DBD7578 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 377615C5249C10E358F73636 /* Preview Assets.xcassets */; };
 		CE56C4D6613B3C81A22038C6 /* SharedDataTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FA8B03857B7C0FBA121B67 /* SharedDataTypes.swift */; };
+		D477652CBB24E9A06C24262A /* CloudSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B9DD90DF89F6720E2277DFD /* CloudSyncService.swift */; };
 		D508D591C01E90172AA5CD5F /* EchoItemEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA1EE45B899F89103A390A81 /* EchoItemEntity.swift */; };
 		D56A6DF8D065FE922F0DC59E /* CareNudgeEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25C30506778FEA2174369100 /* CareNudgeEngine.swift */; };
 		D5F5F39A2A85BE70CF6C9C2C /* EventCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7977BB25ED5CBD3E034ED096 /* EventCardView.swift */; };
 		D7DF86B1EC7D5D82B3201C1C /* TimelineDataProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D72C488C5C21014C1FAB59A /* TimelineDataProviding.swift */; };
 		D8510CF5171BA58672763DD4 /* SensorDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44311ECA1B0B67F057B402DF /* SensorDataStore.swift */; };
 		D8F92239DBE3A3F5C42EF18F /* PhoneInferenceEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF36EFDDCA82F9755D1A41B /* PhoneInferenceEngine.swift */; };
+		DA3A6A05D521B02BFD17A8C2 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 34A5826A33417AE3D1C542E3 /* Supabase */; };
 		DAF34DD17432AFB08D540B5C /* SpendingRecordEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EB7DC4BAC2723544921F3F7 /* SpendingRecordEntity.swift */; };
 		DBE9E90ECD54458DB8BA029C /* EchoMessageCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D7EF65CE3D343FCFF55AE94 /* EchoMessageCard.swift */; };
 		DC191155C71D0D9A88C548A9 /* ManualTimeEntrySheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24D272CC62BE4BE9A63F4C6B /* ManualTimeEntrySheet.swift */; };
@@ -169,13 +171,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		0338914E6721EFF9E131E9F3 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 2C29361A382315565B1DE7BF /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 4C68C618E05CE25C0FDEC115;
-			remoteInfo = ToDayScreenTimeReport;
-		};
 		0B8C66CE96BFBD6584B0159B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 2C29361A382315565B1DE7BF /* Project object */;
@@ -184,20 +179,6 @@
 			remoteInfo = ToDay;
 		};
 /* End PBXContainerItemProxy section */
-
-/* Begin PBXCopyFilesBuildPhase section */
-		ED0ED74106E25B53434FEAF1 /* Embed Foundation Extensions */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 13;
-			files = (
-				5E075C9CFEABC25E63E681E7 /* ToDayScreenTimeReport.appex in Embed Foundation Extensions */,
-			);
-			name = "Embed Foundation Extensions";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		007407D7872DD5977B34F006 /* SpendingManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendingManagerTests.swift; sourceTree = "<group>"; };
@@ -293,6 +274,7 @@
 		9817F02122CC8D53A1DB307D /* EchoMessageStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoMessageStoreTests.swift; sourceTree = "<group>"; };
 		991D2E141791CD4CB4696002 /* EchoDailySummaryGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoDailySummaryGenerator.swift; sourceTree = "<group>"; };
 		9B1E5C267AE66C855A6C07B1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		9B9DD90DF89F6720E2277DFD /* CloudSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSyncService.swift; sourceTree = "<group>"; };
 		A1FE464E0B4CDA1DF3729B75 /* SpendingInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendingInputView.swift; sourceTree = "<group>"; };
 		A3635712A77431904591CCB4 /* EchoEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoEngine.swift; sourceTree = "<group>"; };
 		A50CAC68CF65C166C6C84DED /* PhotoService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoService.swift; sourceTree = "<group>"; };
@@ -332,6 +314,7 @@
 		D549ED87C76853C3B4ADF091 /* ToDayScreenTimeReport.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = ToDayScreenTimeReport.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		D5E3EC90284C88262A943A15 /* TodayInsightComposerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayInsightComposerTests.swift; sourceTree = "<group>"; };
 		D796A8133E65C0F7E468E8AB /* MoodRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodRecord.swift; sourceTree = "<group>"; };
+		DAA1AEBA35421B881AC45209 /* SupabaseClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseClient.swift; sourceTree = "<group>"; };
 		DD8682A65FCDD7B5B3365527 /* DeviceStateCollectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceStateCollectorTests.swift; sourceTree = "<group>"; };
 		DEBA7D34F5C9C73353085631 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		DF6A95A9011E79D975662199 /* ManagedSettings.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ManagedSettings.framework; path = System/Library/Frameworks/ManagedSettings.framework; sourceTree = SDKROOT; };
@@ -375,6 +358,14 @@
 				BEDA014AA6E5FDD10EB52BB8 /* DeviceActivity.framework in Frameworks */,
 				ABCA0EF892CA47271A8C8022 /* FamilyControls.framework in Frameworks */,
 				3F544FD16B219E34BB08C7F3 /* ManagedSettings.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7238B3A37E381039B62B4361 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DA3A6A05D521B02BFD17A8C2 /* Supabase in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -452,6 +443,15 @@
 				0C96E2DCDAC54DA106C2D81A /* Assets.xcassets */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		64B2517531EAF21994E00ED5 /* Sync */ = {
+			isa = PBXGroup;
+			children = (
+				9B9DD90DF89F6720E2277DFD /* CloudSyncService.swift */,
+				DAA1AEBA35421B881AC45209 /* SupabaseClient.swift */,
+			);
+			path = Sync;
 			sourceTree = "<group>";
 		};
 		69129B3B9854812A22C0D389 /* AI */ = {
@@ -654,6 +654,7 @@
 				55D650DDA109D6FBA6EFD2C4 /* WatchSyncHelper.swift */,
 				69129B3B9854812A22C0D389 /* AI */,
 				C293996C7402D3670B7127E0 /* Sensors */,
+				64B2517531EAF21994E00ED5 /* Sync */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -737,15 +738,15 @@
 			buildPhases = (
 				0E45D6EFA7FAF1A88A38ED52 /* Sources */,
 				DECA2DB299C974DCCF9A25AD /* Resources */,
-				ED0ED74106E25B53434FEAF1 /* Embed Foundation Extensions */,
+				7238B3A37E381039B62B4361 /* Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				6526B95BC4E48F679F242522 /* PBXTargetDependency */,
 			);
 			name = ToDay;
 			packageProductDependencies = (
+				34A5826A33417AE3D1C542E3 /* Supabase */,
 			);
 			productName = ToDay;
 			productReference = D273A8E459B1BBB83027539B /* ToDay.app */;
@@ -819,6 +820,9 @@
 			);
 			mainGroup = FB6C6E7EC73BA6A0A179A73B;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				244315B1EA12E44E150F3C97 /* XCRemoteSwiftPackageReference "supabase-swift" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 01BAB423F888B3D328A14A31 /* Products */;
 			projectDirPath = "";
@@ -858,6 +862,7 @@
 				EDFD26E03B1856D6D7A420AB /* CareNudge.swift in Sources */,
 				6C147BA314EBBA6048E66F60 /* CareNudgeCardView.swift in Sources */,
 				D56A6DF8D065FE922F0DC59E /* CareNudgeEngine.swift in Sources */,
+				D477652CBB24E9A06C24262A /* CloudSyncService.swift in Sources */,
 				289858661ACDE5B4E2046978 /* ConnectivityManager.swift in Sources */,
 				1199B8E6F83FB892D6DA1CFD /* CurrentActivityProvider.swift in Sources */,
 				F207BDA9340A4E488E75EE87 /* CurrentEventSnapshot.swift in Sources */,
@@ -954,6 +959,7 @@
 				6AC3AB88E918C8DB60B7E125 /* SpendingRecord.swift in Sources */,
 				DAF34DD17432AFB08D540B5C /* SpendingRecordEntity.swift in Sources */,
 				B531B511B61D408CA3243A26 /* SpendingRecordStoring.swift in Sources */,
+				C2A1498D46BE0E7DD85269CF /* SupabaseClient.swift in Sources */,
 				D7DF86B1EC7D5D82B3201C1C /* TimelineDataProviding.swift in Sources */,
 				3EDD590CF25E429FB8186758 /* ToDayApp.swift in Sources */,
 				FBF90F06A0B49EDD24C7F79C /* TodayFlowViews.swift in Sources */,
@@ -1025,11 +1031,6 @@
 			isa = PBXTargetDependency;
 			target = 1FB5617C31BE25701E8C7ACD /* ToDay */;
 			targetProxy = 0B8C66CE96BFBD6584B0159B /* PBXContainerItemProxy */;
-		};
-		6526B95BC4E48F679F242522 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 4C68C618E05CE25C0FDEC115 /* ToDayScreenTimeReport */;
-			targetProxy = 0338914E6721EFF9E131E9F3 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1355,6 +1356,25 @@
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		244315B1EA12E44E150F3C97 /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/supabase/supabase-swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		34A5826A33417AE3D1C542E3 /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 244315B1EA12E44E150F3C97 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 2C29361A382315565B1DE7BF /* Project object */;
 }

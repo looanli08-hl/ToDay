@@ -115,6 +115,8 @@ final class BackgroundTaskManager {
             persistTimeline(timeline)
             updateLastRecordedDate()
             print("[BGTask] Successfully generated today's timeline with \(timeline.entries.count) events")
+            // Sync to Supabase after generating timeline
+            await CloudSyncService.shared.syncAll(modelContainer: AppContainer.modelContainer)
         } catch {
             print("[BGTask] Failed to generate today's timeline: \(error)")
         }
