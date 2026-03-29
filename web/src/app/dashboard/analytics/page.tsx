@@ -158,63 +158,6 @@ export default function AnalyticsPage() {
           ))}
         </div>
 
-        {/* Activity Heatmap */}
-        <Card className="border border-border/40 bg-card rounded-xl p-6">
-          <div className="flex items-center gap-2 mb-6">
-            <Grid3x3 className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
-            <h2 className="font-display text-lg text-foreground">活跃热力图</h2>
-            <span className="text-xs text-muted-foreground ml-auto">
-              本周 7 x 24 小时
-            </span>
-          </div>
-
-          <div className="space-y-1.5">
-            {/* Hour labels */}
-            <div className="flex gap-1 ml-8">
-              {Array.from({ length: 24 }, (_, i) => (
-                <div key={i} className="flex-1 text-center">
-                  {i % 3 === 0 ? (
-                    <span className="text-[11px] text-muted-foreground">
-                      {i.toString().padStart(2, "0")}
-                    </span>
-                  ) : null}
-                </div>
-              ))}
-            </div>
-
-            {/* Grid rows */}
-            {heatmapData.map((row, dayIdx) => (
-              <div key={dayIdx} className="flex items-center gap-1">
-                <span className="text-[11px] text-muted-foreground w-6 text-right">
-                  {dayLabels[dayIdx]}
-                </span>
-                <div className="flex gap-1 flex-1">
-                  {row.map((val, hourIdx) => (
-                    <div
-                      key={hourIdx}
-                      className={`flex-1 h-6 rounded-lg ${getHeatmapOpacity(val)} transition-colors duration-300`}
-                      title={`${dayLabels[dayIdx]} ${hourIdx}:00 - 活跃度 ${Math.round(val * 100)}%`}
-                    />
-                  ))}
-                </div>
-              </div>
-            ))}
-
-            {/* Legend */}
-            <div className="flex items-center justify-end gap-2 mt-3">
-              <span className="text-[11px] text-muted-foreground">低</span>
-              <div className="flex gap-0.5">
-                {["bg-primary/5", "bg-primary/10", "bg-primary/20", "bg-primary/35", "bg-primary/50", "bg-primary/65", "bg-primary/80"].map(
-                  (cls, i) => (
-                    <div key={i} className={`h-3 w-5 rounded-lg ${cls}`} />
-                  )
-                )}
-              </div>
-              <span className="text-[11px] text-muted-foreground">高</span>
-            </div>
-          </div>
-        </Card>
-
         {/* Category Trends */}
         <Card className="border border-border/40 bg-card rounded-xl p-6">
           <div className="flex items-center gap-2 mb-6">
