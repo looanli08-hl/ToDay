@@ -55,11 +55,9 @@ export function Sidebar() {
     <aside className="flex h-screen w-[260px] flex-col bg-[var(--sidebar)]">
       {/* Logo + Actions */}
       <div className="flex items-center justify-between px-4 pt-4 pb-2">
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary">
-            <span className="text-[11px] font-semibold text-white">T</span>
-          </div>
-          <span className="font-display text-base text-foreground">ToDay</span>
+        <div className="flex items-center gap-1">
+          <span className="font-display text-lg text-foreground">ToDay</span>
+          <span className="text-primary text-lg">.</span>
         </div>
       </div>
 

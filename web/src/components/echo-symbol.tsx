@@ -61,9 +61,9 @@ export function EchoSymbol({
  */
 export function EchoAvatar({ size = "sm" }: { size?: "sm" | "md" | "lg" }) {
   const config = {
-    sm: { dim: "h-7 w-7", symbol: 14, rounded: "rounded-lg" },
-    md: { dim: "h-9 w-9", symbol: 18, rounded: "rounded-xl" },
-    lg: { dim: "h-14 w-14", symbol: 26, rounded: "rounded-xl" },
+    sm: { dim: "h-7 w-7", symbol: 15, rounded: "rounded-full" },
+    md: { dim: "h-9 w-9", symbol: 18, rounded: "rounded-full" },
+    lg: { dim: "h-12 w-12", symbol: 22, rounded: "rounded-full" },
   }[size];
 
   return (
@@ -71,10 +71,10 @@ export function EchoAvatar({ size = "sm" }: { size?: "sm" | "md" | "lg" }) {
       className={cn(
         config.dim,
         config.rounded,
-        "flex-shrink-0 flex items-center justify-center bg-primary"
+        "flex-shrink-0 flex items-center justify-center border border-border bg-card"
       )}
     >
-      <EchoSymbol size={config.symbol} color="white" />
+      <EchoSymbol size={config.symbol} className="text-primary" />
     </div>
   );
 }
