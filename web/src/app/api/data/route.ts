@@ -1,7 +1,8 @@
 import { NextRequest } from "next/server";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 
-// In-memory store for MVP (replace with Supabase later)
-const dataStore: DataPoint[] = [];
+// In-memory fallback for unauthenticated requests (extension)
+const memoryStore: DataPoint[] = [];
 
 interface DataPoint {
   id: string;
@@ -33,7 +34,29 @@ export async function POST(req: NextRequest) {
       metadata,
     };
 
-    dataStore.push(dataPoint);
+    // Always store in memory (for extension requests without auth)
+    memoryStore.push(dataPoint);
+
+    // Try to store in Supabase too (for persistence)
+    try {
+      const supabase = await createServerSupabaseClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (user) {
+        await supabase.from("data_points").insert({
+          user_id: user.id,
+          source: dataPoint.source,
+          type: dataPoint.type,
+          value: dataPoint.value,
+          timestamp: dataPoint.timestamp,
+          metadata: dataPoint.metadata,
+        });
+      }
+    } catch {
+      // Supabase unavailable — memory store is the fallback
+    }
 
     return Response.json({ success: true, id: dataPoint.id });
   } catch {
@@ -43,18 +66,66 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const date = searchParams.get("date"); // "2026-03-29"
-  const source = searchParams.get("source"); // "browser-extension"
+  const date = searchParams.get("date");
+  const source = searchParams.get("source");
 
-  let filtered = dataStore;
+  // Try Supabase first
+  let supabaseData: DataPoint[] = [];
+  try {
+    const supabase = await createServerSupabaseClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
+    if (user) {
+      let query = supabase
+        .from("data_points")
+        .select("id, source, type, value, timestamp, metadata")
+        .eq("user_id", user.id)
+        .order("timestamp", { ascending: false })
+        .limit(200);
+
+      if (source) {
+        query = query.eq("source", source);
+      }
+
+      if (date) {
+        query = query
+          .gte("timestamp", `${date}T00:00:00`)
+          .lt("timestamp", `${date}T23:59:59`);
+      }
+
+      const { data } = await query;
+      if (data) {
+        supabaseData = data.map((d) => ({
+          id: d.id,
+          source: d.source,
+          type: d.type,
+          value: d.value as Record<string, unknown>,
+          timestamp: d.timestamp,
+          metadata: d.metadata as Record<string, unknown> | undefined,
+        }));
+      }
+    }
+  } catch {
+    // Supabase unavailable
+  }
+
+  // Also get from memory store
+  let memoryData = [...memoryStore];
   if (date) {
-    filtered = filtered.filter((d) => d.timestamp.startsWith(date));
+    memoryData = memoryData.filter((d) => d.timestamp.startsWith(date));
   }
-
   if (source) {
-    filtered = filtered.filter((d) => d.source === source);
+    memoryData = memoryData.filter((d) => d.source === source);
   }
 
-  return Response.json({ data: filtered, count: filtered.length });
+  // Merge and deduplicate (prefer Supabase data)
+  const supabaseIds = new Set(supabaseData.map((d) => d.id));
+  const merged = [
+    ...supabaseData,
+    ...memoryData.filter((d) => !supabaseIds.has(d.id)),
+  ];
+
+  return Response.json({ data: merged, count: merged.length });
 }
