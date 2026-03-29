@@ -14,6 +14,8 @@ import {
   Search,
   BarChart3,
   Heart,
+  Puzzle,
+  BookOpen,
 } from "lucide-react";
 
 const mainNav = [
@@ -23,6 +25,8 @@ const mainNav = [
   { href: "/dashboard/screen-time", label: "屏幕时间", icon: Monitor },
   { href: "/dashboard/mood", label: "心情记录", icon: Heart },
   { href: "/dashboard/echo", label: "Echo AI", icon: Sparkles },
+  { href: "/dashboard/connectors", label: "连接器", icon: Puzzle },
+  { href: "/dashboard/docs", label: "开发文档", icon: BookOpen },
 ];
 
 const bottomNav = [
