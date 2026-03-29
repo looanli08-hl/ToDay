@@ -117,7 +117,8 @@ enum AppContainer {
 
     @MainActor
     private static let echoEngine = EchoEngine(
-        echoStore: echoItemStore
+        echoStore: echoItemStore,
+        shutterRecordStore: shutterRecordStore
     )
 
     @MainActor
@@ -209,9 +210,12 @@ enum AppContainer {
                 EchoChatSessionEntity.self,
                 EchoChatMessageEntity.self,
                 EchoMessageEntity.self,
-                SensorReadingEntity.self
+                SensorReadingEntity.self,
+                CustomMoodEntity.self
             )
             migrateLegacyMoodRecordsIfNeeded(into: container)
+            let context = ModelContext(container)
+            CustomMoodEntity.seedDefaultsIfNeeded(in: context)
             return container
         } catch {
             fatalError("无法创建 MoodRecord SwiftData 容器：\(error.localizedDescription)")
