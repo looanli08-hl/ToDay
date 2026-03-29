@@ -123,14 +123,28 @@
     .site-item {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      padding: 6px 0;
+      gap: 10px;
+      padding: 7px 0;
+      border-bottom: 1px solid #E6DFD3;
+    }
+
+    .site-item:last-child {
+      border-bottom: none;
+    }
+
+    .site-time-range {
+      font-size: 11px;
+      color: #8A7D6B;
+      font-variant-numeric: tabular-nums;
+      font-family: ui-monospace, monospace;
+      white-space: nowrap;
+      min-width: 90px;
     }
 
     .site-name {
       font-size: 12px;
       color: #2C2418;
-      max-width: 200px;
+      flex: 1;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -140,6 +154,7 @@
       font-size: 11px;
       color: #8A7D6B;
       font-variant-numeric: tabular-nums;
+      white-space: nowrap;
     }
 
     .footer {

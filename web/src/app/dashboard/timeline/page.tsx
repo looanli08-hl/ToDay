@@ -37,12 +37,14 @@ interface TimelineEvent {
     | "meal";
 }
 
-interface BrowsingEntry {
+interface BrowsingSession {
   domain: string;
   label: string;
   category: string;
-  duration: number;
   title: string;
+  startTime: number;
+  endTime: number;
+  duration: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -153,32 +155,37 @@ function formatDuration(seconds: number): string {
   return `${minutes}m`;
 }
 
-async function fetchTimelineData(date: string): Promise<BrowsingEntry[]> {
+function formatTimeFromTimestamp(ts: number): string {
+  const d = new Date(ts);
+  return d.toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit", hour12: false });
+}
+
+async function fetchBrowsingSessions(date: string): Promise<BrowsingSession[]> {
   try {
     const res = await fetch(`/api/data?date=${date}&source=browser-extension`);
     if (!res.ok) return [];
     const json = await res.json();
 
-    // Aggregate by domain from the data points
-    const domainMap: Record<string, BrowsingEntry> = {};
+    // Extract sessions from data points
+    const allSessions: BrowsingSession[] = [];
 
     for (const point of json.data) {
-      const val = point.value as BrowsingEntry;
-      if (!val.domain) continue;
-
-      if (domainMap[val.domain]) {
-        // Take the latest duration (extension accumulates)
-        if (val.duration > domainMap[val.domain].duration) {
-          domainMap[val.domain] = val;
-        }
-      } else {
-        domainMap[val.domain] = val;
+      const val = point.value as { sessions?: BrowsingSession[] };
+      if (val.sessions && Array.isArray(val.sessions)) {
+        allSessions.push(...val.sessions);
       }
     }
 
-    return Object.values(domainMap)
-      .filter((e) => e.duration >= 30)
-      .sort((a, b) => b.duration - a.duration);
+    // Deduplicate by startTime (sync may send duplicates)
+    const seen = new Set<number>();
+    const unique = allSessions.filter((s) => {
+      if (seen.has(s.startTime)) return false;
+      seen.add(s.startTime);
+      return s.duration >= 10;
+    });
+
+    // Sort by start time (earliest first)
+    return unique.sort((a, b) => a.startTime - b.startTime);
   } catch {
     return [];
   }
@@ -275,15 +282,15 @@ function EmptyState() {
 
 export default function TimelinePage() {
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [browsingData, setBrowsingData] = useState<BrowsingEntry[]>([]);
+  const [browsingSessions, setBrowsingSessions] = useState<BrowsingSession[]>([]);
 
   const today = new Date();
   const isToday = selectedDate.toDateString() === today.toDateString();
 
-  // Fetch browsing data when date changes
+  // Fetch browsing sessions when date changes
   useEffect(() => {
     const dateStr = selectedDate.toISOString().split("T")[0];
-    fetchTimelineData(dateStr).then(setBrowsingData);
+    fetchBrowsingSessions(dateStr).then(setBrowsingSessions);
   }, [selectedDate]);
 
   // For now, only show mock timeline events for "today"; other dates show empty state
@@ -328,7 +335,7 @@ export default function TimelinePage() {
 
         {/* Timeline Body */}
         <div className="border border-border/40 bg-card rounded-xl p-6">
-          {events.length === 0 && browsingData.length === 0 ? (
+          {events.length === 0 && browsingSessions.length === 0 ? (
             <EmptyState />
           ) : (
             <div>
@@ -373,8 +380,8 @@ export default function TimelinePage() {
           )}
         </div>
 
-        {/* Browser Data Section */}
-        {browsingData.length > 0 && (
+        {/* Browsing Sessions */}
+        {browsingSessions.length > 0 && (
           <div className="border border-border/40 bg-card rounded-xl p-6">
             <div className="flex items-center gap-2 mb-4">
               <Monitor
@@ -388,32 +395,36 @@ export default function TimelinePage() {
                 来自浏览器扩展
               </span>
             </div>
-            <div className="space-y-0">
-              {browsingData.map((entry, i) => (
-                <div
-                  key={i}
-                  className="flex items-center justify-between py-2.5 border-b border-border/30 last:border-0"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="h-2 w-2 rounded-full bg-muted-foreground/20" />
-                    <span className="text-sm text-foreground">
-                      {entry.label || entry.domain}
+            <div>
+              {browsingSessions.map((session, i) => {
+                const isLast = i === browsingSessions.length - 1;
+                return (
+                  <div key={i} className="flex items-start gap-4">
+                    <span className="w-24 text-xs font-mono text-muted-foreground pt-0.5 text-right shrink-0">
+                      {formatTimeFromTimestamp(session.startTime)} - {formatTimeFromTimestamp(session.endTime)}
                     </span>
+                    <div className="relative flex flex-col items-center shrink-0">
+                      <div className="h-2 w-2 rounded-full bg-muted-foreground/30 mt-1.5" />
+                      {!isLast && <div className="w-px flex-1 bg-border/60 mt-1" />}
+                    </div>
+                    <div className="flex-1 pb-5 flex items-start justify-between">
+                      <span className="text-sm text-foreground">
+                        {session.label || session.domain}
+                      </span>
+                      <span className="text-xs text-muted-foreground font-mono shrink-0">
+                        {formatDuration(session.duration)}
+                      </span>
+                    </div>
                   </div>
-                  <span className="text-xs text-muted-foreground font-mono">
-                    {formatDuration(entry.duration)}
-                  </span>
-                </div>
-              ))}
+                );
+              })}
             </div>
-            <div className="mt-4 pt-3 border-t border-border/30 flex justify-between">
+            <div className="mt-2 pt-3 border-t border-border/30 flex justify-between">
               <span className="text-xs text-muted-foreground">
-                总计 {browsingData.length} 个网站
+                {browsingSessions.length} 个时段
               </span>
               <span className="text-xs text-muted-foreground font-mono">
-                {formatDuration(
-                  browsingData.reduce((sum, e) => sum + e.duration, 0)
-                )}
+                {formatDuration(browsingSessions.reduce((sum, s) => sum + s.duration, 0))}
               </span>
             </div>
           </div>

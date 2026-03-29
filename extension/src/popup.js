@@ -6,28 +6,47 @@ function formatDuration(seconds) {
   return `${minutes}m`;
 }
 
+function formatTime(timestamp) {
+  const d = new Date(timestamp);
+  return d.toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit", hour12: false });
+}
+
 async function render() {
   const todayKey = new Date().toISOString().split("T")[0];
-  const result = await chrome.storage.local.get(["todayData"]);
-  const todayData = result.todayData?.[todayKey] || {};
+  const result = await chrome.storage.local.get(["sessions", "currentSession"]);
+  const closedSessions = result.sessions?.[todayKey] || [];
 
-  const entries = Object.values(todayData)
-    .filter(e => e.duration >= 30)
-    .sort((a, b) => b.duration - a.duration);
+  // Include current active session
+  const allSessions = [...closedSessions];
+  if (result.currentSession) {
+    const now = Date.now();
+    const duration = Math.round((now - result.currentSession.startTime) / 1000);
+    if (duration >= 10) {
+      allSessions.push({
+        ...result.currentSession,
+        endTime: now,
+        duration,
+      });
+    }
+  }
+
+  // Sort by start time (newest first)
+  allSessions.sort((a, b) => b.startTime - a.startTime);
 
   // Total time
-  const totalSeconds = entries.reduce((sum, e) => sum + e.duration, 0);
+  const totalSeconds = allSessions.reduce((sum, e) => sum + (e.duration || 0), 0);
   document.getElementById("totalTime").textContent = formatDuration(totalSeconds);
 
-  // All sites — show every site with its duration
+  // Render site list as time segments
   const siteList = document.getElementById("siteList");
-  if (entries.length === 0) {
+  if (allSessions.length === 0) {
     siteList.innerHTML = '<div class="empty-state"><p>继续浏览，数据会自动出现</p></div>';
   } else {
-    siteList.innerHTML = entries.map(entry => `
+    siteList.innerHTML = allSessions.map(session => `
       <div class="site-item">
-        <span class="site-name">${entry.label || entry.domain}</span>
-        <span class="site-time">${formatDuration(entry.duration)}</span>
+        <span class="site-time-range">${formatTime(session.startTime)} - ${formatTime(session.endTime)}</span>
+        <span class="site-name">${session.label || session.domain}</span>
+        <span class="site-time">${formatDuration(session.duration || 0)}</span>
       </div>
     `).join("");
   }
@@ -38,5 +57,4 @@ document.getElementById("dashboardLink").addEventListener("click", () => {
   chrome.tabs.create({ url: "http://localhost:3001/dashboard" });
 });
 
-// Render on popup open
 render();
