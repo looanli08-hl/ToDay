@@ -2,7 +2,7 @@ import { categorize } from "./categories.js";
 
 // Configuration
 const HEARTBEAT_INTERVAL = 15; // seconds
-const SYNC_INTERVAL = 5; // minutes
+const SYNC_INTERVAL = 1; // minutes (lowered from 5 for faster dev feedback)
 const API_URL = "http://localhost:3001/api/data";
 
 // ─── State Management (chrome.storage because service workers are non-persistent) ───

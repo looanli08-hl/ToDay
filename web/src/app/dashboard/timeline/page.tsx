@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Moon,
   Footprints,
@@ -37,8 +37,16 @@ interface TimelineEvent {
     | "meal";
 }
 
+interface BrowsingEntry {
+  domain: string;
+  label: string;
+  category: string;
+  duration: number;
+  title: string;
+}
+
 // ---------------------------------------------------------------------------
-// Mock data — will be replaced with real data from Supabase
+// Mock data — used as fallback when no real data exists
 // ---------------------------------------------------------------------------
 
 const mockEvents: TimelineEvent[] = [
@@ -134,6 +142,49 @@ const stats = [
 ];
 
 // ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+function formatDuration(seconds: number): string {
+  if (seconds < 60) return `${seconds}s`;
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  if (hours > 0) return `${hours}h ${minutes}m`;
+  return `${minutes}m`;
+}
+
+async function fetchTimelineData(date: string): Promise<BrowsingEntry[]> {
+  try {
+    const res = await fetch(`/api/data?date=${date}&source=browser-extension`);
+    if (!res.ok) return [];
+    const json = await res.json();
+
+    // Aggregate by domain from the data points
+    const domainMap: Record<string, BrowsingEntry> = {};
+
+    for (const point of json.data) {
+      const val = point.value as BrowsingEntry;
+      if (!val.domain) continue;
+
+      if (domainMap[val.domain]) {
+        // Take the latest duration (extension accumulates)
+        if (val.duration > domainMap[val.domain].duration) {
+          domainMap[val.domain] = val;
+        }
+      } else {
+        domainMap[val.domain] = val;
+      }
+    }
+
+    return Object.values(domainMap)
+      .filter((e) => e.duration >= 30)
+      .sort((a, b) => b.duration - a.duration);
+  } catch {
+    return [];
+  }
+}
+
+// ---------------------------------------------------------------------------
 // DateStrip — horizontal row of selectable dates
 // ---------------------------------------------------------------------------
 
@@ -224,11 +275,19 @@ function EmptyState() {
 
 export default function TimelinePage() {
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [browsingData, setBrowsingData] = useState<BrowsingEntry[]>([]);
 
   const today = new Date();
   const isToday = selectedDate.toDateString() === today.toDateString();
 
-  // For now, only show events for "today"; other dates show empty state
+  // Fetch browsing data when date changes
+  useEffect(() => {
+    const dateStr = selectedDate.toISOString().split("T")[0];
+    fetchTimelineData(dateStr).then(setBrowsingData);
+  }, [selectedDate]);
+
+  // For now, only show mock timeline events for "today"; other dates show empty state
+  // Real browsing data appears in its own section below
   const events = isToday ? mockEvents : [];
 
   const dateStr = selectedDate.toLocaleDateString("zh-CN", {
@@ -269,7 +328,7 @@ export default function TimelinePage() {
 
         {/* Timeline Body */}
         <div className="border border-border/40 bg-card rounded-xl p-6">
-          {events.length === 0 ? (
+          {events.length === 0 && browsingData.length === 0 ? (
             <EmptyState />
           ) : (
             <div>
@@ -313,6 +372,52 @@ export default function TimelinePage() {
             </div>
           )}
         </div>
+
+        {/* Browser Data Section */}
+        {browsingData.length > 0 && (
+          <div className="border border-border/40 bg-card rounded-xl p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <Monitor
+                className="h-4 w-4 text-muted-foreground"
+                strokeWidth={1.5}
+              />
+              <h2 className="font-display text-lg text-foreground">
+                浏览记录
+              </h2>
+              <span className="text-xs text-muted-foreground ml-auto">
+                来自浏览器扩展
+              </span>
+            </div>
+            <div className="space-y-0">
+              {browsingData.map((entry, i) => (
+                <div
+                  key={i}
+                  className="flex items-center justify-between py-2.5 border-b border-border/30 last:border-0"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="h-2 w-2 rounded-full bg-muted-foreground/20" />
+                    <span className="text-sm text-foreground">
+                      {entry.label || entry.domain}
+                    </span>
+                  </div>
+                  <span className="text-xs text-muted-foreground font-mono">
+                    {formatDuration(entry.duration)}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <div className="mt-4 pt-3 border-t border-border/30 flex justify-between">
+              <span className="text-xs text-muted-foreground">
+                总计 {browsingData.length} 个网站
+              </span>
+              <span className="text-xs text-muted-foreground font-mono">
+                {formatDuration(
+                  browsingData.reduce((sum, e) => sum + e.duration, 0)
+                )}
+              </span>
+            </div>
+          </div>
+        )}
 
         {/* Stats Bar */}
         {events.length > 0 && (
