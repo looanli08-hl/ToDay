@@ -12,13 +12,19 @@ import { cn } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import {
+  ClipboardList,
+  Moon,
+  Coffee,
+  Calendar,
+  Lightbulb,
+  Sparkles,
   Plus,
   Search,
   Send,
-  Sparkles,
   MessageSquare,
   Trash2,
   X,
+  Bot,
 } from "lucide-react";
 
 // ---------------------------------------------------------------------------
@@ -44,12 +50,12 @@ interface Conversation {
 // ---------------------------------------------------------------------------
 
 const SUGGESTED_PROMPTS = [
-  { label: "帮我回顾今天做了什么", icon: "📋" },
-  { label: "分析一下我最近的作息", icon: "🌙" },
-  { label: "我有点累了，聊聊天吧", icon: "☕" },
-  { label: "帮我规划明天的安排", icon: "📅" },
-  { label: "记录一个灵感想法", icon: "💡" },
-  { label: "给我一些正能量", icon: "✨" },
+  { label: "帮我回顾今天做了什么", icon: ClipboardList, color: "text-blue-500", bg: "bg-blue-500/8" },
+  { label: "分析一下我最近的作息", icon: Moon, color: "text-indigo-500", bg: "bg-indigo-500/8" },
+  { label: "我有点累了，聊聊天吧", icon: Coffee, color: "text-amber-600", bg: "bg-amber-500/8" },
+  { label: "帮我规划明天的安排", icon: Calendar, color: "text-emerald-500", bg: "bg-emerald-500/8" },
+  { label: "记录一个灵感想法", icon: Lightbulb, color: "text-yellow-500", bg: "bg-yellow-500/8" },
+  { label: "给我一些正能量", icon: Sparkles, color: "text-rose-500", bg: "bg-rose-500/8" },
 ];
 
 // ---------------------------------------------------------------------------
@@ -151,15 +157,15 @@ function TypingIndicator() {
 
 function EchoAvatar({ size = "sm" }: { size?: "sm" | "md" }) {
   const dim = size === "sm" ? "h-7 w-7" : "h-9 w-9";
-  const text = size === "sm" ? "text-xs" : "text-sm";
+  const iconSize = size === "sm" ? "h-3.5 w-3.5" : "h-4 w-4";
   return (
     <div
       className={cn(
         dim,
-        "flex-shrink-0 flex items-center justify-center rounded-full bg-gradient-to-br from-[#e8734a] to-[#f59e6c] shadow-sm"
+        "flex-shrink-0 flex items-center justify-center rounded-lg bg-gradient-to-br from-[#D4864A] to-[#E8A06A]"
       )}
     >
-      <span className={cn(text, "text-white font-medium")}>✦</span>
+      <Bot className={cn(iconSize, "text-white")} strokeWidth={2} />
     </div>
   );
 }
@@ -562,10 +568,10 @@ export default function EchoPage() {
               <div className="mb-8 text-center">
                 <div className="mb-5 flex justify-center">
                   <div className="relative">
-                    <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-[#e8734a] to-[#f59e6c] flex items-center justify-center shadow-lg shadow-[#e8734a]/20">
-                      <Sparkles className="h-7 w-7 text-white" />
+                    <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-[#D4864A] to-[#E8A06A] flex items-center justify-center shadow-lg shadow-[#D4864A]/15">
+                      <Bot className="h-6 w-6 text-white" strokeWidth={1.8} />
                     </div>
-                    <div className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full bg-green-400 border-2 border-background" />
+                    <div className="absolute -bottom-0.5 -right-0.5 h-4 w-4 rounded-full bg-emerald-400 border-[2.5px] border-background" />
                   </div>
                 </div>
                 <h2 className="text-[22px] font-semibold text-foreground/90 mb-2">
@@ -583,10 +589,12 @@ export default function EchoPage() {
                     key={prompt.label}
                     onClick={() => sendMessage(prompt.label)}
                     disabled={isStreaming}
-                    className="group flex items-center gap-2.5 rounded-xl border border-border/60 bg-white px-4 py-3 text-left transition-all duration-200 hover:border-primary/30 hover:shadow-[0_2px_8px_rgba(212,134,74,0.08)] hover:bg-white active:scale-[0.98] disabled:opacity-50"
+                    className="group flex items-center gap-3 rounded-2xl border border-border/50 bg-white px-4 py-3.5 text-left transition-all duration-200 hover:border-primary/20 hover:shadow-[0_2px_12px_rgba(0,0,0,0.04)] active:scale-[0.98] disabled:opacity-50"
                   >
-                    <span className="text-base flex-shrink-0">{prompt.icon}</span>
-                    <span className="text-[13px] text-foreground/70 group-hover:text-foreground/90 transition-colors">
+                    <div className={`rounded-lg p-2 ${prompt.bg} transition-colors`}>
+                      <prompt.icon className={`h-4 w-4 ${prompt.color}`} strokeWidth={1.8} />
+                    </div>
+                    <span className="text-[13px] text-foreground/60 group-hover:text-foreground/80 transition-colors">
                       {prompt.label}
                     </span>
                   </button>

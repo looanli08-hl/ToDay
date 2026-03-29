@@ -1,11 +1,11 @@
 import { Card } from "@/components/ui/card";
 import {
-  BookOpen,
-  Code,
+  BookMarked,
+  Code2,
   Terminal,
   ExternalLink,
   Zap,
-  FileCode,
+  FileCode2,
 } from "lucide-react";
 
 const sections = [
@@ -21,7 +21,7 @@ const sections = [
   {
     title: "API 参考",
     description: "数据推送接口文档",
-    icon: Code,
+    icon: Code2,
     content: `POST /api/data
 {
   "source": "your-connector-id",
@@ -34,7 +34,7 @@ const sections = [
   {
     title: "CONNECTOR.md 规范",
     description: "连接器描述文件格式",
-    icon: FileCode,
+    icon: FileCode2,
     content: `---
 name: my-connector
 description: 连接器描述
@@ -54,7 +54,7 @@ export default function DocsPage() {
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
-          <BookOpen className="h-6 w-6 text-primary" />
+          <BookMarked className="h-6 w-6 text-primary" />
           <h1 className="text-2xl font-semibold tracking-tight">
             开发者文档
           </h1>
@@ -96,7 +96,7 @@ export default function DocsPage() {
             className="flex items-center gap-3 rounded-xl border border-border/60 p-4 hover:bg-accent transition-colors group"
           >
             <div className="rounded-lg bg-muted p-2">
-              <Code className="h-4 w-4 text-foreground/70" />
+              <Code2 className="h-4 w-4 text-foreground/70" />
             </div>
             <div className="flex-1">
               <p className="text-sm font-medium">GitHub</p>

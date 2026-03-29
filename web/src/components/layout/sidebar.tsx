@@ -6,29 +6,28 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import {
-  LayoutDashboard,
-  Clock,
-  MessageSquare,
-  Monitor,
-  Settings,
-  Sparkles,
+  Compass,
+  CalendarDays,
+  LineChart,
+  Layers,
+  Palette,
+  Bot,
+  Blocks,
+  FileCode2,
   Plus,
   Search,
-  BarChart3,
-  Heart,
-  Puzzle,
-  BookOpen,
+  Settings,
 } from "lucide-react";
 
 const mainNav = [
-  { href: "/dashboard", label: "概览", icon: LayoutDashboard },
-  { href: "/dashboard/timeline", label: "时间线", icon: Clock },
-  { href: "/dashboard/analytics", label: "数据分析", icon: BarChart3 },
-  { href: "/dashboard/screen-time", label: "屏幕时间", icon: Monitor },
-  { href: "/dashboard/mood", label: "心情记录", icon: Heart },
-  { href: "/dashboard/echo", label: "Echo AI", icon: Sparkles },
-  { href: "/dashboard/connectors", label: "连接器", icon: Puzzle },
-  { href: "/dashboard/docs", label: "开发文档", icon: BookOpen },
+  { href: "/dashboard", label: "概览", icon: Compass },
+  { href: "/dashboard/timeline", label: "时间线", icon: CalendarDays },
+  { href: "/dashboard/analytics", label: "数据分析", icon: LineChart },
+  { href: "/dashboard/screen-time", label: "屏幕时间", icon: Layers },
+  { href: "/dashboard/mood", label: "心情记录", icon: Palette },
+  { href: "/dashboard/echo", label: "Echo AI", icon: Bot },
+  { href: "/dashboard/connectors", label: "连接器", icon: Blocks },
+  { href: "/dashboard/docs", label: "开发文档", icon: FileCode2 },
 ];
 
 const bottomNav = [
@@ -57,8 +56,8 @@ export function Sidebar() {
       {/* Logo + Actions */}
       <div className="flex items-center justify-between px-4 pt-4 pb-2">
         <div className="flex items-center gap-2.5">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-[#e8734a] to-[#f59e6c]">
-            <span className="text-xs font-bold text-white">T</span>
+          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-[#D4864A] to-[#E8A06A] shadow-sm shadow-[#D4864A]/20">
+            <span className="text-[13px] font-bold text-white tracking-tight">T</span>
           </div>
           <span className="text-[15px] font-semibold tracking-tight text-foreground/90">ToDay</span>
         </div>
@@ -96,7 +95,7 @@ export function Sidebar() {
                   : "text-muted-foreground hover:bg-accent/60 hover:text-foreground/80"
               )}
             >
-              <item.icon className="h-[15px] w-[15px]" />
+              <item.icon className="h-4 w-4" strokeWidth={1.8} />
               {item.label}
             </Link>
           );
@@ -118,7 +117,7 @@ export function Sidebar() {
                   : "text-muted-foreground hover:bg-accent/60 hover:text-foreground/80"
               )}
             >
-              <item.icon className="h-[15px] w-[15px]" />
+              <item.icon className="h-4 w-4" strokeWidth={1.8} />
               {item.label}
             </Link>
           );

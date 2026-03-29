@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { connectors, categories, type Connector } from "@/lib/connectors";
-import { Search, Puzzle, Plus, Laptop } from "lucide-react";
+import { Search, Blocks, Plus, Laptop } from "lucide-react";
 
 // --- Device types & data ---
 
@@ -130,7 +130,7 @@ export default function ConnectorsPage() {
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
-          <Puzzle className="h-6 w-6 text-primary" />
+          <Blocks className="h-6 w-6 text-primary" />
           <h1 className="text-2xl font-semibold tracking-tight">连接器</h1>
         </div>
         <p className="text-sm text-muted-foreground">
@@ -156,7 +156,7 @@ export default function ConnectorsPage() {
       {/* Marketplace Section */}
       <div>
         <div className="flex items-center gap-2 mb-4">
-          <Puzzle className="h-[15px] w-[15px] text-muted-foreground" />
+          <Blocks className="h-[15px] w-[15px] text-muted-foreground" />
           <h2 className="text-[15px] font-semibold text-foreground/90">
             连接器市场
           </h2>

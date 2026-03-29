@@ -2,7 +2,8 @@ import { Card } from "@/components/ui/card";
 import {
   Footprints,
   Moon,
-  Monitor,
+  Layers,
+  Palette,
   Sparkles,
   TrendingUp,
   Clock,
@@ -11,6 +12,7 @@ import {
   Heart,
   ArrowUpRight,
   Activity,
+  Monitor,
 } from "lucide-react";
 
 function getGreeting(): string {
@@ -29,36 +31,32 @@ const statCards = [
     value: "--",
     sub: "运动 · 步行",
     icon: Zap,
-    color: "text-orange-500",
-    bg: "bg-orange-50",
-    iconBg: "bg-gradient-to-br from-orange-400 to-orange-500",
+    tintClass: "from-orange-500/10 to-orange-400/5 ring-orange-500/10",
+    iconColor: "text-orange-500",
   },
   {
     label: "睡眠",
     value: "--",
     sub: "昨晚",
     icon: Moon,
-    color: "text-indigo-500",
-    bg: "bg-indigo-50",
-    iconBg: "bg-gradient-to-br from-indigo-400 to-indigo-500",
+    tintClass: "from-indigo-500/10 to-indigo-400/5 ring-indigo-500/10",
+    iconColor: "text-indigo-500",
   },
   {
     label: "屏幕时间",
     value: "--",
     sub: "今日总计",
-    icon: Monitor,
-    color: "text-purple-500",
-    bg: "bg-purple-50",
-    iconBg: "bg-gradient-to-br from-purple-400 to-purple-500",
+    icon: Layers,
+    tintClass: "from-violet-500/10 to-violet-400/5 ring-violet-500/10",
+    iconColor: "text-violet-500",
   },
   {
     label: "心情",
     value: "😊",
     sub: "开心 · 2 条记录",
-    icon: Heart,
-    color: "text-rose-500",
-    bg: "bg-rose-50",
-    iconBg: "bg-gradient-to-br from-rose-400 to-rose-500",
+    icon: Palette,
+    tintClass: "from-rose-500/10 to-rose-400/5 ring-rose-500/10",
+    iconColor: "text-rose-500",
   },
 ];
 
@@ -93,9 +91,7 @@ export default function DashboardPage() {
       {/* Hero Section */}
       <div className="px-10 pt-12 pb-8">
         <div className="flex items-center gap-3 mb-2">
-          <div className="flex h-8 w-8 items-center justify-center">
-            <span className="text-2xl">✦</span>
-          </div>
+          <div className="h-1 w-8 rounded-full bg-gradient-to-r from-[#D4864A] to-[#E8A06A]" />
           <h1 className="text-[32px] font-semibold tracking-tight text-foreground/90">
             {greeting}，Looan
           </h1>
@@ -117,8 +113,8 @@ export default function DashboardPage() {
                   <p className="text-[28px] font-bold tracking-tight text-foreground/90">{card.value}</p>
                   <p className="text-[12px] text-muted-foreground/70">{card.sub}</p>
                 </div>
-                <div className={`rounded-xl p-2 ${card.iconBg} shadow-sm`}>
-                  <card.icon className="h-4 w-4 text-white" />
+                <div className={`rounded-xl p-2.5 bg-gradient-to-br ${card.tintClass} ring-1`}>
+                  <card.icon className={`h-[18px] w-[18px] ${card.iconColor}`} strokeWidth={1.8} />
                 </div>
               </div>
             </Card>
@@ -219,8 +215,10 @@ export default function DashboardPage() {
 
             {/* Life Pulse */}
             <Card className="border-0 bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-base">🌿</span>
+              <div className="flex items-center gap-2.5 mb-3">
+                <div className="rounded-lg p-1.5 bg-emerald-500/8">
+                  <Activity className="h-4 w-4 text-emerald-500" strokeWidth={1.8} />
+                </div>
                 <h2 className="text-[15px] font-semibold text-foreground/90">生活脉搏</h2>
               </div>
               <p className="text-[13px] leading-relaxed text-muted-foreground">
