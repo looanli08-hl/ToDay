@@ -50,6 +50,7 @@
 		36F6CEEC726A05A87B5DB4E6 /* DashboardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B53F7EA6F669B4A9EE7680B1 /* DashboardViewModel.swift */; };
 		374BB5B8024D43DEEB781C2D /* EchoDailySummaryGeneratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F90D7BD80D380B9E483FF65 /* EchoDailySummaryGeneratorTests.swift */; };
 		3EDD590CF25E429FB8186758 /* ToDayApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCCD453022FB7D3DE28EDE60 /* ToDayApp.swift */; };
+		3F544FD16B219E34BB08C7F3 /* ManagedSettings.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DF6A95A9011E79D975662199 /* ManagedSettings.framework */; };
 		3FD248DEB5BDF808804ABA6C /* PhotoService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A50CAC68CF65C166C6C84DED /* PhotoService.swift */; };
 		42E9331811E33CBD40E88723 /* DayTimelineEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED5E4D5563AC71A0747FEA41 /* DayTimelineEntity.swift */; };
 		44823975A98302AEB5069E00 /* HistoryScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = E41D5FDB97C97E39345EF797 /* HistoryScreen.swift */; };
@@ -66,6 +67,7 @@
 		578F43A4F42F7DF8633BED13 /* EchoMessageListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 178E944715EC8339B4296F34 /* EchoMessageListView.swift */; };
 		59A62671AC37416B6921E436 /* NewEventKindTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19F6F718AF60064D8B59E602 /* NewEventKindTests.swift */; };
 		5AE1B8C4C97B3FDD1AC06675 /* PedometerCollectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3373AE9894FB26E97C58C1FA /* PedometerCollectorTests.swift */; };
+		5E075C9CFEABC25E63E681E7 /* ToDayScreenTimeReport.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = D549ED87C76853C3B4ADF091 /* ToDayScreenTimeReport.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		6009F788A2DCD8E51F97E8D5 /* AppConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB09FC4279F21A281C6D8DC2 /* AppConfiguration.swift */; };
 		62454FB0EE44B3CC284C2C47 /* ShutterFloatingButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AA54DE50AA5352485CC47C2 /* ShutterFloatingButton.swift */; };
 		656215E5648898D4FDA75DCD /* PhoneTimelineDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F156F37B272E8665520A41 /* PhoneTimelineDataProvider.swift */; };
@@ -107,9 +109,11 @@
 		A0CE1E4299EBC7EE964A297E /* EchoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDF4570DB17549404F16B768 /* EchoViewModel.swift */; };
 		A1E57ADE6D59955BA91C69CA /* DeviceStateCollector.swift in Sources */ = {isa = PBXBuildFile; fileRef = D154A43EC2A1E5AA9BB3E6EF /* DeviceStateCollector.swift */; };
 		A22057A1CC2B1E7036B38A06 /* EchoChatInputBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF457392367DE125D6C2CE7F /* EchoChatInputBar.swift */; };
+		A23C1B92188A5ADCBF4E3B82 /* TotalActivityReport.swift in Sources */ = {isa = PBXBuildFile; fileRef = C986D79040F461443BC4D64D /* TotalActivityReport.swift */; };
 		A2F668A004169259C19C90A3 /* TodayInsightComposer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D40EA4B5DE92A1C04FEF877 /* TodayInsightComposer.swift */; };
 		A6DC40FEE40A9E9F17E212CA /* EchoMessageManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 657E7CB2585EACE47FFE1613 /* EchoMessageManagerTests.swift */; };
 		AB5F6A399EE781C4F3B21BC6 /* EchoWeeklyProfileUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE82260DB517A82DAD2783A3 /* EchoWeeklyProfileUpdater.swift */; };
+		ABCA0EF892CA47271A8C8022 /* FamilyControls.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E4F86AADDBC49C09C487C0A9 /* FamilyControls.framework */; };
 		ACB5952FC0F8CB92C245AD7F /* EchoChatSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF883384B93C9EE573AAA35 /* EchoChatSession.swift */; };
 		AFB0264365F2546579D2F53A /* MoodRecordStoring.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E53E00BCF5527A4FE8FD775 /* MoodRecordStoring.swift */; };
 		B1FE8264ADB9954A55A2426D /* EchoMessageStoring.swift in Sources */ = {isa = PBXBuildFile; fileRef = 858B86D76A9DD048BF71A74A /* EchoMessageStoring.swift */; };
@@ -122,6 +126,7 @@
 		B9A386B68A436EFF2D0C3248 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931CD6310C0E2DA52ED0AAA3 /* SettingsView.swift */; };
 		BC27B6044A1FB59CCFBD9B6D /* LocationCollector.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0B2EE8138EE16EC7078C00E /* LocationCollector.swift */; };
 		BD2074AFA0508C7C195D3891 /* DashboardViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DA68A1791C5F24214D3E41B /* DashboardViewModelTests.swift */; };
+		BEDA014AA6E5FDD10EB52BB8 /* DeviceActivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 210FDE8BD7637E4361659A24 /* DeviceActivity.framework */; };
 		C07D139F3CA70857CEFE0C05 /* EchoMemoryManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FEC7FAC9DA97A938455A2C5 /* EchoMemoryManagerTests.swift */; };
 		C0DC99D502C57FEBBF8D2597 /* EchoMessageEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A61345F7366DF2B6CA4DC3 /* EchoMessageEntity.swift */; };
 		C5767BB39D601ADD6EA3AFE5 /* TodayScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = F728CBFA275E061CC33D4193 /* TodayScreen.swift */; };
@@ -163,6 +168,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		0338914E6721EFF9E131E9F3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2C29361A382315565B1DE7BF /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4C68C618E05CE25C0FDEC115;
+			remoteInfo = ToDayScreenTimeReport;
+		};
 		0B8C66CE96BFBD6584B0159B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 2C29361A382315565B1DE7BF /* Project object */;
@@ -171,6 +183,20 @@
 			remoteInfo = ToDay;
 		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		ED0ED74106E25B53434FEAF1 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				5E075C9CFEABC25E63E681E7 /* ToDayScreenTimeReport.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		007407D7872DD5977B34F006 /* SpendingManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendingManagerTests.swift; sourceTree = "<group>"; };
@@ -197,6 +223,7 @@
 		1F90D7BD80D380B9E483FF65 /* EchoDailySummaryGeneratorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoDailySummaryGeneratorTests.swift; sourceTree = "<group>"; };
 		1FEC7FAC9DA97A938455A2C5 /* EchoMemoryManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoMemoryManagerTests.swift; sourceTree = "<group>"; };
 		20B7C51F662EC14C9F7E96DC /* MotionCollectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MotionCollectorTests.swift; sourceTree = "<group>"; };
+		210FDE8BD7637E4361659A24 /* DeviceActivity.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DeviceActivity.framework; path = System/Library/Frameworks/DeviceActivity.framework; sourceTree = SDKROOT; };
 		22E03C5F454E0DBDEEDEDBC7 /* EchoThreadViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoThreadViewModel.swift; sourceTree = "<group>"; };
 		23B9997DEF7C92757AB78EB2 /* CareNudgeCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareNudgeCardView.swift; sourceTree = "<group>"; };
 		24D272CC62BE4BE9A63F4C6B /* ManualTimeEntrySheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualTimeEntrySheet.swift; sourceTree = "<group>"; };
@@ -286,7 +313,9 @@
 		BBFA94CCF4D730B27A3ADECE /* PhoneInferenceEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneInferenceEngineTests.swift; sourceTree = "<group>"; };
 		BCF883384B93C9EE573AAA35 /* EchoChatSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoChatSession.swift; sourceTree = "<group>"; };
 		BE0830BE171EA285B8947AF0 /* EchoCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoCardView.swift; sourceTree = "<group>"; };
+		C21C9E109566FA529B09263C /* ToDayScreenTimeReport.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ToDayScreenTimeReport.entitlements; sourceTree = "<group>"; };
 		C300C973775E007521F18167 /* CurrentActivityProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentActivityProvider.swift; sourceTree = "<group>"; };
+		C986D79040F461443BC4D64D /* TotalActivityReport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TotalActivityReport.swift; sourceTree = "<group>"; };
 		CB09FC4279F21A281C6D8DC2 /* AppConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfiguration.swift; sourceTree = "<group>"; };
 		CCCD453022FB7D3DE28EDE60 /* ToDayApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDayApp.swift; sourceTree = "<group>"; };
 		CDA1FC9F14C4C9223D6E750E /* PlaceManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceManagerTests.swift; sourceTree = "<group>"; };
@@ -298,15 +327,18 @@
 		D4F3F984643A7EA6B5DA144C /* ScreenTimeRecordStoring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenTimeRecordStoring.swift; sourceTree = "<group>"; };
 		D5161D7C3300BF68A09C56F8 /* EchoMessageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoMessageManager.swift; sourceTree = "<group>"; };
 		D52F65A4774BB7467BD2DBC1 /* BackgroundTaskManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundTaskManager.swift; sourceTree = "<group>"; };
+		D549ED87C76853C3B4ADF091 /* ToDayScreenTimeReport.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = ToDayScreenTimeReport.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		D5E3EC90284C88262A943A15 /* TodayInsightComposerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayInsightComposerTests.swift; sourceTree = "<group>"; };
 		D796A8133E65C0F7E468E8AB /* MoodRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodRecord.swift; sourceTree = "<group>"; };
 		DD8682A65FCDD7B5B3365527 /* DeviceStateCollectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceStateCollectorTests.swift; sourceTree = "<group>"; };
 		DEBA7D34F5C9C73353085631 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		DF6A95A9011E79D975662199 /* ManagedSettings.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ManagedSettings.framework; path = System/Library/Frameworks/ManagedSettings.framework; sourceTree = SDKROOT; };
 		E0B2EE8138EE16EC7078C00E /* LocationCollector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationCollector.swift; sourceTree = "<group>"; };
 		E18A951C7A88BE1CC9883050 /* EchoMirrorSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoMirrorSheet.swift; sourceTree = "<group>"; };
 		E24C90EDAC237C756CCF04F9 /* SpendingRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendingRecord.swift; sourceTree = "<group>"; };
 		E3255BECBDB1CE6697C05720 /* ShutterManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShutterManagerTests.swift; sourceTree = "<group>"; };
 		E41D5FDB97C97E39345EF797 /* HistoryScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryScreen.swift; sourceTree = "<group>"; };
+		E4F86AADDBC49C09C487C0A9 /* FamilyControls.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FamilyControls.framework; path = System/Library/Frameworks/FamilyControls.framework; sourceTree = SDKROOT; };
 		E551233BEC618D5CE02A0445 /* EchoChatViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoChatViewModelTests.swift; sourceTree = "<group>"; };
 		E55BD79449543E2EDA158B48 /* SensorCollecting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorCollecting.swift; sourceTree = "<group>"; };
 		E7BB74516D89AD97D04F81B3 /* AppContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppContainer.swift; sourceTree = "<group>"; };
@@ -332,14 +364,37 @@
 		FDB4EF4DBF23B545C6736902 /* MoodPhotoAttachment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodPhotoAttachment.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFrameworksBuildPhase section */
+		371C172740C3A389BE973F86 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BEDA014AA6E5FDD10EB52BB8 /* DeviceActivity.framework in Frameworks */,
+				ABCA0EF892CA47271A8C8022 /* FamilyControls.framework in Frameworks */,
+				3F544FD16B219E34BB08C7F3 /* ManagedSettings.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
 /* Begin PBXGroup section */
 		01BAB423F888B3D328A14A31 /* Products */ = {
 			isa = PBXGroup;
 			children = (
 				D273A8E459B1BBB83027539B /* ToDay.app */,
+				D549ED87C76853C3B4ADF091 /* ToDayScreenTimeReport.appex */,
 				037508DDAD551D2D5F74DE83 /* ToDayTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		154F37BD2988F93F9FB9D282 /* ToDayScreenTimeReport */ = {
+			isa = PBXGroup;
+			children = (
+				C21C9E109566FA529B09263C /* ToDayScreenTimeReport.entitlements */,
+				C986D79040F461443BC4D64D /* TotalActivityReport.swift */,
+			);
+			path = ToDayScreenTimeReport;
 			sourceTree = "<group>";
 		};
 		1814AA7ED46771A743AA32AC /* ScrollCanvas */ = {
@@ -428,6 +483,16 @@
 				377615C5249C10E358F73636 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		822BF586E477C50E04903CAC /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				210FDE8BD7637E4361659A24 /* DeviceActivity.framework */,
+				E4F86AADDBC49C09C487C0A9 /* FamilyControls.framework */,
+				DF6A95A9011E79D975662199 /* ManagedSettings.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		95AF2016323CE338C3D33B9A /* Dashboard */ = {
@@ -632,7 +697,9 @@
 			isa = PBXGroup;
 			children = (
 				4558B47175ED68C428686870 /* ToDay */,
+				154F37BD2988F93F9FB9D282 /* ToDayScreenTimeReport */,
 				BDF9E53E8979EE3E9CB77A86 /* ToDayTests */,
+				822BF586E477C50E04903CAC /* Frameworks */,
 				01BAB423F888B3D328A14A31 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -665,10 +732,12 @@
 			buildPhases = (
 				0E45D6EFA7FAF1A88A38ED52 /* Sources */,
 				DECA2DB299C974DCCF9A25AD /* Resources */,
+				ED0ED74106E25B53434FEAF1 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				6526B95BC4E48F679F242522 /* PBXTargetDependency */,
 			);
 			name = ToDay;
 			packageProductDependencies = (
@@ -676,6 +745,24 @@
 			productName = ToDay;
 			productReference = D273A8E459B1BBB83027539B /* ToDay.app */;
 			productType = "com.apple.product-type.application";
+		};
+		4C68C618E05CE25C0FDEC115 /* ToDayScreenTimeReport */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5270A77ACD8CD500B09B5729 /* Build configuration list for PBXNativeTarget "ToDayScreenTimeReport" */;
+			buildPhases = (
+				554D929CFB121B4220C83C9E /* Sources */,
+				371C172740C3A389BE973F86 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ToDayScreenTimeReport;
+			packageProductDependencies = (
+			);
+			productName = ToDayScreenTimeReport;
+			productReference = D549ED87C76853C3B4ADF091 /* ToDayScreenTimeReport.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 		94E86223F7A3FEAECFA25695 /* ToDayTests */ = {
 			isa = PBXNativeTarget;
@@ -708,6 +795,10 @@
 						DevelopmentTeam = G89F57S8M3;
 						ProvisioningStyle = Automatic;
 					};
+					4C68C618E05CE25C0FDEC115 = {
+						DevelopmentTeam = G89F57S8M3;
+						ProvisioningStyle = Automatic;
+					};
 					94E86223F7A3FEAECFA25695 = {
 						DevelopmentTeam = G89F57S8M3;
 						ProvisioningStyle = Automatic;
@@ -729,6 +820,7 @@
 			projectRoot = "";
 			targets = (
 				1FB5617C31BE25701E8C7ACD /* ToDay */,
+				4C68C618E05CE25C0FDEC115 /* ToDayScreenTimeReport */,
 				94E86223F7A3FEAECFA25695 /* ToDayTests */,
 			);
 		};
@@ -871,6 +963,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		554D929CFB121B4220C83C9E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A23C1B92188A5ADCBF4E3B82 /* TotalActivityReport.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5E0BB6B11E524E4D75D04154 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -920,9 +1020,36 @@
 			target = 1FB5617C31BE25701E8C7ACD /* ToDay */;
 			targetProxy = 0B8C66CE96BFBD6584B0159B /* PBXContainerItemProxy */;
 		};
+		6526B95BC4E48F679F242522 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4C68C618E05CE25C0FDEC115 /* ToDayScreenTimeReport */;
+			targetProxy = 0338914E6721EFF9E131E9F3 /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		086C9F1AFF03BE0E25DCFCDF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = ToDayScreenTimeReport/ToDayScreenTimeReport.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = G89F57S8M3;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSExtension_NSExtensionPointIdentifier = com.apple.deviceactivityui.report;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.looanli.today.screentimereport;
+				PRODUCT_NAME = ToDayScreenTimeReport;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		3A23333C80BAD0A186C9634F /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -973,6 +1100,28 @@
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ToDay.app/ToDay";
 			};
 			name = Release;
+		};
+		69C6A05C718619A6684157B3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = ToDayScreenTimeReport/ToDayScreenTimeReport.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = G89F57S8M3;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSExtension_NSExtensionPointIdentifier = com.apple.deviceactivityui.report;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.looanli.today.screentimereport;
+				PRODUCT_NAME = ToDayScreenTimeReport;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
 		};
 		75B542BB223BF07D88D0E640 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -1165,6 +1314,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		5270A77ACD8CD500B09B5729 /* Build configuration list for PBXNativeTarget "ToDayScreenTimeReport" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				69C6A05C718619A6684157B3 /* Debug */,
+				086C9F1AFF03BE0E25DCFCDF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 		5B214007FA30E3EB354D30D9 /* Build configuration list for PBXProject "ToDay" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

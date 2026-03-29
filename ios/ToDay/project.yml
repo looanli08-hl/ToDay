@@ -28,6 +28,9 @@ targets:
         com.apple.developer.healthkit: true
         com.apple.security.application-groups:
           - group.com.looanli.today
+        com.apple.developer.family-controls: true
+    dependencies:
+      - target: ToDayScreenTimeReport
     info:
       path: ToDay/Info.plist
       properties:
@@ -65,6 +68,31 @@ targets:
         GENERATE_INFOPLIST_FILE: YES
     dependencies:
       - target: ToDay
+  ToDayScreenTimeReport:
+    type: app-extension
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: ToDayScreenTimeReport
+    settings:
+      base:
+        PRODUCT_NAME: ToDayScreenTimeReport
+        PRODUCT_BUNDLE_IDENTIFIER: com.looanli.today.screentimereport
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_NSExtension_NSExtensionPointIdentifier: com.apple.deviceactivityui.report
+        DEVELOPMENT_TEAM: G89F57S8M3
+        CODE_SIGN_STYLE: Automatic
+        SWIFT_VERSION: 5.0
+    entitlements:
+      path: ToDayScreenTimeReport/ToDayScreenTimeReport.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.looanli.today
+        com.apple.developer.family-controls: true
+    dependencies:
+      - sdk: DeviceActivity.framework
+      - sdk: FamilyControls.framework
+      - sdk: ManagedSettings.framework
 schemes:
   ToDay:
     build:
