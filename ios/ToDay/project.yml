@@ -28,9 +28,7 @@ targets:
         com.apple.developer.healthkit: true
         com.apple.security.application-groups:
           - group.com.looanli.today
-        com.apple.developer.family-controls: true
-    dependencies:
-      - target: ToDayScreenTimeReport
+        # com.apple.developer.family-controls: true  # Re-enable after Distribution entitlement approved
     info:
       path: ToDay/Info.plist
       properties:
