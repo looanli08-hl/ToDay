@@ -283,6 +283,7 @@ function EmptyState() {
 export default function TimelinePage() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [browsingSessions, setBrowsingSessions] = useState<BrowsingSession[]>([]);
+  const [expandedBlocks, setExpandedBlocks] = useState<Set<string>>(new Set());
 
   const today = new Date();
   const isToday = selectedDate.toDateString() === today.toDateString();
@@ -294,16 +295,48 @@ export default function TimelinePage() {
   }, [selectedDate]);
 
   // Merge browsing sessions into the timeline as real events
-  // Mock events are used as placeholder for non-browser data (phone, sensors)
   const phoneEvents = isToday ? mockEvents : [];
 
-  // Convert browsing sessions to timeline events
-  const browsingEvents: TimelineEvent[] = browsingSessions.map((s, i) => ({
-    id: `browse-${i}`,
-    time: formatTimeFromTimestamp(s.startTime),
-    label: s.title && s.title !== s.domain ? `${s.label} · ${s.title}` : s.label || s.domain,
+  // Group consecutive browsing sessions by category into blocks
+  const browsingBlocks: {
+    id: string;
+    category: string;
+    startTime: number;
+    endTime: number;
+    totalDuration: number;
+    sessions: BrowsingSession[];
+  }[] = [];
+
+  for (const session of browsingSessions) {
+    const lastBlock = browsingBlocks[browsingBlocks.length - 1];
+    // Merge into last block if same category and within 5 minutes
+    if (
+      lastBlock &&
+      lastBlock.category === session.category &&
+      session.startTime - lastBlock.endTime < 5 * 60 * 1000
+    ) {
+      lastBlock.endTime = session.endTime;
+      lastBlock.totalDuration += session.duration;
+      lastBlock.sessions.push(session);
+    } else {
+      browsingBlocks.push({
+        id: `block-${browsingBlocks.length}`,
+        category: session.category,
+        startTime: session.startTime,
+        endTime: session.endTime,
+        totalDuration: session.duration,
+        sessions: [session],
+      });
+    }
+  }
+
+  // Convert blocks to timeline events
+  const browsingEvents: TimelineEvent[] = browsingBlocks.map((block) => ({
+    id: block.id,
+    time: formatTimeFromTimestamp(block.startTime),
+    label: block.category,
     icon: Monitor,
-    duration: formatDuration(s.duration),
+    duration: formatDuration(block.totalDuration),
     type: "screen" as const,
   }));
 
@@ -356,38 +389,85 @@ export default function TimelinePage() {
             <div>
               {events.map((event, index) => {
                 const isLast = index === events.length - 1;
+                const block = event.id.startsWith("block-")
+                  ? browsingBlocks.find((b) => b.id === event.id)
+                  : null;
+                const isExpanded = expandedBlocks.has(event.id);
+
                 return (
-                  <div key={event.id} className="flex items-start gap-4">
-                    {/* Time */}
-                    <span className="w-12 text-xs font-mono text-muted-foreground pt-0.5 text-right shrink-0">
-                      {event.time}
-                    </span>
-
-                    {/* Dot + Line */}
-                    <div className="relative flex flex-col items-center shrink-0">
-                      <div className="h-2 w-2 rounded-full bg-muted-foreground/30 mt-1.5" />
-                      {!isLast && (
-                        <div className="w-px flex-1 bg-border/60 mt-1" />
+                  <div key={event.id}>
+                    <div
+                      className={cn(
+                        "flex items-start gap-4",
+                        block && "cursor-pointer"
                       )}
-                    </div>
+                      onClick={() => {
+                        if (!block) return;
+                        setExpandedBlocks((prev) => {
+                          const next = new Set(prev);
+                          if (next.has(event.id)) next.delete(event.id);
+                          else next.add(event.id);
+                          return next;
+                        });
+                      }}
+                    >
+                      <span className="w-12 text-xs font-mono text-muted-foreground pt-0.5 text-right shrink-0">
+                        {event.time}
+                      </span>
 
-                    {/* Content */}
-                    <div className="flex-1 pb-6">
-                      <div className="flex items-center gap-2">
-                        <event.icon
-                          className="h-4 w-4 text-muted-foreground"
-                          strokeWidth={1.5}
-                        />
-                        <span className="text-sm text-foreground">
-                          {event.label}
-                        </span>
+                      <div className="relative flex flex-col items-center shrink-0">
+                        <div className="h-2 w-2 rounded-full bg-muted-foreground/30 mt-1.5" />
+                        {(!isLast || isExpanded) && (
+                          <div className="w-px flex-1 bg-border/60 mt-1" />
+                        )}
                       </div>
-                      {event.duration && (
-                        <span className="mt-1 inline-block text-xs text-muted-foreground">
-                          {event.duration}
-                        </span>
-                      )}
+
+                      <div className="flex-1 pb-5">
+                        <div className="flex items-center gap-2">
+                          <event.icon
+                            className="h-4 w-4 text-muted-foreground"
+                            strokeWidth={1.5}
+                          />
+                          <span className="text-sm text-foreground">
+                            {event.label}
+                          </span>
+                          {event.duration && (
+                            <span className="text-xs text-muted-foreground ml-auto font-mono">
+                              {event.duration}
+                            </span>
+                          )}
+                        </div>
+                        {block && (
+                          <p className="text-[11px] text-muted-foreground mt-1 ml-6">
+                            {block.sessions.length} 个网站{isExpanded ? "" : " · 点击展开"}
+                          </p>
+                        )}
+                      </div>
                     </div>
+
+                    {/* Expanded sessions */}
+                    {block && isExpanded && (
+                      <div className="ml-[76px] mb-4 border-l border-border/40 pl-4 space-y-0">
+                        {block.sessions.map((session, si) => (
+                          <div
+                            key={si}
+                            className="flex items-center gap-3 py-1.5"
+                          >
+                            <span className="text-[11px] font-mono text-muted-foreground w-24 shrink-0">
+                              {formatTimeFromTimestamp(session.startTime)} - {formatTimeFromTimestamp(session.endTime)}
+                            </span>
+                            <span className="text-xs text-foreground flex-1 truncate">
+                              {session.title && session.title !== session.domain
+                                ? session.title
+                                : session.label || session.domain}
+                            </span>
+                            <span className="text-[11px] text-muted-foreground font-mono shrink-0">
+                              {formatDuration(session.duration)}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 );
               })}
