@@ -38,7 +38,13 @@ export async function GET(request: Request) {
 
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
-      return response;
+      // Debug: show success + how many cookies were set
+      const setCookies = response.headers.getSetCookie();
+      response.headers.set("x-debug-cookies", String(setCookies.length));
+      const successUrl = new URL(redirectUrl);
+      successUrl.searchParams.set("auth_status", "success");
+      successUrl.searchParams.set("cookies_set", String(setCookies.length));
+      return NextResponse.redirect(successUrl, { headers: response.headers });
     }
 
     // Debug: show the actual error
