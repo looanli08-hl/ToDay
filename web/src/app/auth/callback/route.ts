@@ -10,18 +10,15 @@ export async function GET(request: Request) {
   const url = (process.env.NEXT_PUBLIC_SUPABASE_URL || "").trim();
   const key = (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "").trim();
 
-  // Debug: if env vars missing, show error
   if (!url || !key) {
-    return NextResponse.redirect(
-      `${origin}/dashboard?auth_error=${encodeURIComponent("Missing Supabase env vars: url=" + !!url + " key=" + !!key)}`
-    );
+    return NextResponse.redirect(`${origin}/dashboard`);
   }
 
   if (code) {
     const cookieStore = await cookies();
 
-    const redirectUrl = `${origin}${next}`;
-    const response = NextResponse.redirect(redirectUrl);
+    // Collect cookies during exchange, apply them after
+    const pendingCookies: { name: string; value: string; options: Record<string, unknown> }[] = [];
 
     const supabase = createServerClient(url, key, {
       cookies: {
@@ -29,31 +26,37 @@ export async function GET(request: Request) {
           return cookieStore.getAll();
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            response.cookies.set(name, value, options);
-          });
+          for (const cookie of cookiesToSet) {
+            pendingCookies.push(cookie);
+            // Also set on request cookie store for subsequent reads
+            try { cookieStore.set(cookie.name, cookie.value, cookie.options); } catch {}
+          }
         },
       },
     });
 
     const { error } = await supabase.auth.exchangeCodeForSession(code);
+
     if (!error) {
-      // Debug: show success + how many cookies were set
-      const setCookies = response.headers.getSetCookie();
-      response.headers.set("x-debug-cookies", String(setCookies.length));
-      const successUrl = new URL(redirectUrl);
-      successUrl.searchParams.set("auth_status", "success");
-      successUrl.searchParams.set("cookies_set", String(setCookies.length));
-      return NextResponse.redirect(successUrl, { headers: response.headers });
+      const response = NextResponse.redirect(`${origin}${next}`);
+      // Apply collected cookies to the response
+      for (const { name, value, options } of pendingCookies) {
+        response.cookies.set(name, value, {
+          path: (options.path as string) || "/",
+          maxAge: options.maxAge as number | undefined,
+          domain: options.domain as string | undefined,
+          secure: options.secure as boolean | undefined,
+          httpOnly: options.httpOnly as boolean | undefined,
+          sameSite: options.sameSite as "lax" | "strict" | "none" | undefined,
+        });
+      }
+      return response;
     }
 
-    // Debug: show the actual error
     return NextResponse.redirect(
       `${origin}/dashboard?auth_error=${encodeURIComponent(error.message)}`
     );
   }
 
-  return NextResponse.redirect(
-    `${origin}/dashboard?auth_error=${encodeURIComponent("No code parameter in callback")}`
-  );
+  return NextResponse.redirect(`${origin}/dashboard`);
 }
