@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
-export default function AuthConfirmPage() {
+function AuthConfirmInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
@@ -34,20 +34,24 @@ export default function AuthConfirmPage() {
 
   if (error) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <div className="text-center">
-          <p className="text-destructive mb-4">登录失败: {error}</p>
-          <a href="/auth/login" className="text-primary hover:underline">
-            重新登录
-          </a>
-        </div>
+      <div className="text-center">
+        <p className="text-destructive mb-4">登录失败: {error}</p>
+        <a href="/auth/login" className="text-primary hover:underline">
+          重新登录
+        </a>
       </div>
     );
   }
 
+  return <p className="text-muted-foreground">正在登录...</p>;
+}
+
+export default function AuthConfirmPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background">
-      <p className="text-muted-foreground">正在登录...</p>
+      <Suspense fallback={<p className="text-muted-foreground">正在登录...</p>}>
+        <AuthConfirmInner />
+      </Suspense>
     </div>
   );
 }
