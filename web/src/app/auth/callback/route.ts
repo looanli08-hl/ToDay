@@ -2,6 +2,9 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
+// Force Node.js runtime (Edge Runtime has stricter Headers that breaks Supabase JWT)
+export const runtime = "nodejs";
+
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
@@ -10,53 +13,44 @@ export async function GET(request: Request) {
   const url = (process.env.NEXT_PUBLIC_SUPABASE_URL || "").trim();
   const key = (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "").trim();
 
-  if (!url || !key) {
+  if (!url || !key || !code) {
     return NextResponse.redirect(`${origin}/dashboard`);
   }
 
-  if (code) {
-    const cookieStore = await cookies();
+  const cookieStore = await cookies();
+  const response = NextResponse.redirect(`${origin}${next}`);
 
-    // Collect cookies during exchange, apply them after
-    const pendingCookies: { name: string; value: string; options: Record<string, unknown> }[] = [];
-
-    const supabase = createServerClient(url, key, {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-        setAll(cookiesToSet) {
-          for (const cookie of cookiesToSet) {
-            pendingCookies.push(cookie);
-            // Also set on request cookie store for subsequent reads
-            try { cookieStore.set(cookie.name, cookie.value, cookie.options); } catch {}
-          }
-        },
+  const supabase = createServerClient(url, key, {
+    cookies: {
+      getAll() {
+        return cookieStore.getAll();
       },
-    });
+      setAll(cookiesToSet) {
+        for (const { name, value, options } of cookiesToSet) {
+          try {
+            cookieStore.set(name, value, options);
+          } catch {
+            // Fallback: set on response
+          }
+          response.cookies.set(name, value, {
+            path: String(options?.path ?? "/"),
+            maxAge: options?.maxAge as number | undefined,
+            secure: options?.secure as boolean | undefined,
+            httpOnly: options?.httpOnly as boolean | undefined,
+            sameSite: options?.sameSite as "lax" | "strict" | "none" | undefined,
+          });
+        }
+      },
+    },
+  });
 
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
+  const { error } = await supabase.auth.exchangeCodeForSession(code);
 
-    if (!error) {
-      const response = NextResponse.redirect(`${origin}${next}`);
-      // Apply collected cookies to the response
-      for (const { name, value, options } of pendingCookies) {
-        response.cookies.set(name, value, {
-          path: (options.path as string) || "/",
-          maxAge: options.maxAge as number | undefined,
-          domain: options.domain as string | undefined,
-          secure: options.secure as boolean | undefined,
-          httpOnly: options.httpOnly as boolean | undefined,
-          sameSite: options.sameSite as "lax" | "strict" | "none" | undefined,
-        });
-      }
-      return response;
-    }
-
+  if (error) {
     return NextResponse.redirect(
       `${origin}/dashboard?auth_error=${encodeURIComponent(error.message)}`
     );
   }
 
-  return NextResponse.redirect(`${origin}/dashboard`);
+  return response;
 }
