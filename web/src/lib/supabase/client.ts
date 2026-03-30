@@ -6,12 +6,15 @@ export function createClient() {
 
   if (!url || !key) {
     console.error("Supabase env vars missing:", { url: !!url, key: !!key });
-    // Return a dummy client that won't crash the page
     return createBrowserClient(
       "https://placeholder.supabase.co",
       "placeholder-key"
     );
   }
 
-  return createBrowserClient(url, key);
+  return createBrowserClient(url, key, {
+    auth: {
+      flowType: "implicit",
+    },
+  });
 }
