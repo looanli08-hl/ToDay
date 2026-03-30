@@ -54,6 +54,7 @@ export async function GET(req: NextRequest) {
       return Response.json({ error: "Not authenticated" }, { status: 401 });
     }
 
+    const supabase = await createServerSupabaseClient();
     const { searchParams } = new URL(req.url);
     const today =
       searchParams.get("date") ||
