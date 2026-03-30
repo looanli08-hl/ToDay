@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import {
   Layers,
@@ -8,49 +9,21 @@ import {
   Clock,
   Globe,
   BarChart3,
+  MonitorSmartphone,
 } from "lucide-react";
 
-// --- Mock Data ---
+// --- Types ---
 
-const todaySummary = {
-  total: "4h 32m",
-  totalMinutes: 272,
-  yesterdayMinutes: 310,
-};
-
-const categories = [
-  { name: "效率", minutes: 135, color: "bg-primary/70" },
-  { name: "娱乐", minutes: 70, color: "bg-primary/50" },
-  { name: "社交", minutes: 35, color: "bg-primary/35" },
-  { name: "学习", minutes: 20, color: "bg-primary/25" },
-  { name: "其他", minutes: 12, color: "bg-primary/15" },
-];
-
-const topSites = [
-  { domain: "github.com", title: "Pull Requests - ToDay Repository", minutes: 80 },
-  { domain: "youtube.com", title: "WWDC 2025 Highlights - SwiftUI...", minutes: 55 },
-  { domain: "notion.so", title: "项目计划 / Q2 Roadmap", minutes: 40 },
-  { domain: "twitter.com", title: "Home / X", minutes: 30 },
-  { domain: "claude.ai", title: "Claude - New conversation", minutes: 15 },
-  { domain: "stackoverflow.com", title: "SwiftUI NavigationStack...", minutes: 12 },
-  { domain: "figma.com", title: "ToDay - Design System v2", minutes: 10 },
-  { domain: "mail.google.com", title: "Inbox (3) - Gmail", minutes: 8 },
-];
-
-const hourlyData = [
-  0, 0, 0, 0, 0, 0, 2, 8, 15, 28, 35, 20,
-  10, 18, 32, 22, 12, 8, 5, 15, 30, 18, 6, 0,
-];
-
-const weeklyData = [
-  { day: "一", minutes: 280 },
-  { day: "二", minutes: 310 },
-  { day: "三", minutes: 245 },
-  { day: "四", minutes: 272 },
-  { day: "五", minutes: 190 },
-  { day: "六", minutes: 120 },
-  { day: "日", minutes: 165 },
-];
+interface ScreenTimeData {
+  today: {
+    totalMinutes: number;
+    categories: { name: string; minutes: number }[];
+    topSites: { domain: string; title: string; minutes: number }[];
+    hourly: number[];
+  };
+  yesterday: { totalMinutes: number };
+  weekly: { day: string; date: string; minutes: number }[];
+}
 
 // --- Helpers ---
 
@@ -61,18 +34,106 @@ function formatDuration(minutes: number): string {
   return `${h}h ${m}m`;
 }
 
+const CATEGORY_COLORS: Record<string, string> = {
+  "效率": "bg-primary/70",
+  "娱乐": "bg-primary/55",
+  "社交": "bg-primary/45",
+  "通讯": "bg-primary/40",
+  "学习": "bg-primary/35",
+  "购物": "bg-primary/30",
+  "搜索": "bg-primary/25",
+  "AI工具": "bg-primary/20",
+  "其他": "bg-primary/15",
+};
+
 // --- Component ---
 
 export default function ScreenTimePage() {
-  const diff = todaySummary.yesterdayMinutes - todaySummary.totalMinutes;
-  const diffPercent = Math.round(
-    (Math.abs(diff) / todaySummary.yesterdayMinutes) * 100
-  );
+  const [data, setData] = useState<ScreenTimeData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const today = new Date().toISOString().split("T")[0];
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+    fetch(`/api/screen-time?date=${today}&tz=${tz}`)
+      .then((res) => res.json())
+      .then((json) => {
+        setData(json);
+        setLoading(false);
+      })
+      .catch(() => {
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen">
+        <div className="px-12 pt-12 pb-10">
+          <h1 className="font-display text-4xl font-normal tracking-tight text-foreground">
+            屏幕时间
+          </h1>
+          <p className="text-base text-muted-foreground mt-2">
+            了解你的数字生活习惯
+          </p>
+        </div>
+        <div className="px-12 pb-12 space-y-8">
+          {[1, 2, 3].map((i) => (
+            <Card
+              key={i}
+              className="border border-border/40 bg-card rounded-xl p-6 h-40 animate-pulse"
+            >
+              <div className="h-4 w-32 bg-muted rounded mb-4" />
+              <div className="h-8 w-24 bg-muted rounded" />
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Empty state
+  if (!data || data.today.totalMinutes === 0) {
+    return (
+      <div className="min-h-screen">
+        <div className="px-12 pt-12 pb-10">
+          <h1 className="font-display text-4xl font-normal tracking-tight text-foreground">
+            屏幕时间
+          </h1>
+          <p className="text-base text-muted-foreground mt-2">
+            了解你的数字生活习惯
+          </p>
+        </div>
+        <div className="px-12 pb-12">
+          <Card className="border border-border/40 bg-card rounded-xl p-12 text-center">
+            <MonitorSmartphone
+              className="h-10 w-10 text-muted-foreground/40 mx-auto mb-4"
+              strokeWidth={1}
+            />
+            <p className="text-foreground font-display text-lg">
+              还没有浏览数据
+            </p>
+            <p className="text-sm text-muted-foreground mt-2">
+              安装浏览器扩展并配置同步令牌，开始记录你的屏幕时间
+            </p>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  const { today, yesterday, weekly } = data;
+  const diff = yesterday.totalMinutes - today.totalMinutes;
+  const diffPercent =
+    yesterday.totalMinutes > 0
+      ? Math.round((Math.abs(diff) / yesterday.totalMinutes) * 100)
+      : 0;
   const isLess = diff > 0;
 
-  const maxCategory = Math.max(...categories.map((c) => c.minutes));
-  const maxHourly = Math.max(...hourlyData);
-  const maxWeekly = Math.max(...weeklyData.map((d) => d.minutes));
+  const maxCategory = Math.max(...today.categories.map((c) => c.minutes), 1);
+  const maxHourly = Math.max(...today.hourly, 1);
+  const maxWeekly = Math.max(...weekly.map((d) => d.minutes), 1);
 
   return (
     <div className="min-h-screen">
@@ -95,18 +156,20 @@ export default function ScreenTimePage() {
           </div>
           <div className="flex items-end gap-4">
             <span className="font-display text-4xl font-normal text-foreground">
-              {todaySummary.total}
+              {formatDuration(today.totalMinutes)}
             </span>
-            <div className="flex items-center gap-1 pb-1.5">
-              {isLess ? (
-                <ArrowDown className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
-              ) : (
-                <ArrowUp className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
-              )}
-              <span className="text-sm text-muted-foreground">
-                比昨天{isLess ? "少" : "多"} {diffPercent}%
-              </span>
-            </div>
+            {yesterday.totalMinutes > 0 && (
+              <div className="flex items-center gap-1 pb-1.5">
+                {isLess ? (
+                  <ArrowDown className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
+                ) : (
+                  <ArrowUp className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
+                )}
+                <span className="text-sm text-muted-foreground">
+                  比昨天{isLess ? "少" : "多"} {diffPercent}%
+                </span>
+              </div>
+            )}
           </div>
         </Card>
 
@@ -119,7 +182,7 @@ export default function ScreenTimePage() {
               <h2 className="font-display text-lg text-foreground">分类用时</h2>
             </div>
             <div className="space-y-4">
-              {categories.map((cat) => (
+              {today.categories.map((cat) => (
                 <div key={cat.name}>
                   <div className="flex items-center justify-between mb-1.5">
                     <span className="text-sm text-foreground">{cat.name}</span>
@@ -129,7 +192,7 @@ export default function ScreenTimePage() {
                   </div>
                   <div className="h-2 w-full rounded-full bg-muted">
                     <div
-                      className={`h-full rounded-full ${cat.color} transition-all duration-500`}
+                      className={`h-full rounded-full ${CATEGORY_COLORS[cat.name] || "bg-primary/15"} transition-all duration-500`}
                       style={{
                         width: `${(cat.minutes / maxCategory) * 100}%`,
                       }}
@@ -147,7 +210,7 @@ export default function ScreenTimePage() {
               <h2 className="font-display text-lg text-foreground">常用站点</h2>
             </div>
             <div className="space-y-0">
-              {topSites.map((site, i) => (
+              {today.topSites.map((site, i) => (
                 <div
                   key={site.domain}
                   className="flex items-center gap-3 py-3 border-b border-border/40 last:border-0"
@@ -179,7 +242,7 @@ export default function ScreenTimePage() {
             <h2 className="font-display text-lg text-foreground">每小时分布</h2>
           </div>
           <div className="flex items-end gap-1 h-32">
-            {hourlyData.map((val, i) => (
+            {today.hourly.map((val, i) => (
               <div
                 key={i}
                 className="flex flex-col items-center flex-1 gap-1.5 group"
@@ -214,19 +277,22 @@ export default function ScreenTimePage() {
             <h2 className="font-display text-lg text-foreground">本周趋势</h2>
           </div>
           <div className="flex items-end justify-between gap-3 h-36">
-            {weeklyData.map((d) => (
+            {weekly.map((d) => (
               <div
-                key={d.day}
+                key={d.date}
                 className="flex flex-col items-center gap-2 flex-1"
               >
                 <span className="text-xs text-muted-foreground">
-                  {formatDuration(d.minutes)}
+                  {d.minutes > 0 ? formatDuration(d.minutes) : "—"}
                 </span>
                 <div className="w-full flex flex-col items-center justify-end h-24">
                   <div
                     className="w-full rounded-lg bg-primary/70 transition-all duration-500"
                     style={{
-                      height: `${(d.minutes / maxWeekly) * 100}%`,
+                      height:
+                        d.minutes > 0
+                          ? `${(d.minutes / maxWeekly) * 100}%`
+                          : "2px",
                     }}
                   />
                 </div>
