@@ -1,4 +1,5 @@
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
@@ -7,19 +8,37 @@ export async function GET(request: Request) {
   const next = searchParams.get("next") ?? "/dashboard";
 
   if (code) {
-    try {
-      const supabase = await createServerSupabaseClient();
-      const { error } = await supabase.auth.exchangeCodeForSession(code);
-      if (!error) {
-        return NextResponse.redirect(`${origin}${next}`);
+    const cookieStore = await cookies();
+    const url = (process.env.NEXT_PUBLIC_SUPABASE_URL || "").trim();
+    const key = (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "").trim();
+
+    // Build response first so we can set cookies on it
+    const redirectUrl = `${origin}${next}`;
+    const response = NextResponse.redirect(redirectUrl);
+
+    const supabase = createServerClient(
+      url || "https://placeholder.supabase.co",
+      key || "placeholder-key",
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll();
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              response.cookies.set(name, value, options);
+            });
+          },
+        },
       }
-      console.error("[Auth Callback] Exchange error:", error.message);
-    } catch (e) {
-      console.error("[Auth Callback] Error:", e);
+    );
+
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    if (!error) {
+      return response;
     }
+    console.error("[Auth Callback] Exchange error:", error.message);
   }
 
-  // If no code, check for hash-based auth (some OAuth flows use hash fragments)
-  // Redirect to dashboard and let client-side handle the session
   return NextResponse.redirect(`${origin}/dashboard`);
 }
