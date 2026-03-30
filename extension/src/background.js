@@ -2,10 +2,10 @@ import { categorize } from "./categories.js";
 
 // ─── Configuration ───
 
-const HEARTBEAT_INTERVAL = 10; // seconds (was 15 — more accurate)
+const HEARTBEAT_INTERVAL = 10; // seconds
 const SYNC_INTERVAL = 1; // minutes
-const IDLE_THRESHOLD = 120; // seconds — consider idle after 2 min of no input
-const API_URL = "http://localhost:3001/api/data";
+const IDLE_THRESHOLD = 120; // seconds
+const DEFAULT_API_BASE = "https://to-day-ten.vercel.app";
 
 // ─── State Management ───
 
@@ -16,13 +16,19 @@ async function getState() {
     "lastSync",
     "isIdle",
     "trackingEnabled",
+    "lastSyncedCount",
+    "syncToken",
+    "apiBaseUrl",
   ]);
   return {
     currentSession: result.currentSession || null,
     sessions: result.sessions || {},
     lastSync: result.lastSync || null,
     isIdle: result.isIdle || false,
-    trackingEnabled: result.trackingEnabled !== false, // default true
+    trackingEnabled: result.trackingEnabled !== false,
+    lastSyncedCount: result.lastSyncedCount || {},
+    syncToken: result.syncToken || null,
+    apiBaseUrl: result.apiBaseUrl || DEFAULT_API_BASE,
   };
 }
 
@@ -31,18 +37,15 @@ async function saveState(updates) {
 }
 
 // ─── Idle Detection ───
-// Pause tracking when user is away from computer
 
 chrome.idle.setDetectionInterval(IDLE_THRESHOLD);
 
 chrome.idle.onStateChanged.addListener(async (state) => {
   if (state === "idle" || state === "locked") {
-    // User left — close current session
     await closeCurrentSession("idle");
     await saveState({ isIdle: true });
     console.log("[ToDay] User idle — tracking paused");
   } else if (state === "active") {
-    // User returned — resume tracking
     await saveState({ isIdle: false });
     heartbeat();
     console.log("[ToDay] User active — tracking resumed");
@@ -50,14 +53,11 @@ chrome.idle.onStateChanged.addListener(async (state) => {
 });
 
 // ─── Window Focus Detection ───
-// Pause when browser loses focus (user switched to native app)
 
 chrome.windows.onFocusChanged.addListener(async (windowId) => {
   if (windowId === chrome.windows.WINDOW_ID_NONE) {
-    // Browser lost focus — close current session
     await closeCurrentSession("blur");
   } else {
-    // Browser regained focus — start new session
     heartbeat();
   }
 });
@@ -68,7 +68,6 @@ async function heartbeat() {
   try {
     const state = await getState();
 
-    // Don't track if disabled or idle
     if (!state.trackingEnabled || state.isIdle) return;
 
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -85,7 +84,6 @@ async function heartbeat() {
       return;
     }
 
-    // Skip incognito tabs
     if (tab.incognito) {
       await closeCurrentSession("incognito");
       return;
@@ -98,17 +96,13 @@ async function heartbeat() {
     const now = Date.now();
     const todayKey = new Date().toISOString().split("T")[0];
 
-    // Same domain — extend current session, update title
     if (state.currentSession && state.currentSession.domain === domain) {
-      // Check for stale session (gap > 5 min means user was likely away)
       const gap = now - state.currentSession.endTime;
       if (gap > 5 * 60 * 1000) {
-        // Close stale session, start fresh
         await closeCurrentSession("stale");
         await startNewSession({ domain, label, category, title, now, todayKey, state });
       } else {
         state.currentSession.endTime = now;
-        // Update title if it changed (e.g., navigated within same domain)
         if (title && title !== state.currentSession.title) {
           state.currentSession.title = title;
         }
@@ -117,7 +111,6 @@ async function heartbeat() {
       return;
     }
 
-    // Different domain — close old, start new
     await closeCurrentSession("switch");
     await startNewSession({ domain, label, category, title, now, todayKey, state });
   } catch (e) {
@@ -125,7 +118,7 @@ async function heartbeat() {
   }
 }
 
-async function startNewSession({ domain, label, category, title, now, todayKey, state }) {
+async function startNewSession({ domain, label, category, title, now }) {
   const newSession = {
     domain,
     label,
@@ -135,21 +128,17 @@ async function startNewSession({ domain, label, category, title, now, todayKey, 
     endTime: now,
   };
 
-  await saveState({
-    currentSession: newSession,
-  });
+  await saveState({ currentSession: newSession });
 }
 
 async function closeCurrentSession(reason) {
   const state = await getState();
   if (!state.currentSession) return;
 
-  const now = Date.now();
   const todayKey = new Date(state.currentSession.startTime).toISOString().split("T")[0];
   const todaySessions = state.sessions[todayKey] || [];
   const duration = Math.round((state.currentSession.endTime - state.currentSession.startTime) / 1000);
 
-  // Only save sessions longer than 5 seconds
   if (duration >= 5) {
     todaySessions.push({
       domain: state.currentSession.domain,
@@ -168,15 +157,22 @@ async function closeCurrentSession(reason) {
   });
 }
 
-// ─── Data Sync ───
+// ─── Incremental Data Sync ───
 
 async function syncToServer() {
   try {
     const state = await getState();
+
+    // Skip if no sync token configured
+    if (!state.syncToken) {
+      console.log("[ToDay] No sync token — skipping server sync");
+      return;
+    }
+
     const todayKey = new Date().toISOString().split("T")[0];
     const todaySessions = state.sessions[todayKey] || [];
 
-    // Include current active session in sync
+    // Include current active session
     const allSessions = [...todaySessions];
     if (state.currentSession) {
       const now = Date.now();
@@ -192,30 +188,46 @@ async function syncToServer() {
 
     if (allSessions.length === 0) return;
 
-    try {
-      await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          source: "browser-extension",
-          type: "screenTime",
-          value: { sessions: allSessions },
-          timestamp: new Date().toISOString(),
-        }),
-      });
-    } catch {
-      // Server might not be running
-    }
+    // Incremental: only send new sessions since last sync
+    const lastCount = state.lastSyncedCount[todayKey] || 0;
+    const newSessions = allSessions.slice(lastCount);
 
-    await saveState({ lastSync: Date.now() });
+    if (newSessions.length === 0) return;
+
+    const apiUrl = `${state.apiBaseUrl}/api/sessions`;
+
+    try {
+      const res = await fetch(apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${state.syncToken}`,
+        },
+        body: JSON.stringify({ sessions: newSessions }),
+      });
+
+      if (res.ok) {
+        // Update synced count on success
+        await saveState({
+          lastSync: Date.now(),
+          lastSyncedCount: {
+            ...state.lastSyncedCount,
+            [todayKey]: allSessions.length,
+          },
+        });
+        console.log(`[ToDay] Synced ${newSessions.length} new sessions`);
+      } else {
+        console.warn(`[ToDay] Sync failed: ${res.status}`);
+      }
+    } catch {
+      // Server unavailable — will retry next cycle
+    }
   } catch (e) {
     console.error("[ToDay] Sync error:", e);
   }
 }
 
 // ─── Local Cache Cleanup ───
-// Remove LOCAL cache older than 30 days to free chrome.storage space.
-// Historical data is preserved permanently in Supabase (synced every minute).
 
 async function cleanup() {
   const state = await getState();
@@ -230,14 +242,22 @@ async function cleanup() {
     }
   }
 
-  await saveState({ sessions: cleaned });
+  // Also clean old lastSyncedCount entries
+  const cleanedCount = {};
+  for (const [key, count] of Object.entries(state.lastSyncedCount)) {
+    if (key >= cutoffKey) {
+      cleanedCount[key] = count;
+    }
+  }
+
+  await saveState({ sessions: cleaned, lastSyncedCount: cleanedCount });
 }
 
 // ─── Alarms ───
 
 chrome.alarms.create("heartbeat", { periodInMinutes: HEARTBEAT_INTERVAL / 60 });
 chrome.alarms.create("sync", { periodInMinutes: SYNC_INTERVAL });
-chrome.alarms.create("cleanup", { periodInMinutes: 60 }); // hourly cleanup
+chrome.alarms.create("cleanup", { periodInMinutes: 60 });
 
 chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === "heartbeat") heartbeat();
@@ -245,13 +265,11 @@ chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === "cleanup") cleanup();
 });
 
-// Tab change = instant heartbeat
 chrome.tabs.onActivated.addListener(() => heartbeat());
 chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
   if (changeInfo.status === "complete") heartbeat();
 });
 
-// Initial heartbeat
 heartbeat();
 
 console.log("[ToDay] Extension loaded — session tracking started");

@@ -11,7 +11,8 @@
     "idle"
   ],
   "host_permissions": [
-    "http://localhost:3001/*"
+    "http://localhost:3001/*",
+    "https://to-day-ten.vercel.app/*"
   ],
   "background": {
     "service_worker": "src/background.js",
