@@ -12,6 +12,8 @@ import {
   Smartphone,
   Globe,
   LogOut,
+  Copy,
+  Check,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -35,6 +37,8 @@ export default function SettingsPage() {
   const [displayName, setDisplayName] = useState("...");
   const [echoPersonality, setEchoPersonality] = useState("gentle");
   const [signingOut, setSigningOut] = useState(false);
+  const [syncToken, setSyncToken] = useState<string | null>(null);
+  const [tokenCopied, setTokenCopied] = useState(false);
 
   useEffect(() => {
     const supabase = createClient();
@@ -46,6 +50,17 @@ export default function SettingsPage() {
             user.email?.split("@")[0] ||
             "用户"
         );
+        // Fetch sync token
+        supabase
+          .from("profiles")
+          .select("sync_token")
+          .eq("id", user.id)
+          .single()
+          .then(({ data }) => {
+            if (data?.sync_token) {
+              setSyncToken(data.sync_token);
+            }
+          });
       }
     });
   }, []);
@@ -140,6 +155,42 @@ export default function SettingsPage() {
               <span className="text-xs text-muted-foreground">未连接</span>
             </div>
           </div>
+
+          {syncToken && (
+            <div className="py-3 border-b border-border/30">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-foreground">同步令牌</p>
+                  <p className="text-xs text-muted-foreground">
+                    在浏览器扩展中输入此令牌以同步数据
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(syncToken);
+                    setTokenCopied(true);
+                    setTimeout(() => setTokenCopied(false), 2000);
+                  }}
+                  className="flex items-center gap-2 border border-border/50 text-muted-foreground rounded-full px-4 py-2 text-sm hover:text-foreground hover:border-border transition-colors"
+                >
+                  {tokenCopied ? (
+                    <>
+                      <Check className="h-3.5 w-3.5" strokeWidth={1.5} />
+                      已复制
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="h-3.5 w-3.5" strokeWidth={1.5} />
+                      复制
+                    </>
+                  )}
+                </button>
+              </div>
+              <code className="block mt-2 text-xs text-muted-foreground bg-muted/50 rounded-lg px-3 py-2 font-mono break-all select-all">
+                {syncToken}
+              </code>
+            </div>
+          )}
 
           <div className="flex items-center justify-between py-3 border-b border-border/30">
             <div className="flex items-center gap-3">
