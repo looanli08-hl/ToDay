@@ -56,7 +56,7 @@ export default function SettingsPage() {
           .select("sync_token")
           .eq("id", user.id)
           .single()
-          .then(({ data }) => {
+          .then(({ data }: { data: Record<string, string> | null }) => {
             if (data?.sync_token) {
               setSyncToken(data.sync_token);
             }
