@@ -190,6 +190,69 @@
       font-size: 13px;
       color: #8A7D6B;
     }
+
+    .settings {
+      padding: 16px 20px;
+    }
+
+    .settings-title {
+      font-size: 12px;
+      color: #8A7D6B;
+      margin-bottom: 12px;
+      font-weight: 500;
+    }
+
+    .settings-field {
+      margin-bottom: 12px;
+    }
+
+    .settings-field label {
+      display: block;
+      font-size: 11px;
+      color: #8A7D6B;
+      margin-bottom: 4px;
+    }
+
+    .settings-field input {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #E6DFD3;
+      border-radius: 8px;
+      background: #FDFBF7;
+      font-size: 12px;
+      color: #2C2418;
+      outline: none;
+      font-family: ui-monospace, monospace;
+    }
+
+    .settings-field input:focus {
+      border-color: #C4713E;
+    }
+
+    .settings-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .settings-actions button {
+      background: #C4713E;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 6px 16px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .settings-actions button:hover {
+      opacity: 0.9;
+    }
+
+    .save-status {
+      font-size: 11px;
+      color: #10b981;
+    }
   </style>
 </head>
 <body>
@@ -213,9 +276,30 @@
     <div id="siteList"></div>
   </div>
 
+  <div class="divider"></div>
+
+  <div class="settings" id="settingsSection" style="display:none;">
+    <div class="settings-title">同步设置</div>
+    <div class="settings-field">
+      <label for="syncTokenInput">同步令牌</label>
+      <input type="text" id="syncTokenInput" placeholder="从 Dashboard 设置中复制" />
+    </div>
+    <div class="settings-field">
+      <label for="apiBaseInput">服务器地址</label>
+      <input type="text" id="apiBaseInput" placeholder="https://to-day-ten.vercel.app" />
+    </div>
+    <div class="settings-actions">
+      <button id="saveSettingsBtn">保存</button>
+      <span id="saveStatus" class="save-status"></span>
+    </div>
+  </div>
+
   <div class="footer">
     <span class="footer-text">ToDay Browser Extension</span>
-    <a class="dashboard-link" id="dashboardLink">打开 Dashboard →</a>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <a class="dashboard-link" id="settingsToggle">设置</a>
+      <a class="dashboard-link" id="dashboardLink">Dashboard →</a>
+    </div>
   </div>
 
   <script src="popup.js"></script>

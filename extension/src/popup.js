@@ -1,3 +1,5 @@
+const DEFAULT_API_BASE = "https://to-day-ten.vercel.app";
+
 function formatDuration(seconds) {
   if (seconds < 60) return `${seconds}s`;
   const hours = Math.floor(seconds / 3600);
@@ -13,7 +15,7 @@ function formatTime(timestamp) {
 
 async function render() {
   const todayKey = new Date().toISOString().split("T")[0];
-  const result = await chrome.storage.local.get(["sessions", "currentSession"]);
+  const result = await chrome.storage.local.get(["sessions", "currentSession", "syncToken"]);
   const closedSessions = result.sessions?.[todayKey] || [];
 
   // Include current active session
@@ -37,7 +39,18 @@ async function render() {
   const totalSeconds = allSessions.reduce((sum, e) => sum + (e.duration || 0), 0);
   document.getElementById("totalTime").textContent = formatDuration(totalSeconds);
 
-  // Render site list as time segments
+  // Update status indicator
+  const statusDot = document.querySelector(".status-dot");
+  const statusText = document.querySelector(".status span");
+  if (result.syncToken) {
+    statusDot.style.background = "#10b981";
+    statusText.textContent = "已连接";
+  } else {
+    statusDot.style.background = "#f59e0b";
+    statusText.textContent = "未同步";
+  }
+
+  // Render site list
   const siteList = document.getElementById("siteList");
   if (allSessions.length === 0) {
     siteList.innerHTML = '<div class="empty-state"><p>继续浏览，数据会自动出现</p></div>';
@@ -52,9 +65,41 @@ async function render() {
   }
 }
 
+// Settings toggle
+let settingsVisible = false;
+document.getElementById("settingsToggle").addEventListener("click", () => {
+  settingsVisible = !settingsVisible;
+  document.getElementById("settingsSection").style.display = settingsVisible ? "block" : "none";
+  document.getElementById("settingsToggle").textContent = settingsVisible ? "收起" : "设置";
+});
+
+// Load saved settings
+chrome.storage.local.get(["syncToken", "apiBaseUrl"], (result) => {
+  document.getElementById("syncTokenInput").value = result.syncToken || "";
+  document.getElementById("apiBaseInput").value = result.apiBaseUrl || DEFAULT_API_BASE;
+});
+
+// Save settings
+document.getElementById("saveSettingsBtn").addEventListener("click", async () => {
+  const syncToken = document.getElementById("syncTokenInput").value.trim();
+  const apiBaseUrl = document.getElementById("apiBaseInput").value.trim() || DEFAULT_API_BASE;
+
+  await chrome.storage.local.set({ syncToken: syncToken || null, apiBaseUrl });
+
+  document.getElementById("saveStatus").textContent = "已保存";
+  setTimeout(() => {
+    document.getElementById("saveStatus").textContent = "";
+  }, 2000);
+
+  // Re-render to update status
+  render();
+});
+
 // Open dashboard
-document.getElementById("dashboardLink").addEventListener("click", () => {
-  chrome.tabs.create({ url: "http://localhost:3001/dashboard" });
+document.getElementById("dashboardLink").addEventListener("click", async () => {
+  const result = await chrome.storage.local.get(["apiBaseUrl"]);
+  const base = result.apiBaseUrl || DEFAULT_API_BASE;
+  chrome.tabs.create({ url: `${base}/dashboard` });
 });
 
 render();
