@@ -53,12 +53,26 @@ export default function ScreenTimePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const today = new Date().toISOString().split("T")[0];
-    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const token = new URLSearchParams(window.location.search).get("token") || "";
-    const tokenParam = token ? `&token=${token}` : "";
+    async function fetchData() {
+      const today = new Date().toISOString().split("T")[0];
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-    fetch(`/api/screen-time?date=${today}&tz=${tz}${tokenParam}`)
+      // Get token: from URL param, or from logged-in user's profile
+      let token = new URLSearchParams(window.location.search).get("token") || "";
+      if (!token) {
+        try {
+          const { createClient } = await import("@/lib/supabase/client");
+          const supabase = createClient();
+          const { data: { user } } = await supabase.auth.getUser();
+          if (user) {
+            const { data: profile } = await supabase.from("profiles").select("sync_token").eq("id", user.id).single() as { data: { sync_token: string } | null };
+            if (profile?.sync_token) token = profile.sync_token;
+          }
+        } catch {}
+      }
+
+      const tokenParam = token ? `&token=${token}` : "";
+      fetch(`/api/screen-time?date=${today}&tz=${tz}${tokenParam}`)
       .then((res) => {
         if (!res.ok) return null;
         return res.json();
@@ -70,6 +84,8 @@ export default function ScreenTimePage() {
       .catch(() => {
         setLoading(false);
       });
+    }
+    fetchData();
   }, []);
 
   if (loading) {
