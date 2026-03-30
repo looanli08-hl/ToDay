@@ -57,9 +57,12 @@ export default function ScreenTimePage() {
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
     fetch(`/api/screen-time?date=${today}&tz=${tz}`)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) return null;
+        return res.json();
+      })
       .then((json) => {
-        setData(json);
+        if (json) setData(json);
         setLoading(false);
       })
       .catch(() => {
