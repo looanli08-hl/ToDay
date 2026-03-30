@@ -55,8 +55,10 @@ export default function ScreenTimePage() {
   useEffect(() => {
     const today = new Date().toISOString().split("T")[0];
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const token = new URLSearchParams(window.location.search).get("token") || "";
+    const tokenParam = token ? `&token=${token}` : "";
 
-    fetch(`/api/screen-time?date=${today}&tz=${tz}`)
+    fetch(`/api/screen-time?date=${today}&tz=${tz}${tokenParam}`)
       .then((res) => {
         if (!res.ok) return null;
         return res.json();

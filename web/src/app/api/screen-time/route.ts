@@ -22,14 +22,35 @@ function emptyResponse() {
   };
 }
 
+async function resolveUserId(req: NextRequest) {
+  // Try sync token from Authorization header first
+  const authHeader = req.headers.get("authorization");
+  if (authHeader?.startsWith("Bearer ")) {
+    const token = authHeader.slice(7).trim();
+    const supabase = await createServerSupabaseClient();
+    const { data: userId } = await supabase.rpc("get_user_id_by_sync_token", { token });
+    if (userId) return userId as string;
+  }
+
+  // Try sync token from query param
+  const tokenParam = new URL(req.url).searchParams.get("token");
+  if (tokenParam) {
+    const supabase = await createServerSupabaseClient();
+    const { data: userId } = await supabase.rpc("get_user_id_by_sync_token", { token: tokenParam });
+    if (userId) return userId as string;
+  }
+
+  // Fall back to session auth
+  const supabase = await createServerSupabaseClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  return user?.id || null;
+}
+
 export async function GET(req: NextRequest) {
   try {
-    const supabase = await createServerSupabaseClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const userId = await resolveUserId(req);
 
-    if (!user) {
+    if (!userId) {
       return Response.json({ error: "Not authenticated" }, { status: 401 });
     }
 
@@ -51,7 +72,7 @@ export async function GET(req: NextRequest) {
     const { data: totalData } = await supabase
       .from("browsing_sessions")
       .select("duration_seconds")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .gte("start_time", todayRange.start)
       .lte("start_time", todayRange.end);
 
@@ -65,7 +86,7 @@ export async function GET(req: NextRequest) {
     const { data: catRows } = await supabase
       .from("browsing_sessions")
       .select("category, duration_seconds")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .gte("start_time", todayRange.start)
       .lte("start_time", todayRange.end);
 
@@ -84,7 +105,7 @@ export async function GET(req: NextRequest) {
     const { data: siteRows } = await supabase
       .from("browsing_sessions")
       .select("domain, title, duration_seconds")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .gte("start_time", todayRange.start)
       .lte("start_time", todayRange.end);
 
@@ -114,7 +135,7 @@ export async function GET(req: NextRequest) {
     const { data: hourlyRows } = await supabase
       .from("browsing_sessions")
       .select("start_time, duration_seconds")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .gte("start_time", todayRange.start)
       .lte("start_time", todayRange.end);
 
@@ -129,7 +150,7 @@ export async function GET(req: NextRequest) {
     const { data: yesterdayData } = await supabase
       .from("browsing_sessions")
       .select("duration_seconds")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .gte("start_time", yesterdayRange.start)
       .lte("start_time", yesterdayRange.end);
 
@@ -147,7 +168,7 @@ export async function GET(req: NextRequest) {
     const { data: weeklyRows } = await supabase
       .from("browsing_sessions")
       .select("start_time, duration_seconds")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .gte("start_time", `${weeklyStartStr}T00:00:00`)
       .lte("start_time", todayRange.end);
 
