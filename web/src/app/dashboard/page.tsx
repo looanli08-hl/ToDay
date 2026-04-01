@@ -84,7 +84,7 @@ export default function DashboardPage() {
           .from("profiles")
           .select("sync_token")
           .eq("id", user.id)
-          .single();
+          .single() as { data: { sync_token: string } | null };
 
         if (profile?.sync_token) {
           try {
