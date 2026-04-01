@@ -61,6 +61,8 @@ export default function DashboardPage() {
   const [userName, setUserName] = useState("");
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [echoMessage, setEchoMessage] = useState("");
+  const [echoLoading, setEchoLoading] = useState(true);
   const greeting = getGreeting();
   const now = new Date();
   const dateStr = now.toLocaleDateString("zh-CN", {
@@ -91,8 +93,29 @@ export default function DashboardPage() {
             const res = await fetch(`/api/dashboard?token=${profile.sync_token}`);
             const json = await res.json();
             setData(json);
+
+            // Fetch Echo dynamic insight
+            try {
+              const echoRes = await fetch("/api/echo/insight", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  stats: json.stats,
+                  timeline_count: json.timeline?.length || 0,
+                  has_data: json.has_data,
+                  hour: new Date().getHours(),
+                  user_name: user.user_metadata?.display_name || "",
+                }),
+              });
+              const echoJson = await echoRes.json();
+              setEchoMessage(echoJson.message);
+            } catch {
+              setEchoMessage("在这里陪着你。");
+            }
+            setEchoLoading(false);
           } catch {
             setData({ stats: { steps: 0, sleep_hours: 0, screen_time_minutes: 0, mood_latest: null, mood_count: 0 }, timeline: [], has_data: false });
+            setEchoLoading(false);
           }
         }
       }
@@ -240,28 +263,31 @@ export default function DashboardPage() {
           {/* Right Column */}
           <div className="space-y-6">
             {/* Echo AI */}
-            <Card className="border border-border/40 bg-card rounded-xl p-6">
-              <div className="flex items-center gap-2 mb-4">
-                <EchoSymbol size={15} className="text-primary" />
-                <h2 className="font-display text-lg text-foreground">Echo</h2>
-              </div>
-              <div className="rounded-xl bg-background p-4 mb-3">
-                <p className="text-sm text-foreground/70 leading-relaxed">
-                  「今天看起来很充实。下午记得休息一下眼睛」
-                </p>
-                <p className="mt-2 text-[11px] text-muted-foreground">Echo · 刚刚</p>
-              </div>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  placeholder="跟 Echo 说点什么..."
-                  className="flex-1 rounded-lg border border-border bg-background px-4 py-2.5 text-sm placeholder:text-muted-foreground/50 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all"
-                />
-                <button className="bg-primary text-primary-foreground rounded-lg px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity">
-                  发送
-                </button>
-              </div>
-            </Card>
+            <Link href="/dashboard/echo" className="block">
+              <Card className="border border-border/40 bg-card rounded-xl p-6 hover:shadow-sm transition-shadow duration-300 cursor-pointer">
+                <div className="flex items-center gap-2 mb-4">
+                  <EchoSymbol size={15} className="text-primary" />
+                  <h2 className="font-display text-lg text-foreground">Echo</h2>
+                </div>
+                <div className="rounded-xl bg-background p-4 mb-3">
+                  {echoLoading ? (
+                    <div className="flex items-center gap-2">
+                      <div className="h-2 w-2 rounded-full bg-primary/40 animate-pulse" />
+                      <div className="h-2 w-2 rounded-full bg-primary/30 animate-pulse" style={{ animationDelay: "0.3s" }} />
+                      <div className="h-2 w-2 rounded-full bg-primary/20 animate-pulse" style={{ animationDelay: "0.6s" }} />
+                    </div>
+                  ) : (
+                    <>
+                      <p className="text-sm text-foreground/70 leading-relaxed">
+                        {echoMessage.startsWith("「") ? echoMessage : `「${echoMessage}」`}
+                      </p>
+                      <p className="mt-2 text-[11px] text-muted-foreground">Echo · 刚刚</p>
+                    </>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground text-center">点击和 Echo 聊天 →</p>
+              </Card>
+            </Link>
 
             {/* Weekly Activity */}
             <Card className="border border-border/40 bg-card rounded-xl p-6">
