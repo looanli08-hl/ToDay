@@ -41,10 +41,7 @@ export default function RegisterPage() {
         return;
       }
 
-      // Email confirmation is currently disabled, go straight to dashboard
-      // When re-enabled, change to: router.push(`/auth/verify?email=${encodeURIComponent(email)}`);
-      router.push("/dashboard");
-      router.refresh();
+      router.push(`/auth/verify?email=${encodeURIComponent(email)}`);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "注册失败");
       setLoading(false);
