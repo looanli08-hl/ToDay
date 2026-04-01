@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
 // ---------------------------------------------------------------------------
@@ -65,8 +65,24 @@ function formatHeaderDate(): string {
 // ---------------------------------------------------------------------------
 
 export default function CapturePage() {
-  const [memos, setMemos] = useState<Memo[]>(mockMemos);
+  const [memos, setMemos] = useState<Memo[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      const saved = localStorage.getItem("capture-memos");
+      if (saved) {
+        return JSON.parse(saved).map((m: Memo) => ({
+          ...m,
+          createdAt: new Date(m.createdAt),
+        }));
+      }
+    } catch {}
+    return [];
+  });
   const [inputValue, setInputValue] = useState("");
+
+  useEffect(() => {
+    localStorage.setItem("capture-memos", JSON.stringify(memos));
+  }, [memos]);
 
   const grouped = groupByDate(memos);
 
