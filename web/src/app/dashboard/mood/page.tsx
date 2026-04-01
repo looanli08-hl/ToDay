@@ -57,7 +57,7 @@ export default function CapturePage() {
         .eq("emoji", "📝")
         .eq("name", "捕捉")
         .order("created_at", { ascending: false })
-        .limit(200);
+        .limit(200) as { data: { id: string; note: string | null; created_at: string }[] | null };
 
       if (data) {
         setMemos(data.filter((r) => r.note).map((r) => ({
@@ -80,11 +80,12 @@ export default function CapturePage() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setSubmitting(false); return; }
 
-    const { data, error } = await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase as any)
       .from("mood_records")
       .insert({ user_id: user.id, emoji: "📝", name: "捕捉", note: inputValue.trim() })
       .select("id, created_at")
-      .single();
+      .single() as { data: { id: string; created_at: string } | null; error: unknown };
 
     if (!error && data) {
       setMemos((prev) => [{ id: data.id, content: inputValue.trim(), createdAt: new Date(data.created_at) }, ...prev]);
