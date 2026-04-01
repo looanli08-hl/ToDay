@@ -79,42 +79,33 @@ export default function DashboardPage() {
             ""
         );
 
-        // Fetch sync token for API auth
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("sync_token")
-          .eq("id", user.id)
-          .single() as { data: { sync_token: string } | null };
+        try {
+          const res = await fetch("/api/dashboard");
+          const json = await res.json();
+          setData(json);
 
-        if (profile?.sync_token) {
+          // Fetch Echo dynamic insight
           try {
-            const res = await fetch(`/api/dashboard?token=${profile.sync_token}`);
-            const json = await res.json();
-            setData(json);
-
-            // Fetch Echo dynamic insight
-            try {
-              const echoRes = await fetch("/api/echo/insight", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  stats: json.stats,
-                  timeline_count: json.timeline?.length || 0,
-                  has_data: json.has_data,
-                  hour: new Date().getHours(),
-                  user_name: user.user_metadata?.display_name || "",
-                }),
-              });
-              const echoJson = await echoRes.json();
-              setEchoMessage(echoJson.message);
-            } catch {
-              setEchoMessage("在这里陪着你。");
-            }
-            setEchoLoading(false);
+            const echoRes = await fetch("/api/echo/insight", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                stats: json.stats,
+                timeline_count: json.timeline?.length || 0,
+                has_data: json.has_data,
+                hour: new Date().getHours(),
+                user_name: user.user_metadata?.display_name || "",
+              }),
+            });
+            const echoJson = await echoRes.json();
+            setEchoMessage(echoJson.message);
           } catch {
-            setData({ stats: { steps: 0, sleep_hours: 0, screen_time_minutes: 0, mood_latest: null, mood_count: 0 }, timeline: [], has_data: false });
-            setEchoLoading(false);
+            setEchoMessage("在这里陪着你。");
           }
+          setEchoLoading(false);
+        } catch {
+          setData({ stats: { steps: 0, sleep_hours: 0, screen_time_minutes: 0, mood_latest: null, mood_count: 0 }, timeline: [], has_data: false });
+          setEchoLoading(false);
         }
       }
       setLoading(false);
