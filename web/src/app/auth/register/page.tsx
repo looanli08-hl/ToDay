@@ -47,7 +47,8 @@ export default function RegisterPage() {
         return;
       }
 
-      router.push(`/auth/verify?email=${encodeURIComponent(email)}`);
+      router.push("/dashboard");
+      router.refresh();
     } catch (err: unknown) {
       setError(err instanceof Error ? getFriendlyAuthError(err.message) : "注册失败");
     } finally {
