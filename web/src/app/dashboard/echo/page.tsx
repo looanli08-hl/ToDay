@@ -171,8 +171,25 @@ function EchoMessageContent({ content }: { content: string }) {
 
 export default function EchoPage() {
   // Conversation state
-  const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [activeId, setActiveId] = useState<string | null>(null);
+  const [conversations, setConversations] = useState<Conversation[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      const saved = localStorage.getItem("echo-conversations");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return parsed.map((c: Conversation) => ({
+          ...c,
+          createdAt: new Date(c.createdAt),
+          updatedAt: new Date(c.updatedAt),
+        }));
+      }
+    } catch {}
+    return [];
+  });
+  const [activeId, setActiveId] = useState<string | null>(() => {
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem("echo-active-id") || null;
+  });
   const [searchQuery, setSearchQuery] = useState("");
 
   // Chat state
@@ -183,6 +200,19 @@ export default function EchoPage() {
 
   // Sidebar state
   const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  // Persist conversations to localStorage
+  useEffect(() => {
+    localStorage.setItem("echo-conversations", JSON.stringify(conversations));
+  }, [conversations]);
+
+  useEffect(() => {
+    if (activeId) {
+      localStorage.setItem("echo-active-id", activeId);
+    } else {
+      localStorage.removeItem("echo-active-id");
+    }
+  }, [activeId]);
 
   // Refs
   const messagesEndRef = useRef<HTMLDivElement>(null);
