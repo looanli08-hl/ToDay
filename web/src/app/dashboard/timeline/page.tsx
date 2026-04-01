@@ -79,30 +79,44 @@ function formatTimeFromTimestamp(ts: number): string {
 
 async function fetchBrowsingSessions(date: string): Promise<BrowsingSession[]> {
   try {
-    const res = await fetch(`/api/data?date=${date}&source=browser-extension`);
+    // Get sync token from Supabase
+    const { createClient } = await import("@/lib/supabase/client");
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return [];
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("sync_token")
+      .eq("id", user.id)
+      .single() as { data: { sync_token: string } | null };
+
+    if (!profile?.sync_token) return [];
+
+    // Query browsing_sessions directly via screen-time API with date
+    const res = await fetch(`/api/screen-time?date=${date}&token=${profile.sync_token}`);
     if (!res.ok) return [];
     const json = await res.json();
 
-    // Extract sessions from data points
-    const allSessions: BrowsingSession[] = [];
-
-    for (const point of json.data) {
-      const val = point.value as { sessions?: BrowsingSession[] };
-      if (val.sessions && Array.isArray(val.sessions)) {
-        allSessions.push(...val.sessions);
+    // Build timeline events from top sites
+    const sessions: BrowsingSession[] = [];
+    if (json.today?.topSites) {
+      for (const site of json.today.topSites) {
+        if (site.minutes > 0) {
+          sessions.push({
+            domain: site.domain,
+            label: site.domain,
+            category: site.title || site.domain,
+            title: site.title || site.domain,
+            startTime: 0,
+            endTime: 0,
+            duration: site.minutes * 60,
+          });
+        }
       }
     }
 
-    // Deduplicate by startTime (sync may send duplicates)
-    const seen = new Set<number>();
-    const unique = allSessions.filter((s) => {
-      if (seen.has(s.startTime)) return false;
-      seen.add(s.startTime);
-      return s.duration >= 10;
-    });
-
-    // Sort by start time (earliest first)
-    return unique.sort((a, b) => a.startTime - b.startTime);
+    return sessions;
   } catch {
     return [];
   }
@@ -211,56 +225,17 @@ export default function TimelinePage() {
     fetchBrowsingSessions(dateStr).then(setBrowsingSessions);
   }, [selectedDate]);
 
-  // Merge browsing sessions into the timeline as real events
-  const phoneEvents = mockEvents;
-
-  // Group consecutive browsing sessions by category into blocks
-  const browsingBlocks: {
-    id: string;
-    category: string;
-    startTime: number;
-    endTime: number;
-    totalDuration: number;
-    sessions: BrowsingSession[];
-  }[] = [];
-
-  for (const session of browsingSessions) {
-    const lastBlock = browsingBlocks[browsingBlocks.length - 1];
-    // Merge into last block if same category and within 5 minutes
-    if (
-      lastBlock &&
-      lastBlock.category === session.category &&
-      session.startTime - lastBlock.endTime < 5 * 60 * 1000
-    ) {
-      lastBlock.endTime = session.endTime;
-      lastBlock.totalDuration += session.duration;
-      lastBlock.sessions.push(session);
-    } else {
-      browsingBlocks.push({
-        id: `block-${browsingBlocks.length}`,
-        category: session.category,
-        startTime: session.startTime,
-        endTime: session.endTime,
-        totalDuration: session.duration,
-        sessions: [session],
-      });
-    }
-  }
-
-  // Convert blocks to timeline events
-  const browsingEvents: TimelineEvent[] = browsingBlocks.map((block) => ({
-    id: block.id,
-    time: formatTimeFromTimestamp(block.startTime),
-    label: block.category,
+  // Build timeline events from browsing sessions
+  const browsingEvents: TimelineEvent[] = browsingSessions.map((session, i) => ({
+    id: `browse-${i}`,
+    time: "—",
+    label: `屏幕时间 · ${session.category}`,
     icon: Monitor,
-    duration: formatDuration(block.totalDuration),
+    duration: formatDuration(session.duration),
     type: "screen" as const,
   }));
 
-  // Merge and sort all events by time
-  const events = [...phoneEvents, ...browsingEvents].sort((a, b) =>
-    a.time.localeCompare(b.time)
-  );
+  const events = browsingEvents;
 
   const dateStr = selectedDate.toLocaleDateString("zh-CN", {
     year: "numeric",
@@ -306,35 +281,17 @@ export default function TimelinePage() {
             <div>
               {events.map((event, index) => {
                 const isLast = index === events.length - 1;
-                const block = event.id.startsWith("block-")
-                  ? browsingBlocks.find((b) => b.id === event.id)
-                  : null;
-                const isExpanded = expandedBlocks.has(event.id);
 
                 return (
                   <div key={event.id}>
-                    <div
-                      className={cn(
-                        "flex items-start gap-4",
-                        block && "cursor-pointer"
-                      )}
-                      onClick={() => {
-                        if (!block) return;
-                        setExpandedBlocks((prev) => {
-                          const next = new Set(prev);
-                          if (next.has(event.id)) next.delete(event.id);
-                          else next.add(event.id);
-                          return next;
-                        });
-                      }}
-                    >
+                    <div className="flex items-start gap-4">
                       <span className="w-12 text-xs font-mono text-muted-foreground pt-0.5 text-right shrink-0">
                         {event.time}
                       </span>
 
                       <div className="relative flex flex-col items-center shrink-0">
-                        <div className="h-2 w-2 rounded-full bg-muted-foreground/30 mt-1.5" />
-                        {(!isLast || isExpanded) && (
+                        <div className="h-2 w-2 rounded-full bg-amber-400 mt-1.5" />
+                        {!isLast && (
                           <div className="w-px flex-1 bg-border/60 mt-1" />
                         )}
                       </div>
@@ -354,37 +311,8 @@ export default function TimelinePage() {
                             </span>
                           )}
                         </div>
-                        {block && (
-                          <p className="text-[11px] text-muted-foreground mt-1 ml-6">
-                            {block.sessions.length} 个网站{isExpanded ? "" : " · 点击展开"}
-                          </p>
-                        )}
                       </div>
                     </div>
-
-                    {/* Expanded sessions */}
-                    {block && isExpanded && (
-                      <div className="ml-[76px] mb-4 border-l border-border/40 pl-4 space-y-0">
-                        {block.sessions.map((session, si) => (
-                          <div
-                            key={si}
-                            className="flex items-center gap-3 py-1.5"
-                          >
-                            <span className="text-[11px] font-mono text-muted-foreground w-24 shrink-0">
-                              {formatTimeFromTimestamp(session.startTime)} - {formatTimeFromTimestamp(session.endTime)}
-                            </span>
-                            <span className="text-xs text-foreground flex-1 truncate">
-                              {session.title && session.title !== session.domain
-                                ? session.title
-                                : session.label || session.domain}
-                            </span>
-                            <span className="text-[11px] text-muted-foreground font-mono shrink-0">
-                              {formatDuration(session.duration)}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
                   </div>
                 );
               })}
