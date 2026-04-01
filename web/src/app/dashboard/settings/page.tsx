@@ -298,9 +298,12 @@ export default function SettingsPage() {
                 删除所有记录和设置，此操作不可撤销
               </p>
             </div>
-            <button className="border border-destructive/30 text-destructive rounded-lg px-4 py-2 text-sm font-medium hover:bg-destructive/10 transition-colors">
-              清除数据
-            </button>
+            <div className="flex flex-col items-end gap-1">
+              <button disabled className="border border-destructive/30 text-destructive rounded-lg px-4 py-2 text-sm font-medium opacity-50 cursor-not-allowed">
+                清除数据
+              </button>
+              <p className="text-xs text-muted-foreground">即将开放</p>
+            </div>
           </div>
 
           <div className="flex items-center justify-between py-3 last:border-0">
@@ -310,9 +313,12 @@ export default function SettingsPage() {
                 永久删除你的账户和所有相关数据
               </p>
             </div>
-            <button className="border border-destructive/30 text-destructive rounded-lg px-4 py-2 text-sm font-medium hover:bg-destructive/10 transition-colors">
-              删除账户
-            </button>
+            <div className="flex flex-col items-end gap-1">
+              <button disabled className="border border-destructive/30 text-destructive rounded-lg px-4 py-2 text-sm font-medium opacity-50 cursor-not-allowed">
+                删除账户
+              </button>
+              <p className="text-xs text-muted-foreground">即将开放</p>
+            </div>
           </div>
         </div>
 
