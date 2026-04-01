@@ -13,39 +13,7 @@ interface Memo {
   createdAt: Date;
 }
 
-const mockMemos: Memo[] = [
-  {
-    id: "1",
-    content: "项目进展顺利，Echo 的流式对话体验很好",
-    createdAt: new Date(Date.now() - 2 * 3600000),
-  },
-  {
-    id: "2",
-    content:
-      "想到一个功能：浏览器扩展可以记录 YouTube 视频标题，这样 Echo 就能知道用户在学什么",
-    createdAt: new Date(Date.now() - 6 * 3600000),
-  },
-  {
-    id: "3",
-    content: "跟 Claude 合作开发效率真的很高，一天做完了平时一周的量",
-    createdAt: new Date(Date.now() - 24 * 3600000),
-  },
-  {
-    id: "4",
-    content: "ToDay 的定位越来越清晰了：不只是记录工具，是一个生活统筹中心",
-    createdAt: new Date(Date.now() - 25 * 3600000),
-  },
-  {
-    id: "5",
-    content: "OpenClaw 的开源策略很值得学习，先做好产品再开源",
-    createdAt: new Date(Date.now() - 48 * 3600000),
-  },
-  {
-    id: "6",
-    content: "设计系统定好以后，新页面做起来快多了，一致性也好",
-    createdAt: new Date(Date.now() - 50 * 3600000),
-  },
-];
+const mockMemos: Memo[] = [];
 
 // ---------------------------------------------------------------------------
 // Helpers
