@@ -3,13 +3,7 @@
 import { useState, useEffect } from "react";
 import {
   Moon,
-  Footprints,
-  MapPin,
   Monitor,
-  Heart,
-  Coffee,
-  Home,
-  Briefcase,
   ChevronLeft,
   ChevronRight,
   CalendarDays,
@@ -48,19 +42,6 @@ interface BrowsingSession {
 }
 
 // ---------------------------------------------------------------------------
-// Mock data — used as fallback when no real data exists
-// ---------------------------------------------------------------------------
-
-const mockEvents: TimelineEvent[] = [];
-
-const stats = [
-  { label: "步数", value: "--" },
-  { label: "运动", value: "--" },
-  { label: "屏幕", value: "--" },
-  { label: "心情", value: "--" },
-];
-
-// ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
@@ -93,8 +74,9 @@ async function fetchBrowsingSessions(date: string): Promise<BrowsingSession[]> {
 
     if (!profile?.sync_token) return [];
 
-    // Query browsing_sessions directly via screen-time API with date
-    const res = await fetch(`/api/screen-time?date=${date}&token=${profile.sync_token}`);
+    const res = await fetch(`/api/screen-time?date=${date}`, {
+      headers: { Authorization: `Bearer ${profile.sync_token}` },
+    });
     if (!res.ok) return [];
     const json = await res.json();
 
@@ -214,10 +196,6 @@ function EmptyState() {
 export default function TimelinePage() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [browsingSessions, setBrowsingSessions] = useState<BrowsingSession[]>([]);
-  const [expandedBlocks, setExpandedBlocks] = useState<Set<string>>(new Set());
-
-  const today = new Date();
-  const isToday = selectedDate.toDateString() === today.toDateString();
 
   // Fetch browsing sessions when date changes
   useEffect(() => {
@@ -356,20 +334,38 @@ export default function TimelinePage() {
         {/* Stats Bar */}
         {events.length > 0 && (
           <div className="border border-border/40 bg-card rounded-xl p-6">
-            <p className="text-xs font-medium text-muted-foreground mb-4">
-              今日统计
-            </p>
-            <div className="grid grid-cols-4 gap-4">
-              {stats.map((stat) => (
-                <div key={stat.label} className="text-center">
-                  <p className="font-display text-lg text-foreground">
-                    {stat.value}
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {stat.label}
-                  </p>
-                </div>
-              ))}
+            <p className="text-xs font-medium text-muted-foreground mb-4">今日统计</p>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="text-center">
+                <p className="font-display text-lg text-foreground">
+                  {browsingSessions.length > 0
+                    ? formatDuration(browsingSessions.reduce((sum, s) => sum + s.duration, 0))
+                    : "--"}
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">屏幕时间</p>
+              </div>
+              <div className="text-center">
+                <p className="font-display text-lg text-foreground">
+                  {browsingSessions.length > 0
+                    ? new Set(browsingSessions.map((s) => s.domain)).size
+                    : "--"}
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">访问站点</p>
+              </div>
+              <div className="text-center">
+                <p className="font-display text-lg text-foreground">
+                  {browsingSessions.length > 0
+                    ? (() => {
+                        const catMap = new Map<string, number>();
+                        for (const s of browsingSessions) {
+                          catMap.set(s.category, (catMap.get(s.category) || 0) + s.duration);
+                        }
+                        return Array.from(catMap.entries()).sort((a, b) => b[1] - a[1])[0]?.[0] || "--";
+                      })()
+                    : "--"}
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">最活跃</p>
+              </div>
             </div>
           </div>
         )}
