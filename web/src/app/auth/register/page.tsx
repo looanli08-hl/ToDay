@@ -41,7 +41,10 @@ export default function RegisterPage() {
         return;
       }
 
-      router.push(`/auth/verify?email=${encodeURIComponent(email)}`);
+      // TODO: restore verify redirect when SMTP is fixed
+      // router.push(`/auth/verify?email=${encodeURIComponent(email)}`);
+      router.push("/dashboard");
+      router.refresh();
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "注册失败");
       setLoading(false);
