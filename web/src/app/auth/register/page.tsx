@@ -55,13 +55,13 @@ export default function RegisterPage() {
     <div className="flex min-h-screen items-center justify-center bg-background">
       <div className="w-full max-w-sm">
         {/* Logo */}
-        <div className="flex items-center justify-center gap-1 mb-8">
-          <span className="font-display text-2xl text-foreground">ToDay</span>
-          <span className="text-primary text-2xl">.</span>
+        <div className="flex items-center justify-center gap-1 mb-10">
+          <span className="font-display text-3xl text-foreground tracking-tight">ToDay</span>
+          <span className="text-primary text-3xl">.</span>
         </div>
 
         {/* Card */}
-        <div className="rounded-xl bg-card border border-border/40 p-8">
+        <div className="rounded-2xl bg-card border border-border/30 p-8 shadow-sm">
           <h1 className="font-display text-xl text-foreground mb-1">创建账户</h1>
           <p className="text-sm text-muted-foreground mb-6">开始记录你的生活</p>
 
@@ -75,7 +75,7 @@ export default function RegisterPage() {
                 onChange={(e) => setName(e.target.value)}
                 placeholder="你的名字"
                 required
-                className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm placeholder:text-muted-foreground/50 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all"
+                className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm placeholder:text-muted-foreground/50 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all"
               />
             </div>
             <div>
@@ -86,7 +86,7 @@ export default function RegisterPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="your@email.com"
                 required
-                className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm placeholder:text-muted-foreground/50 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all"
+                className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm placeholder:text-muted-foreground/50 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all"
               />
             </div>
             <div>
@@ -99,7 +99,7 @@ export default function RegisterPage() {
                   placeholder="至少 6 位"
                   required
                   minLength={6}
-                  className="w-full rounded-lg border border-border bg-background px-4 py-2.5 pr-10 text-sm placeholder:text-muted-foreground/50 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all"
+                  className="w-full rounded-xl border border-border bg-background px-4 py-2.5 pr-10 text-sm placeholder:text-muted-foreground/50 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all"
                 />
                 <button
                   type="button"
@@ -129,19 +129,19 @@ export default function RegisterPage() {
                   placeholder="再次输入密码"
                   required
                   minLength={6}
-                  className="w-full rounded-lg border border-border bg-background px-4 py-2.5 pr-10 text-sm placeholder:text-muted-foreground/50 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all"
+                  className="w-full rounded-xl border border-border bg-background px-4 py-2.5 pr-10 text-sm placeholder:text-muted-foreground/50 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all"
                 />
               </div>
             </div>
 
             {error && (
-              <p className="text-sm text-destructive bg-destructive/10 rounded-lg px-3 py-2">{error}</p>
+              <p className="text-sm text-destructive bg-destructive/10 rounded-xl px-3 py-2">{error}</p>
             )}
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-primary text-primary-foreground rounded-lg px-4 py-2.5 text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+              className="w-full bg-primary text-primary-foreground rounded-xl px-4 py-2.5 text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
             >
               {loading ? "注册中..." : "注册"}
             </button>
