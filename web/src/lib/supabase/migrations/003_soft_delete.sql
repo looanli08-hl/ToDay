@@ -66,6 +66,8 @@ $$ LANGUAGE sql SECURITY DEFINER;
 -- 5. RPC: soft-delete user account
 CREATE OR REPLACE FUNCTION soft_delete_user_account(p_user_id UUID)
 RETURNS void AS $$
+BEGIN
   UPDATE profiles SET deleted_at = NOW() WHERE id = p_user_id AND deleted_at IS NULL;
   PERFORM soft_delete_user_data(p_user_id);
-$$ LANGUAGE sql SECURITY DEFINER;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
