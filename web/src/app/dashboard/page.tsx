@@ -6,10 +6,8 @@ import {
   Moon,
   Layers,
   TrendingUp,
-  Clock,
   Zap,
   Heart,
-  ArrowUpRight,
   Activity,
   Monitor,
   Smartphone,
@@ -291,26 +289,13 @@ export default function DashboardPage() {
 
             {/* Weekly Activity */}
             <Card className="border border-border/40 bg-card rounded-xl p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
-                  <h2 className="font-display text-lg text-foreground">本周活跃度</h2>
-                </div>
-                <button className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-0.5 transition-colors">
-                  详情 <ArrowUpRight className="h-3 w-3" />
-                </button>
+              <div className="flex items-center gap-2 mb-4">
+                <TrendingUp className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
+                <h2 className="font-display text-lg text-foreground">本周活跃度</h2>
               </div>
-              <div className="flex items-end justify-between gap-2 h-24">
-                {["一", "二", "三", "四", "五", "六", "日"].map((d) => (
-                  <div key={d} className="flex flex-col items-center gap-1.5 flex-1">
-                    <div
-                      className="w-full rounded-lg bg-muted-foreground/10 transition-all duration-500"
-                      style={{ height: "20%" }}
-                    />
-                    <span className="text-[11px] text-muted-foreground">{d}</span>
-                  </div>
-                ))}
-              </div>
+              <p className="text-sm text-muted-foreground">
+                使用一周后，这里会展示你的活跃趋势
+              </p>
             </Card>
 
             {/* Life Pulse */}
@@ -330,32 +315,27 @@ export default function DashboardPage() {
         <Card className="border border-border/40 bg-card rounded-xl p-6">
           <p className="text-sm text-muted-foreground mb-3">快速操作</p>
           <div className="flex flex-wrap gap-2">
-            {[
-              { icon: Heart, label: "记录心情" },
-              { icon: Clock, label: "补充时段" },
-              { icon: Monitor, label: "查看屏幕时间", href: "/dashboard/screen-time" },
-              { icon: Heart, label: "跟 Echo 聊天", href: "/dashboard/echo" },
-              { icon: TrendingUp, label: "周报分析" },
-            ].map((action) => (
-              action.href ? (
-                <Link
-                  key={action.label}
-                  href={action.href}
-                  className="flex items-center gap-2 rounded-full border border-border/50 px-4 py-2 text-sm text-muted-foreground hover:text-foreground hover:border-border transition-colors"
-                >
-                  <action.icon className="h-4 w-4" strokeWidth={1.5} />
-                  {action.label}
-                </Link>
-              ) : (
-                <button
-                  key={action.label}
-                  className="flex items-center gap-2 rounded-full border border-border/50 px-4 py-2 text-sm text-muted-foreground hover:text-foreground hover:border-border transition-colors"
-                >
-                  <action.icon className="h-4 w-4" strokeWidth={1.5} />
-                  {action.label}
-                </button>
-              )
-            ))}
+            <Link
+              href="/dashboard/screen-time"
+              className="flex items-center gap-2 rounded-full border border-border/50 px-4 py-2 text-sm text-muted-foreground hover:text-foreground hover:border-border transition-colors"
+            >
+              <Monitor className="h-4 w-4" strokeWidth={1.5} />
+              查看屏幕时间
+            </Link>
+            <Link
+              href="/dashboard/echo"
+              className="flex items-center gap-2 rounded-full border border-border/50 px-4 py-2 text-sm text-muted-foreground hover:text-foreground hover:border-border transition-colors"
+            >
+              <Heart className="h-4 w-4" strokeWidth={1.5} />
+              跟 Echo 聊天
+            </Link>
+            <Link
+              href="/dashboard/mood"
+              className="flex items-center gap-2 rounded-full border border-border/50 px-4 py-2 text-sm text-muted-foreground hover:text-foreground hover:border-border transition-colors"
+            >
+              <Heart className="h-4 w-4" strokeWidth={1.5} />
+              记录心情
+            </Link>
           </div>
         </Card>
       </div>
