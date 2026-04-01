@@ -47,7 +47,7 @@ export default function CapturePage() {
 
   useEffect(() => {
     const supabase = createClient();
-    supabase.auth.getUser().then(async ({ data: { user } }) => {
+    supabase.auth.getUser().then(async ({ data: { user } }: { data: { user: any } }) => {
       if (!user) { setLoading(false); return; }
 
       const { data } = await supabase

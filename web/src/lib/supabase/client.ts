@@ -1,6 +1,6 @@
-import { createClient as createSupabaseClient } from "@supabase/supabase-js";
+import { createBrowserClient } from "@supabase/ssr";
 
-let client: ReturnType<typeof createSupabaseClient> | null = null;
+let client: ReturnType<typeof createBrowserClient> | null = null;
 
 export function createClient() {
   if (client) return client;
@@ -12,7 +12,7 @@ export function createClient() {
     console.error("Supabase env vars missing:", { url: !!url, key: !!key });
   }
 
-  client = createSupabaseClient(
+  client = createBrowserClient(
     url || "https://placeholder.supabase.co",
     key || "placeholder-key"
   );
