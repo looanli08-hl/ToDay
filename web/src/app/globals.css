@@ -130,5 +130,17 @@
 }
 
 .font-display {
-  font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  font-family: var(--font-display), ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+}
+
+/* Smooth page transitions */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Selection color */
+::selection {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
 }
