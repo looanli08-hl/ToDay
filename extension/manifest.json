@@ -2,7 +2,8 @@
   "manifest_version": 3,
   "name": "ToDay",
   "version": "1.0.0",
-  "description": "记录你的浏览时间，了解你的数字生活",
+  "description": "智能追踪你的数字生活 — 浏览时间分析、习惯洞察、与 Echo AI 联动",
+  "homepage_url": "https://daycho.com",
   "permissions": [
     "tabs",
     "activeTab",
@@ -11,7 +12,8 @@
     "idle"
   ],
   "host_permissions": [
-    "https://to-day-ten.vercel.app/*"
+    "https://to-day-ten.vercel.app/*",
+    "https://daycho.com/*"
   ],
   "background": {
     "service_worker": "src/background.js",
