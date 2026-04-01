@@ -130,7 +130,9 @@
 }
 
 .font-display {
-  font-family: var(--font-display), ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+  letter-spacing: -0.025em;
+  font-weight: 500;
 }
 
 /* Smooth page transitions */
