@@ -1,105 +1,53 @@
-import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-
-function toBase64Url(str: string): string {
-  return btoa(str).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-}
+import { createClient } from "@/lib/supabase/client";
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
+
+  // Supabase sends different params depending on the flow:
+  // - Email confirmation (PKCE enabled): ?code=xxx
+  // - Email confirmation (non-PKCE): ?token_hash=xxx&type=signup
+  // - Password reset: ?token_hash=xxx&type=recovery
+  // - OAuth: ?code=xxx (with code_verifier cookie)
   const code = searchParams.get("code");
+  const tokenHash = searchParams.get("token_hash");
+  const type = searchParams.get("type");
 
-  const supabaseUrl = (process.env.NEXT_PUBLIC_SUPABASE_URL || "").trim();
-  const supabaseKey = (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "").trim();
+  const supabase = createClient();
 
-  if (!code || !supabaseUrl || !supabaseKey) {
+  // Handle token_hash flow (email confirmation / password reset without PKCE)
+  if (tokenHash && type) {
+    const { error } = await supabase.auth.verifyOtp({
+      token_hash: tokenHash,
+      type: type as "signup" | "recovery" | "email",
+    });
+
+    if (error) {
+      return NextResponse.redirect(
+        `${origin}/auth/login?error=${encodeURIComponent(error.message)}`
+      );
+    }
+
+    if (type === "recovery") {
+      return NextResponse.redirect(`${origin}/auth/update-password`);
+    }
+
     return NextResponse.redirect(`${origin}/dashboard`);
   }
 
-  try {
-    const cookieStore = await cookies();
-    const allCookies = cookieStore.getAll();
-    const codeVerifierCookie = allCookies.find((c) =>
-      c.name.endsWith("-auth-token-code-verifier")
-    );
+  // Handle code flow (PKCE — OAuth or email confirmation with PKCE)
+  if (code) {
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
 
-    if (!codeVerifierCookie) {
+    if (error) {
       return NextResponse.redirect(
-        `${origin}/auth/login?error=${encodeURIComponent("Code verifier cookie not found")}`
+        `${origin}/auth/login?error=${encodeURIComponent(error.message)}`
       );
     }
 
-    // Exchange code via raw fetch (bypasses Supabase JS Headers bug)
-    const tokenRes = await fetch(
-      `${supabaseUrl}/auth/v1/token?grant_type=pkce`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          apikey: supabaseKey,
-        },
-        body: JSON.stringify({
-          auth_code: code,
-          code_verifier: codeVerifierCookie.value,
-        }),
-      }
-    );
-
-    if (!tokenRes.ok) {
-      const errText = await tokenRes.text();
-      return NextResponse.redirect(
-        `${origin}/auth/login?error=${encodeURIComponent(errText.slice(0, 200))}`
-      );
-    }
-
-    const session = await tokenRes.json();
-    const response = NextResponse.redirect(`${origin}/dashboard`);
-
-    // Cookie name prefix matching @supabase/ssr format
-    const projectRef = new URL(supabaseUrl).hostname.split(".")[0];
-    const cookieName = `sb-${projectRef}-auth-token`;
-
-    // Base64url encode the session JSON (same as @supabase/ssr)
-    const encoded = toBase64Url(JSON.stringify(session));
-
-    // Chunk into ~3500 char cookies if needed
-    const chunkSize = 3500;
-    if (encoded.length <= chunkSize) {
-      response.cookies.set(cookieName, encoded, {
-        path: "/",
-        maxAge: 60 * 60 * 24 * 365,
-        sameSite: "lax",
-        secure: true,
-        httpOnly: false,
-      });
-    } else {
-      const chunks = Math.ceil(encoded.length / chunkSize);
-      for (let i = 0; i < chunks; i++) {
-        response.cookies.set(
-          `${cookieName}.${i}`,
-          encoded.slice(i * chunkSize, (i + 1) * chunkSize),
-          {
-            path: "/",
-            maxAge: 60 * 60 * 24 * 365,
-            sameSite: "lax",
-            secure: true,
-            httpOnly: false,
-          }
-        );
-      }
-    }
-
-    // Clean up code verifier
-    response.cookies.set(codeVerifierCookie.name, "", {
-      path: "/",
-      maxAge: 0,
-    });
-
-    return response;
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : "Unknown error";
-    return NextResponse.redirect(
-      `${origin}/auth/login?error=${encodeURIComponent(msg)}`
-    );
+    return NextResponse.redirect(`${origin}/dashboard`);
   }
+
+  // No code or token_hash — redirect to login
+  return NextResponse.redirect(`${origin}/auth/login`);
 }
