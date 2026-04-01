@@ -51,96 +51,13 @@ interface BrowsingSession {
 // Mock data — used as fallback when no real data exists
 // ---------------------------------------------------------------------------
 
-const mockEvents: TimelineEvent[] = [
-  {
-    id: "1",
-    time: "06:00",
-    label: "睡眠结束",
-    icon: Moon,
-    duration: "7h 30m",
-    type: "sleep",
-  },
-  {
-    id: "2",
-    time: "07:15",
-    label: "步行",
-    icon: Footprints,
-    duration: "12 分钟",
-    type: "exercise",
-  },
-  {
-    id: "3",
-    time: "07:30",
-    label: "到达 公司",
-    icon: Briefcase,
-    type: "location",
-  },
-  {
-    id: "4",
-    time: "09:00",
-    label: "屏幕时间 · 效率工具",
-    icon: Monitor,
-    duration: "2h",
-    type: "screen",
-  },
-  {
-    id: "5",
-    time: "12:00",
-    label: "午餐",
-    icon: Coffee,
-    type: "meal",
-  },
-  {
-    id: "6",
-    time: "12:30",
-    label: "记录心情 · 开心",
-    icon: Heart,
-    type: "mood",
-  },
-  {
-    id: "7",
-    time: "14:00",
-    label: "步行",
-    icon: Footprints,
-    duration: "8 分钟",
-    type: "exercise",
-  },
-  {
-    id: "8",
-    time: "18:00",
-    label: "离开 公司",
-    icon: Briefcase,
-    type: "location",
-  },
-  {
-    id: "9",
-    time: "18:30",
-    label: "到达 家",
-    icon: Home,
-    type: "location",
-  },
-  {
-    id: "10",
-    time: "22:30",
-    label: "屏幕时间 · 娱乐",
-    icon: Monitor,
-    duration: "1.5h",
-    type: "screen",
-  },
-  {
-    id: "11",
-    time: "23:30",
-    label: "入睡",
-    icon: Moon,
-    type: "sleep",
-  },
-];
+const mockEvents: TimelineEvent[] = [];
 
 const stats = [
-  { label: "步数", value: "8,240" },
-  { label: "运动", value: "46m" },
-  { label: "屏幕", value: "5.2h" },
-  { label: "心情", value: "2 条" },
+  { label: "步数", value: "--" },
+  { label: "运动", value: "--" },
+  { label: "屏幕", value: "--" },
+  { label: "心情", value: "--" },
 ];
 
 // ---------------------------------------------------------------------------
@@ -295,7 +212,7 @@ export default function TimelinePage() {
   }, [selectedDate]);
 
   // Merge browsing sessions into the timeline as real events
-  const phoneEvents = isToday ? mockEvents : [];
+  const phoneEvents = mockEvents;
 
   // Group consecutive browsing sessions by category into blocks
   const browsingBlocks: {
