@@ -13,9 +13,6 @@ import {
   PenLine,
   Bot,
   Blocks,
-  FileCode2,
-  Plus,
-  Search,
   Settings,
 } from "lucide-react";
 
@@ -27,7 +24,6 @@ const mainNav = [
   { href: "/dashboard/mood", label: "捕捉", icon: PenLine },
   { href: "/dashboard/echo", label: "Echo AI", icon: Bot },
   { href: "/dashboard/connectors", label: "连接器", icon: Blocks },
-  { href: "/dashboard/docs", label: "开发文档", icon: FileCode2 },
 ];
 
 const bottomNav = [
@@ -60,21 +56,6 @@ export function Sidebar() {
           <span className="text-primary text-lg">.</span>
         </div>
       </div>
-
-      {/* New + Search */}
-      <div className="px-3 py-2 space-y-1">
-        <button className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-accent transition-colors">
-          <Plus className="h-4 w-4" />
-          <span>新建记录</span>
-        </button>
-        <button className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-accent transition-colors">
-          <Search className="h-4 w-4" />
-          <span>搜索</span>
-        </button>
-      </div>
-
-      {/* Divider */}
-      <div className="mx-4 my-1 h-px bg-border/60" />
 
       {/* Main Navigation */}
       <nav className="flex-1 space-y-0.5 px-3 py-2">
