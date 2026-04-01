@@ -69,10 +69,11 @@ async function streamResponse(
   onError: (err: string) => void
 ) {
   try {
+    const personality = (typeof window !== "undefined" && localStorage.getItem("echo-personality")) || "gentle";
     const res = await fetch("/api/echo/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ messages }),
+      body: JSON.stringify({ messages, personality }),
     });
 
     if (!res.ok) {

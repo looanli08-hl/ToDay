@@ -35,7 +35,10 @@ export default function SettingsPage() {
   const router = useRouter();
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [displayName, setDisplayName] = useState("...");
-  const [echoPersonality, setEchoPersonality] = useState("gentle");
+  const [echoPersonality, setEchoPersonality] = useState(() => {
+    if (typeof window === "undefined") return "gentle";
+    return localStorage.getItem("echo-personality") || "gentle";
+  });
   const [signingOut, setSigningOut] = useState(false);
   const [syncToken, setSyncToken] = useState<string | null>(null);
   const [tokenCopied, setTokenCopied] = useState(false);
@@ -235,7 +238,7 @@ export default function SettingsPage() {
               return (
                 <button
                   key={p.id}
-                  onClick={() => setEchoPersonality(p.id)}
+                  onClick={() => { setEchoPersonality(p.id); localStorage.setItem("echo-personality", p.id); }}
                   className={`w-full flex items-center gap-4 rounded-xl border p-4 text-left transition-all duration-200 ${
                     isSelected
                       ? "border-primary/60 bg-primary/5"
