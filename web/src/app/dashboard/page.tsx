@@ -1,3 +1,6 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import {
   Moon,
@@ -11,6 +14,7 @@ import {
   Monitor,
 } from "lucide-react";
 import { EchoSymbol } from "@/components/echo-symbol";
+import { createClient } from "@/lib/supabase/client";
 
 function getGreeting(): string {
   const hour = new Date().getHours();
@@ -47,6 +51,7 @@ const weeklyData = [
 ];
 
 export default function DashboardPage() {
+  const [userName, setUserName] = useState("");
   const greeting = getGreeting();
   const now = new Date();
   const dateStr = now.toLocaleDateString("zh-CN", {
@@ -55,12 +60,25 @@ export default function DashboardPage() {
     weekday: "long",
   });
 
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) {
+        setUserName(
+          user.user_metadata?.display_name ||
+            user.email?.split("@")[0] ||
+            ""
+        );
+      }
+    });
+  }, []);
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
       <div className="px-12 pt-12 pb-10">
         <h1 className="font-display text-4xl font-normal tracking-tight text-foreground">
-          {greeting}，Looan
+          {greeting}{userName ? `，${userName}` : ""}
         </h1>
         <p className="text-base text-muted-foreground mt-2">{dateStr}</p>
       </div>
