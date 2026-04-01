@@ -1,4 +1,6 @@
-const DEEPSEEK_API_KEY = "sk-94d311f460e54b4cac9c216ed8d5af36";
+import { NextRequest } from "next/server";
+import { withAuth } from "@/lib/api/auth";
+
 const DEEPSEEK_URL = "https://api.deepseek.com/chat/completions";
 
 const BASE_PROMPT = `你是 Echo，用户生活中温暖而有洞察力的 AI 伙伴。你不是通用 AI 助手——你是一个了解用户生活节奏的朋友。
@@ -18,22 +20,25 @@ const PERSONALITY_PROMPTS: Record<string, string> = {
   rational: `你的风格：克制理性。冷静、客观、逻辑清晰。用数据和事实说话，帮用户理性分析问题。语气沉稳，少用 emoji，注重深度。`,
 };
 
-export async function POST(req: Request) {
-  const { messages, personality } = await req.json();
+export const POST = withAuth(async (req: NextRequest) => {
+  const apiKey = process.env.DEEPSEEK_API_KEY;
+  if (!apiKey) {
+    return Response.json(
+      { error: "AI service not configured" },
+      { status: 503 }
+    );
+  }
 
+  const { messages, personality } = await req.json();
   const personalityPrompt = PERSONALITY_PROMPTS[personality] || PERSONALITY_PROMPTS.gentle;
   const systemPrompt = `${BASE_PROMPT}\n\n${personalityPrompt}`;
-
-  const apiMessages = [
-    { role: "system" as const, content: systemPrompt },
-    ...messages,
-  ];
+  const apiMessages = [{ role: "system" as const, content: systemPrompt }, ...messages];
 
   const response = await fetch(DEEPSEEK_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${DEEPSEEK_API_KEY}`,
+      Authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
       model: "deepseek-chat",
@@ -45,13 +50,9 @@ export async function POST(req: Request) {
   });
 
   if (!response.ok) {
-    return Response.json(
-      { error: "AI service unavailable" },
-      { status: response.status }
-    );
+    return Response.json({ error: "AI service unavailable" }, { status: response.status });
   }
 
-  // Forward the SSE stream directly
   return new Response(response.body, {
     headers: {
       "Content-Type": "text/event-stream",
@@ -59,4 +60,4 @@ export async function POST(req: Request) {
       Connection: "keep-alive",
     },
   });
-}
+});
