@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { getAuthCallbackUrl, getFriendlyAuthError } from "@/lib/auth";
 import Link from "next/link";
 
 export default function ResetPasswordPage() {
@@ -18,18 +19,17 @@ export default function ResetPasswordPage() {
     try {
       const supabase = createClient();
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: getAuthCallbackUrl(),
       });
 
       if (error) {
-        setError(error.message);
-        setLoading(false);
+        setError(getFriendlyAuthError(error.message));
         return;
       }
 
       setSent(true);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "发送失败");
+      setError(err instanceof Error ? getFriendlyAuthError(err.message) : "发送失败");
     } finally {
       setLoading(false);
     }

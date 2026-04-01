@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { getAuthCallbackUrl, getFriendlyAuthError } from "@/lib/auth";
 import Link from "next/link";
 
 function LoginContent() {
@@ -37,27 +38,44 @@ function LoginContent() {
           setError("请先验证你的邮箱");
           setShowResend(true);
         } else {
-          setError(error.message);
+          setError(getFriendlyAuthError(error.message));
         }
-        setLoading(false);
         return;
       }
       router.push("/dashboard");
       router.refresh();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "登录失败");
+      setError(err instanceof Error ? getFriendlyAuthError(err.message) : "登录失败");
+    } finally {
       setLoading(false);
     }
   }
 
   async function handleResend() {
+    if (!email) {
+      setError("请先输入邮箱");
+      return;
+    }
+
     setResendLoading(true);
     try {
       const supabase = createClient();
-      await supabase.auth.resend({ type: "signup", email });
+      const { error } = await supabase.auth.resend({
+        type: "signup",
+        email,
+        options: {
+          emailRedirectTo: getAuthCallbackUrl(),
+        },
+      });
+
+      if (error) {
+        setError(getFriendlyAuthError(error.message));
+        return;
+      }
+
       setResendSent(true);
-    } catch {
-      setError("发送失败，请稍后重试");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? getFriendlyAuthError(err.message) : "发送失败，请稍后重试");
     } finally {
       setResendLoading(false);
     }

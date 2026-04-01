@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { getAuthCallbackUrl, getFriendlyAuthError } from "@/lib/auth";
 import Link from "next/link";
 import { Suspense } from "react";
 
@@ -12,6 +13,7 @@ function VerifyContent() {
   const [resendLoading, setResendLoading] = useState(false);
   const [resendSent, setResendSent] = useState(false);
   const [cooldown, setCooldown] = useState(0);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (cooldown <= 0) return;
@@ -21,14 +23,27 @@ function VerifyContent() {
 
   async function handleResend() {
     if (cooldown > 0 || !email) return;
+    setError("");
     setResendLoading(true);
     try {
       const supabase = createClient();
-      await supabase.auth.resend({ type: "signup", email });
+      const { error } = await supabase.auth.resend({
+        type: "signup",
+        email,
+        options: {
+          emailRedirectTo: getAuthCallbackUrl(),
+        },
+      });
+
+      if (error) {
+        setError(getFriendlyAuthError(error.message));
+        return;
+      }
+
       setResendSent(true);
       setCooldown(60);
-    } catch {
-      // silently fail
+    } catch (err: unknown) {
+      setError(err instanceof Error ? getFriendlyAuthError(err.message) : "发送失败，请稍后再试");
     } finally {
       setResendLoading(false);
     }
@@ -76,6 +91,10 @@ function VerifyContent() {
                   ? "再次发送"
                   : "重新发送验证邮件"}
           </button>
+
+          {error && (
+            <p className="mt-3 rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">{error}</p>
+          )}
         </div>
 
         <p className="text-center text-xs text-muted-foreground mt-4">

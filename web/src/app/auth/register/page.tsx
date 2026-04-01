@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { getAuthCallbackUrl, getFriendlyAuthError, isExistingUserSignUp } from "@/lib/auth";
 import Link from "next/link";
 
 export default function RegisterPage() {
@@ -27,23 +28,29 @@ export default function RegisterPage() {
 
     try {
       const supabase = createClient();
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: { display_name: name },
+          emailRedirectTo: getAuthCallbackUrl(),
         },
       });
 
       if (error) {
-        setError(error.message);
-        setLoading(false);
+        setError(getFriendlyAuthError(error.message));
+        return;
+      }
+
+      if (isExistingUserSignUp(data.user?.identities)) {
+        setError("该邮箱已注册，请直接登录");
         return;
       }
 
       router.push(`/auth/verify?email=${encodeURIComponent(email)}`);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "注册失败");
+      setError(err instanceof Error ? getFriendlyAuthError(err.message) : "注册失败");
+    } finally {
       setLoading(false);
     }
   }
