@@ -1,29 +1,19 @@
 import { NextRequest } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { withAuth } from "@/lib/api/auth";
 
 interface SessionPayload {
   domain: string;
   label?: string;
   category: string;
   title?: string;
-  startTime: number; // epoch ms
-  endTime: number;   // epoch ms
-  duration: number;  // seconds
+  startTime: number;
+  endTime: number;
+  duration: number;
 }
 
-export async function POST(req: NextRequest) {
+export const POST = withAuth(async (req: NextRequest, { userId }) => {
   try {
-    // 1. Extract sync token from Authorization header
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader?.startsWith("Bearer ")) {
-      return Response.json(
-        { error: "Missing Authorization header" },
-        { status: 401 }
-      );
-    }
-    const syncToken = authHeader.slice(7).trim();
-
-    // 2. Parse body
     const body = await req.json();
     const sessions: SessionPayload[] = body.sessions;
 
@@ -34,21 +24,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 3. Look up user_id by sync token
     const supabase = await createServerSupabaseClient();
-    const { data: userId, error: rpcError } = await supabase.rpc(
-      "get_user_id_by_sync_token",
-      { token: syncToken }
-    );
-
-    if (rpcError || !userId) {
-      return Response.json(
-        { error: "Invalid sync token" },
-        { status: 401 }
-      );
-    }
-
-    // 4. Insert sessions via RPC (bypasses RLS)
     let inserted = 0;
     let duplicates = 0;
 
@@ -81,4 +57,4 @@ export async function POST(req: NextRequest) {
   } catch {
     return Response.json({ error: "Invalid request" }, { status: 400 });
   }
-}
+});
