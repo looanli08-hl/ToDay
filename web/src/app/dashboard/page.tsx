@@ -153,7 +153,7 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <div className="px-12 pt-12 pb-10">
+      <div className="px-12 pt-14 pb-10">
         <h1 className="font-display text-4xl font-normal tracking-tight text-foreground">
           {greeting}{userName ? `，${userName}` : ""}
         </h1>
@@ -166,7 +166,7 @@ export default function DashboardPage() {
           {statCards.map((card) => (
             <Card
               key={card.label}
-              className="border border-border/40 bg-card rounded-xl p-6 hover:shadow-sm transition-shadow duration-300"
+              className="border border-border/30 bg-card rounded-2xl p-6 hover:shadow-md transition-all duration-300"
             >
               <div className="flex items-start justify-between">
                 <div>
@@ -189,7 +189,7 @@ export default function DashboardPage() {
         {/* Main Grid */}
         <div className="grid gap-6 xl:grid-cols-3">
           {/* Timeline */}
-          <Card className="xl:col-span-2 border border-border/40 bg-card rounded-xl p-6">
+          <Card className="xl:col-span-2 border border-border/30 bg-card rounded-2xl p-6">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2.5">
                 <Activity className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
@@ -234,21 +234,21 @@ export default function DashboardPage() {
                 ))}
               </div>
             ) : (
-              <div className="rounded-xl border border-dashed border-border/50 p-8 text-center">
+              <div className="rounded-2xl border border-dashed border-border/40 p-8 text-center">
                 <p className="text-sm text-muted-foreground mb-4">
                   连接你的设备，开始记录生活
                 </p>
                 <div className="flex justify-center gap-3">
                   <Link
                     href="/dashboard/connectors"
-                    className="flex items-center gap-2 rounded-full border border-border/50 px-4 py-2 text-sm text-muted-foreground hover:text-foreground hover:border-border transition-colors"
+                    className="flex items-center gap-2 rounded-full border border-border/30 px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:border-border transition-colors"
                   >
                     <Globe className="h-4 w-4" strokeWidth={1.5} />
                     安装浏览器扩展
                   </Link>
                   <Link
                     href="/dashboard/settings"
-                    className="flex items-center gap-2 rounded-full border border-border/50 px-4 py-2 text-sm text-muted-foreground hover:text-foreground hover:border-border transition-colors"
+                    className="flex items-center gap-2 rounded-full border border-border/30 px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:border-border transition-colors"
                   >
                     <Smartphone className="h-4 w-4" strokeWidth={1.5} />
                     连接手机 App
@@ -262,7 +262,7 @@ export default function DashboardPage() {
           <div className="space-y-6">
             {/* Echo AI */}
             <Link href="/dashboard/echo" className="block">
-              <Card className="border border-border/40 bg-card rounded-xl p-6 hover:shadow-sm transition-shadow duration-300 cursor-pointer">
+              <Card className="border border-border/30 bg-card rounded-2xl p-6 hover:shadow-md transition-all duration-300 cursor-pointer">
                 <div className="flex items-center gap-2 mb-4">
                   <EchoSymbol size={15} className="text-primary" />
                   <h2 className="font-display text-lg text-foreground">Echo</h2>
@@ -288,7 +288,7 @@ export default function DashboardPage() {
             </Link>
 
             {/* Weekly Activity */}
-            <Card className="border border-border/40 bg-card rounded-xl p-6">
+            <Card className="border border-border/30 bg-card rounded-2xl p-6">
               <div className="flex items-center gap-2 mb-4">
                 <TrendingUp className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
                 <h2 className="font-display text-lg text-foreground">本周活跃度</h2>
@@ -299,7 +299,7 @@ export default function DashboardPage() {
             </Card>
 
             {/* Life Pulse */}
-            <Card className="border border-border/40 bg-card rounded-xl p-6">
+            <Card className="border border-border/30 bg-card rounded-2xl p-6">
               <div className="flex items-center gap-2 mb-3">
                 <Activity className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
                 <h2 className="font-display text-lg text-foreground">生活脉搏</h2>
@@ -312,26 +312,26 @@ export default function DashboardPage() {
         </div>
 
         {/* Quick Actions */}
-        <Card className="border border-border/40 bg-card rounded-xl p-6">
+        <Card className="border border-border/30 bg-card rounded-2xl p-6">
           <p className="text-sm text-muted-foreground mb-3">快速操作</p>
           <div className="flex flex-wrap gap-2">
             <Link
               href="/dashboard/screen-time"
-              className="flex items-center gap-2 rounded-full border border-border/50 px-4 py-2 text-sm text-muted-foreground hover:text-foreground hover:border-border transition-colors"
+              className="flex items-center gap-2 rounded-full border border-border/30 px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:border-border transition-colors"
             >
               <Monitor className="h-4 w-4" strokeWidth={1.5} />
               查看屏幕时间
             </Link>
             <Link
               href="/dashboard/echo"
-              className="flex items-center gap-2 rounded-full border border-border/50 px-4 py-2 text-sm text-muted-foreground hover:text-foreground hover:border-border transition-colors"
+              className="flex items-center gap-2 rounded-full border border-border/30 px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:border-border transition-colors"
             >
               <Heart className="h-4 w-4" strokeWidth={1.5} />
               跟 Echo 聊天
             </Link>
             <Link
               href="/dashboard/mood"
-              className="flex items-center gap-2 rounded-full border border-border/50 px-4 py-2 text-sm text-muted-foreground hover:text-foreground hover:border-border transition-colors"
+              className="flex items-center gap-2 rounded-full border border-border/30 px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:border-border transition-colors"
             >
               <Heart className="h-4 w-4" strokeWidth={1.5} />
               记录心情
