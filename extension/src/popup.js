@@ -1,4 +1,4 @@
-const DEFAULT_API_BASE = "https://to-day-ten.vercel.app";
+const DEFAULT_API_BASE = "https://daycho.com";
 
 function formatDuration(seconds) {
   if (seconds < 60) return `${seconds}s`;

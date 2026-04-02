@@ -9,7 +9,7 @@ chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: false });
 const HEARTBEAT_INTERVAL = 10; // seconds
 const SYNC_INTERVAL = 1; // minutes
 const IDLE_THRESHOLD = 120; // seconds
-const DEFAULT_API_BASE = "https://to-day-ten.vercel.app";
+const DEFAULT_API_BASE = "https://daycho.com";
 
 // ─── State Management ───
 

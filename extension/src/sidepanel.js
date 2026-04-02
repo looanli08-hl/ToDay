@@ -68,6 +68,11 @@ async function init() {
 
   // Request current context from background
   chrome.runtime.sendMessage({ type: "get_context" });
+
+  // Delayed re-request ensures context bar updates when Side Panel is reopened
+  setTimeout(() => {
+    chrome.runtime.sendMessage({ type: "get_context" }).catch(() => {});
+  }, 500);
 }
 
 // ─── Auth State Rendering ───
@@ -197,7 +202,7 @@ function setupMessageBus() {
 // ─── Context Bar ───
 
 function updateContextBar(context) {
-  if (!context || !context.domain) {
+  if (!context || (!context.domain && !context.title)) {
     dom.contextBar.classList.add("hidden");
     state.currentContext = null;
     return;
@@ -324,6 +329,9 @@ async function streamEchoResponse(userText) {
     };
     state.messages.push(msg);
     persistMessages();
+
+    // Sync conversation summary to cloud for cross-device access
+    syncConversationToCloud();
   }
 }
 
@@ -334,6 +342,28 @@ function createStreamingMessage() {
   bubble.className = "message-bubble";
   el.appendChild(bubble);
   return el;
+}
+
+// ─── Conversation Cloud Sync ───
+
+async function syncConversationToCloud() {
+  if (!state.syncToken) return;
+  try {
+    const recent = state.messages.slice(-20);
+    await fetch(`${state.apiBaseUrl}/api/memory`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${state.syncToken}`,
+      },
+      body: JSON.stringify({
+        memory_type: "note",
+        content: {
+          text: `Recent conversation (${new Date().toLocaleDateString()}): ${recent.map(m => `[${m.role}] ${m.text.slice(0, 100)}`).join(" | ")}`,
+        },
+      }),
+    });
+  } catch {}
 }
 
 // ─── Message Rendering ───
