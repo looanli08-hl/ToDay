@@ -1,4 +1,4 @@
-const DEFAULT_API_BASE = "https://to-day-ten.vercel.app";
+const DEFAULT_API_BASE = "https://daycho.com";
 
 function formatDuration(seconds) {
   if (seconds < 60) return `${seconds}s`;
@@ -100,6 +100,13 @@ document.getElementById("dashboardLink").addEventListener("click", async () => {
   const result = await chrome.storage.local.get(["apiBaseUrl"]);
   const base = result.apiBaseUrl || DEFAULT_API_BASE;
   chrome.tabs.create({ url: `${base}/dashboard` });
+});
+
+// Open Echo side panel
+document.getElementById("openEchoBtn").addEventListener("click", async () => {
+  const win = await chrome.windows.getCurrent();
+  await chrome.sidePanel.open({ windowId: win.id });
+  window.close();
 });
 
 render();

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ToDay</title>
+  <title>Attune</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -257,7 +257,7 @@
 </head>
 <body>
   <div class="header">
-    <span class="logo">ToDay<span class="logo-dot">.</span></span>
+    <span class="logo">Attune<span class="logo-dot">.</span></span>
     <div class="status">
       <div class="status-dot"></div>
       <span>记录中</span>
@@ -267,6 +267,21 @@
   <div class="summary">
     <div class="total-time" id="totalTime">0m</div>
     <div class="total-label">今日屏幕时间</div>
+  </div>
+
+  <div style="padding: 0 20px 16px;">
+    <button id="openEchoBtn" style="
+      width: 100%;
+      padding: 12px;
+      background: #C4713E;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity 0.15s ease;
+    ">Open Echo</button>
   </div>
 
   <div class="divider"></div>
@@ -286,7 +301,7 @@
     </div>
     <div class="settings-field">
       <label for="apiBaseInput">服务器地址</label>
-      <input type="text" id="apiBaseInput" placeholder="https://to-day-ten.vercel.app" />
+      <input type="text" id="apiBaseInput" placeholder="https://daycho.com" />
     </div>
     <div class="settings-actions">
       <button id="saveSettingsBtn">保存</button>
@@ -295,7 +310,7 @@
   </div>
 
   <div class="footer">
-    <span class="footer-text">ToDay Browser Extension</span>
+    <span class="footer-text">Attune Browser Extension</span>
     <div style="display:flex; align-items:center; gap:12px;">
       <a class="dashboard-link" id="settingsToggle">设置</a>
       <a class="dashboard-link" id="dashboardLink">Dashboard →</a>

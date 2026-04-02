@@ -54,7 +54,7 @@ function VerifyContent() {
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="flex items-center justify-center gap-1 mb-8">
-          <span className="font-display text-2xl text-foreground">ToDay</span>
+          <span className="font-display text-2xl text-foreground">Attune</span>
           <span className="text-primary text-2xl">.</span>
         </div>
 

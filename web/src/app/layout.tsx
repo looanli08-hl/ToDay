@@ -8,8 +8,8 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "ToDay — 你的生活统筹中心",
-  description: "记录、理解、优化你的每一天",
+  title: "Attune — Your AI, attuned to your life.",
+  description: "Echo lives in your browser. It sees what you see, remembers what matters, and talks to you like a friend.",
 };
 
 export default function RootLayout({

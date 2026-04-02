@@ -61,7 +61,7 @@ export default function RegisterPage() {
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="flex items-center justify-center gap-1 mb-10">
-          <span className="font-display text-3xl text-foreground tracking-tight">ToDay</span>
+          <span className="font-display text-3xl text-foreground tracking-tight">Attune</span>
           <span className="text-primary text-3xl">.</span>
         </div>
 

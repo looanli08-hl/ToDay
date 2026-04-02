@@ -5,25 +5,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
-import {
-  Compass,
-  CalendarDays,
-  LineChart,
-  Layers,
-  PenLine,
-  Bot,
-  Blocks,
-  Settings,
-} from "lucide-react";
+import { Compass, Settings } from "lucide-react";
 
 const mainNav = [
   { href: "/dashboard", label: "概览", icon: Compass },
-  { href: "/dashboard/timeline", label: "时间线", icon: CalendarDays },
-  { href: "/dashboard/analytics", label: "数据分析", icon: LineChart },
-  { href: "/dashboard/screen-time", label: "屏幕时间", icon: Layers },
-  { href: "/dashboard/mood", label: "捕捉", icon: PenLine },
-  { href: "/dashboard/echo", label: "Echo AI", icon: Bot },
-  { href: "/dashboard/connectors", label: "连接器", icon: Blocks },
 ];
 
 const bottomNav = [
@@ -52,7 +37,7 @@ export function Sidebar() {
       {/* Logo */}
       <div className="px-5 pt-6 pb-4">
         <div className="flex items-center gap-1">
-          <span className="font-display text-xl text-foreground tracking-tight">ToDay</span>
+          <span className="font-display text-xl text-foreground tracking-tight">Attune</span>
           <span className="text-primary text-xl">.</span>
         </div>
       </div>

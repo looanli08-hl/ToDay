@@ -2,44 +2,25 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import {
   User,
-  Blocks,
-  Bot,
   Shield,
   AlertTriangle,
-  Smartphone,
-  Globe,
   LogOut,
   Copy,
   Check,
   Download,
+  Key,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-
-const ECHO_PERSONALITIES = [
-  { id: "gentle", label: "温柔内敛", description: "安静、体贴，像一位默默陪伴的朋友" },
-  { id: "positive", label: "积极阳光", description: "热情、鼓励，总是给你正能量" },
-  { id: "rational", label: "克制理性", description: "冷静、客观，用逻辑帮你分析问题" },
-];
 
 export default function SettingsPage() {
   const router = useRouter();
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [displayName, setDisplayName] = useState("...");
-  const [echoPersonality, setEchoPersonality] = useState(() => {
-    if (typeof window === "undefined") return "gentle";
-    return localStorage.getItem("echo-personality") || "gentle";
-  });
   const [signingOut, setSigningOut] = useState(false);
   const [syncToken, setSyncToken] = useState<string | null>(null);
   const [tokenCopied, setTokenCopied] = useState(false);
-
-  // Dynamic connector status
-  const [hasBrowsingData, setHasBrowsingData] = useState(false);
-  const [hasIOSData, setHasIOSData] = useState(false);
-  const [connectorLoading, setConnectorLoading] = useState(true);
 
   // Account operation states
   const [showClearDialog, setShowClearDialog] = useState(false);
@@ -66,20 +47,6 @@ export default function SettingsPage() {
         .single()) as { data: { sync_token: string } | null };
 
       if (profile?.sync_token) setSyncToken(profile.sync_token);
-
-      const { count: browsingCount } = await supabase
-        .from("browsing_sessions")
-        .select("id", { count: "exact", head: true })
-        .eq("user_id", user.id);
-      setHasBrowsingData((browsingCount || 0) > 0);
-
-      const { count: iosCount } = await supabase
-        .from("data_points")
-        .select("id", { count: "exact", head: true })
-        .eq("user_id", user.id)
-        .eq("source", "iphone");
-      setHasIOSData((iosCount || 0) > 0);
-      setConnectorLoading(false);
     });
   }, []);
 
@@ -152,89 +119,22 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {/* Data Sources Section */}
-        <div className="border border-border/40 bg-card rounded-xl p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <Blocks className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
-            <h2 className="font-display text-lg text-foreground">数据源</h2>
-          </div>
-          <div className="flex items-center justify-between py-3 border-b border-border/30">
-            <div className="flex items-center gap-3">
-              <Globe className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
-              <div><p className="text-sm text-foreground">浏览器扩展</p><p className="text-xs text-muted-foreground">追踪浏览活动和屏幕时间</p></div>
+        {/* Sync Token Section */}
+        {syncToken && (
+          <div className="border border-border/40 bg-card rounded-xl p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <Key className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
+              <h2 className="font-display text-lg text-foreground">同步令牌</h2>
             </div>
+            <p className="text-xs text-muted-foreground mb-3">在浏览器扩展中输入此令牌以同步数据</p>
             <div className="flex items-center gap-2">
-              {connectorLoading ? (
-                <span className="text-xs text-muted-foreground">检查中...</span>
-              ) : (
-                <>
-                  <div className={`h-2 w-2 rounded-full ${hasBrowsingData ? "bg-emerald-500" : "bg-muted-foreground/30"}`} />
-                  <span className={`text-xs ${hasBrowsingData ? "text-emerald-600 font-medium" : "text-muted-foreground"}`}>
-                    {hasBrowsingData ? "已连接" : "未连接"}
-                  </span>
-                </>
-              )}
+              <code className="flex-1 text-xs text-muted-foreground bg-muted/50 rounded-lg px-3 py-2.5 font-mono break-all select-all">{syncToken}</code>
+              <button onClick={() => { navigator.clipboard.writeText(syncToken); setTokenCopied(true); setTimeout(() => setTokenCopied(false), 2000); }} className="flex items-center gap-2 border border-border/50 text-muted-foreground rounded-full px-4 py-2 text-sm hover:text-foreground hover:border-border transition-colors">
+                {tokenCopied ? (<><Check className="h-3.5 w-3.5" strokeWidth={1.5} />已复制</>) : (<><Copy className="h-3.5 w-3.5" strokeWidth={1.5} />复制</>)}
+              </button>
             </div>
           </div>
-
-          {syncToken && (
-            <div className="py-3 border-b border-border/30">
-              <div className="flex items-center justify-between">
-                <div><p className="text-sm text-foreground">同步令牌</p><p className="text-xs text-muted-foreground">在浏览器扩展中输入此令牌以同步数据</p></div>
-                <button onClick={() => { navigator.clipboard.writeText(syncToken); setTokenCopied(true); setTimeout(() => setTokenCopied(false), 2000); }} className="flex items-center gap-2 border border-border/50 text-muted-foreground rounded-full px-4 py-2 text-sm hover:text-foreground hover:border-border transition-colors">
-                  {tokenCopied ? (<><Check className="h-3.5 w-3.5" strokeWidth={1.5} />已复制</>) : (<><Copy className="h-3.5 w-3.5" strokeWidth={1.5} />复制</>)}
-                </button>
-              </div>
-              <code className="block mt-2 text-xs text-muted-foreground bg-muted/50 rounded-lg px-3 py-2 font-mono break-all select-all">{syncToken}</code>
-            </div>
-          )}
-
-          <div className="flex items-center justify-between py-3 border-b border-border/30">
-            <div className="flex items-center gap-3">
-              <Smartphone className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
-              <div><p className="text-sm text-foreground">手机 App</p><p className="text-xs text-muted-foreground">同步健康和活动数据</p></div>
-            </div>
-            <div className="flex items-center gap-2">
-              {connectorLoading ? (
-                <span className="text-xs text-muted-foreground">检查中...</span>
-              ) : (
-                <>
-                  <div className={`h-2 w-2 rounded-full ${hasIOSData ? "bg-emerald-500" : "bg-muted-foreground/30"}`} />
-                  <span className={`text-xs ${hasIOSData ? "text-emerald-600 font-medium" : "text-muted-foreground"}`}>
-                    {hasIOSData ? "已连接" : "未连接"}
-                  </span>
-                </>
-              )}
-            </div>
-          </div>
-
-          <div className="pt-3 last:border-0">
-            <Link href="/dashboard/connectors" className="text-sm text-primary hover:opacity-80 transition-opacity">管理所有连接器 →</Link>
-          </div>
-        </div>
-
-        {/* Echo AI Section */}
-        <div className="border border-border/40 bg-card rounded-xl p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <Bot className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
-            <h2 className="font-display text-lg text-foreground">Echo AI</h2>
-          </div>
-          <p className="text-sm text-muted-foreground mb-4">选择 Echo 的性格风格</p>
-          <div className="space-y-2">
-            {ECHO_PERSONALITIES.map((p) => {
-              const isSelected = echoPersonality === p.id;
-              return (
-                <button key={p.id} onClick={() => { setEchoPersonality(p.id); localStorage.setItem("echo-personality", p.id); }}
-                  className={`w-full flex items-center gap-4 rounded-xl border p-4 text-left transition-all duration-200 ${isSelected ? "border-primary/60 bg-primary/5" : "border-border/40 bg-background hover:border-border hover:shadow-sm"}`}>
-                  <div className={`h-4 w-4 rounded-full border-2 flex items-center justify-center transition-colors ${isSelected ? "border-primary" : "border-muted-foreground/40"}`}>
-                    {isSelected && <div className="h-2 w-2 rounded-full bg-primary" />}
-                  </div>
-                  <div><p className="text-sm text-foreground">{p.label}</p><p className="text-xs text-muted-foreground">{p.description}</p></div>
-                </button>
-              );
-            })}
-          </div>
-        </div>
+        )}
 
         {/* Privacy Section */}
         <div className="border border-border/40 bg-card rounded-xl p-6">
@@ -245,7 +145,7 @@ export default function SettingsPage() {
           <div className="py-3 border-b border-border/30">
             <p className="text-sm text-foreground mb-1">数据说明</p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              所有数据仅存储在你的设备和你的 Supabase 账户中。ToDay 不会将你的个人数据分享给任何第三方。你可以随时导出或删除所有数据。
+              所有数据仅存储在你的设备和你的 Supabase 账户中。Attune 不会将你的个人数据分享给任何第三方。你可以随时导出或删除所有数据。
             </p>
           </div>
           <div className="flex items-center justify-between py-3">
@@ -270,7 +170,7 @@ export default function SettingsPage() {
 
           {showClearDialog && (
             <div className="py-3 border-b border-border/30 bg-destructive/5 rounded-lg px-4 -mx-2">
-              <p className="text-sm text-foreground mb-2">此操作将清除你的所有浏览记录、健康数据和心情记录。</p>
+              <p className="text-sm text-foreground mb-2">此操作将清除你的所有浏览记录和相关数据。</p>
               <p className="text-xs text-muted-foreground mb-3">请输入「删除」以确认：</p>
               <div className="flex gap-2">
                 <input type="text" value={clearConfirmText} onChange={(e) => setClearConfirmText(e.target.value)} placeholder="删除" className="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-destructive/20" />
@@ -319,7 +219,7 @@ export default function SettingsPage() {
           )}
         </div>
 
-        <div className="text-center pb-4"><p className="text-xs text-muted-foreground">ToDay v0.5.0</p></div>
+        <div className="text-center pb-4"><p className="text-xs text-muted-foreground">Attune v0.1.0</p></div>
       </div>
     </div>
   );
