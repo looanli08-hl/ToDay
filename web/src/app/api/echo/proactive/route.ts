@@ -18,6 +18,8 @@ interface ProactiveRequest {
   totalVideosToday: number;
   skippedCount: number;
   isFirstObservation?: boolean;
+  type?: "daily_summary" | string;
+  daySummary?: string;
   lang?: string;
 }
 
@@ -62,14 +64,18 @@ function buildNormalTriggerPrompt(data: ProactiveRequest): string {
     )
     .join("\n");
 
-  return `You are Echo, a close friend casually watching the user browse YouTube alongside them. Drop a single natural comment like a friend texting about what they just noticed.
+  let prompt = `You are Echo, a close friend casually watching the user browse YouTube alongside them. Drop a single natural comment like a friend texting about what they just noticed.
 
 Stats: ${data.totalVideosToday} videos today, ${data.skippedCount} skipped.
 
 Recent videos:
-${videoList}
+${videoList}`;
 
-Generate ONE short, natural comment (1 sentence, max 100 characters). Sound like a real friend — not an AI, not a life coach, not a notification.
+  if (data.daySummary) {
+    prompt += `\n\nHere is the user's full day context:\n${data.daySummary}`;
+  }
+
+  prompt += `\n\nGenerate ONE short, natural comment (1 sentence, max 100 characters). Sound like a real friend — not an AI, not a life coach, not a notification.
 
 IMPORTANT: Respond in the language indicated by the lang field. If lang starts with "zh", respond in Chinese. Otherwise respond in English.
 
@@ -84,6 +90,24 @@ Bad examples:
 - "You might want to consider being more selective"
 
 Reply with ONLY the comment, nothing else. No quotes.`;
+
+  return prompt;
+}
+
+function buildDailySummaryPrompt(data: ProactiveRequest): string {
+  return `You are Echo, reviewing the user's day. Here is a summary of their browsing activity:
+
+${data.daySummary || "No summary available."}
+
+Write a warm, reflective end-of-day message (2-4 sentences). Don't just list stats. Tell a STORY about their day — what they were interested in, how their mood seemed to shift, what stood out. Be specific about content they watched. Sound like a friend reflecting on a day you spent together.
+
+Example good response: "你今天的状态挺有意思的。上午一直在看CS求职相关的东西，有点焦虑的感觉。但到了晚上你认真看完了3Blue1Brown的神经网络视频，状态明显好多了。那种从焦虑到好奇的转变，其实挺好的。"
+
+Example bad response: "你今天看了20个视频，浏览了15个网站。" (This is just data, not insight.)
+
+LANGUAGE: ${data.lang?.startsWith("zh") ? "Respond in Chinese." : "Respond in English."}
+
+Reply with ONLY the message, nothing else. No quotes.`;
 }
 
 // ---------------------------------------------------------------------------
@@ -113,11 +137,17 @@ export const POST = withAuth(async (req: NextRequest) => {
     return Response.json({ message: null });
   }
 
-  const prompt = isFirstObservation
-    ? buildFirstObservationPrompt(body)
-    : buildNormalTriggerPrompt(body);
+  let prompt: string;
+  if (body.type === "daily_summary") {
+    prompt = buildDailySummaryPrompt(body);
+  } else if (isFirstObservation) {
+    prompt = buildFirstObservationPrompt(body);
+  } else {
+    prompt = buildNormalTriggerPrompt(body);
+  }
 
   try {
+    const isDailySummary = body.type === "daily_summary";
     const response = await fetch(DEEPSEEK_URL, {
       method: "POST",
       headers: {
@@ -128,7 +158,7 @@ export const POST = withAuth(async (req: NextRequest) => {
         model: "deepseek-chat",
         messages: [{ role: "user", content: prompt }],
         temperature: 0.85,
-        max_tokens: 100,
+        max_tokens: isDailySummary ? 300 : 100,
         stream: false,
       }),
     });

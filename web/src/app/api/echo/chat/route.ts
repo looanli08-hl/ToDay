@@ -109,7 +109,7 @@ function formatMemory(m: MemoryEntry): string {
   }
 }
 
-function buildSystemPrompt(context?: BrowsingContext, memories?: MemoryEntry[], lang?: string, localTime?: string, localHour?: number): string {
+function buildSystemPrompt(context?: BrowsingContext, memories?: MemoryEntry[], lang?: string, localTime?: string, localHour?: number, daySummary?: string): string {
   const hour = localHour ?? new Date().getHours();
   const timeStr = localTime || new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true });
   const timeOfDay = getTimeOfDay(hour);
@@ -121,9 +121,15 @@ Personality rules:
 - Observe and reflect, don't judge
 - Keep responses short: 1-3 sentences
 - Never say "as an AI" or anything that breaks the friend illusion
+- When the user asks for recommendations (videos, content, things to watch), give 3-5 specific suggestions based on what you know about their interests. Don't just suggest one thing.
 - LANGUAGE: The user's browser language is "${lang || "en"}". If it starts with "zh", respond in Chinese. Otherwise respond in English. Always match the user's language naturally.
 
 Current time (user's local): ${timeStr} (${timeOfDay}).`;
+
+  // Inject day summary
+  if (daySummary) {
+    prompt += `\n\nTODAY'S ACTIVITY (what you observed throughout the day):\n${daySummary}\n\nUse this naturally in conversation. You SAW all of this happen. Reference specific details when relevant.`;
+  }
 
   // Inject memories
   if (memories && memories.length > 0) {
@@ -178,7 +184,7 @@ export const POST = withAuth(async (req: NextRequest, { userId }) => {
     );
   }
 
-  let body: { messages?: unknown; context?: BrowsingContext; lang?: string; localTime?: string; localHour?: number };
+  let body: { messages?: unknown; context?: BrowsingContext; lang?: string; localTime?: string; localHour?: number; daySummary?: string };
   try {
     body = await req.json();
   } catch {
@@ -212,7 +218,7 @@ export const POST = withAuth(async (req: NextRequest, { userId }) => {
   }
 
   const lang = body.lang || "en";
-  const systemPrompt = buildSystemPrompt(context, memories, lang, body.localTime, body.localHour);
+  const systemPrompt = buildSystemPrompt(context, memories, lang, body.localTime, body.localHour, body.daySummary);
 
   const apiMessages = [
     { role: "system" as const, content: systemPrompt },
