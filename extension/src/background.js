@@ -376,19 +376,62 @@ function broadcastContext() {
 
 async function evaluateProactiveTrigger() {
   const now = Date.now();
-  if (now - youtubeState.lastProactiveTime < PROACTIVE_COOLDOWN) return;
 
-  const { quietMode, syncToken, apiBaseUrl } = await chrome.storage.local
-    .get(["quietMode", "syncToken", "apiBaseUrl"])
-    .then((r) => ({
-      quietMode: r.quietMode || false,
-      syncToken: r.syncToken || null,
-      apiBaseUrl: r.apiBaseUrl || DEFAULT_API_BASE,
-    }));
+  const { quietMode, syncToken, apiBaseUrl, isFirstSession, sessionCount } =
+    await chrome.storage.local
+      .get(["quietMode", "syncToken", "apiBaseUrl", "isFirstSession", "sessionCount"])
+      .then((r) => ({
+        quietMode: r.quietMode || false,
+        syncToken: r.syncToken || null,
+        apiBaseUrl: r.apiBaseUrl || DEFAULT_API_BASE,
+        isFirstSession: r.isFirstSession !== undefined ? r.isFirstSession : true,
+        sessionCount: r.sessionCount || 0,
+      }));
 
   if (quietMode || !syncToken) return;
 
   const videos = youtubeState.videosThisSession;
+
+  // ─── First-session trigger: after exactly 3 videos, fire once ───
+  if (isFirstSession === true && videos.length >= 3 && sessionCount === 0) {
+    try {
+      const res = await fetch(`${apiBaseUrl}/api/echo/proactive`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${syncToken}`,
+        },
+        body: JSON.stringify({
+          recentVideos: videos.slice(-10),
+          totalVideosToday: videos.length,
+          skippedCount: videos.filter((v) => v.skipped).length,
+          isFirstObservation: true,
+        }),
+      });
+
+      if (res.ok) {
+        const result = await res.json();
+        if (result.message) {
+          chrome.runtime
+            .sendMessage({ type: "proactive_message", text: result.message })
+            .catch(() => {});
+        }
+        // Mark first session complete
+        await chrome.storage.local.set({
+          isFirstSession: false,
+          sessionCount: 1,
+        });
+        youtubeState.lastProactiveTime = now;
+      }
+    } catch {
+      // API unavailable — will retry next evaluation
+    }
+    return; // Skip normal trigger evaluation
+  }
+
+  // ─── Normal trigger evaluation ───
+  if (now - youtubeState.lastProactiveTime < PROACTIVE_COOLDOWN) return;
+
   if (videos.length < 3) return;
 
   // Count skipped videos in last 5
@@ -416,13 +459,15 @@ async function evaluateProactiveTrigger() {
 
     if (res.ok) {
       const result = await res.json();
-      chrome.runtime
-        .sendMessage({ type: "proactive_message", data: result })
-        .catch(() => {});
+      if (result.message) {
+        chrome.runtime
+          .sendMessage({ type: "proactive_message", text: result.message })
+          .catch(() => {});
+      }
       youtubeState.lastProactiveTime = now;
     }
   } catch {
-    // Endpoint doesn't exist yet — fail gracefully
+    // Endpoint unavailable — fail gracefully
   }
 }
 

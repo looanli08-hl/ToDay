@@ -46,6 +46,8 @@ async function init() {
     "apiBaseUrl",
     "quietMode",
     "echoMessages",
+    "isFirstSession",
+    "sessionCount",
   ]);
 
   state.syncToken = result.syncToken || null;
@@ -53,6 +55,8 @@ async function init() {
   state.quietMode = result.quietMode || false;
   state.messages = result.echoMessages || [];
   state.connected = !!state.syncToken;
+  state.isFirstSession = result.isFirstSession !== undefined ? result.isFirstSession : true;
+  state.sessionCount = result.sessionCount || 0;
 
   renderAuthState();
   setupListeners();
@@ -141,7 +145,12 @@ async function handleConnect() {
   await chrome.storage.local.set({
     syncToken: token,
     apiBaseUrl: apiBase,
+    isFirstSession: true,
+    sessionCount: 0,
   });
+
+  state.isFirstSession = true;
+  state.sessionCount = 0;
 
   // Add welcome message on first connect
   if (state.messages.length === 0) {
