@@ -256,6 +256,8 @@ async function streamEchoResponse(userText) {
     messages: recentMessages,
     context: state.currentContext || undefined,
     lang: navigator.language || "en",
+    localTime: new Date().toLocaleString(),
+    localHour: new Date().getHours(),
   };
 
   const res = await fetch(apiUrl, {

@@ -109,14 +109,10 @@ function formatMemory(m: MemoryEntry): string {
   }
 }
 
-function buildSystemPrompt(context?: BrowsingContext, memories?: MemoryEntry[], lang?: string): string {
-  const now = new Date();
-  const timeStr = now.toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: true,
-  });
-  const timeOfDay = getTimeOfDay(now.getHours());
+function buildSystemPrompt(context?: BrowsingContext, memories?: MemoryEntry[], lang?: string, localTime?: string, localHour?: number): string {
+  const hour = localHour ?? new Date().getHours();
+  const timeStr = localTime || new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true });
+  const timeOfDay = getTimeOfDay(hour);
 
   let prompt = `You are Echo, the AI companion inside Attune. You are NOT an assistant. You are a close friend who happens to be watching the user browse the internet alongside them.
 
@@ -127,7 +123,7 @@ Personality rules:
 - Never say "as an AI" or anything that breaks the friend illusion
 - LANGUAGE: The user's browser language is "${lang || "en"}". If it starts with "zh", respond in Chinese. Otherwise respond in English. Always match the user's language naturally.
 
-Current time: ${timeStr} (${timeOfDay}).`;
+Current time (user's local): ${timeStr} (${timeOfDay}).`;
 
   // Inject memories
   if (memories && memories.length > 0) {
@@ -182,7 +178,7 @@ export const POST = withAuth(async (req: NextRequest, { userId }) => {
     );
   }
 
-  let body: { messages?: unknown; context?: BrowsingContext; lang?: string };
+  let body: { messages?: unknown; context?: BrowsingContext; lang?: string; localTime?: string; localHour?: number };
   try {
     body = await req.json();
   } catch {
@@ -216,7 +212,7 @@ export const POST = withAuth(async (req: NextRequest, { userId }) => {
   }
 
   const lang = body.lang || "en";
-  const systemPrompt = buildSystemPrompt(context, memories, lang);
+  const systemPrompt = buildSystemPrompt(context, memories, lang, body.localTime, body.localHour);
 
   const apiMessages = [
     { role: "system" as const, content: systemPrompt },
