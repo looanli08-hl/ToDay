@@ -244,8 +244,16 @@ async function sendMessage() {
 async function streamEchoResponse(userText) {
   const apiUrl = `${state.apiBaseUrl}/api/echo/chat`;
 
+  // Build messages array from conversation history
+  const recentMessages = state.messages.slice(-20).map((m) => ({
+    role: m.role === "user" ? "user" : "assistant",
+    content: m.text,
+  }));
+  // Add the new user message
+  recentMessages.push({ role: "user", content: userText });
+
   const body = {
-    message: userText,
+    messages: recentMessages,
     context: state.currentContext || undefined,
     lang: navigator.language || "en",
   };
