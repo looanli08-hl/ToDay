@@ -276,11 +276,112 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
 
 heartbeat();
 
-// ─── Message Listener (Side Panel) ───
+// ─── YouTube Perception State ───
+
+let youtubeState = {
+  currentVideo: null,
+  videosThisSession: [],
+  lastProactiveTime: 0,
+};
+
+const PROACTIVE_COOLDOWN = 10 * 60 * 1000; // 10 minutes
+
+// ─── YouTube Context Helpers ───
+
+function respondWithContext() {
+  const current = youtubeState.currentVideo;
+  const recentVideos = youtubeState.videosThisSession.slice(-10);
+
+  const context = current
+    ? {
+        type: "youtube",
+        videoId: current.videoId,
+        title: current.title,
+        channel: current.channel,
+        duration: current.duration,
+        currentTime: current.currentTime,
+        completionPercent: current.completionPercent,
+        paused: current.paused,
+        url: current.url,
+        recentVideos,
+      }
+    : null;
+
+  chrome.runtime
+    .sendMessage({ type: "context_update", data: context })
+    .catch(() => {
+      // No listeners — that's fine
+    });
+}
+
+function broadcastContext() {
+  respondWithContext();
+}
+
+async function evaluateProactiveTrigger() {
+  const now = Date.now();
+  if (now - youtubeState.lastProactiveTime < PROACTIVE_COOLDOWN) return;
+
+  const { quietMode, syncToken, apiBaseUrl } = await chrome.storage.local
+    .get(["quietMode", "syncToken", "apiBaseUrl"])
+    .then((r) => ({
+      quietMode: r.quietMode || false,
+      syncToken: r.syncToken || null,
+      apiBaseUrl: r.apiBaseUrl || DEFAULT_API_BASE,
+    }));
+
+  if (quietMode || !syncToken) return;
+
+  const videos = youtubeState.videosThisSession;
+  if (videos.length < 3) return;
+
+  // Count skipped videos in last 5
+  const lastFive = videos.slice(-5);
+  const skippedCount = lastFive.filter((v) => v.skipped).length;
+
+  const shouldTrigger =
+    skippedCount >= 3 || videos.length % 5 === 0;
+
+  if (!shouldTrigger) return;
+
+  try {
+    const res = await fetch(`${apiBaseUrl}/api/echo/proactive`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${syncToken}`,
+      },
+      body: JSON.stringify({
+        recentVideos: videos.slice(-10),
+        totalVideosToday: videos.length,
+        skippedCount: videos.filter((v) => v.skipped).length,
+      }),
+    });
+
+    if (res.ok) {
+      const result = await res.json();
+      chrome.runtime
+        .sendMessage({ type: "proactive_message", data: result })
+        .catch(() => {});
+      youtubeState.lastProactiveTime = now;
+    }
+  } catch {
+    // Endpoint doesn't exist yet — fail gracefully
+  }
+}
+
+// ─── Message Listener (Side Panel + YouTube) ───
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "get_context") {
     (async () => {
+      // If YouTube video is active, include YouTube context
+      if (youtubeState.currentVideo) {
+        respondWithContext();
+        return;
+      }
+
+      // Otherwise fall back to session context
       const state = await getState();
       const context = state.currentSession
         ? {
@@ -291,14 +392,84 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           }
         : null;
 
-      // Broadcast context_update to all extension pages (side panel)
-      chrome.runtime.sendMessage({
-        type: "context_update",
-        data: context,
-      }).catch(() => {
-        // No listeners — that's fine
-      });
+      chrome.runtime
+        .sendMessage({ type: "context_update", data: context })
+        .catch(() => {
+          // No listeners — that's fine
+        });
     })();
+    return false;
+  }
+
+  if (message.type === "youtube_event") {
+    const { event, data } = message;
+
+    switch (event) {
+      case "video_start":
+        youtubeState.currentVideo = {
+          videoId: data.videoId,
+          title: data.title,
+          channel: data.channel,
+          duration: data.duration,
+          currentTime: data.currentTime,
+          completionPercent: data.completionPercent,
+          paused: data.paused,
+          url: data.url,
+          timestamp: data.timestamp,
+          completed: false,
+          skipped: false,
+        };
+        youtubeState.videosThisSession.push({ ...youtubeState.currentVideo });
+        broadcastContext();
+        break;
+
+      case "video_progress":
+        if (youtubeState.currentVideo) {
+          youtubeState.currentVideo.currentTime = data.currentTime;
+          youtubeState.currentVideo.completionPercent = data.completionPercent;
+        }
+        break;
+
+      case "video_leave":
+      case "video_ended": {
+        if (youtubeState.currentVideo) {
+          youtubeState.currentVideo.completionPercent = data.completionPercent;
+          youtubeState.currentVideo.completed = data.completionPercent >= 85;
+          youtubeState.currentVideo.skipped = data.completionPercent < 20;
+
+          // Update the entry in videosThisSession
+          const idx = youtubeState.videosThisSession.findLastIndex(
+            (v) => v.videoId === youtubeState.currentVideo.videoId
+          );
+          if (idx !== -1) {
+            youtubeState.videosThisSession[idx] = {
+              ...youtubeState.currentVideo,
+            };
+          }
+
+          broadcastContext();
+          evaluateProactiveTrigger();
+
+          if (event === "video_leave") {
+            youtubeState.currentVideo = null;
+          }
+        }
+        break;
+      }
+
+      case "video_pause":
+        if (youtubeState.currentVideo) {
+          youtubeState.currentVideo.paused = true;
+        }
+        break;
+
+      case "video_play":
+        if (youtubeState.currentVideo) {
+          youtubeState.currentVideo.paused = false;
+        }
+        break;
+    }
+
     return false;
   }
 });
