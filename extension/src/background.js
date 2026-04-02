@@ -1,5 +1,9 @@
 import { categorize } from "./categories.js";
 
+// ─── Side Panel Behavior ───
+
+chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: false });
+
 // ─── Configuration ───
 
 const HEARTBEAT_INTERVAL = 10; // seconds
@@ -44,11 +48,11 @@ chrome.idle.onStateChanged.addListener(async (state) => {
   if (state === "idle" || state === "locked") {
     await closeCurrentSession("idle");
     await saveState({ isIdle: true });
-    console.log("[ToDay] User idle — tracking paused");
+    console.log("[Attune] User idle — tracking paused");
   } else if (state === "active") {
     await saveState({ isIdle: false });
     heartbeat();
-    console.log("[ToDay] User active — tracking resumed");
+    console.log("[Attune] User active — tracking resumed");
   }
 });
 
@@ -114,7 +118,7 @@ async function heartbeat() {
     await closeCurrentSession("switch");
     await startNewSession({ domain, label, category, title, now, todayKey, state });
   } catch (e) {
-    console.error("[ToDay] Heartbeat error:", e);
+    console.error("[Attune] Heartbeat error:", e);
   }
 }
 
@@ -165,7 +169,7 @@ async function syncToServer() {
 
     // Skip if no sync token configured
     if (!state.syncToken) {
-      console.log("[ToDay] No sync token — skipping server sync");
+      console.log("[Attune] No sync token — skipping server sync");
       return;
     }
 
@@ -215,15 +219,15 @@ async function syncToServer() {
             [todayKey]: allSessions.length,
           },
         });
-        console.log(`[ToDay] Synced ${newSessions.length} new sessions`);
+        console.log(`[Attune] Synced ${newSessions.length} new sessions`);
       } else {
-        console.warn(`[ToDay] Sync failed: ${res.status}`);
+        console.warn(`[Attune] Sync failed: ${res.status}`);
       }
     } catch {
       // Server unavailable — will retry next cycle
     }
   } catch (e) {
-    console.error("[ToDay] Sync error:", e);
+    console.error("[Attune] Sync error:", e);
   }
 }
 
@@ -272,4 +276,31 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
 
 heartbeat();
 
-console.log("[ToDay] Extension loaded — session tracking started");
+// ─── Message Listener (Side Panel) ───
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.type === "get_context") {
+    (async () => {
+      const state = await getState();
+      const context = state.currentSession
+        ? {
+            domain: state.currentSession.domain,
+            title: state.currentSession.title,
+            category: state.currentSession.category,
+            label: state.currentSession.label,
+          }
+        : null;
+
+      // Broadcast context_update to all extension pages (side panel)
+      chrome.runtime.sendMessage({
+        type: "context_update",
+        data: context,
+      }).catch(() => {
+        // No listeners — that's fine
+      });
+    })();
+    return false;
+  }
+});
+
+console.log("[Attune] Extension loaded — session tracking started");

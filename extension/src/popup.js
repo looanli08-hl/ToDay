@@ -102,4 +102,11 @@ document.getElementById("dashboardLink").addEventListener("click", async () => {
   chrome.tabs.create({ url: `${base}/dashboard` });
 });
 
+// Open Echo side panel
+document.getElementById("openEchoBtn").addEventListener("click", async () => {
+  const win = await chrome.windows.getCurrent();
+  await chrome.sidePanel.open({ windowId: win.id });
+  window.close();
+});
+
 render();
