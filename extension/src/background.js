@@ -107,6 +107,7 @@ async function heartbeat() {
       if (tabBehavior.searches.length > 50) {
         tabBehavior.searches = tabBehavior.searches.slice(-50);
       }
+      persistTabBehavior();
     }
 
     if (state.currentSession && state.currentSession.domain === domain) {
@@ -290,6 +291,7 @@ function extractSearchQuery(url) {
 // ─── Tab Behavior Tracking ───
 
 let tabBehavior = {
+  date: new Date().toISOString().split("T")[0],
   switchCount: 0,
   lastSwitchTime: 0,
   openTabCount: 0,
@@ -317,6 +319,7 @@ chrome.tabs.onActivated.addListener(async () => {
   } catch {
     // Query failed — keep previous count
   }
+  persistTabBehavior();
   heartbeat();
 });
 chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
@@ -328,12 +331,158 @@ heartbeat();
 // ─── YouTube Perception State ───
 
 let youtubeState = {
+  date: new Date().toISOString().split("T")[0],
   currentVideo: null,
   videosThisSession: [],
   lastProactiveTime: 0,
 };
 
 const PROACTIVE_COOLDOWN = 10 * 60 * 1000; // 10 minutes
+
+// ─── Proactive Message Queue ───
+
+let proactiveQueue = [];
+
+function queueProactiveMessage(text) {
+  proactiveQueue.push({ text, time: Date.now() });
+  chrome.action.setBadgeText({ text: "•" });
+  chrome.action.setBadgeBackgroundColor({ color: "#C4713E" });
+  // Persist queue in case service worker restarts
+  chrome.storage.local.set({ proactiveQueue });
+}
+
+// ─── State Persistence Helpers ───
+
+async function persistYoutubeState() {
+  await chrome.storage.local.set({ youtubeState });
+}
+
+async function persistTabBehavior() {
+  await chrome.storage.local.set({ tabBehavior });
+}
+
+// ─── Rolling Day Summary ───
+
+function buildDaySummary(todaySessions) {
+  const videos = youtubeState.videosThisSession || [];
+  const searches = tabBehavior.searches || [];
+  const sessions = todaySessions || [];
+
+  let summary = "";
+
+  // Video summary
+  if (videos.length > 0) {
+    const completed = videos.filter((v) => v.completed).length;
+    const skipped = videos.filter((v) => v.skipped).length;
+    summary += `YouTube: ${videos.length} videos today (${completed} watched fully, ${skipped} skipped). `;
+    summary += `Recent: ${videos
+      .slice(-5)
+      .map(
+        (v) =>
+          `"${v.title}" (${v.completed ? "watched" : v.skipped ? "skipped" : (v.completionPercent || 0) + "%"})`
+      )
+      .join(", ")}. `;
+  }
+
+  // Browsing summary from sessions
+  if (sessions.length > 0) {
+    const domainTime = {};
+    for (const s of sessions) {
+      const d = s.label || s.domain;
+      domainTime[d] = (domainTime[d] || 0) + (s.duration || 0);
+    }
+    const sorted = Object.entries(domainTime)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5);
+    if (sorted.length > 0) {
+      summary += `Browsing: visited ${sessions.length} sites. Top: ${sorted
+        .map(([d, t]) => `${d} (${Math.round(t / 60)}m)`)
+        .join(", ")}. `;
+    }
+  }
+
+  // Search summary
+  if (searches.length > 0) {
+    summary += `Searches: ${searches
+      .slice(-5)
+      .map((s) => `"${s.query}"`)
+      .join(", ")}. `;
+  }
+
+  return summary;
+}
+
+function getTopDomains(sessions) {
+  if (!sessions || sessions.length === 0) return [];
+  const domainTime = {};
+  for (const s of sessions) {
+    const d = s.label || s.domain;
+    domainTime[d] = (domainTime[d] || 0) + (s.duration || 0);
+  }
+  return Object.entries(domainTime)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([domain, seconds]) => ({ domain, minutes: Math.round(seconds / 60) }));
+}
+
+// ─── Daily Summary Trigger ───
+
+async function checkDailySummaryTrigger() {
+  const stored = await chrome.storage.local.get(["lastDailySummaryDate"]);
+  const today = new Date().toISOString().split("T")[0];
+  const hour = new Date().getHours();
+
+  // Only trigger in the evening (after 8 PM) and only once per day
+  if (hour < 20) return;
+  if (stored.lastDailySummaryDate === today) return;
+
+  const videos = youtubeState.videosThisSession || [];
+  if (videos.length < 3) return; // Not enough data for a summary
+
+  const settings = await chrome.storage.local.get(["syncToken", "apiBaseUrl", "quietMode"]);
+  if (!settings.syncToken || settings.quietMode) return;
+
+  const apiBase = settings.apiBaseUrl || DEFAULT_API_BASE;
+  const todayKey = new Date().toISOString().split("T")[0];
+  const sessionsData = await chrome.storage.local.get(["sessions"]);
+  const todaySessions = sessionsData.sessions?.[todayKey] || [];
+
+  try {
+    const res = await fetch(`${apiBase}/api/echo/proactive`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${settings.syncToken}`,
+      },
+      body: JSON.stringify({
+        recentVideos: videos.slice(-10).map((v) => ({
+          title: v.title,
+          channel: v.channel,
+          completionPercent: v.completionPercent || 0,
+          skipped: v.skipped || false,
+        })),
+        totalVideosToday: videos.length,
+        skippedCount: videos.filter((v) => v.skipped).length,
+        type: "daily_summary",
+        daySummary: buildDaySummary(todaySessions),
+        lang: navigator.language || "en",
+      }),
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data.message) {
+        chrome.runtime
+          .sendMessage({ type: "proactive_message", text: data.message })
+          .catch(() => {});
+        queueProactiveMessage(data.message);
+        await chrome.storage.local.set({ lastDailySummaryDate: today });
+      }
+    }
+  } catch {
+    // API unavailable — will retry next evaluation
+  }
+}
 
 // ─── YouTube Context Helpers ───
 
@@ -372,6 +521,41 @@ function respondWithContext() {
 
 function broadcastContext() {
   respondWithContext();
+}
+
+function extractTopicKeywords(title) {
+  // Extract meaningful words from a video title (strip common noise)
+  const noise = new Set(["the", "a", "an", "is", "are", "was", "were", "in", "on", "at", "to", "for", "of", "and", "or", "but", "with", "how", "why", "what", "when", "this", "that", "it", "my", "your", "i", "you", "we", "they", "do", "does", "did", "will", "can", "not", "no", "so", "just", "get", "got", "new", "from", "all", "about", "been", "have", "has", "had"]);
+  return (title || "")
+    .toLowerCase()
+    .replace(/[^\w\s]/g, " ")
+    .split(/\s+/)
+    .filter((w) => w.length > 2 && !noise.has(w));
+}
+
+function detectTopicOverlap(videos) {
+  // Check if same topic keywords appear in 3+ video titles
+  const keywordCount = {};
+  for (const v of videos) {
+    const keywords = extractTopicKeywords(v.title);
+    const unique = new Set(keywords);
+    for (const kw of unique) {
+      keywordCount[kw] = (keywordCount[kw] || 0) + 1;
+    }
+  }
+  return Object.values(keywordCount).some((count) => count >= 3);
+}
+
+function detectSearchVideoMatch(videos, searches) {
+  // Check if any video title matches a recent search query
+  if (!searches || searches.length === 0) return false;
+  const searchTerms = searches.slice(-10).flatMap((s) => extractTopicKeywords(s.query));
+  const searchSet = new Set(searchTerms);
+  for (const v of videos.slice(-5)) {
+    const titleWords = extractTopicKeywords(v.title);
+    if (titleWords.some((w) => searchSet.has(w))) return true;
+  }
+  return false;
 }
 
 async function evaluateProactiveTrigger() {
@@ -416,6 +600,7 @@ async function evaluateProactiveTrigger() {
           chrome.runtime
             .sendMessage({ type: "proactive_message", text: result.message })
             .catch(() => {});
+          queueProactiveMessage(result.message);
         }
         // Mark first session complete
         await chrome.storage.local.set({
@@ -423,6 +608,7 @@ async function evaluateProactiveTrigger() {
           sessionCount: 1,
         });
         youtubeState.lastProactiveTime = now;
+        persistYoutubeState();
       }
     } catch {
       // API unavailable — will retry next evaluation
@@ -430,19 +616,25 @@ async function evaluateProactiveTrigger() {
     return; // Skip normal trigger evaluation
   }
 
-  // ─── Normal trigger evaluation ───
+  // ─── Code layer filter (fast checks) ───
   if (now - youtubeState.lastProactiveTime < PROACTIVE_COOLDOWN) return;
-
   if (videos.length < 3) return;
 
-  // Count skipped videos in last 5
   const lastFive = videos.slice(-5);
   const skippedCount = lastFive.filter((v) => v.skipped).length;
 
   const shouldTrigger =
-    skippedCount >= 3 || videos.length % 5 === 0;
+    skippedCount >= 3 ||
+    detectTopicOverlap(videos) ||
+    detectSearchVideoMatch(videos, tabBehavior.searches) ||
+    videos.length % 5 === 0;
 
   if (!shouldTrigger) return;
+
+  // ─── AI layer: send full context for richer proactive messages ───
+  const todayKey = new Date().toISOString().split("T")[0];
+  const sessionsData = await chrome.storage.local.get(["sessions"]);
+  const todaySessions = sessionsData.sessions?.[todayKey] || [];
 
   try {
     const res = await fetch(`${apiBaseUrl}/api/echo/proactive`, {
@@ -455,6 +647,7 @@ async function evaluateProactiveTrigger() {
         recentVideos: videos.slice(-10),
         totalVideosToday: videos.length,
         skippedCount: videos.filter((v) => v.skipped).length,
+        daySummary: buildDaySummary(todaySessions),
         lang: navigator.language || "en",
       }),
     });
@@ -465,8 +658,10 @@ async function evaluateProactiveTrigger() {
         chrome.runtime
           .sendMessage({ type: "proactive_message", text: result.message })
           .catch(() => {});
+        queueProactiveMessage(result.message);
       }
       youtubeState.lastProactiveTime = now;
+      persistYoutubeState();
     }
   } catch {
     // Endpoint unavailable — fail gracefully
@@ -478,6 +673,21 @@ async function evaluateProactiveTrigger() {
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "get_context") {
     (async () => {
+      // Deliver any queued proactive messages
+      if (proactiveQueue.length > 0) {
+        for (const msg of proactiveQueue) {
+          chrome.runtime
+            .sendMessage({ type: "proactive_message", text: msg.text })
+            .catch(() => {});
+        }
+        proactiveQueue = [];
+        chrome.action.setBadgeText({ text: "" });
+        chrome.storage.local.set({ proactiveQueue: [] });
+      }
+
+      // Check daily summary trigger
+      checkDailySummaryTrigger();
+
       // If YouTube video is active, include YouTube context
       if (youtubeState.currentVideo) {
         respondWithContext();
@@ -504,6 +714,74 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return false;
   }
 
+  if (message.type === "get_full_context") {
+    (async () => {
+      // Deliver any queued proactive messages
+      if (proactiveQueue.length > 0) {
+        for (const msg of proactiveQueue) {
+          chrome.runtime
+            .sendMessage({ type: "proactive_message", text: msg.text })
+            .catch(() => {});
+        }
+        proactiveQueue = [];
+        chrome.action.setBadgeText({ text: "" });
+        chrome.storage.local.set({ proactiveQueue: [] });
+      }
+
+      // Check daily summary trigger
+      checkDailySummaryTrigger();
+
+      const todayKey = new Date().toISOString().split("T")[0];
+      const stored = await chrome.storage.local.get(["sessions"]);
+      const todaySessions = stored.sessions?.[todayKey] || [];
+
+      // Build current context (same as respondWithContext but returned directly)
+      const current = youtubeState.currentVideo;
+      const recentVideos = youtubeState.videosThisSession.slice(-10);
+      const tabContext = {
+        tabSwitchCount: tabBehavior.switchCount,
+        openTabs: tabBehavior.openTabCount,
+        recentSearches: tabBehavior.searches.slice(-5).map((s) => s.query),
+      };
+
+      let currentContext;
+      if (current) {
+        currentContext = {
+          type: "youtube",
+          videoId: current.videoId,
+          title: current.title,
+          channel: current.channel,
+          duration: current.duration,
+          currentTime: current.currentTime,
+          completionPercent: current.completionPercent,
+          paused: current.paused,
+          url: current.url,
+          recentVideos,
+          ...tabContext,
+        };
+      } else {
+        const state = await getState();
+        currentContext = state.currentSession
+          ? {
+              domain: state.currentSession.domain,
+              title: state.currentSession.title,
+              category: state.currentSession.category,
+              label: state.currentSession.label,
+              ...tabContext,
+            }
+          : tabContext;
+      }
+
+      sendResponse({
+        currentContext,
+        daySummary: buildDaySummary(todaySessions),
+        videoCount: youtubeState.videosThisSession.length,
+        topDomains: getTopDomains(todaySessions),
+      });
+    })();
+    return true; // async response with sendResponse
+  }
+
   if (message.type === "youtube_event") {
     const { event, data } = message;
 
@@ -523,6 +801,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           skipped: false,
         };
         youtubeState.videosThisSession.push({ ...youtubeState.currentVideo });
+        persistYoutubeState();
         broadcastContext();
         break;
 
@@ -550,11 +829,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             };
           }
 
+          persistYoutubeState();
           broadcastContext();
           evaluateProactiveTrigger();
 
           if (event === "video_leave") {
             youtubeState.currentVideo = null;
+            persistYoutubeState();
           }
         }
         break;
@@ -574,6 +855,23 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
 
     return false;
+  }
+});
+
+// ─── Restore Persisted State on Service Worker Startup ───
+
+chrome.storage.local.get(["youtubeState", "tabBehavior", "proactiveQueue"]).then((stored) => {
+  const today = new Date().toISOString().split("T")[0];
+  if (stored.youtubeState && stored.youtubeState.date === today) {
+    youtubeState = stored.youtubeState;
+  }
+  if (stored.tabBehavior && stored.tabBehavior.date === today) {
+    tabBehavior = stored.tabBehavior;
+  }
+  if (stored.proactiveQueue && Array.isArray(stored.proactiveQueue) && stored.proactiveQueue.length > 0) {
+    proactiveQueue = stored.proactiveQueue;
+    chrome.action.setBadgeText({ text: "•" });
+    chrome.action.setBadgeBackgroundColor({ color: "#C4713E" });
   }
 });
 

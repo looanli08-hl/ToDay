@@ -241,6 +241,14 @@ async function sendMessage() {
   hideTypingIndicator();
 }
 
+async function getFullContext() {
+  return new Promise((resolve) => {
+    chrome.runtime.sendMessage({ type: "get_full_context" }, (response) => {
+      resolve(response || {});
+    });
+  });
+}
+
 async function streamEchoResponse(userText) {
   const apiUrl = `${state.apiBaseUrl}/api/echo/chat`;
 
@@ -252,9 +260,12 @@ async function streamEchoResponse(userText) {
   // Add the new user message
   recentMessages.push({ role: "user", content: userText });
 
+  const fullContext = await getFullContext();
+
   const body = {
     messages: recentMessages,
-    context: state.currentContext || undefined,
+    context: fullContext.currentContext || state.currentContext || undefined,
+    daySummary: fullContext.daySummary || "",
     lang: navigator.language || "en",
     localTime: new Date().toLocaleString(),
     localHour: new Date().getHours(),
