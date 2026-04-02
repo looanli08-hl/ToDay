@@ -86,14 +86,14 @@ function LoginContent() {
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="flex items-center justify-center gap-1 mb-10">
-          <span className="font-display text-3xl text-foreground tracking-tight">ToDay</span>
+          <span className="font-display text-3xl text-foreground tracking-tight">Attune</span>
           <span className="text-primary text-3xl">.</span>
         </div>
 
         {/* Card */}
         <div className="rounded-2xl bg-card border border-border/30 p-8 shadow-sm">
           <h1 className="font-display text-xl text-foreground mb-1">欢迎回来</h1>
-          <p className="text-sm text-muted-foreground mb-6">登录你的 ToDay 账户</p>
+          <p className="text-sm text-muted-foreground mb-6">登录你的 Attune 账户</p>
 
           {/* Email Form */}
           <form onSubmit={handleLogin} className="space-y-4">

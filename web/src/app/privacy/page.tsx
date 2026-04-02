@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "隐私政策 — ToDay",
-  description: "ToDay 浏览器扩展及网页服务的隐私政策",
+  title: "隐私政策 — Attune",
+  description: "Attune 浏览器扩展及网页服务的隐私政策",
 };
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -37,7 +37,7 @@ export default function PrivacyPage() {
       <header className="border-b border-border/40 bg-background/80 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-2xl mx-auto px-6 h-14 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-1">
-            <span className="font-display text-xl text-foreground tracking-tight">ToDay</span>
+            <span className="font-display text-xl text-foreground tracking-tight">Attune</span>
             <span className="text-primary text-xl">.</span>
           </Link>
           <span className="text-xs text-muted-foreground">隐私政策</span>
@@ -60,7 +60,7 @@ export default function PrivacyPage() {
         {/* Intro */}
         <div className="rounded-2xl bg-card border border-border/30 p-6 mb-10 shadow-sm">
           <p className="text-sm text-foreground/80 leading-relaxed">
-            ToDay（以下简称"我们"）非常重视你的隐私。本隐私政策说明了 ToDay
+            Attune（以下简称"我们"）非常重视你的隐私。本隐私政策说明了 Attune
             浏览器扩展及网页服务（daycho.com）如何收集、使用和保护你的数据。
             <strong className="text-foreground">
               我们的核心原则：你的数据属于你，不属于我们。
@@ -69,7 +69,7 @@ export default function PrivacyPage() {
         </div>
 
         <Section title="一、我们收集哪些数据 — What We Collect">
-          <p>ToDay 浏览器扩展仅收集以下最小必要数据：</p>
+          <p>Attune 浏览器扩展仅收集以下最小必要数据：</p>
           <Item>
             <strong className="text-foreground">域名（Domain）</strong>
             ：你访问的网站域名，例如 <code className="bg-muted px-1 rounded text-xs">github.com</code>，用于分类和时长统计。
@@ -102,7 +102,7 @@ export default function PrivacyPage() {
             扩展默认将所有数据保存在<strong className="text-foreground">本地浏览器存储（chrome.storage.local）</strong>中，不会上传至任何服务器。
           </p>
           <p>
-            仅当你在扩展设置中<strong className="text-foreground">主动配置同步令牌（Sync Token）</strong>后，数据才会同步至你的 ToDay 账户。同步功能完全可选，随时可以关闭或撤销。
+            仅当你在扩展设置中<strong className="text-foreground">主动配置同步令牌（Sync Token）</strong>后，数据才会同步至你的 Attune 账户。同步功能完全可选，随时可以关闭或撤销。
           </p>
           <Item>
             云端数据存储在你的个人 Supabase 数据库实例中，与其他用户数据严格隔离。
@@ -116,7 +116,7 @@ export default function PrivacyPage() {
         </Section>
 
         <Section title="四、数据如何使用 — How We Use Data">
-          <Item>生成你的每日、每周浏览时间统计，展示在 ToDay 仪表盘上。</Item>
+          <Item>生成你的每日、每周浏览时间统计，展示在 Attune 仪表盘上。</Item>
           <Item>为 Echo AI 提供上下文，生成个性化的习惯洞察和生活建议。</Item>
           <Item>识别使用模式，帮助你优化数字生活习惯。</Item>
           <p>
@@ -143,7 +143,7 @@ export default function PrivacyPage() {
         <Section title="六、你的权利 — Your Rights">
           <p>你对自己的数据拥有完整控制权：</p>
           <Item>
-            <strong className="text-foreground">查看（Access）</strong>：在 ToDay 仪表盘随时查看所有已同步的浏览记录。
+            <strong className="text-foreground">查看（Access）</strong>：在 Attune 仪表盘随时查看所有已同步的浏览记录。
           </Item>
           <Item>
             <strong className="text-foreground">导出（Export）</strong>：在账户设置页导出完整数据（JSON 格式）。
@@ -158,7 +158,7 @@ export default function PrivacyPage() {
 
         <Section title="七、Chrome 扩展权限说明 — Extension Permissions">
           <p>
-            ToDay 扩展在 Chrome Web Store 审核时声明了以下权限，以下是每项权限的用途说明：
+            Attune 扩展在 Chrome Web Store 审核时声明了以下权限，以下是每项权限的用途说明：
           </p>
           <Item>
             <code className="bg-muted px-1 rounded text-xs font-mono">tabs</code>
@@ -184,7 +184,7 @@ export default function PrivacyPage() {
 
         <Section title="八、儿童隐私 — Children's Privacy">
           <p>
-            ToDay 服务不面向 13 岁以下儿童（美国 COPPA 标准）或 14 岁以下儿童（中国《个人信息保护法》标准）。我们不会故意收集未成年人的个人信息。
+            Attune 服务不面向 13 岁以下儿童（美国 COPPA 标准）或 14 岁以下儿童（中国《个人信息保护法》标准）。我们不会故意收集未成年人的个人信息。
           </p>
         </Section>
 
@@ -199,7 +199,7 @@ export default function PrivacyPage() {
             如你对本隐私政策有任何疑问，或希望行使上述权利，请通过以下方式联系我们：
           </p>
           <div className="mt-2 p-4 rounded-xl bg-card border border-border/30">
-            <p className="text-foreground font-medium mb-1">ToDay 团队</p>
+            <p className="text-foreground font-medium mb-1">Attune 团队</p>
             <p>
               邮箱：
               <a
@@ -228,7 +228,7 @@ export default function PrivacyPage() {
       <footer className="border-t border-border/40 py-8">
         <div className="max-w-2xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-xs text-muted-foreground">
-            © 2026 ToDay. All rights reserved.
+            © 2026 Attune. All rights reserved.
           </p>
           <div className="flex gap-4 text-xs text-muted-foreground">
             <Link href="/privacy" className="hover:text-foreground transition-colors font-medium text-foreground/70">
