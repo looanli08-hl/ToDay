@@ -406,6 +406,7 @@ async function evaluateProactiveTrigger() {
           totalVideosToday: videos.length,
           skippedCount: videos.filter((v) => v.skipped).length,
           isFirstObservation: true,
+          lang: navigator.language || "en",
         }),
       });
 
@@ -454,6 +455,7 @@ async function evaluateProactiveTrigger() {
         recentVideos: videos.slice(-10),
         totalVideosToday: videos.length,
         skippedCount: videos.filter((v) => v.skipped).length,
+        lang: navigator.language || "en",
       }),
     });
 

@@ -1,7 +1,13 @@
 // ─── Attune Side Panel Controller ───
 
 const DEFAULT_API_BASE = "https://daycho.com";
-const WELCOME_MESSAGE = "Hey \u2014 I'm Echo. I just got here, so I don't know you yet. Go do your thing, I'll be watching. Give me a few videos and I'll start to get a sense of you.";
+function getWelcomeMessage() {
+  const lang = navigator.language || "en";
+  if (lang.startsWith("zh")) {
+    return "嘿，我是 Echo。刚到这儿，还不了解你。你先随便逛，我在旁边看着。刷几个视频我就开始有感觉了。";
+  }
+  return "Hey \u2014 I'm Echo. I just got here, so I don't know you yet. Go do your thing, I'll be watching. Give me a few videos and I'll start to get a sense of you.";
+}
 const MAX_STORED_MESSAGES = 100;
 
 // ─── State ───
@@ -159,7 +165,7 @@ async function handleConnect() {
 
   // Add welcome message on first connect
   if (state.messages.length === 0) {
-    addEchoMessage(WELCOME_MESSAGE);
+    addEchoMessage(getWelcomeMessage());
   }
 
   showChat();
@@ -241,6 +247,7 @@ async function streamEchoResponse(userText) {
   const body = {
     message: userText,
     context: state.currentContext || undefined,
+    lang: navigator.language || "en",
   };
 
   const res = await fetch(apiUrl, {

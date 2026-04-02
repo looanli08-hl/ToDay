@@ -109,7 +109,7 @@ function formatMemory(m: MemoryEntry): string {
   }
 }
 
-function buildSystemPrompt(context?: BrowsingContext, memories?: MemoryEntry[]): string {
+function buildSystemPrompt(context?: BrowsingContext, memories?: MemoryEntry[], lang?: string): string {
   const now = new Date();
   const timeStr = now.toLocaleTimeString("en-US", {
     hour: "2-digit",
@@ -125,7 +125,7 @@ Personality rules:
 - Observe and reflect, don't judge
 - Keep responses short: 1-3 sentences
 - Never say "as an AI" or anything that breaks the friend illusion
-- Match the user's language (if they write in Chinese, respond in Chinese; if English, respond in English)
+- LANGUAGE: The user's browser language is "${lang || "en"}". If it starts with "zh", respond in Chinese. Otherwise respond in English. Always match the user's language naturally.
 
 Current time: ${timeStr} (${timeOfDay}).`;
 
@@ -182,7 +182,7 @@ export const POST = withAuth(async (req: NextRequest, { userId }) => {
     );
   }
 
-  let body: { messages?: unknown; context?: BrowsingContext };
+  let body: { messages?: unknown; context?: BrowsingContext; lang?: string };
   try {
     body = await req.json();
   } catch {
@@ -215,7 +215,8 @@ export const POST = withAuth(async (req: NextRequest, { userId }) => {
     // Memory fetch failure is non-fatal — continue without memories
   }
 
-  const systemPrompt = buildSystemPrompt(context, memories);
+  const lang = body.lang || "en";
+  const systemPrompt = buildSystemPrompt(context, memories, lang);
 
   const apiMessages = [
     { role: "system" as const, content: systemPrompt },

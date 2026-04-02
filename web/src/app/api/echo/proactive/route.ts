@@ -18,6 +18,7 @@ interface ProactiveRequest {
   totalVideosToday: number;
   skippedCount: number;
   isFirstObservation?: boolean;
+  lang?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -38,6 +39,8 @@ Their recent videos:
 ${videoList}
 
 Generate ONE short, natural comment (1 sentence, max 100 characters). You're making a first impression — be curious, warm, maybe a little playful. Show you noticed something interesting about their taste.
+
+IMPORTANT: Respond in the language indicated by the lang field. If lang starts with "zh", respond in Chinese. Otherwise respond in English.
 
 Good examples:
 - "Okay I already like your taste in videos"
@@ -67,6 +70,8 @@ Recent videos:
 ${videoList}
 
 Generate ONE short, natural comment (1 sentence, max 100 characters). Sound like a real friend — not an AI, not a life coach, not a notification.
+
+IMPORTANT: Respond in the language indicated by the lang field. If lang starts with "zh", respond in Chinese. Otherwise respond in English.
 
 Good examples:
 - "You really can't resist Fireship videos, can you"
