@@ -100,6 +100,15 @@ async function heartbeat() {
     const now = Date.now();
     const todayKey = new Date().toISOString().split("T")[0];
 
+    // Track search queries
+    const search = extractSearchQuery(url);
+    if (search) {
+      tabBehavior.searches.push(search);
+      if (tabBehavior.searches.length > 50) {
+        tabBehavior.searches = tabBehavior.searches.slice(-50);
+      }
+    }
+
     if (state.currentSession && state.currentSession.domain === domain) {
       const gap = now - state.currentSession.endTime;
       if (gap > 5 * 60 * 1000) {
@@ -112,11 +121,13 @@ async function heartbeat() {
         }
         await saveState({ currentSession: state.currentSession });
       }
+      broadcastContext();
       return;
     }
 
     await closeCurrentSession("switch");
     await startNewSession({ domain, label, category, title, now, todayKey, state });
+    broadcastContext();
   } catch (e) {
     console.error("[Attune] Heartbeat error:", e);
   }
@@ -257,6 +268,34 @@ async function cleanup() {
   await saveState({ sessions: cleaned, lastSyncedCount: cleanedCount });
 }
 
+// ─── Search Keyword Extraction ───
+
+function extractSearchQuery(url) {
+  try {
+    const parsed = new URL(url);
+    const params = parsed.searchParams;
+    const queryKeys = ["q", "query", "wd", "keyword"];
+    for (const key of queryKeys) {
+      const value = params.get(key);
+      if (value) {
+        return { engine: parsed.hostname.replace(/^www\./, ""), query: value };
+      }
+    }
+  } catch {
+    // Invalid URL — ignore
+  }
+  return null;
+}
+
+// ─── Tab Behavior Tracking ───
+
+let tabBehavior = {
+  switchCount: 0,
+  lastSwitchTime: 0,
+  openTabCount: 0,
+  searches: [],
+};
+
 // ─── Alarms ───
 
 chrome.alarms.create("heartbeat", { periodInMinutes: HEARTBEAT_INTERVAL / 60 });
@@ -269,7 +308,17 @@ chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === "cleanup") cleanup();
 });
 
-chrome.tabs.onActivated.addListener(() => heartbeat());
+chrome.tabs.onActivated.addListener(async () => {
+  tabBehavior.switchCount++;
+  tabBehavior.lastSwitchTime = Date.now();
+  try {
+    const tabs = await chrome.tabs.query({ currentWindow: true });
+    tabBehavior.openTabCount = tabs.length;
+  } catch {
+    // Query failed — keep previous count
+  }
+  heartbeat();
+});
 chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
   if (changeInfo.status === "complete") heartbeat();
 });
@@ -292,6 +341,12 @@ function respondWithContext() {
   const current = youtubeState.currentVideo;
   const recentVideos = youtubeState.videosThisSession.slice(-10);
 
+  const tabContext = {
+    tabSwitchCount: tabBehavior.switchCount,
+    openTabs: tabBehavior.openTabCount,
+    recentSearches: tabBehavior.searches.slice(-5).map((s) => s.query),
+  };
+
   const context = current
     ? {
         type: "youtube",
@@ -304,8 +359,9 @@ function respondWithContext() {
         paused: current.paused,
         url: current.url,
         recentVideos,
+        ...tabContext,
       }
-    : null;
+    : tabContext;
 
   chrome.runtime
     .sendMessage({ type: "context_update", data: context })
