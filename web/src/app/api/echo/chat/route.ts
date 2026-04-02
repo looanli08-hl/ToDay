@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { withAuth } from "@/lib/api/auth";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 const DEEPSEEK_URL = "https://api.deepseek.com/chat/completions";
 
@@ -68,6 +69,16 @@ interface BrowsingContext {
 }
 
 // ---------------------------------------------------------------------------
+// Memory types
+// ---------------------------------------------------------------------------
+
+interface MemoryEntry {
+  memory_type: string;
+  content: Record<string, unknown>;
+  updated_at: string;
+}
+
+// ---------------------------------------------------------------------------
 // System Prompt Builder
 // ---------------------------------------------------------------------------
 
@@ -80,7 +91,25 @@ function getTimeOfDay(hour: number): string {
   return "late night";
 }
 
-function buildSystemPrompt(context?: BrowsingContext): string {
+function formatMemory(m: MemoryEntry): string {
+  const c = m.content;
+  switch (m.memory_type) {
+    case "interest":
+      return `Interested in: ${c.topic ?? "unknown"}${c.depth ? ` (level: ${c.depth})` : ""}`;
+    case "personality":
+      return `Personality: ${c.trait ?? JSON.stringify(c)}`;
+    case "pattern":
+      return `Pattern: ${c.description ?? JSON.stringify(c)}`;
+    case "event":
+      return `Notable: ${c.description ?? JSON.stringify(c)}`;
+    case "note":
+      return `Note: ${c.text ?? JSON.stringify(c)}`;
+    default:
+      return `${m.memory_type}: ${JSON.stringify(c)}`;
+  }
+}
+
+function buildSystemPrompt(context?: BrowsingContext, memories?: MemoryEntry[]): string {
   const now = new Date();
   const timeStr = now.toLocaleTimeString("en-US", {
     hour: "2-digit",
@@ -99,6 +128,15 @@ Personality rules:
 - Match the user's language (if they write in Chinese, respond in Chinese; if English, respond in English)
 
 Current time: ${timeStr} (${timeOfDay}).`;
+
+  // Inject memories
+  if (memories && memories.length > 0) {
+    prompt += `\n\nWHAT YOU KNOW ABOUT THIS USER:`;
+    for (const m of memories) {
+      prompt += `\n- ${formatMemory(m)}`;
+    }
+    prompt += `\n\nUse this knowledge naturally. Don't list facts. Weave them into conversation like a friend who just knows these things about them.`;
+  }
 
   if (!context) return prompt;
 
@@ -135,7 +173,7 @@ Current time: ${timeStr} (${timeOfDay}).`;
 // Route handler
 // ---------------------------------------------------------------------------
 
-export const POST = withAuth(async (req: NextRequest) => {
+export const POST = withAuth(async (req: NextRequest, { userId }) => {
   const apiKey = process.env.DEEPSEEK_API_KEY;
   if (!apiKey) {
     return Response.json(
@@ -160,7 +198,24 @@ export const POST = withAuth(async (req: NextRequest) => {
     );
   }
 
-  const systemPrompt = buildSystemPrompt(context);
+  // Fetch user memories from Supabase
+  let memories: MemoryEntry[] | undefined;
+  try {
+    const supabase = await createServerSupabaseClient();
+    const { data } = await supabase
+      .from("echo_memory")
+      .select("memory_type, content, updated_at")
+      .eq("user_id", userId)
+      .order("updated_at", { ascending: false })
+      .limit(20);
+    if (data && data.length > 0) {
+      memories = data as MemoryEntry[];
+    }
+  } catch {
+    // Memory fetch failure is non-fatal — continue without memories
+  }
+
+  const systemPrompt = buildSystemPrompt(context, memories);
 
   const apiMessages = [
     { role: "system" as const, content: systemPrompt },
