@@ -30,7 +30,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Summary text references actual place names and activities from the user's recorded day (not generic filler)
   4. Summary tone is observational — it describes what happened, never tells the user what they should do
   5. Cloud AI calls pass through AIProxy; per-user daily rate limit prevents cost runaway
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — Add AIProxySwift package and create AnthropicAIProvider
+- [ ] 01-02-PLAN.md — Remove hardcoded key, wire provider, configure AIProxy, add tone guard
+- [ ] 01-03-PLAN.md — Binary strings verification and user credential checkpoint
 
 ### Phase 2: Onboarding and First Visible AI
 **Goal**: A new user can install the app, grant Always Location, see their day record, and read their AI insight — all within the first session
@@ -85,7 +90,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Security and AI Pipeline | 0/TBD | Not started | - |
+| 1. Security and AI Pipeline | 0/3 | Not started | - |
 | 2. Onboarding and First Visible AI | 0/TBD | Not started | - |
 | 3. Timeline and Recording Polish | 0/TBD | Not started | - |
 | 4. Pattern Recognition and Proactive Push | 0/TBD | Not started | - |
