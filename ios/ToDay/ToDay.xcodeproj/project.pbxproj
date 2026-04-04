@@ -49,6 +49,7 @@
 		3671BDB36ED0522EB78A2271 /* EchoMemoryEntities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72FA29C77F8847333AECE124 /* EchoMemoryEntities.swift */; };
 		36F6CEEC726A05A87B5DB4E6 /* DashboardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B53F7EA6F669B4A9EE7680B1 /* DashboardViewModel.swift */; };
 		374BB5B8024D43DEEB781C2D /* EchoDailySummaryGeneratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F90D7BD80D380B9E483FF65 /* EchoDailySummaryGeneratorTests.swift */; };
+		3DB938748A08ECE8E68EDB47 /* OnboardingViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B12ADD36D97D353B3D887DD /* OnboardingViewTests.swift */; };
 		3EDD590CF25E429FB8186758 /* ToDayApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCCD453022FB7D3DE28EDE60 /* ToDayApp.swift */; };
 		3F544FD16B219E34BB08C7F3 /* ManagedSettings.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DF6A95A9011E79D975662199 /* ManagedSettings.framework */; };
 		3FD248DEB5BDF808804ABA6C /* PhotoService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A50CAC68CF65C166C6C84DED /* PhotoService.swift */; };
@@ -203,6 +204,7 @@
 		19F6F718AF60064D8B59E602 /* NewEventKindTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewEventKindTests.swift; sourceTree = "<group>"; };
 		1A7313E34ABE1036CAEC076F /* TodayTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayTheme.swift; sourceTree = "<group>"; };
 		1AFD9404013D3FA99D633AC6 /* ShutterTextComposer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShutterTextComposer.swift; sourceTree = "<group>"; };
+		1B12ADD36D97D353B3D887DD /* OnboardingViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewTests.swift; sourceTree = "<group>"; };
 		1C29581A49B2103DA33AEBA1 /* EchoDailyInsightCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoDailyInsightCard.swift; sourceTree = "<group>"; };
 		1F90D7BD80D380B9E483FF65 /* EchoDailySummaryGeneratorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoDailySummaryGeneratorTests.swift; sourceTree = "<group>"; };
 		1FEC7FAC9DA97A938455A2C5 /* EchoMemoryManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoMemoryManagerTests.swift; sourceTree = "<group>"; };
@@ -594,6 +596,7 @@
 				B200FA9169D89E482820B450 /* LocationCollectorTests.swift */,
 				20B7C51F662EC14C9F7E96DC /* MotionCollectorTests.swift */,
 				19F6F718AF60064D8B59E602 /* NewEventKindTests.swift */,
+				1B12ADD36D97D353B3D887DD /* OnboardingViewTests.swift */,
 				3373AE9894FB26E97C58C1FA /* PedometerCollectorTests.swift */,
 				BBFA94CCF4D730B27A3ADECE /* PhoneInferenceEngineTests.swift */,
 				FA0CD7C3B25332C37FAC3859 /* PhoneTimelineDataProviderTests.swift */,
@@ -1021,6 +1024,7 @@
 				C73B5E5049C1FE5A70D5CF6F /* LocationCollectorTests.swift in Sources */,
 				912B401A1F125E4E3745F5C6 /* MotionCollectorTests.swift in Sources */,
 				59A62671AC37416B6921E436 /* NewEventKindTests.swift in Sources */,
+				3DB938748A08ECE8E68EDB47 /* OnboardingViewTests.swift in Sources */,
 				5AE1B8C4C97B3FDD1AC06675 /* PedometerCollectorTests.swift in Sources */,
 				6632D141410E33E7CE3039C4 /* PhoneInferenceEngineTests.swift in Sources */,
 				4D23057BD49E8F3BF5B43BF4 /* PhoneTimelineDataProviderTests.swift in Sources */,
@@ -1085,10 +1089,10 @@
 				INFOPLIST_KEY_NSCameraUsageDescription = "ToDay 使用相机拍摄照片和视频，快速记录生活碎片。媒体文件仅存储在本地。";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "ToDay 读取你的运动、心率和睡眠数据，用来生成每日生活画卷。所有数据仅存储在本地。";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "ToDay 不会写入任何健康数据，此权限仅用于满足系统要求。";
-				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "用于自动记录你的位置变化和常去地点，即使 App 在后台也能记录";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "ToDay 记录你到访过的地点，让画卷上的事件有地理上下文。位置数据仅存储在本地。";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Unfold passively records your location visits throughout the day to build your life timeline automatically, even when the app is closed. Always authorization is required for background recording.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Unfold uses your location to record places you visit and build your daily life timeline. Without location access, the timeline cannot be generated.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "ToDay 使用麦克风录制语音备忘，帮你用最少的操作捕捉灵感。录音仅存储在本地。";
-				INFOPLIST_KEY_NSMotionUsageDescription = "用于识别你的运动状态（步行、跑步、骑车等），自动记录你的活动";
+				INFOPLIST_KEY_NSMotionUsageDescription = "Unfold uses motion activity to detect whether you are walking, running, or commuting, making your daily timeline more accurate and complete.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "ToDay 读取你当天拍摄的照片，将它们匹配到画卷中对应的事件。照片不会上传。";
 				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "ToDay 使用语音识别将你的录音转为文字，方便在时间线上快速浏览。识别在设备上完成。";
 				INFOPLIST_KEY_UIBackgroundModes = "fetch processing";
@@ -1176,10 +1180,10 @@
 				INFOPLIST_KEY_NSCameraUsageDescription = "ToDay 使用相机拍摄照片和视频，快速记录生活碎片。媒体文件仅存储在本地。";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "ToDay 读取你的运动、心率和睡眠数据，用来生成每日生活画卷。所有数据仅存储在本地。";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "ToDay 不会写入任何健康数据，此权限仅用于满足系统要求。";
-				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "用于自动记录你的位置变化和常去地点，即使 App 在后台也能记录";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "ToDay 记录你到访过的地点，让画卷上的事件有地理上下文。位置数据仅存储在本地。";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Unfold passively records your location visits throughout the day to build your life timeline automatically, even when the app is closed. Always authorization is required for background recording.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Unfold uses your location to record places you visit and build your daily life timeline. Without location access, the timeline cannot be generated.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "ToDay 使用麦克风录制语音备忘，帮你用最少的操作捕捉灵感。录音仅存储在本地。";
-				INFOPLIST_KEY_NSMotionUsageDescription = "用于识别你的运动状态（步行、跑步、骑车等），自动记录你的活动";
+				INFOPLIST_KEY_NSMotionUsageDescription = "Unfold uses motion activity to detect whether you are walking, running, or commuting, making your daily timeline more accurate and complete.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "ToDay 读取你当天拍摄的照片，将它们匹配到画卷中对应的事件。照片不会上传。";
 				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "ToDay 使用语音识别将你的录音转为文字，方便在时间线上快速浏览。识别在设备上完成。";
 				INFOPLIST_KEY_UIBackgroundModes = "fetch processing";

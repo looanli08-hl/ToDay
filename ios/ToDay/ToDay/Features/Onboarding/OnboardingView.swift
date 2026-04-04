@@ -222,9 +222,7 @@ struct OnboardingView: View {
                 .frame(height: 12)
 
             Button("稍后设置") {
-                withAnimation {
-                    step = .smartRecording
-                }
+                onComplete()
             }
             .font(.system(size: 14))
             .foregroundStyle(Color(UIColor.tertiaryLabel))
