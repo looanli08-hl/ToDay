@@ -69,6 +69,10 @@ final class PhoneTimelineDataProvider: TimelineDataProviding, @unchecked Sendabl
             }
         }
 
+        // 4b. Reclassify places (home/work/frequent) and resolve unnamed ones via geocoding
+        placeManager.reclassifyPlaces()
+        await placeManager.resolveUnnamedPlaces()
+
         // 5. Infer events from all stored readings
         let knownPlaces = placeManager.allPlaces
         let events = inferenceEngine.inferEvents(
@@ -133,7 +137,7 @@ final class PhoneTimelineDataProvider: TimelineDataProviding, @unchecked Sendabl
 
     private func buildSummary(events: [InferredEvent], date: Date) -> String {
         if events.isEmpty {
-            return "今天还没有记录到活动，继续使用 ToDay 后会自动感知你的一天。"
+            return "今天还没有记录到活动，带上手机出门后会自动感知你的一天。"
         }
 
         let kinds = Set(events.map(\.kind))

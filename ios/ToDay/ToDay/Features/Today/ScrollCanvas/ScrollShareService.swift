@@ -27,7 +27,7 @@ private struct ScrollShareSnapshotView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
-            Text("由 ToDay 生成 · \(watermarkDate)")
+            Text("由 Unfold 生成 · \(watermarkDate)")
                 .font(.system(size: 11, weight: .medium))
                 .foregroundStyle(Color(UIColor.tertiaryLabel).opacity(0.78))
                 .frame(maxWidth: .infinity, alignment: .trailing)

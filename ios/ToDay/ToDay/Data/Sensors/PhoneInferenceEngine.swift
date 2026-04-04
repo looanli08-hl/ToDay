@@ -426,11 +426,19 @@ final class PhoneInferenceEngine {
 
     private func findPlace(latitude: Double, longitude: Double, in places: [KnownPlace]) -> String? {
         let target = CLLocation(latitude: latitude, longitude: longitude)
-        let match = places.first { place in
+        guard let match = places.first(where: { place in
             let loc = CLLocation(latitude: place.latitude, longitude: place.longitude)
             return target.distance(from: loc) < max(place.radius, Threshold.placeMatchRadius)
+        }) else { return nil }
+
+        // Return user/geocoded name, or fall back to category label
+        if let name = match.name { return name }
+        switch match.category {
+        case .home: return "家"
+        case .work: return "公司"
+        case .frequent: return "常去的地方"
+        case .visited: return nil
         }
-        return match?.name
     }
 
     private func mergeConsecutiveEvents(_ events: [InferredEvent]) -> [InferredEvent] {

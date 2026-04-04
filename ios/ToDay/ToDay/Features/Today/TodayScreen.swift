@@ -262,7 +262,7 @@ struct TodayScreen: View {
     private var emptyStateCard: some View {
         ContentCard {
             VStack(spacing: 16) {
-                Image(systemName: "applewatch.and.arrow.forward")
+                Image(systemName: "location.circle")
                     .font(.system(size: 36))
                     .foregroundStyle(Color(UIColor.quaternaryLabel))
 
@@ -271,7 +271,7 @@ struct TodayScreen: View {
                     .italic()
                     .foregroundStyle(.primary)
 
-                Text("戴上 Apple Watch 活动一会儿，心率、步数和运动数据会自动填入时间轴。你也可以先用下方的「记录此刻」手动打点。")
+                Text("带着手机出门走走，位置和活动数据会自动填入时间轴。你也可以先用下方的「记录此刻」手动打点。")
                     .font(.system(size: 14))
                     .foregroundStyle(Color(UIColor.tertiaryLabel))
                     .multilineTextAlignment(.center)

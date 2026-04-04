@@ -1,21 +1,29 @@
 import CoreLocation
-import HealthKit
+import CoreMotion
 import SwiftUI
 
 struct OnboardingView: View {
     let onComplete: () -> Void
+
+    @State private var locationStatus: PermissionStatus = .pending
+    @State private var motionStatus: PermissionStatus = .pending
+    @State private var currentStep = 0
+
+    private enum PermissionStatus {
+        case pending, granted, denied
+    }
 
     var body: some View {
         VStack(spacing: 0) {
             Spacer()
 
             VStack(spacing: 12) {
-                Text("ToDay")
+                Text("Unfold")
                     .font(.system(size: 42, weight: .regular, design: .serif))
                     .italic()
                     .foregroundStyle(.primary)
 
-                Text("把每一天变成可见的故事")
+                Text("Your day, unfolded.")
                     .font(.system(size: 16))
                     .foregroundStyle(Color(UIColor.tertiaryLabel))
             }
@@ -25,22 +33,20 @@ struct OnboardingView: View {
 
             VStack(spacing: 14) {
                 permissionRow(
-                    icon: "heart.fill",
-                    iconColor: TodayTheme.rose,
-                    title: "健康数据",
-                    detail: "读取心率、步数、睡眠和运动，自动生成每日时间轴。"
-                )
-                permissionRow(
                     icon: "location.fill",
                     iconColor: TodayTheme.teal,
                     title: "位置信息",
-                    detail: "记录到访地点，让事件有地理上下文。"
+                    detail: "自动记录你到过的地方和停留时间，零操作生成一天的轨迹。",
+                    status: locationStatus,
+                    step: 0
                 )
                 permissionRow(
-                    icon: "photo.fill",
-                    iconColor: Color.accentColor,
-                    title: "照片库",
-                    detail: "匹配当天拍的照片到对应事件。"
+                    icon: "figure.walk",
+                    iconColor: TodayTheme.rose,
+                    title: "运动与健身",
+                    detail: "感知走路、跑步、通勤等活动，让时间轴更完整。",
+                    status: motionStatus,
+                    step: 1
                 )
             }
             .padding(.horizontal, 24)
@@ -56,7 +62,7 @@ struct OnboardingView: View {
 
             Button {
                 Task {
-                    await requestAllPermissions()
+                    await requestPermissions()
                     onComplete()
                 }
             } label: {
@@ -85,7 +91,9 @@ struct OnboardingView: View {
         icon: String,
         iconColor: Color,
         title: String,
-        detail: String
+        detail: String,
+        status: PermissionStatus,
+        step: Int
     ) -> some View {
         HStack(spacing: 14) {
             Image(systemName: icon)
@@ -96,9 +104,17 @@ struct OnboardingView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(title)
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundStyle(.primary)
+                HStack(spacing: 6) {
+                    Text(title)
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(.primary)
+
+                    if status == .granted {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.system(size: 13))
+                            .foregroundStyle(.green)
+                    }
+                }
 
                 Text(detail)
                     .font(.system(size: 13))
@@ -113,27 +129,40 @@ struct OnboardingView: View {
         .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .stroke(Color(UIColor.separator), lineWidth: 0.5)
+                .stroke(status == .granted ? Color.green.opacity(0.3) : Color(UIColor.separator), lineWidth: 0.5)
         )
     }
 
-    private func requestAllPermissions() async {
-        if HKHealthStore.isHealthDataAvailable() {
-            let store = HKHealthStore()
-            let types = Set([
-                HKObjectType.quantityType(forIdentifier: .heartRate),
-                HKObjectType.quantityType(forIdentifier: .stepCount),
-                HKObjectType.quantityType(forIdentifier: .activeEnergyBurned),
-                HKObjectType.categoryType(forIdentifier: .sleepAnalysis),
-                HKObjectType.workoutType(),
-                HKObjectType.activitySummaryType()
-            ]
-            .compactMap { $0 })
-
-            try? await store.requestAuthorization(toShare: [], read: types)
-        }
-
+    private func requestPermissions() async {
+        // 1. Location — request "Always" for background tracking
         let locationManager = CLLocationManager()
-        locationManager.requestAlwaysAuthorization()
+        let locStatus = locationManager.authorizationStatus
+        if locStatus == .notDetermined {
+            locationManager.requestAlwaysAuthorization()
+            // Give time for the system dialog
+            try? await Task.sleep(for: .milliseconds(500))
+        }
+        let updatedLocStatus = locationManager.authorizationStatus
+        locationStatus = (updatedLocStatus == .authorizedAlways || updatedLocStatus == .authorizedWhenInUse)
+            ? .granted : (updatedLocStatus == .denied ? .denied : .pending)
+
+        // 2. Motion — triggers the system permission dialog
+        let motionManager = CMMotionActivityManager()
+        if CMMotionActivityManager.isActivityAvailable() {
+            await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+                motionManager.queryActivityStarting(
+                    from: Date().addingTimeInterval(-3600),
+                    to: Date(),
+                    to: .main
+                ) { _, error in
+                    if error != nil {
+                        Task { @MainActor in motionStatus = .denied }
+                    } else {
+                        Task { @MainActor in motionStatus = .granted }
+                    }
+                    continuation.resume()
+                }
+            }
+        }
     }
 }

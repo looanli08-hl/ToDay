@@ -215,7 +215,7 @@ struct SettingsView: View {
                 // MARK: - Footer Version
                 Section {
                 } footer: {
-                    Text("ToDay v\(versionText)")
+                    Text("Unfold v\(versionText)")
                         .frame(maxWidth: .infinity, alignment: .center)
                 }
             }
@@ -392,7 +392,7 @@ private struct DataExplanationView: View {
             Section {
                 Text(
                     """
-                    ToDay 的所有数据（健康、位置、照片）仅存储在你的设备本地。
+                    Unfold 的所有数据（位置、活动）仅存储在你的设备本地。
 
                     我们不上传、不收集、不分享任何个人数据。
 

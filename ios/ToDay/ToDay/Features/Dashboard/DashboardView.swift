@@ -75,7 +75,7 @@ struct DashboardView: View {
 
     private var headerSection: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text("ToDay")
+            Text("Unfold")
                 .font(.system(size: 14, weight: .medium))
                 .foregroundStyle(AppColor.labelSecondary)
                 .tracking(2)
@@ -277,7 +277,7 @@ struct DashboardView: View {
                     .font(.body.weight(.medium))
                     .foregroundStyle(AppColor.labelSecondary)
 
-                Text("戴上 Apple Watch 活动一会儿，或用快门记录生活碎片。")
+                Text("带着手机出门活动一会儿，或用快门记录生活碎片。")
                     .font(.subheadline)
                     .foregroundStyle(AppColor.labelTertiary)
                     .multilineTextAlignment(.center)

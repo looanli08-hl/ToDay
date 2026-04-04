@@ -58,7 +58,7 @@ struct TodayInsightComposer {
 
             return TodayInsightSummary(
                 headline: "今天还没有形成你的个人总结",
-                narrative: "先记下一次情绪、一个事件或一句备注，ToDay 才会从“发生了什么”开始过渡到“今天像什么”。",
+                narrative: "先记下一次情绪、一个事件或一句备注，才会从「发生了什么」开始过渡到「今天像什么」。",
                 badges: badges
             )
         }
@@ -120,7 +120,7 @@ struct TodayInsightComposer {
         if totalRecords == 0 {
             return WeeklyInsightSummary(
                 headline: "连续洞察会从最近 7 天开始长出来",
-                narrative: "当你开始持续记录，ToDay 会逐渐告诉你最近一周更像在恢复、推进、拉扯还是漂浮。",
+                narrative: "当你开始持续记录，会逐渐告诉你最近一周更像在恢复、推进、拉扯还是漂浮。",
                 badges: ["0/7 活跃天", "等待记录", "连续回看会逐渐成形"]
             )
         }

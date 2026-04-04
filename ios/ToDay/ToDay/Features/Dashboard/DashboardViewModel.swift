@@ -64,7 +64,7 @@ struct DashboardViewModel {
         }
 
         if parts.isEmpty {
-            return "今天还没有可展示的维度数据，戴上 Apple Watch 活动一下吧。"
+            return "今天还没有可展示的维度数据，带着手机出门活动一下吧。"
         }
 
         let entryCount = timeline.entries.count
