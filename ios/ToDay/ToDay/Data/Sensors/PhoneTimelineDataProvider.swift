@@ -52,8 +52,18 @@ final class PhoneTimelineDataProvider: TimelineDataProviding, @unchecked Sendabl
         }
 
         // 3. Read all stored readings for the date from store
-        let allReadings = try await MainActor.run {
+        var allReadings = try await MainActor.run {
             try store.readings(for: date)
+        }
+
+        // 3b. Retroactive fill: if stored motion data is sparse, query sensors directly
+        // This ensures timelines are populated even if background tasks didn't run
+        if allReadings.filter({ $0.sensorType == .motion }).isEmpty {
+            let retroReadings = try await retroactiveCollect(for: date)
+            if !retroReadings.isEmpty {
+                try await MainActor.run { try store.save(retroReadings) }
+                allReadings = try await MainActor.run { try store.readings(for: date) }
+            }
         }
 
         // 4. Update PlaceManager with visit data extracted from location readings
@@ -93,6 +103,28 @@ final class PhoneTimelineDataProvider: TimelineDataProviding, @unchecked Sendabl
             stats: stats,
             entries: events
         )
+    }
+
+    // MARK: - Retroactive Collection
+
+    /// Retroactively queries CoreMotion and Pedometer for historical data.
+    /// iOS stores ~7 days of motion/pedometer data natively.
+    private func retroactiveCollect(for date: Date) async throws -> [SensorReading] {
+        var readings: [SensorReading] = []
+        for collector in collectors {
+            guard collector.isAvailable else { continue }
+            let type = collector.sensorType
+            // Only motion, pedometer, and healthKit support retroactive queries
+            // Location and DeviceState are real-time event-based
+            guard type == .motion || type == .pedometer || type == .healthKit else { continue }
+            do {
+                let data = try await collector.collectData(for: date)
+                readings.append(contentsOf: data)
+            } catch {
+                print("[PhoneTimelineDataProvider] Retroactive \(type) failed: \(error)")
+            }
+        }
+        return readings
     }
 
     // MARK: - Helpers

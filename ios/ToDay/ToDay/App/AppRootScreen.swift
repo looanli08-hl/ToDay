@@ -66,8 +66,10 @@ struct AppRootScreen: View {
                 }
                 .tint(.accentColor)
 
-                // Center "+" button overlaying the tab bar
-                centerButton
+                // Center "+" button overlaying the tab bar (hidden on Echo tab to avoid blocking chat input)
+                if selectedTab != .echo {
+                    centerButton
+                }
             }
             .sheet(isPresented: $showRecordSheet, onDismiss: {
                 guard let action = pendingAction else { return }

@@ -25,7 +25,9 @@ final class MotionCollector: SensorCollecting, @unchecked Sendable {
                     continuation.resume(throwing: error)
                     return
                 }
-                let readings = (activities ?? []).map { activity -> SensorReading in
+                let sortedActivities = (activities ?? []).sorted { $0.startDate < $1.startDate }
+                var readings: [SensorReading] = []
+                for (i, activity) in sortedActivities.enumerated() {
                     let motionActivity = Self.mapActivity(
                         stationary: activity.stationary,
                         walking: activity.walking,
@@ -34,11 +36,16 @@ final class MotionCollector: SensorCollecting, @unchecked Sendable {
                         cycling: activity.cycling
                     )
                     let confidence = Self.mapConfidence(activity.confidence.rawValue)
-                    return SensorReading(
+                    // Use the next activity's start as this one's end
+                    let endTime: Date? = (i + 1 < sortedActivities.count)
+                        ? sortedActivities[i + 1].startDate
+                        : nil
+                    readings.append(SensorReading(
                         sensorType: .motion,
                         timestamp: activity.startDate,
+                        endTimestamp: endTime,
                         payload: .motion(activity: motionActivity, confidence: confidence)
-                    )
+                    ))
                 }
                 continuation.resume(returning: readings)
             }

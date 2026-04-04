@@ -1,4 +1,5 @@
 import PhotosUI
+import SwiftData
 import SwiftUI
 import UIKit
 
@@ -11,7 +12,11 @@ struct QuickRecordSheet: View {
     private static let maxPhotoCount = 3
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
+    @Query(sort: \CustomMoodEntity.sortOrder) private var customMoods: [CustomMoodEntity]
+
     @State private var selectedMood: MoodRecord.Mood?
+    @State private var selectedCustomMood: CustomMoodEntity?
     @State private var note: String = ""
     @State private var createdAt: Date = Date()
     @State private var isSubmitting = false
@@ -19,6 +24,10 @@ struct QuickRecordSheet: View {
     @State private var draftPhotos: [DraftPhoto] = []
     @State private var selectedDetent: PresentationDetent = .large
     @State private var photoErrorMessage: String?
+    @State private var showAddMood = false
+    @State private var newMoodEmoji = ""
+    @State private var newMoodName = ""
+    @State private var isEditingMoods = false
 
     let mode: QuickRecordSheetMode
     let onSave: (MoodRecord) -> Void
@@ -76,15 +85,35 @@ struct QuickRecordSheet: View {
         dismiss()
     }
 
+    private var resolvedMood: MoodRecord.Mood? {
+        if let selectedMood { return selectedMood }
+        guard let custom = selectedCustomMood else { return nil }
+        // Try to match custom mood name to an existing enum case
+        return MoodRecord.Mood(rawValue: custom.name) ?? .happy
+    }
+
+    private var hasSelection: Bool {
+        selectedMood != nil || selectedCustomMood != nil
+    }
+
     private func createRecord(isSession: Bool) -> MoodRecord? {
-        guard let mood = selectedMood else { return nil }
+        guard let mood = resolvedMood else { return nil }
+
+        // If using a truly custom mood (no enum match), prepend info to note
+        let effectiveNote: String
+        if let custom = selectedCustomMood, MoodRecord.Mood(rawValue: custom.name) == nil {
+            let prefix = "\(custom.emoji) \(custom.name)"
+            effectiveNote = note.isEmpty ? prefix : "\(prefix) — \(note)"
+        } else {
+            effectiveNote = note
+        }
 
         do {
             let attachments = try draftPhotos.map { try MoodPhotoLibrary.storeImageData($0.data) }
             if isSession {
                 return MoodRecord.active(
                     mood: mood,
-                    note: note,
+                    note: effectiveNote,
                     createdAt: createdAt,
                     photoAttachments: attachments
                 )
@@ -92,7 +121,7 @@ struct QuickRecordSheet: View {
 
             return MoodRecord(
                 mood: mood,
-                note: note,
+                note: effectiveNote,
                 createdAt: createdAt,
                 isTracking: false,
                 photoAttachments: attachments
@@ -108,7 +137,7 @@ struct QuickRecordSheet: View {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 8) {
                     Text(sheetTitle)
-                        .font(.system(size: 28, weight: .regular, design: .serif))
+                        .font(.system(size: 23, weight: .regular, design: .serif))
                         .italic()
                         .foregroundStyle(.primary)
 
@@ -253,36 +282,70 @@ struct QuickRecordSheet: View {
 
     private var actionBar: some View {
         HStack(spacing: 10) {
-            Button(mode == .pointOnly ? "保存打点" : "打点") {
+            Button {
                 guard let record = createRecord(isSession: false) else { return }
                 submit(record)
+            } label: {
+                Group {
+                    if mode == .pointOnly {
+                        // Primary action in pointOnly mode — gradient fill
+                        Text("保存打点")
+                            .font(.headline)
+                            .foregroundStyle(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 14)
+                            .background(
+                                LinearGradient(
+                                    colors: [Color(red: 0.95, green: 0.45, blue: 0.35), Color(red: 0.98, green: 0.60, blue: 0.38)],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                            .shadow(color: Color(red: 0.95, green: 0.45, blue: 0.35).opacity(0.25), radius: 8, x: 0, y: 3)
+                    } else {
+                        // Secondary action in flexible mode — light border
+                        Text("打点")
+                            .font(.headline)
+                            .foregroundStyle(AppColor.label)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 14)
+                            .background(AppColor.surface)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                    .stroke(AppColor.labelQuaternary, lineWidth: 1)
+                            )
+                            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    }
+                }
             }
-            .font(.system(size: 15, weight: .semibold))
-            .foregroundStyle(mode == .pointOnly ? .white : .secondary)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 14)
-            .background(mode == .pointOnly ? TodayTheme.teal : Color(UIColor.secondarySystemGroupedBackground))
-            .overlay(
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .stroke(mode == .pointOnly ? Color.clear : Color(UIColor.separator), lineWidth: 1)
-            )
-            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-            .disabled(selectedMood == nil || isSubmitting)
-            .opacity(selectedMood == nil || isSubmitting ? 0.45 : 1)
+            .buttonStyle(.plain)
+            .disabled(!hasSelection || isSubmitting)
+            .opacity(!hasSelection || isSubmitting ? 0.45 : 1)
 
             if mode == .flexible {
-                Button("开始一段") {
+                Button {
                     guard let record = createRecord(isSession: true) else { return }
                     submit(record)
+                } label: {
+                    Text("开始一段")
+                        .font(.headline)
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                        .background(
+                            LinearGradient(
+                                colors: [Color(red: 0.95, green: 0.45, blue: 0.35), Color(red: 0.98, green: 0.60, blue: 0.38)],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                        .shadow(color: Color(red: 0.95, green: 0.45, blue: 0.35).opacity(0.25), radius: 8, x: 0, y: 3)
                 }
-                .font(.system(size: 15, weight: .semibold))
-                .foregroundStyle(.white)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 14)
-                .background(Color.accentColor)
-                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                .disabled(selectedMood == nil || isSubmitting)
-                .opacity(selectedMood == nil || isSubmitting ? 0.45 : 1)
+                .buttonStyle(.plain)
+                .disabled(!hasSelection || isSubmitting)
+                .opacity(!hasSelection || isSubmitting ? 0.45 : 1)
             }
         }
     }
@@ -342,39 +405,133 @@ struct QuickRecordSheet: View {
     }
 
     private var moodGrid: some View {
-        LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 12), count: 3), spacing: 12) {
-            ForEach(MoodRecord.Mood.allCases) { mood in
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("心情")
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(Color(UIColor.tertiaryLabel))
+                Spacer()
                 Button {
-                    withAnimation(.easeInOut(duration: 0.15)) {
-                        selectedMood = mood
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        isEditingMoods.toggle()
                     }
                 } label: {
+                    Text(isEditingMoods ? "完成" : "编辑")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(isEditingMoods ? Color.accentColor : .secondary)
+                }
+            }
+
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 12), count: 3), spacing: 12) {
+                ForEach(customMoods) { mood in
+                    let isSelected = selectedCustomMood?.id == mood.id
+                    ZStack(alignment: .topTrailing) {
+                        Button {
+                            withAnimation(.easeInOut(duration: 0.15)) {
+                                selectedCustomMood = mood
+                                selectedMood = nil
+                            }
+                        } label: {
+                            VStack(spacing: 6) {
+                                Text(mood.emoji)
+                                    .font(.title)
+                                Text(mood.name)
+                                    .font(.subheadline.weight(.medium))
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 14)
+                            .background(
+                                isSelected
+                                    ? Color.accentColor.opacity(0.12)
+                                    : Color(UIColor.secondarySystemGroupedBackground)
+                            )
+                            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                    .stroke(
+                                        isSelected ? Color.accentColor : Color.clear,
+                                        lineWidth: 2
+                                    )
+                            )
+                        }
+                        .buttonStyle(.plain)
+
+                        if isEditingMoods {
+                            Button {
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    if isSelected { selectedCustomMood = nil }
+                                    modelContext.delete(mood)
+                                    try? modelContext.save()
+                                }
+                            } label: {
+                                Image(systemName: "minus.circle.fill")
+                                    .font(.system(size: 20))
+                                    .foregroundStyle(.white, Color.red)
+                            }
+                            .buttonStyle(.plain)
+                            .offset(x: 6, y: -6)
+                            .transition(.scale.combined(with: .opacity))
+                        }
+                    }
+                }
+
+                // Add mood button
+                Button {
+                    showAddMood = true
+                } label: {
                     VStack(spacing: 6) {
-                        Text(mood.emoji)
-                            .font(.title)
-                        Text(mood.rawValue)
+                        Image(systemName: "plus")
+                            .font(.title2.weight(.medium))
+                            .foregroundStyle(.secondary)
+                        Text("添加")
                             .font(.subheadline.weight(.medium))
+                            .foregroundStyle(.secondary)
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 14)
-                    .background(
-                        selectedMood == mood
-                            ? Color.accentColor.opacity(0.12)
-                            : Color(UIColor.secondarySystemGroupedBackground)
-                    )
+                    .background(Color(UIColor.secondarySystemGroupedBackground))
                     .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                     .overlay(
                         RoundedRectangle(cornerRadius: 16, style: .continuous)
-                            .stroke(
-                                selectedMood == mood
-                                    ? Color.accentColor
-                                    : Color.clear,
-                                lineWidth: 2
-                            )
+                            .stroke(Color(UIColor.separator).opacity(0.5), style: StrokeStyle(lineWidth: 1, dash: [6, 4]))
                     )
                 }
                 .buttonStyle(.plain)
             }
+        }
+        .sheet(isPresented: $showAddMood) {
+            NavigationStack {
+                Form {
+                    Section("表情") {
+                        TextField("输入一个 emoji", text: $newMoodEmoji)
+                            .font(.system(size: 40))
+                            .multilineTextAlignment(.center)
+                    }
+                    Section("名称") {
+                        TextField("心情名称", text: $newMoodName)
+                    }
+                }
+                .navigationTitle("添加心情")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("取消") { showAddMood = false }
+                    }
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button("保存") {
+                            let order = customMoods.count
+                            let entity = CustomMoodEntity(emoji: newMoodEmoji, name: newMoodName, sortOrder: order)
+                            modelContext.insert(entity)
+                            try? modelContext.save()
+                            newMoodEmoji = ""
+                            newMoodName = ""
+                            showAddMood = false
+                        }
+                        .disabled(newMoodEmoji.isEmpty || newMoodName.isEmpty)
+                    }
+                }
+            }
+            .presentationDetents([.medium])
         }
     }
 

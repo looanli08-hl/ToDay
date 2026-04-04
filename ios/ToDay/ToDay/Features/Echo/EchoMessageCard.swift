@@ -17,7 +17,7 @@ struct EchoMessageCard: View {
             VStack(alignment: .leading, spacing: AppSpacing.xxs) {
                 // Title + time row
                 HStack(alignment: .firstTextBaseline) {
-                    Text(entity.title)
+                    Text(entity.displayTitle)
                         .font(entity.isRead ? AppFont.subheadline : AppFont.headline)
                         .foregroundStyle(AppColor.label)
                         .lineLimit(1)

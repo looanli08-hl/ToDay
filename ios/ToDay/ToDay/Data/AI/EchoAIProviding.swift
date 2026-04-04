@@ -87,13 +87,6 @@ enum EchoPersonality: String, Codable, CaseIterable, Sendable {
     }
 }
 
-// MARK: - User Tier
-
-enum EchoUserTier: String, Codable, Sendable {
-    case free   // Apple Foundation Models (local)
-    case pro    // DeepSeek API (cloud)
-}
-
 // MARK: - Errors
 
 enum EchoAIError: Error, LocalizedError, Sendable {

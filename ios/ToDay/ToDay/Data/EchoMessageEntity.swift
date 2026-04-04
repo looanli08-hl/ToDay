@@ -20,6 +20,8 @@ final class EchoMessageEntity {
     var isRead: Bool
     /// ID of the associated EchoChatSessionEntity for the conversation thread
     var threadId: UUID
+    /// User-defined custom title (nil = use default title)
+    var customTitle: String?
 
     init(
         id: UUID = UUID(),
@@ -30,7 +32,8 @@ final class EchoMessageEntity {
         sourceDataJSON: Data? = nil,
         isRead: Bool = false,
         threadId: UUID,
-        createdAt: Date = Date()
+        createdAt: Date = Date(),
+        customTitle: String? = nil
     ) {
         self.id = id
         self.type = type
@@ -41,6 +44,7 @@ final class EchoMessageEntity {
         self.isRead = isRead
         self.threadId = threadId
         self.createdAt = createdAt
+        self.customTitle = customTitle
     }
 
     // MARK: - Convenience
@@ -48,6 +52,11 @@ final class EchoMessageEntity {
     /// Decoded message type enum.
     var messageType: EchoMessageType {
         EchoMessageType(rawValue: type) ?? .freeChat
+    }
+
+    /// Display title: uses customTitle if set, otherwise falls back to the original title.
+    var displayTitle: String {
+        customTitle ?? title
     }
 
     /// Decoded source data (nil if sourceDataJSON is nil or corrupt).

@@ -1,3 +1,4 @@
+import CoreLocation
 import Foundation
 import UserNotifications
 
@@ -40,6 +41,7 @@ final class SystemNotificationScheduler: EchoNotificationScheduling {
 @MainActor
 final class EchoEngine {
     private let echoStore: any EchoItemStoring
+    private let shutterRecordStore: (any ShutterRecordStoring)?
     private let notificationScheduler: any EchoNotificationScheduling
     private let calendar: Calendar
     private var hasRequestedPermission = false
@@ -67,10 +69,12 @@ final class EchoEngine {
 
     init(
         echoStore: any EchoItemStoring,
+        shutterRecordStore: (any ShutterRecordStoring)? = nil,
         notificationScheduler: any EchoNotificationScheduling = SystemNotificationScheduler(),
         calendar: Calendar = .current
     ) {
         self.echoStore = echoStore
+        self.shutterRecordStore = shutterRecordStore
         self.notificationScheduler = notificationScheduler
         self.calendar = calendar
     }
@@ -111,6 +115,78 @@ final class EchoEngine {
                 triggerDate: scheduledDate
             )
         }
+    }
+
+    /// Evaluate shutter records using relevance scoring and push an elastic echo
+    /// notification if the top-scoring record exceeds the frequency threshold.
+    func evaluateAndPushIfNeeded() {
+        let frequency = globalFrequency ?? .medium
+        guard frequency != .off else { return }
+
+        // Check min interval since last elastic push
+        let lastPush = UserDefaults.standard.object(forKey: "today.echo.lastPushDate") as? Date ?? .distantPast
+        let minInterval = EchoRelevanceScorer.minInterval(for: frequency)
+        guard Date().timeIntervalSince(lastPush) >= minInterval else { return }
+
+        let threshold = EchoRelevanceScorer.threshold(for: frequency)
+        let scorer = EchoRelevanceScorer()
+        let now = Date()
+
+        guard let store = shutterRecordStore else { return }
+        let records = store.loadAll()
+        guard !records.isEmpty else { return }
+
+        var bestScore: Double = 0
+        var bestRecord: (title: String, id: UUID)?
+
+        for record in records {
+            let recordLocation: CLLocation?
+            if let lat = record.latitude, let lon = record.longitude {
+                recordLocation = CLLocation(latitude: lat, longitude: lon)
+            } else {
+                recordLocation = nil
+            }
+
+            let s = scorer.score(
+                recordDate: record.createdAt,
+                recordNote: record.displayText,
+                now: now,
+                currentLocation: nil,
+                recordLocation: recordLocation
+            )
+            if s > bestScore {
+                bestScore = s
+                bestRecord = (record.displayText, record.id)
+            }
+        }
+
+        guard bestScore >= threshold, let best = bestRecord else { return }
+
+        if !hasRequestedPermission {
+            requestNotificationPermission()
+            hasRequestedPermission = true
+        }
+
+        // Schedule immediate notification
+        let content = UNMutableNotificationContent()
+        content.title = "回响"
+        content.body = "还记得「\(best.title)」吗？"
+        content.sound = .default
+        content.categoryIdentifier = "ECHO_REMINDER"
+
+        let request = UNNotificationRequest(
+            identifier: "echo.elastic.\(best.id)",
+            content: content,
+            trigger: nil // Deliver immediately
+        )
+
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error {
+                print("[EchoEngine] Failed to schedule elastic echo: \(error.localizedDescription)")
+            }
+        }
+
+        UserDefaults.standard.set(Date(), forKey: "today.echo.lastPushDate")
     }
 
     /// Cancel all echoes for a deleted ShutterRecord

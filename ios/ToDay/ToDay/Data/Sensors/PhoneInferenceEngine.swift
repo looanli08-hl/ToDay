@@ -11,8 +11,10 @@ final class PhoneInferenceEngine {
         static let sleepMinGapHours: TimeInterval = 2 * 3600          // 2 hours
         static let napMinGapMinutes: TimeInterval = 40 * 60           // 40 minutes
         static let commuteMinDuration: TimeInterval = 2 * 60          // 2 minutes
+        static let commuteMaxDuration: TimeInterval = 4 * 3600        // 4 hours max
         static let walkMinDurationForActiveWalk: TimeInterval = 10 * 60 // 10 minutes
         static let walkMinDuration: TimeInterval = 1 * 60             // 1 minute
+        static let exerciseMaxDuration: TimeInterval = 6 * 3600       // 6 hours max
         static let visitMinStay: TimeInterval = 5 * 60                // 5 minutes
         static let blankMinDuration: TimeInterval = 15 * 60           // 15 minutes
         static let mergeGap: TimeInterval = 3 * 60                    // 3 minutes
@@ -186,7 +188,8 @@ final class PhoneInferenceEngine {
             let end = motion.endTimestamp ?? start
             let duration = end.timeIntervalSince(start)
 
-            guard duration >= Threshold.commuteMinDuration else { continue }
+            guard duration >= Threshold.commuteMinDuration,
+                  duration <= Threshold.commuteMaxDuration else { continue }
             let interval = DateInterval(start: start, end: end)
             guard !isOverlapping(interval, with: covered) else { continue }
 
@@ -246,6 +249,9 @@ final class PhoneInferenceEngine {
             guard !isOverlapping(interval, with: covered) else { continue }
 
             let duration = segment.end.timeIntervalSince(segment.start)
+
+            // Skip unreasonably long exercise segments
+            guard duration <= Threshold.exerciseMaxDuration else { continue }
 
             switch segment.activity {
             case .running:

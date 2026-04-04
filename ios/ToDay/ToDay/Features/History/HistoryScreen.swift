@@ -2,6 +2,7 @@ import SwiftUI
 
 struct HistoryScreen: View {
     @ObservedObject var viewModel: TodayViewModel
+    @StateObject private var activityProvider = CurrentActivityProvider()
 
     @State private var selectedDate: Date = Calendar.current.startOfDay(for: Date())
     @State private var showCalendar = false
@@ -22,6 +23,22 @@ struct HistoryScreen: View {
             VStack(spacing: 0) {
                 // 0. Recording status indicator
                 recordingStatusBar
+
+                // 0.5. Real-time activity status
+                if !activityProvider.statusText.isEmpty {
+                    HStack(spacing: 6) {
+                        Image(systemName: activityProvider.statusIcon)
+                            .font(.caption2)
+                            .foregroundStyle(AppColor.labelTertiary)
+                        Text(activityProvider.statusText)
+                            .font(.caption)
+                            .foregroundStyle(AppColor.labelSecondary)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 6)
+                    .background(AppColor.surface)
+                }
 
                 // 1. Date strip (sticky at top)
                 dateStripSection
@@ -55,6 +72,12 @@ struct HistoryScreen: View {
             }
             .task(id: selectedDate) {
                 await loadSelectedDay()
+            }
+            .onAppear {
+                activityProvider.refresh()
+            }
+            .onReceive(Timer.publish(every: 30, on: .main, in: .common).autoconnect()) { _ in
+                activityProvider.refresh()
             }
         }
     }
@@ -208,10 +231,11 @@ struct HistoryScreen: View {
     // MARK: - Selected Day Content
 
     private var selectedDayContent: some View {
-        VStack(alignment: .leading, spacing: 20) {
+        VStack(alignment: .leading, spacing: AppSpacing.md) {
             // Date header
             Text(selectedDateFormatted)
-                .font(.title2.bold())
+                .font(.system(size: 23, weight: .regular, design: .serif))
+                .italic()
                 .padding(.horizontal, 20)
                 .padding(.top, 20)
 
@@ -290,7 +314,7 @@ struct HistoryScreen: View {
                         .foregroundStyle(TodayTheme.teal)
 
                     Text("生活脉搏")
-                        .font(.system(size: 18, weight: .bold))
+                        .font(.system(size: 15, weight: .semibold))
                         .foregroundStyle(AppColor.label)
                 }
 
@@ -363,7 +387,7 @@ struct HistoryScreen: View {
             }
 
             Text(value)
-                .font(.system(size: 26, weight: .bold))
+                .font(.system(size: 23, weight: .semibold, design: .rounded))
                 .foregroundStyle(AppColor.label)
 
             Text(detail)
@@ -374,7 +398,7 @@ struct HistoryScreen: View {
         .padding(16)
         .background(AppColor.surface)
         .clipShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
-        .shadow(color: Color(red: 0.4, green: 0.3, blue: 0.2).opacity(0.06), radius: 8, x: 0, y: 2)
+        .appShadow(.subtle)
     }
 
     // MARK: - Event Row

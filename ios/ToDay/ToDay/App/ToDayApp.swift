@@ -12,6 +12,7 @@ struct ToDayApp: App {
     private let backgroundTaskManager = BackgroundTaskManager.shared
 
     init() {
+        UserDefaults.standard.register(defaults: ["today.smartRecording.enabled": true])
         backgroundTaskManager.registerTasks()
     }
 
@@ -48,6 +49,10 @@ struct ToDayApp: App {
                     // Refresh timeline when coming back to foreground
                     Task {
                         await viewModel.load(forceReload: true)
+                    }
+                    // Sync local data to Supabase for web dashboard
+                    Task {
+                        await CloudSyncService.shared.syncAll(modelContainer: AppContainer.modelContainer)
                     }
                 default:
                     break
