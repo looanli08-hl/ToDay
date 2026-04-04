@@ -22,12 +22,12 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Recording
 
-- [ ] **REC-01**: App automatically records location visits in background without user action
-- [ ] **REC-02**: App detects and records activity type (walking, running, driving, cycling, stationary)
-- [ ] **REC-03**: App infers events from sensor data (sleep, commute, exercise, location stay)
-- [ ] **REC-04**: Places are auto-labeled via reverse geocoding (e.g. "星巴克", "北大图书馆")
-- [ ] **REC-05**: Places are auto-classified as home/work/frequent based on visit patterns
-- [ ] **REC-06**: Recording survives app being killed by system (significant location change re-launch)
+- [x] **REC-01**: App automatically records location visits in background without user action
+- [x] **REC-02**: App detects and records activity type (walking, running, driving, cycling, stationary)
+- [x] **REC-03**: App infers events from sensor data (sleep, commute, exercise, location stay)
+- [x] **REC-04**: Places are auto-labeled via reverse geocoding (e.g. "星巴克", "北大图书馆")
+- [x] **REC-05**: Places are auto-classified as home/work/frequent based on visit patterns
+- [x] **REC-06**: Recording survives app being killed by system (significant location change re-launch)
 - [x] **REC-07**: Data gaps from force-quit/airplane mode are displayed gracefully, not hidden
 
 ### Timeline UI
@@ -146,12 +146,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TML-04 | Phase 3 | Complete |
 | TML-05 | Phase 3 | Complete |
 | TML-06 | Phase 3 | Complete |
-| REC-01 | Phase 3 | Pending |
-| REC-02 | Phase 3 | Pending |
-| REC-03 | Phase 3 | Pending |
-| REC-04 | Phase 3 | Pending |
-| REC-05 | Phase 3 | Pending |
-| REC-06 | Phase 3 | Pending |
+| REC-01 | Phase 3 | Complete |
+| REC-02 | Phase 3 | Complete |
+| REC-03 | Phase 3 | Complete |
+| REC-04 | Phase 3 | Complete |
+| REC-05 | Phase 3 | Complete |
+| REC-06 | Phase 3 | Complete |
 | MAN-01 | Phase 3 | Complete |
 | MAN-02 | Phase 3 | Complete |
 | MAN-03 | Phase 3 | Complete |

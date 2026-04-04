@@ -71,7 +71,7 @@ Plans:
 - [x] 03-01-PLAN.md — EventCardView + TodayScreen typography, corner radius, spacing, and shadow compliance
 - [x] 03-02-PLAN.md — HistoryScreen + QuickRecordSheet + DayScrollView timestamp/moodRow compliance
 - [x] 03-03-PLAN.md — Proportional event row heights + DayScrollViewTests (5 new tests)
-- [ ] 03-04-PLAN.md — LocationCollector authorization hardening + real-device recording validation (TestFlight checkpoint)
+- [x] 03-04-PLAN.md — LocationCollector authorization hardening + real-device recording validation (TestFlight checkpoint)
 
 ### Phase 4: Pattern Recognition and Proactive Push
 **Goal**: The app surfaces one meaningful behavioral pattern per day that makes the user feel understood
