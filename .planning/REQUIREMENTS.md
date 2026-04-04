@@ -35,9 +35,9 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **TML-01**: User sees a vertical timeline of their day with time-of-day gradient background
 - [x] **TML-02**: Each event shows type badge, duration, and place name
 - [ ] **TML-03**: User can tap an event to see details
-- [ ] **TML-04**: User can annotate blank periods with what they were doing
+- [x] **TML-04**: User can annotate blank periods with what they were doing
 - [x] **TML-05**: Timeline visual quality reaches Apple-level design standard per .impeccable.md
-- [ ] **TML-06**: User can browse any past day's timeline via history screen
+- [x] **TML-06**: User can browse any past day's timeline via history screen
 
 ### AI Daily Summary
 
@@ -61,9 +61,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Manual Recording
 
-- [ ] **MAN-01**: User can record mood with one tap
-- [ ] **MAN-02**: User can capture moments via text/voice/photo (shutter)
-- [ ] **MAN-03**: Manual records appear inline on the timeline
+- [x] **MAN-01**: User can record mood with one tap
+- [x] **MAN-02**: User can capture moments via text/voice/photo (shutter)
+- [x] **MAN-03**: Manual records appear inline on the timeline
 
 ### Privacy & Compliance
 
@@ -143,18 +143,18 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TML-01 | Phase 3 | Complete |
 | TML-02 | Phase 3 | Complete |
 | TML-03 | Phase 3 | Pending |
-| TML-04 | Phase 3 | Pending |
+| TML-04 | Phase 3 | Complete |
 | TML-05 | Phase 3 | Complete |
-| TML-06 | Phase 3 | Pending |
+| TML-06 | Phase 3 | Complete |
 | REC-01 | Phase 3 | Pending |
 | REC-02 | Phase 3 | Pending |
 | REC-03 | Phase 3 | Pending |
 | REC-04 | Phase 3 | Pending |
 | REC-05 | Phase 3 | Pending |
 | REC-06 | Phase 3 | Pending |
-| MAN-01 | Phase 3 | Pending |
-| MAN-02 | Phase 3 | Pending |
-| MAN-03 | Phase 3 | Pending |
+| MAN-01 | Phase 3 | Complete |
+| MAN-02 | Phase 3 | Complete |
+| MAN-03 | Phase 3 | Complete |
 | AIP-01 | Phase 4 | Pending |
 | AIP-02 | Phase 4 | Pending |
 | AIP-03 | Phase 4 | Pending |
