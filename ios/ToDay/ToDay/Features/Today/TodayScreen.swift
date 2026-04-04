@@ -35,6 +35,7 @@ struct TodayScreen: View {
                         } else {
                             signatureSection(timeline)
                             scrollCanvasSection(timeline)
+                            aiDailySummarySection
                         }
                     }
 
@@ -291,8 +292,37 @@ struct TodayScreen: View {
     }
 
     @ViewBuilder
+    private var aiDailySummarySection: some View {
+        if let aiSummary = viewModel.aiDailySummary {
+            ContentCard {
+                EyebrowLabel("Echo 今日洞察")
+
+                Text("今日 AI 洞察")
+                    .font(.system(size: 23, weight: .regular, design: .serif))
+                    .italic()
+                    .foregroundStyle(.primary)
+
+                Text(aiSummary.summaryText)
+                    .font(.system(size: 15))
+                    .foregroundStyle(Color(UIColor.secondaryLabel))
+                    .lineSpacing(5)
+
+                if let moodTrend = aiSummary.moodTrend, !moodTrend.isEmpty {
+                    Text(moodTrend)
+                        .font(.system(size: 12, weight: .medium, design: .monospaced))
+                        .foregroundStyle(AppColor.echo)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .background(AppColor.echo.opacity(0.1))
+                        .clipShape(Capsule())
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
     private var summarySection: some View {
-        if let summary = viewModel.insightSummary {
+        if viewModel.aiDailySummary == nil, let summary = viewModel.insightSummary {
             ContentCard {
                 EyebrowLabel("今日总结")
 

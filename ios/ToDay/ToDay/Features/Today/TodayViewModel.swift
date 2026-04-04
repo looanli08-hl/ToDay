@@ -19,6 +19,7 @@ final class TodayViewModel: ObservableObject {
     @Published private(set) var quickRecordMode: QuickRecordSheetMode = .flexible
     @Published var showSpendingInput = false
     @Published var showScreenTimeInput = false
+    @Published private(set) var aiDailySummary: DailySummaryEntity?
 
     // MARK: - Managers
 
@@ -32,6 +33,10 @@ final class TodayViewModel: ObservableObject {
     #if os(iOS)
     private let watchSync: WatchSyncHelper
     #endif
+
+    // MARK: - AI Memory
+
+    private lazy var echoMemoryManager = EchoMemoryManager(container: modelContainer)
 
     // MARK: - Timeline State
 
@@ -110,8 +115,14 @@ final class TodayViewModel: ObservableObject {
         }
         rebuildTimeline(referenceDate: currentBaseTimeline?.date ?? Date())
         hasLoadedOnce = true
+        loadAIDailySummary()
 
         isLoading = false
+    }
+
+    private func loadAIDailySummary() {
+        let dateKey = Self.dateKeyFormatter.string(from: Date())
+        aiDailySummary = echoMemoryManager.loadSummary(forDateKey: dateKey)
     }
 
     // MARK: - Mood Records

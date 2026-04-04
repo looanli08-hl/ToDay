@@ -114,6 +114,13 @@ struct DayVerticalTimelineContent: View {
     }
 
     private func eventRow(event: InferredEvent, startTime: Date, endTime: Date) -> some View {
+        if event.kind == .dataGap {
+            return AnyView(gapIndicatorRow(event: event, startTime: startTime, endTime: endTime))
+        }
+        return AnyView(standardEventRow(event: event, startTime: startTime, endTime: endTime))
+    }
+
+    private func standardEventRow(event: InferredEvent, startTime: Date, endTime: Date) -> some View {
         HStack(alignment: .top, spacing: 0) {
             VStack(alignment: .trailing, spacing: 2) {
                 Text(formatTime(startTime))
@@ -145,6 +152,41 @@ struct DayVerticalTimelineContent: View {
         }
         .padding(.vertical, 3)
         .frame(maxWidth: .infinity, minHeight: eventRowHeight(for: event), alignment: .topLeading)
+    }
+
+    private func gapIndicatorRow(event: InferredEvent, startTime: Date, endTime: Date) -> some View {
+        let durationMinutes = Int(event.duration / 60)
+        let durationText = durationMinutes >= 60
+            ? "\(durationMinutes / 60)h \(durationMinutes % 60)m"
+            : "\(durationMinutes)m"
+
+        return HStack(alignment: .center, spacing: 0) {
+            Text(formatTime(startTime))
+                .font(.system(size: 10, weight: .medium, design: .monospaced))
+                .foregroundStyle(Color(UIColor.quaternaryLabel))
+                .frame(width: 44, alignment: .trailing)
+
+            Rectangle()
+                .fill(Color(UIColor.separator))
+                .frame(width: 20, height: 1)
+
+            HStack(spacing: 4) {
+                Image(systemName: "minus")
+                    .font(.system(size: 9))
+                    .foregroundStyle(Color(UIColor.quaternaryLabel))
+                Text("这段时间没有记录 · \(durationText)")
+                    .font(.system(size: 12, design: .monospaced))
+                    .foregroundStyle(Color(UIColor.quaternaryLabel))
+                Image(systemName: "minus")
+                    .font(.system(size: 9))
+                    .foregroundStyle(Color(UIColor.quaternaryLabel))
+            }
+            .padding(.horizontal, 8)
+
+            Spacer()
+        }
+        .padding(.vertical, 6)
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private func quietGapRow(
