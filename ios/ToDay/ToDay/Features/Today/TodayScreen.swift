@@ -21,7 +21,7 @@ struct TodayScreen: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 18) {
+                VStack(alignment: .leading, spacing: AppSpacing.md) {
                     headerSection
                     overviewSection
 
@@ -114,12 +114,12 @@ struct TodayScreen: View {
 
                 Spacer()
 
-                HStack(spacing: 10) {
+                HStack(spacing: AppSpacing.xs) {
                     Button {
                         viewModel.openQuickRecordComposer()
                     } label: {
                         Image(systemName: "heart.circle.fill")
-                            .font(.system(size: 16, weight: .semibold))
+                            .font(.system(size: 15, weight: .semibold))
                             .foregroundStyle(Color.accentColor)
                             .frame(width: 42, height: 42)
                             .background(Color(UIColor.secondarySystemGroupedBackground))
@@ -174,9 +174,9 @@ struct TodayScreen: View {
     }
 
     private var overviewSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: AppSpacing.xs) {
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 10) {
+                HStack(spacing: AppSpacing.xs) {
                     ForEach(overviewStats) { stat in
                         OverviewStatCard(stat: stat)
                     }
@@ -184,7 +184,7 @@ struct TodayScreen: View {
                 .padding(.vertical, 2)
             }
 
-            HStack(spacing: 10) {
+            HStack(spacing: AppSpacing.xs) {
                 Button {
                     viewModel.showScreenTimeInput = true
                 } label: {
@@ -213,7 +213,7 @@ struct TodayScreen: View {
                 .foregroundStyle(.primary)
 
             Text("把一天里的起伏、停顿和推进压成一条流线，先看今天的流向，再回到具体片段。")
-                .font(.system(size: 14))
+                .font(.system(size: 15))
                 .foregroundStyle(Color(UIColor.tertiaryLabel))
                 .lineSpacing(4)
 
@@ -235,7 +235,7 @@ struct TodayScreen: View {
     }
 
     private func scrollCanvasSection(_ timeline: DayTimeline) -> some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: AppSpacing.sm) {
             EyebrowLabel("今日时间轴")
 
             Text("今日时间轴")
@@ -244,7 +244,7 @@ struct TodayScreen: View {
                 .foregroundStyle(.primary)
 
             Text("从凌晨到夜里，一天的起伏与留白。")
-                .font(.system(size: 14))
+                .font(.system(size: 15))
                 .foregroundStyle(Color(UIColor.tertiaryLabel))
                 .lineSpacing(4)
 
@@ -332,7 +332,7 @@ struct TodayScreen: View {
                     .foregroundStyle(.primary)
 
                 Text(summary.headline)
-                    .font(.system(size: 16, weight: .semibold))
+                    .font(.system(size: 15, weight: .semibold))
                     .foregroundStyle(.secondary)
 
                 Text(summary.narrative)
@@ -359,7 +359,7 @@ struct TodayScreen: View {
                     .foregroundStyle(.primary)
 
                 Text(weeklyInsight.headline)
-                    .font(.system(size: 16, weight: .semibold))
+                    .font(.system(size: 15, weight: .semibold))
                     .foregroundStyle(.secondary)
 
                 Text(weeklyInsight.narrative)
@@ -396,7 +396,7 @@ struct TodayScreen: View {
                     .buttonStyle(.plain)
                 }
 
-                VStack(spacing: 10) {
+                VStack(spacing: AppSpacing.xs) {
                     ForEach(viewModel.recentDigests.prefix(3)) { digest in
                         RecentDayCard(digest: digest, locale: chineseLocale)
                     }
@@ -406,7 +406,7 @@ struct TodayScreen: View {
     }
 
     private var bottomActionBar: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: AppSpacing.sm) {
             if let activeSessionTitle = viewModel.activeSessionTitle,
                let activeSessionDetail = viewModel.activeSessionDetail {
                 VStack(alignment: .leading, spacing: 4) {
@@ -437,7 +437,7 @@ struct TodayScreen: View {
                 } label: {
                     VStack(spacing: 4) {
                         Label(viewModel.quickRecordButtonTitle, systemImage: viewModel.quickRecordButtonSystemImage)
-                            .font(.system(size: 16, weight: .semibold))
+                            .font(.system(size: 15, weight: .semibold))
                             .foregroundStyle(.white)
 
                         if let caption = viewModel.quickRecordButtonCaption {
@@ -453,7 +453,7 @@ struct TodayScreen: View {
                 }
                 .buttonStyle(.plain)
             } else {
-                HStack(spacing: 10) {
+                HStack(spacing: AppSpacing.xs) {
                     Button {
                         viewModel.openPointComposer()
                     } label: {
@@ -493,7 +493,7 @@ struct TodayScreen: View {
                 .stroke(Color(UIColor.separator), lineWidth: 1)
         )
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-        .shadow(color: Color.primary.opacity(0.06), radius: 18, x: 0, y: 8)
+        .appShadow(.elevated)
     }
 
     private var loadingCard: some View {
