@@ -223,7 +223,7 @@ final class EchoPromptBuilder: @unchecked Sendable {
     ) -> String {
         var parts: [String] = []
 
-        parts.append("请根据以下数据，生成一段简洁的中文日记摘要（100-150字）。摘要应包含关键活动、情绪和值得记住的细节。")
+        parts.append("请根据以下数据，生成一段简洁的中文日记摘要（100-150字）。摘要应包含关键活动、地点和值得记住的细节。语气要温暖、观察性的，像在描述朋友的一天。只描述发生了什么，不评判，不建议，不使用「应该」「建议」「需要改善」等措辞。")
 
         parts.append("【健康与活动数据】\n\(todayDataSummary)")
 

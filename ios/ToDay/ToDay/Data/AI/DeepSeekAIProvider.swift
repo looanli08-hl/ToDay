@@ -14,9 +14,6 @@ final class DeepSeekAIProvider: EchoAIProviding, @unchecked Sendable {
     /// UserDefaults key where the user's DeepSeek API key is stored.
     static let apiKeyDefaultsKey = "today.echo.deepseekAPIKey"
 
-    /// Built-in default API key so users don't need to configure it.
-    private static let defaultAPIKey = "sk-94d311f460e54b4cac9c216ed8d5af36"
-
     init(session: URLSession = .shared) {
         self.session = session
     }
@@ -25,8 +22,8 @@ final class DeepSeekAIProvider: EchoAIProviding, @unchecked Sendable {
 
     var apiKey: String? {
         let stored = UserDefaults.standard.string(forKey: Self.apiKeyDefaultsKey)
-        if let stored, !stored.isEmpty { return stored }
-        return Self.defaultAPIKey
+        guard let stored, !stored.isEmpty else { return nil }
+        return stored
     }
 
     // MARK: - EchoAIProviding
@@ -44,7 +41,7 @@ final class DeepSeekAIProvider: EchoAIProviding, @unchecked Sendable {
 
     func summarize(prompt: String) async throws -> String {
         let messages = [
-            DeepSeekMessage(role: "system", content: "你是一个生活数据分析助手。根据提供的数据，生成简洁的中文摘要。"),
+            DeepSeekMessage(role: "system", content: "你是一个生活记录助手。根据提供的数据，生成温暖的中文摘要，像在描述朋友的一天。只描述发生了什么，不评判，不建议。"),
             DeepSeekMessage(role: "user", content: prompt)
         ]
         return try await callAPI(messages: messages)
