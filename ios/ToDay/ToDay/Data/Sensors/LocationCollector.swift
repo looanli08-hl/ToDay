@@ -31,8 +31,14 @@ final class LocationCollector: NSObject, SensorCollecting, CLLocationManagerDele
     }
 
     func startMonitoring() {
-        locationManager.startMonitoringSignificantLocationChanges()
-        locationManager.startMonitoringVisits()
+        // Re-register immediately if already authorized.
+        // This handles the kill-and-relaunch case where iOS fires a significant
+        // location change, re-launches the app, and the delegate callback will
+        // NOT fire again — we must call the monitoring APIs directly at startup.
+        if locationManager.authorizationStatus == .authorizedAlways {
+            locationManager.startMonitoringVisits()
+            locationManager.startMonitoringSignificantLocationChanges()
+        }
     }
 
     // MARK: - Recording
@@ -89,11 +95,14 @@ final class LocationCollector: NSObject, SensorCollecting, CLLocationManagerDele
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         switch manager.authorizationStatus {
         case .authorizedAlways:
-            startMonitoring()
+            // Fresh authorization upgrade — start background monitoring immediately.
+            manager.startMonitoringVisits()
+            manager.startMonitoringSignificantLocationChanges()
         case .authorizedWhenInUse:
             // Background significant location changes and visits require Always.
-            // Do not start monitoring — foreground-only access cannot power the timeline.
-            break
+            // Stop any active monitoring — foreground-only access cannot power the timeline.
+            manager.stopMonitoringVisits()
+            manager.stopMonitoringSignificantLocationChanges()
         default:
             break
         }
