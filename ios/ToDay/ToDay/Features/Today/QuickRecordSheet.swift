@@ -137,7 +137,7 @@ struct QuickRecordSheet: View {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 8) {
                     Text(sheetTitle)
-                        .font(.system(size: 28, weight: .regular, design: .serif))
+                        .font(.system(size: 23, weight: .regular, design: .serif))
                         .italic()
                         .foregroundStyle(.primary)
 

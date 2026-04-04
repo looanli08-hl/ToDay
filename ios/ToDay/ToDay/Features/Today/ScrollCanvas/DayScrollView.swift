@@ -117,11 +117,11 @@ struct DayVerticalTimelineContent: View {
         HStack(alignment: .top, spacing: 0) {
             VStack(alignment: .trailing, spacing: 2) {
                 Text(formatTime(startTime))
-                    .font(.system(size: 11, weight: .medium, design: .monospaced))
-                    .foregroundStyle(AppColor.label.opacity(0.6))
+                    .font(.system(size: 12, weight: .regular, design: .monospaced))
+                    .foregroundStyle(AppColor.label.opacity(0.60))
 
                 Text(formatTime(endTime))
-                    .font(.system(size: 10, weight: .medium, design: .monospaced))
+                    .font(.system(size: 12, weight: .regular, design: .monospaced))
                     .foregroundStyle(AppColor.label.opacity(0.35))
             }
             .frame(width: 44, alignment: .trailing)
@@ -155,7 +155,7 @@ struct DayVerticalTimelineContent: View {
     ) -> some View {
         HStack(alignment: .center, spacing: 0) {
             Text(formatTime(startTime))
-                .font(.system(size: 10, weight: .medium, design: .monospaced))
+                .font(.system(size: 12, weight: .regular, design: .monospaced))
                 .foregroundStyle(AppColor.label.opacity(0.3))
                 .frame(width: 44, alignment: .trailing)
 
@@ -194,7 +194,7 @@ struct DayVerticalTimelineContent: View {
     private func moodRow(event: InferredEvent, time: Date) -> some View {
         HStack(alignment: .center, spacing: 0) {
             Text(formatTime(time))
-                .font(.system(size: 10, weight: .medium, design: .monospaced))
+                .font(.system(size: 12, weight: .regular, design: .monospaced))
                 .foregroundStyle(AppColor.label.opacity(0.4))
                 .frame(width: 44, alignment: .trailing)
 
@@ -216,7 +216,7 @@ struct DayVerticalTimelineContent: View {
                 }
         }
         .padding(.vertical, 3)
-        .frame(maxWidth: .infinity, minHeight: 38, alignment: .center)
+        .frame(maxWidth: .infinity, minHeight: 44, alignment: .center)
     }
 
     private var currentTimeIndicator: some View {
