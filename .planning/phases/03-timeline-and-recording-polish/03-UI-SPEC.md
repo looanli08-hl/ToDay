@@ -36,7 +36,6 @@ Declared values (4pt grid — tokens already in `AppSpacing`):
 
 | Token | Value | SwiftUI Usage |
 |-------|-------|---------------|
-| `AppSpacing.xxxs` | 2pt | Hairline offsets, sub-pixel corrections |
 | `AppSpacing.xxs` | 4pt | Icon-to-label gap, timeline dot spacing |
 | `AppSpacing.xs` | 8pt | Compact element spacing, badge padding vertical |
 | `AppSpacing.sm` | 12pt | Card internal row gap, chip padding horizontal |
@@ -44,6 +43,8 @@ Declared values (4pt grid — tokens already in `AppSpacing`):
 | `AppSpacing.lg` | 24pt | Section vertical gap, sheet section spacing |
 | `AppSpacing.xl` | 32pt | Major layout gaps between cards |
 | `AppSpacing.xxl` | 48pt | Screen top padding, modal hero area |
+
+> `AppSpacing.xxxs` (2pt) is removed from this contract — 2pt is not a multiple of 4. Any sub-pixel hairline offsets must use `AppSpacing.xxs` (4pt) or be expressed as literal `1` only for separator line widths (not padding or spacing).
 
 Exceptions:
 - Timeline left column (time labels): fixed 44pt width — preserves HH:mm monospaced alignment
@@ -60,22 +61,25 @@ Exceptions:
 
 All fonts are SF Pro via `.system(size:weight:design:)`. No third-party typefaces.
 
+Four sizes, two weights only.
+
 | Role | Size | Weight | Design | Line Height | Usage |
 |------|------|--------|--------|-------------|-------|
-| Screen hero | 33pt | regular | serif | 1.1 | "今日画卷" screen title |
-| Card title | 23pt | regular | serif | 1.15 | Section headings inside cards ("今日脉络", "今日时间轴") |
-| Detail hero | 28pt | regular | serif | 1.15 | EventDetailView event name, QuickRecordSheet title |
-| Body primary | 15pt | semibold | default | 1.4 | Event name in EventCardView |
-| Body secondary | 14pt | regular | default | 1.5 | Card descriptive text, sheet subtitle, annotation notes |
-| Body medium | 15pt | regular | default | 1.5 | AI summary text |
-| Subheadline | 13pt | regular | default | 1.4 | Compact detail line on event cards |
-| Timestamp mono | 11–12pt | medium | monospaced | 1.0 | Timeline HH:mm labels, badge labels, duration text |
-| Badge / eyebrow | 10pt | bold | monospaced | 1.0 | `kindBadgeTitle` inside EventCardView, `EyebrowLabel` |
-| Date header | 12pt | medium | monospaced | 1.0 | Screen-level date header ("yyyy · MM · dd EEE"), tracking 1.4 |
-| Caption | 11pt | regular | default | 1.3 | `AppFont.caption`, section labels, metadata chips |
-| Caption semibold | 11pt | semibold | default | 1.3 | "点击记录" affordance hint, minor action labels |
+| Hero | 33pt | regular | serif | 1.1 | "今日画卷" screen title only |
+| Heading | 23pt | regular | serif | 1.15 | Card titles, section headings ("今日脉络", "今日时间轴"), EventDetailView event name, QuickRecordSheet title |
+| Body | 15pt | semibold | default | 1.4 | Event name in EventCardView, primary body text, AI summary text (use regular weight for AI summary — see note) |
+| Small | 12pt | regular | monospaced | 1.0 | Timestamps (HH:mm), badge labels, duration text, eyebrow labels, date header, captions, section labels, metadata chips, "点击记录" hint |
 
-Italic: Applied to `.design(.serif)` titles only (hero titles, card titles, EventDetail names). Never applied to body or monospaced text.
+Weight note: Only two weights are used — **regular (400)** and **semibold (600)**. Medium and bold are not used. Within the Body row, event names use semibold; AI summary and descriptive body text use regular.
+
+Mapping of previously declared sizes to consolidated scale:
+- 10pt bold → 12pt semibold (badge/eyebrow)
+- 11pt → 12pt (caption, timestamp)
+- 13pt → 12pt (compact detail lines, duration)
+- 14pt → 15pt (card descriptions, sheet subtitles, annotation notes)
+- 28pt → 23pt (EventDetailView event name, QuickRecordSheet title — heading tier)
+
+Italic: Applied to `.design(.serif)` titles only (hero, heading tier). Never applied to body or small/monospaced text.
 
 ---
 
@@ -177,10 +181,10 @@ Components already implemented that Phase 3 must maintain and refine:
 ### `DayVerticalTimelineContent` (DayScrollView.swift)
 - **Purpose:** Full-day vertical scroll canvas — the product's visual core
 - **Upgrade contract for this phase:** Time-of-day gradient background is already implemented. Phase 3 must ensure event row heights are proportional to duration (currently fixed at 76pt/92pt for sleep). Minimum visible row: 44pt touch target.
-- **Left column:** 44pt wide, HH:mm in 11pt monospaced medium at 60% opacity (start time) + 10pt at 35% (end time)
+- **Left column:** 44pt wide, HH:mm in 12pt monospaced regular at 60% opacity (start time) + 12pt at 35% (end time)
 - **Connector:** 20pt wide frame. 8pt dot filled with `event.cardFill` at top. 1.5pt spine line filled with `AppColor.label.opacity(0.1)`
 - **Gap rows:** Dashed border (`[7, 5]` dash pattern), `opacity(0.35)` separator, "点击记录" capsule affordance bottom-trailing
-- **Data gap rows:** "这段时间没有记录 · Xm" in 12pt monospaced quaternary — no tap target needed
+- **Data gap rows:** "这段时间没有记录 · Xm" in 12pt monospaced regular quaternary — no tap target needed
 - **Current time needle:** 6pt teal dot + 1.5pt separator-colored line, `allowsHitTesting(false)`
 - **Mood rows:** 7pt circle (cardStroke fill), capsule layout, 38pt min height
 
@@ -188,9 +192,9 @@ Components already implemented that Phase 3 must maintain and refine:
 - **Purpose:** Individual event presentation within the timeline
 - **Color accent bar:** 4pt wide, `AppRadius.sm`-ish corner radius (2pt), `event.cardFill`
 - **Event name:** 15pt semibold primary
-- **Kind badge:** 10pt bold monospaced in `event.cardFill` color
-- **Duration:** 13pt bold monospaced tertiary, trailing
-- **Detail line:** 13pt regular tertiary — place name + weather + metrics joined by ` · `
+- **Kind badge:** 12pt semibold monospaced in `event.cardFill` color
+- **Duration:** 12pt semibold monospaced tertiary, trailing
+- **Detail line:** 12pt regular tertiary — place name + weather + metrics joined by ` · `
 - **Background:** `Color(UIColor.secondarySystemGroupedBackground).opacity(0.82)` + `.ultraThinMaterial` layered
 - **Blank candidate:** opacity 0.62, dashed border
 
@@ -198,14 +202,14 @@ Components already implemented that Phase 3 must maintain and refine:
 - **Purpose:** Tap-into sheet for a single event
 - **Header card:** `event.cardFill.opacity(0.92)` background. White text on colored backgrounds; `.primary` text on `.quietTime`
 - **Detail chips:** Weather + place, 12pt tile-style, `secondarySystemGroupedBackground.opacity(0.78)`, corner 16pt
-- **Metric mini-cards:** 11pt monospaced label + 18pt bold rounded value, `tertiarySystemGroupedBackground.opacity(0.7)`, corner 16pt
+- **Metric mini-cards:** 12pt monospaced regular label + 23pt semibold rounded value, `tertiarySystemGroupedBackground.opacity(0.7)`, corner 16pt
 - **Heart rate chart:** `TodayTheme.rose` line + 18% area fill, 180pt height, 4 X-axis marks
 - **Sleep stage bar:** 28pt height, per-stage color segments
 
 ### `QuickRecordSheet` (QuickRecordSheet.swift)
 - **Purpose:** Manual mood recording and moment capture
 - **Mood grid:** 3-column `LazyVGrid`, 12pt spacing. Selected state: `Color.accentColor.opacity(0.12)` background + 2pt `Color.accentColor` border
-- **Text field:** 14pt padding, 14pt corner radius, `secondarySystemGroupedBackground`, separator stroke
+- **Text field:** 16pt padding, 16pt corner radius, `secondarySystemGroupedBackground`, separator stroke
 - **Photo thumbnails:** 88pt × 88pt, corner 18pt
 - **Action bar:** Sticky `safeAreaInset(.bottom)`, systemGroupedBackground at 96% opacity
 - **Detents:** `.medium` and `.large`; drag indicator visible
@@ -221,7 +225,7 @@ Components already implemented that Phase 3 must maintain and refine:
 - **Date strip:** Horizontal scroll, 40pt × 40pt date cells, corner 10pt, `AppColor.accent` fill for selected
 - **Has-data dot:** 5pt circle, `Color.accentColor` fill, centered below cell
 - **Recording status bar:** 8pt pulse dot in system `.green`, 1.5s ease-in-out repeat animation
-- **Metric cards:** 2-column `LazyVGrid`, 26pt bold metric value, `AppRadius.md` corner, warm shadow
+- **Metric cards:** 2-column `LazyVGrid`, 23pt semibold metric value, `AppRadius.md` corner, warm shadow
 - **Calendar sheet:** `.large` detent, 36pt × 36pt day cells in circle, data dot 6pt
 
 ### `ContentCard` (TodayTheme.swift)
@@ -232,9 +236,9 @@ Components already implemented that Phase 3 must maintain and refine:
 - **Internal spacing:** `AppSpacing.sm` (12pt) between children
 
 ### `OverviewStatCard` (TodayFlowViews.swift)
-- **Size:** 92pt wide, internal padding: 14pt horizontal / 16pt vertical
-- **Value:** 24pt bold monospaced in `stat.tint`
-- **Label:** 11pt regular tertiary
+- **Size:** 92pt wide, internal padding: 16pt horizontal / 16pt vertical
+- **Value:** 23pt semibold monospaced in `stat.tint`
+- **Label:** 12pt regular tertiary
 
 ---
 
@@ -281,7 +285,7 @@ Components already implemented that Phase 3 must maintain and refine:
 
 ### Active Session State
 - Bottom action bar splits into two buttons: "补一个打点" (secondary) + "结束这段状态" (primary teal)
-- "进行中" badge: `TodayTheme.teal` text on `TodayTheme.tealSoft` background, 11pt bold monospaced
+- "进行中" badge: `TodayTheme.teal` text on `TodayTheme.tealSoft` background, 12pt semibold monospaced
 
 ---
 
