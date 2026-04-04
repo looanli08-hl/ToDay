@@ -32,11 +32,11 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Timeline UI
 
-- [ ] **TML-01**: User sees a vertical timeline of their day with time-of-day gradient background
-- [ ] **TML-02**: Each event shows type badge, duration, and place name
+- [x] **TML-01**: User sees a vertical timeline of their day with time-of-day gradient background
+- [x] **TML-02**: Each event shows type badge, duration, and place name
 - [ ] **TML-03**: User can tap an event to see details
 - [ ] **TML-04**: User can annotate blank periods with what they were doing
-- [ ] **TML-05**: Timeline visual quality reaches Apple-level design standard per .impeccable.md
+- [x] **TML-05**: Timeline visual quality reaches Apple-level design standard per .impeccable.md
 - [ ] **TML-06**: User can browse any past day's timeline via history screen
 
 ### AI Daily Summary
@@ -140,11 +140,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | REC-07 | Phase 2 | Complete |
 | PRV-02 | Phase 2 | Complete |
 | PRV-03 | Phase 2 | Complete |
-| TML-01 | Phase 3 | Pending |
-| TML-02 | Phase 3 | Pending |
+| TML-01 | Phase 3 | Complete |
+| TML-02 | Phase 3 | Complete |
 | TML-03 | Phase 3 | Pending |
 | TML-04 | Phase 3 | Pending |
-| TML-05 | Phase 3 | Pending |
+| TML-05 | Phase 3 | Complete |
 | TML-06 | Phase 3 | Pending |
 | REC-01 | Phase 3 | Pending |
 | REC-02 | Phase 3 | Pending |

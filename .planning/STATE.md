@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: verifying
-stopped_at: Completed 02-02-PLAN.md
-last_updated: "2026-04-04T15:19:49.535Z"
+status: executing
+stopped_at: Completed 03-01-PLAN.md
+last_updated: "2026-04-04T16:05:22.614Z"
 last_activity: 2026-04-04
 progress:
   total_phases: 5
   completed_phases: 1
-  total_plans: 6
-  completed_plans: 3
+  total_plans: 10
+  completed_plans: 4
   percent: 0
 ---
 
@@ -21,13 +21,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-04)
 
 **Core value:** 让用户睡前打开 App，一眼看到自己今天是怎么度过的，并从 AI 那里获得一句让他想继续用的洞察。
-**Current focus:** Phase 02 — Onboarding and First Visible AI
+**Current focus:** Phase 03 — Timeline and Recording Polish
 
 ## Current Position
 
-Phase: 3
-Plan: Not started
-Status: Phase complete — ready for verification
+Phase: 03 (Timeline and Recording Polish) — EXECUTING
+Plan: 2 of 4
+Status: Ready to execute
 Last activity: 2026-04-04
 
 Progress: [░░░░░░░░░░] 0%
@@ -55,6 +55,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 02-onboarding-and-first-visible-ai P03 | 8min | 2 tasks | 2 files |
 | Phase 02-onboarding-and-first-visible-ai P01 | 7 | 2 tasks | 3 files |
 | Phase 02 P02 | 25 | 2 tasks | 8 files |
+| Phase 03-timeline-and-recording-polish P01 | 15 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -74,6 +75,8 @@ Recent decisions affecting current work:
 - [Phase 02-onboarding-and-first-visible-ai]: LocationPermissionCoordinator as @StateObject retains CLLocationManager for delegate lifetime — local variable pattern causes premature deallocation
 - [Phase 02]: Suppressed algorithmic summarySection when AI content is available to avoid redundant dual summaries
 - [Phase 02]: LocationCollector background monitoring restricted to .authorizedAlways only — .authorizedWhenInUse was silently failing
+- [Phase 03-timeline-and-recording-polish]: EventCardView uses AppRadius.lg (16pt squircle) on both clipShape and overlay for UI-SPEC compliant event card corners
+- [Phase 03-timeline-and-recording-polish]: TodayScreen bottom action bar uses .appShadow(.elevated) replacing Color.primary cold shadow per warm-tinted shadow contract
 
 ### Pending Todos
 
@@ -87,6 +90,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-04T10:23:18.447Z
-Stopped at: Completed 02-02-PLAN.md
+Last session: 2026-04-04T16:05:22.612Z
+Stopped at: Completed 03-01-PLAN.md
 Resume file: None

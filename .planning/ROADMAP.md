@@ -68,7 +68,7 @@ Plans:
 **UI hint**: yes
 
 Plans:
-- [ ] 03-01-PLAN.md — EventCardView + TodayScreen typography, corner radius, spacing, and shadow compliance
+- [x] 03-01-PLAN.md — EventCardView + TodayScreen typography, corner radius, spacing, and shadow compliance
 - [ ] 03-02-PLAN.md — HistoryScreen + QuickRecordSheet + DayScrollView timestamp/moodRow compliance
 - [ ] 03-03-PLAN.md — Proportional event row heights + DayScrollViewTests (5 new tests)
 - [ ] 03-04-PLAN.md — LocationCollector authorization hardening + real-device recording validation (TestFlight checkpoint)
@@ -102,6 +102,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 |-------|----------------|--------|-----------|
 | 1. Security and AI Pipeline | 0/3 | Not started | - |
 | 2. Onboarding and First Visible AI | 3/3 | Complete   | 2026-04-04 |
-| 3. Timeline and Recording Polish | 0/4 | Not started | - |
+| 3. Timeline and Recording Polish | 1/4 | In Progress|  |
 | 4. Pattern Recognition and Proactive Push | 0/TBD | Not started | - |
 | 5. Echo Conversation | 0/TBD | Not started | - |
