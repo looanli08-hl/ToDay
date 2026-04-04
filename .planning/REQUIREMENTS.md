@@ -34,7 +34,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **TML-01**: User sees a vertical timeline of their day with time-of-day gradient background
 - [x] **TML-02**: Each event shows type badge, duration, and place name
-- [ ] **TML-03**: User can tap an event to see details
+- [x] **TML-03**: User can tap an event to see details
 - [x] **TML-04**: User can annotate blank periods with what they were doing
 - [x] **TML-05**: Timeline visual quality reaches Apple-level design standard per .impeccable.md
 - [x] **TML-06**: User can browse any past day's timeline via history screen
@@ -142,7 +142,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PRV-03 | Phase 2 | Complete |
 | TML-01 | Phase 3 | Complete |
 | TML-02 | Phase 3 | Complete |
-| TML-03 | Phase 3 | Pending |
+| TML-03 | Phase 3 | Complete |
 | TML-04 | Phase 3 | Complete |
 | TML-05 | Phase 3 | Complete |
 | TML-06 | Phase 3 | Complete |
