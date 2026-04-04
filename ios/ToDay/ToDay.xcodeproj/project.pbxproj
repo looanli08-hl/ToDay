@@ -63,6 +63,7 @@
 		4E0E762B4D92B8C4703F24C0 /* MoodRecordEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 517D081EC92833825D6C1658 /* MoodRecordEntity.swift */; };
 		4FE7ED6B910849760A8ED1BE /* QuickRecordSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90DD0AA794ABBBE1F95F1B7 /* QuickRecordSheet.swift */; };
 		50D54D3F7E2914EB1CEC9C91 /* SensorTypesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B841AA3458BDB1107651FED3 /* SensorTypesTests.swift */; };
+		52830123F66707C10C29F71B /* DayScrollViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B907BCCAD9C4524D3CAAC6F /* DayScrollViewTests.swift */; };
 		52BA7C5CA039BE601267E41F /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEBA7D34F5C9C73353085631 /* OnboardingView.swift */; };
 		568C42F2CFFDC620FA62FF39 /* ShutterMediaLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA2945C087EDB5436443DA92 /* ShutterMediaLibrary.swift */; };
 		578F43A4F42F7DF8633BED13 /* EchoMessageListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 178E944715EC8339B4296F34 /* EchoMessageListView.swift */; };
@@ -253,6 +254,7 @@
 		5D612B7371CBAC2D72C59FB2 /* ScrollShareService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollShareService.swift; sourceTree = "<group>"; };
 		5DA68A1791C5F24214D3E41B /* DashboardViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardViewModelTests.swift; sourceTree = "<group>"; };
 		657E7CB2585EACE47FFE1613 /* EchoMessageManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoMessageManagerTests.swift; sourceTree = "<group>"; };
+		6B907BCCAD9C4524D3CAAC6F /* DayScrollViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayScrollViewTests.swift; sourceTree = "<group>"; };
 		6B917ECDF78E99FB0636A58B /* MoodRecord+Timeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MoodRecord+Timeline.swift"; sourceTree = "<group>"; };
 		6D40EA4B5DE92A1C04FEF877 /* TodayInsightComposer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayInsightComposer.swift; sourceTree = "<group>"; };
 		6E5B2A3BE2F159F5638142B6 /* ScreenTimeInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenTimeInputView.swift; sourceTree = "<group>"; };
@@ -580,6 +582,7 @@
 			children = (
 				0B762E60A466C03F155E20DA /* CareNudgeEngineTests.swift */,
 				5DA68A1791C5F24214D3E41B /* DashboardViewModelTests.swift */,
+				6B907BCCAD9C4524D3CAAC6F /* DayScrollViewTests.swift */,
 				DD8682A65FCDD7B5B3365527 /* DeviceStateCollectorTests.swift */,
 				193E7480FCC24BAD0368A991 /* EchoAIServiceTests.swift */,
 				BB963E6AE239CB001EA533A1 /* EchoChatSessionTests.swift */,
@@ -1008,6 +1011,7 @@
 			files = (
 				162F90C0444A634F997BF6CA /* CareNudgeEngineTests.swift in Sources */,
 				BD2074AFA0508C7C195D3891 /* DashboardViewModelTests.swift in Sources */,
+				52830123F66707C10C29F71B /* DayScrollViewTests.swift in Sources */,
 				2F9E1C73B23729E7CD0B5DAA /* DeviceStateCollectorTests.swift in Sources */,
 				097A0AD5ABBA6532888B0793 /* EchoAIServiceTests.swift in Sources */,
 				A06CED5605D3420D5B21617E /* EchoChatSessionTests.swift in Sources */,

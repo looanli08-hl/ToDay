@@ -1,5 +1,23 @@
 import SwiftUI
 
+// MARK: - Module-level helper (internal, accessible from test target)
+
+/// Computes the proportional row height for a timeline event.
+///
+/// Formula: `max(44, min(180, durationMinutes * 0.5))`
+/// Sleep events with stage data receive an additional 92pt minimum floor.
+func eventRowHeightFor(event: InferredEvent) -> CGFloat {
+    let durationMinutes = max(Int(event.duration / 60), 1)
+    let proportional = CGFloat(durationMinutes) * 0.5
+    let base = max(44, min(180, proportional))
+    if event.kind == .sleep,
+       let stages = event.associatedMetrics?.sleepStages,
+       !stages.isEmpty {
+        return max(base, 92)
+    }
+    return base
+}
+
 struct DayScrollView: View {
     let timeline: DayTimeline
     let onEventTap: (InferredEvent) -> Void
@@ -327,12 +345,7 @@ struct DayVerticalTimelineContent: View {
     }
 
     private func eventRowHeight(for event: InferredEvent) -> CGFloat {
-        if event.kind == .sleep,
-           let sleepStages = event.associatedMetrics?.sleepStages,
-           !sleepStages.isEmpty {
-            return 92
-        }
-        return 76
+        return eventRowHeightFor(event: event)
     }
 
     private func rowHeight(for item: TimelineItem) -> CGFloat {
