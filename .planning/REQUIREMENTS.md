@@ -124,4 +124,40 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| — | — | Pending roadmap |
+| SEC-01 | Phase 1 | Pending |
+| SEC-02 | Phase 1 | Pending |
+| SEC-03 | Phase 1 | Pending |
+| AIS-01 | Phase 1 | Pending |
+| AIS-02 | Phase 1 | Pending |
+| AIS-04 | Phase 1 | Pending |
+| AIS-05 | Phase 1 | Pending |
+| PRV-01 | Phase 1 | Pending |
+| ONB-01 | Phase 2 | Pending |
+| ONB-02 | Phase 2 | Pending |
+| ONB-03 | Phase 2 | Pending |
+| ONB-04 | Phase 2 | Pending |
+| AIS-03 | Phase 2 | Pending |
+| REC-07 | Phase 2 | Pending |
+| PRV-02 | Phase 2 | Pending |
+| PRV-03 | Phase 2 | Pending |
+| TML-01 | Phase 3 | Pending |
+| TML-02 | Phase 3 | Pending |
+| TML-03 | Phase 3 | Pending |
+| TML-04 | Phase 3 | Pending |
+| TML-05 | Phase 3 | Pending |
+| TML-06 | Phase 3 | Pending |
+| REC-01 | Phase 3 | Pending |
+| REC-02 | Phase 3 | Pending |
+| REC-03 | Phase 3 | Pending |
+| REC-04 | Phase 3 | Pending |
+| REC-05 | Phase 3 | Pending |
+| REC-06 | Phase 3 | Pending |
+| MAN-01 | Phase 3 | Pending |
+| MAN-02 | Phase 3 | Pending |
+| MAN-03 | Phase 3 | Pending |
+| AIP-01 | Phase 4 | Pending |
+| AIP-02 | Phase 4 | Pending |
+| AIP-03 | Phase 4 | Pending |
+| AIC-01 | Phase 5 | Pending |
+| AIC-02 | Phase 5 | Pending |
+| AIC-03 | Phase 5 | Pending |
