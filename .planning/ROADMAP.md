@@ -13,7 +13,7 @@ Unfold has a complete sensor-to-timeline pipeline that already works — locatio
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [ ] **Phase 1: Security and AI Pipeline** - Remove hardcoded API key, migrate to Claude via AIProxy, wire EchoScheduler to app lifecycle so daily summaries generate and persist
-- [ ] **Phase 2: Onboarding and First Visible AI** - Ship permission onboarding that gets Always Location granted, surface AI summary on TodayScreen, handle data gaps gracefully, complete privacy compliance
+- [x] **Phase 2: Onboarding and First Visible AI** - Ship permission onboarding that gets Always Location granted, surface AI summary on TodayScreen, handle data gaps gracefully, complete privacy compliance (completed 2026-04-04)
 - [ ] **Phase 3: Timeline and Recording Polish** - Raise the "画卷" timeline to Apple-quality design; validate the complete passive recording pipeline on real devices
 - [ ] **Phase 4: Pattern Recognition and Proactive Push** - Detect behavioral patterns across days, surface one meaningful daily notification insight
 - [ ] **Phase 5: Echo Conversation** - Enable users to ask Echo natural language questions about their life data
@@ -51,7 +51,7 @@ Plans:
 
 Plans:
 - [x] 02-01-PLAN.md — Rewrite OnboardingView as multi-step flow with two-step Always Location and denial recovery
-- [ ] 02-02-PLAN.md — Wire AI summary to TodayScreen, add dataGap EventKind, fix LocationCollector whenInUse bug
+- [x] 02-02-PLAN.md — Wire AI summary to TodayScreen, add dataGap EventKind, fix LocationCollector whenInUse bug
 - [x] 02-03-PLAN.md — Update DataExplanationView privacy disclosure, produce App Review Notes document
 
 ### Phase 3: Timeline and Recording Polish
@@ -95,7 +95,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Security and AI Pipeline | 0/3 | Not started | - |
-| 2. Onboarding and First Visible AI | 0/3 | Not started | - |
+| 2. Onboarding and First Visible AI | 3/3 | Complete   | 2026-04-04 |
 | 3. Timeline and Recording Polish | 0/TBD | Not started | - |
 | 4. Pattern Recognition and Proactive Push | 0/TBD | Not started | - |
 | 5. Echo Conversation | 0/TBD | Not started | - |

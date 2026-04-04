@@ -28,7 +28,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **REC-04**: Places are auto-labeled via reverse geocoding (e.g. "星巴克", "北大图书馆")
 - [ ] **REC-05**: Places are auto-classified as home/work/frequent based on visit patterns
 - [ ] **REC-06**: Recording survives app being killed by system (significant location change re-launch)
-- [ ] **REC-07**: Data gaps from force-quit/airplane mode are displayed gracefully, not hidden
+- [x] **REC-07**: Data gaps from force-quit/airplane mode are displayed gracefully, not hidden
 
 ### Timeline UI
 
@@ -43,7 +43,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [ ] **AIS-01**: App generates a short AI summary of the user's day (1-2 sentences) using cloud API
 - [ ] **AIS-02**: Summary references specific places and activities from the user's actual data
-- [ ] **AIS-03**: Summary is displayed prominently on the today screen
+- [x] **AIS-03**: Summary is displayed prominently on the today screen
 - [ ] **AIS-04**: Summary tone is observational ("你今天..."), never prescriptive ("你应该...")
 - [ ] **AIS-05**: Summary generation runs automatically when user opens app in evening or on app background
 
@@ -136,8 +136,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ONB-02 | Phase 2 | Complete |
 | ONB-03 | Phase 2 | Complete |
 | ONB-04 | Phase 2 | Complete |
-| AIS-03 | Phase 2 | Pending |
-| REC-07 | Phase 2 | Pending |
+| AIS-03 | Phase 2 | Complete |
+| REC-07 | Phase 2 | Complete |
 | PRV-02 | Phase 2 | Complete |
 | PRV-03 | Phase 2 | Complete |
 | TML-01 | Phase 3 | Pending |
