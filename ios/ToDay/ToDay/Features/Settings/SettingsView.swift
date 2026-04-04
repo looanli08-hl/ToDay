@@ -390,18 +390,38 @@ private struct DataExplanationView: View {
     var body: some View {
         List {
             Section {
-                Text(
-                    """
-                    Unfold 的所有数据（位置、活动）仅存储在你的设备本地。
+                Text("位置与活动数据仅存储在你的设备本地，不会上传到任何服务器。")
+                    .font(.body)
+                    .foregroundStyle(.primary)
+                    .lineSpacing(4)
+            } header: {
+                Text("本地数据")
+            }
 
-                    我们不上传、不收集、不分享任何个人数据。
+            Section {
+                Text("""
+                    Unfold 的 AI 每日总结功能（Echo 洞察）会将你当天的活动摘要发送给 AI 服务进行分析。
 
-                    你可以随时在设置页面清除所有标注和心情记录。
-                    """
-                )
-                .font(.body)
-                .foregroundStyle(.primary)
-                .lineSpacing(4)
+                    发送内容：推断出的地点名称和活动类型（例如"在家 2 小时""步行 30 分钟"）。
+
+                    不发送：原始 GPS 坐标、个人身份信息或任何可识别你位置的精确数据。
+
+                    AI 服务商：DeepSeek，你的活动摘要由 DeepSeek 的语言模型处理。
+                    """)
+                    .font(.body)
+                    .foregroundStyle(.primary)
+                    .lineSpacing(4)
+            } header: {
+                Text("AI 功能数据处理")
+            }
+
+            Section {
+                Text("你可以随时在设置页面清除所有标注、心情记录和本地数据。")
+                    .font(.body)
+                    .foregroundStyle(.primary)
+                    .lineSpacing(4)
+            } header: {
+                Text("数据删除")
             }
         }
         .navigationTitle("数据说明")
