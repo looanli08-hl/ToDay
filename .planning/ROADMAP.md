@@ -52,7 +52,7 @@ Plans:
 Plans:
 - [ ] 02-01-PLAN.md — Rewrite OnboardingView as multi-step flow with two-step Always Location and denial recovery
 - [ ] 02-02-PLAN.md — Wire AI summary to TodayScreen, add dataGap EventKind, fix LocationCollector whenInUse bug
-- [ ] 02-03-PLAN.md — Update DataExplanationView privacy disclosure, produce App Review Notes document
+- [x] 02-03-PLAN.md — Update DataExplanationView privacy disclosure, produce App Review Notes document
 
 ### Phase 3: Timeline and Recording Polish
 **Goal**: Opening the app at 11pm and seeing your day feels worth doing again tomorrow

@@ -68,8 +68,8 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Privacy & Compliance
 
 - [ ] **PRV-01**: No raw GPS coordinates are sent to cloud AI — only place names and event descriptions
-- [ ] **PRV-02**: Privacy policy page exists and is accessible from app settings
-- [ ] **PRV-03**: App Review Notes explain Always Location usage clearly
+- [x] **PRV-02**: Privacy policy page exists and is accessible from app settings
+- [x] **PRV-03**: App Review Notes explain Always Location usage clearly
 
 ## v2 Requirements
 
@@ -138,8 +138,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ONB-04 | Phase 2 | Pending |
 | AIS-03 | Phase 2 | Pending |
 | REC-07 | Phase 2 | Pending |
-| PRV-02 | Phase 2 | Pending |
-| PRV-03 | Phase 2 | Pending |
+| PRV-02 | Phase 2 | Complete |
+| PRV-03 | Phase 2 | Complete |
 | TML-01 | Phase 3 | Pending |
 | TML-02 | Phase 3 | Pending |
 | TML-03 | Phase 3 | Pending |
