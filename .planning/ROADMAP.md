@@ -47,8 +47,12 @@ Plans:
   3. AI daily summary card appears on the TodayScreen at a prominent position the user encounters naturally
   4. Periods where the phone was off, force-quit, or in airplane mode are shown as labeled gap indicators, not missing time
   5. Privacy policy is accessible from app Settings and accurately discloses that anonymized activity summaries (not GPS) are sent to an AI provider
-**Plans**: TBD
-**UI hint**: yes
+**Plans**: 3 plans
+
+Plans:
+- [ ] 02-01-PLAN.md — Rewrite OnboardingView as multi-step flow with two-step Always Location and denial recovery
+- [ ] 02-02-PLAN.md — Wire AI summary to TodayScreen, add dataGap EventKind, fix LocationCollector whenInUse bug
+- [ ] 02-03-PLAN.md — Update DataExplanationView privacy disclosure, produce App Review Notes document
 
 ### Phase 3: Timeline and Recording Polish
 **Goal**: Opening the app at 11pm and seeing your day feels worth doing again tomorrow
@@ -91,7 +95,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Security and AI Pipeline | 0/3 | Not started | - |
-| 2. Onboarding and First Visible AI | 0/TBD | Not started | - |
+| 2. Onboarding and First Visible AI | 0/3 | Not started | - |
 | 3. Timeline and Recording Polish | 0/TBD | Not started | - |
 | 4. Pattern Recognition and Proactive Push | 0/TBD | Not started | - |
 | 5. Echo Conversation | 0/TBD | Not started | - |
