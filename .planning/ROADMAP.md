@@ -50,7 +50,7 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 02-01-PLAN.md — Rewrite OnboardingView as multi-step flow with two-step Always Location and denial recovery
+- [x] 02-01-PLAN.md — Rewrite OnboardingView as multi-step flow with two-step Always Location and denial recovery
 - [ ] 02-02-PLAN.md — Wire AI summary to TodayScreen, add dataGap EventKind, fix LocationCollector whenInUse bug
 - [x] 02-03-PLAN.md — Update DataExplanationView privacy disclosure, produce App Review Notes document
 

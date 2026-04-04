@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-03-PLAN.md — DataExplanationView updated, APP-REVIEW-NOTES.md created; awaiting human verification at checkpoint
-last_updated: "2026-04-04T10:13:25.443Z"
+stopped_at: "Completed 02-01-PLAN.md: OnboardingView multi-step flow + usage description strings"
+last_updated: "2026-04-04T10:19:03.741Z"
 last_activity: 2026-04-04
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 6
-  completed_plans: 1
+  completed_plans: 2
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-04)
 ## Current Position
 
 Phase: 02 (Onboarding and First Visible AI) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-04-04
 
@@ -53,6 +53,7 @@ Progress: [░░░░░░░░░░] 0%
 
 *Updated after each plan completion*
 | Phase 02-onboarding-and-first-visible-ai P03 | 8min | 2 tasks | 2 files |
+| Phase 02-onboarding-and-first-visible-ai P01 | 7 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -68,6 +69,8 @@ Recent decisions affecting current work:
 - Roadmap: Pattern recognition (Phase 4) is data-gated — requires 3+ weeks of accumulated daily summaries from real users
 - [Phase 02-onboarding-and-first-visible-ai]: DataExplanationView restructured into three named sections — explicit Anthropic/AIProxy naming chosen over vague third-party language for honest disclosure
 - [Phase 02-onboarding-and-first-visible-ai]: APP-REVIEW-NOTES.md stored in .planning/ as a permanent submission artifact — not shipped in codebase
+- [Phase 02-onboarding-and-first-visible-ai]: iOS 17 two-step Always Location pattern required: requestWhenInUse first, then requestAlways after .authorizedWhenInUse received
+- [Phase 02-onboarding-and-first-visible-ai]: LocationPermissionCoordinator as @StateObject retains CLLocationManager for delegate lifetime — local variable pattern causes premature deallocation
 
 ### Pending Todos
 
@@ -81,6 +84,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-04T10:13:25.441Z
-Stopped at: Completed 02-03-PLAN.md — DataExplanationView updated, APP-REVIEW-NOTES.md created; awaiting human verification at checkpoint
+Last session: 2026-04-04T10:19:03.739Z
+Stopped at: Completed 02-01-PLAN.md: OnboardingView multi-step flow + usage description strings
 Resume file: None

@@ -15,10 +15,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Onboarding
 
-- [ ] **ONB-01**: User is guided through Location "Always" permission with clear value explanation before system dialog
-- [ ] **ONB-02**: User is guided through Motion permission with clear value explanation
-- [ ] **ONB-03**: Permission denial is handled gracefully with path to Settings
-- [ ] **ONB-04**: App Store usage description strings are specific enough to pass App Review
+- [x] **ONB-01**: User is guided through Location "Always" permission with clear value explanation before system dialog
+- [x] **ONB-02**: User is guided through Motion permission with clear value explanation
+- [x] **ONB-03**: Permission denial is handled gracefully with path to Settings
+- [x] **ONB-04**: App Store usage description strings are specific enough to pass App Review
 
 ### Recording
 
@@ -132,10 +132,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AIS-04 | Phase 1 | Pending |
 | AIS-05 | Phase 1 | Pending |
 | PRV-01 | Phase 1 | Pending |
-| ONB-01 | Phase 2 | Pending |
-| ONB-02 | Phase 2 | Pending |
-| ONB-03 | Phase 2 | Pending |
-| ONB-04 | Phase 2 | Pending |
+| ONB-01 | Phase 2 | Complete |
+| ONB-02 | Phase 2 | Complete |
+| ONB-03 | Phase 2 | Complete |
+| ONB-04 | Phase 2 | Complete |
 | AIS-03 | Phase 2 | Pending |
 | REC-07 | Phase 2 | Pending |
 | PRV-02 | Phase 2 | Complete |
