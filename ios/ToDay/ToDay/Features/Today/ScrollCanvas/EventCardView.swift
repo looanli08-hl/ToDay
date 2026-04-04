@@ -25,7 +25,7 @@ struct EventCardView: View {
             VStack(alignment: .leading, spacing: 6) {
                 HStack(alignment: .firstTextBaseline, spacing: 8) {
                     Text(event.kindBadgeTitle)
-                        .font(.system(size: 10, weight: .bold, design: .monospaced))
+                        .font(.system(size: 12, weight: .semibold, design: .monospaced))
                         .foregroundStyle(event.cardFill)
 
                     Text(event.resolvedName)
@@ -36,13 +36,13 @@ struct EventCardView: View {
                     Spacer(minLength: 8)
 
                     Text(event.scrollDurationText)
-                        .font(.system(size: 13, weight: .bold, design: .monospaced))
+                        .font(.system(size: 12, weight: .semibold, design: .monospaced))
                         .foregroundStyle(Color(UIColor.tertiaryLabel))
                 }
 
                 if let detailLine = event.compactDetailLine {
                     Text(detailLine)
-                        .font(.system(size: 13))
+                        .font(.system(size: 12, weight: .regular))
                         .foregroundStyle(Color(UIColor.tertiaryLabel))
                         .lineLimit(1)
                 }
@@ -60,13 +60,13 @@ struct EventCardView: View {
         .padding(.trailing, 14)
         .background(Color(UIColor.secondarySystemGroupedBackground).opacity(event.isBlankCandidate ? 0.62 : 0.82))
         .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
         .overlay(cardBorder)
     }
 
     @ViewBuilder
     private var cardBorder: some View {
-        RoundedRectangle(cornerRadius: 14, style: .continuous)
+        RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
             .stroke(
                 style: StrokeStyle(
                     lineWidth: event.isBlankCandidate ? 1 : 0.5,
@@ -103,7 +103,7 @@ struct EventCardView: View {
                 }
 
             Text(event.resolvedName)
-                .font(.system(size: 14, weight: .medium))
+                .font(.system(size: 15, weight: .semibold))
                 .foregroundStyle(.primary)
                 .lineLimit(1)
 
