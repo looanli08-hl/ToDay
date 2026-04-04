@@ -206,6 +206,7 @@ enum EventKind: String, Codable, CaseIterable, Sendable {
     case shutter
     case screenTime
     case spending
+    case dataGap    // periods where no sensor data was recorded
 }
 
 enum EventConfidence: Int, Codable, Comparable, Sendable {

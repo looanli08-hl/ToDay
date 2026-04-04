@@ -208,6 +208,8 @@ extension InferredEvent {
             return TodayTheme.glass
         case .spending:
             return TodayTheme.teal.opacity(0.82)
+        case .dataGap:
+            return TodayTheme.glass
         }
     }
 
@@ -237,6 +239,8 @@ extension InferredEvent {
             return Color(UIColor.quaternaryLabel)
         case .spending:
             return TodayTheme.teal
+        case .dataGap:
+            return Color(UIColor.quaternaryLabel)
         }
     }
 
@@ -266,6 +270,8 @@ extension InferredEvent {
             return "屏幕"
         case .spending:
             return "消费"
+        case .dataGap:
+            return "留空"
         }
     }
 

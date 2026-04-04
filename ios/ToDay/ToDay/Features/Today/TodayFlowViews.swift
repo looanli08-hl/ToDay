@@ -516,6 +516,8 @@ extension EventKind {
             return Color(UIColor.quaternaryLabel)
         case .spending:
             return TodayTheme.teal
+        case .dataGap:
+            return Color(UIColor.quaternaryLabel)
         }
     }
 
@@ -537,6 +539,8 @@ extension EventKind {
             return Color(UIColor.tertiarySystemGroupedBackground)
         case .spending:
             return TodayTheme.tealSoft
+        case .dataGap:
+            return Color(UIColor.tertiarySystemGroupedBackground)
         }
     }
 
@@ -560,6 +564,8 @@ extension EventKind {
             return 0.30
         case .spending:
             return 0.52
+        case .dataGap:
+            return 0.10
         }
     }
 
@@ -585,6 +591,8 @@ extension EventKind {
             return "📱"
         case .spending:
             return "💳"
+        case .dataGap:
+            return "—"
         }
     }
 }
@@ -636,6 +644,8 @@ private extension InferredEvent {
             return note ?? "一段屏幕使用时间。"
         case .spending:
             return note ?? "记录了一笔消费。"
+        case .dataGap:
+            return note ?? "这段时间没有传感器记录。"
         }
     }
 

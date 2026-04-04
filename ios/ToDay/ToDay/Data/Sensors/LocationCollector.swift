@@ -87,9 +87,15 @@ final class LocationCollector: NSObject, SensorCollecting, CLLocationManagerDele
     }
 
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-        if manager.authorizationStatus == .authorizedAlways ||
-           manager.authorizationStatus == .authorizedWhenInUse {
+        switch manager.authorizationStatus {
+        case .authorizedAlways:
             startMonitoring()
+        case .authorizedWhenInUse:
+            // Background significant location changes and visits require Always.
+            // Do not start monitoring — foreground-only access cannot power the timeline.
+            break
+        default:
+            break
         }
     }
 }

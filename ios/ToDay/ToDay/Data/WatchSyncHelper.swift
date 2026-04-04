@@ -148,6 +148,8 @@ final class WatchSyncHelper {
             return "iphone"
         case .spending:
             return "creditcard.fill"
+        case .dataGap:
+            return "minus"
         }
     }
 }
