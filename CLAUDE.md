@@ -8,20 +8,23 @@ iOS 自动生活记录 App — "把你的一天变成一张会让你想看的生
 
 开发分支: `feature/phone-first-auto-recording`
 
-## MVP 范围（严格）
+## v1 范围
 
 1. CoreLocation 自动记录地点 + 停留时长
-2. 地点自动标签（家、学校、咖啡厅等，CLGeocoder 反向地理编码）
-3. 一张精美的"今日画卷"时间轴（设计是核心壁垒）
+2. 地点自动标签（CLGeocoder 反向地理编码）
+3. 精美的"今日画卷"时间轴（设计是核心壁垒）
+4. AI 每日总结（DeepSeek API，观察性语气）
+5. AI 模式识别 + 主动推送
+6. Echo 对话（用自然语言查询生活数据）
 
-## 不做（MVP 阶段）
+## 不做（v1 阶段）
 
 - ❌ 心率 / Apple Watch
-- ❌ AI / Echo 伴侣
 - ❌ 屏幕时间自动采集
 - ❌ 分享卡片 / 社交
 - ❌ 云端同步
 - ❌ Web / Chrome Extension（已暂停）
+- ❌ 付费/订阅系统
 
 ## Tech Stack
 
