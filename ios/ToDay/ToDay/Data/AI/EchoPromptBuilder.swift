@@ -240,6 +240,28 @@ final class EchoPromptBuilder: @unchecked Sendable {
         return parts.joined(separator: "\n\n")
     }
 
+    // MARK: - Pattern Insight Prompt
+
+    /// Build a Chinese-language prompt asking AI to describe a detected behavioral pattern.
+    ///
+    /// The prompt instructs the model to output a single observational sentence (20-40 characters),
+    /// describing the pattern without evaluation or prescriptive advice.
+    func buildPatternInsightPrompt(_ pattern: DetectedPattern) -> String {
+        let timeLabel: String
+        switch pattern.timeOfDay {
+        case .morning:   timeLabel = "早上"
+        case .afternoon: timeLabel = "下午"
+        case .evening:   timeLabel = "晚上"
+        }
+        return """
+        请根据以下行为规律，生成一句简洁的中文观察（20-40字）。只描述规律，不评价，不建议，语气温和自然，像老朋友观察到的一件事。
+
+        规律：用户连续\(pattern.streakLength)天\(timeLabel)都在\(pattern.placeName)
+
+        只输出一句话，不加标题或解释。
+        """
+    }
+
     // MARK: - Profile Update Prompt
 
     /// Build a prompt for the weekly profile updater.
