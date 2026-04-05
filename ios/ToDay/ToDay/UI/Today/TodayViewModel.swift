@@ -48,15 +48,6 @@ final class TodayViewModel: ObservableObject {
 
     func load() async {
         await loadTimeline(for: selectedDate)
-
-        #if targetEnvironment(simulator)
-        if aiSummary == nil {
-            aiSummary = "今天节奏不错，上午在家安静待着，中午出门吃了饭，下午跑了一圈步。整体是个有动有静的一天。"
-        }
-        if patternInsight == nil {
-            patternInsight = "你最近三天下午都出门跑步了，慢慢成了一个习惯。"
-        }
-        #endif
     }
 
     func refresh() async {
@@ -78,10 +69,16 @@ final class TodayViewModel: ObservableObject {
             if isToday {
                 BackgroundTaskManager.updateTodayEventCount(mergedTimeline.entries.count)
                 loadAISummary()
-            } else {
-                aiSummary = nil
-                patternInsight = nil
             }
+
+            #if targetEnvironment(simulator)
+            if aiSummary == nil {
+                aiSummary = "今天节奏不错，上午在家安静待着，中午出门吃了饭，下午跑了一圈步。整体是个有动有静的一天。"
+            }
+            if patternInsight == nil {
+                patternInsight = "你最近三天下午都出门跑步了，慢慢成了一个习惯。"
+            }
+            #endif
         } catch {
             if !hasLoadedOnce {
                 errorMessage = error.localizedDescription
