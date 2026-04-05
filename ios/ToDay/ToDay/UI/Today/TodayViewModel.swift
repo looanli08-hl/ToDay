@@ -76,10 +76,10 @@ final class TodayViewModel: ObservableObject {
         displayDate = date
     }
 
-    // MARK: - Mood Record
+    // MARK: - Memo
 
-    func saveMoodRecord(mood: MoodRecord.Mood, note: String) {
-        let record = MoodRecord(mood: mood, note: note)
+    func saveMemo(_ note: String) {
+        let record = MoodRecord(mood: .calm, note: note)
         moodRecordManager.startRecord(record)
         Task { await load() }
     }

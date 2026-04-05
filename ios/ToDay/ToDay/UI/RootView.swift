@@ -72,9 +72,9 @@ struct RootView: View {
         .sheet(isPresented: $showQuickRecord) {
             QuickRecordSheet(
                 isPresented: $showQuickRecord,
-                onSave: { mood, note in
+                onSave: { note in
                     let manager = AppContainer.makeMoodRecordManager()
-                    let record = MoodRecord(mood: mood, note: note)
+                    let record = MoodRecord(mood: .calm, note: note)
                     manager.startRecord(record)
                 }
             )

@@ -53,8 +53,8 @@ struct TodayScreen: View {
         .sheet(isPresented: $viewModel.showQuickRecord) {
             QuickRecordSheet(
                 isPresented: $viewModel.showQuickRecord,
-                onSave: { mood, note in
-                    viewModel.saveMoodRecord(mood: mood, note: note)
+                onSave: { note in
+                    viewModel.saveMemo(note)
                 }
             )
             .presentationDetents([.medium, .large])
@@ -270,7 +270,7 @@ struct TodayScreen: View {
                     viewModel.openQuickRecordComposer()
                 } label: {
                     HStack(spacing: AppSpacing.xs) {
-                        Image(systemName: "heart.circle")
+                        Image(systemName: "square.and.pencil")
                         Text("记录此刻")
                     }
                     .font(AppFont.body())
