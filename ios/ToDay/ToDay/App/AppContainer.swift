@@ -1,202 +1,200 @@
 import Foundation
 import SwiftData
 
+/// Composition root — wires all dependencies for the Unfold app.
+/// Uses enum with static properties for singleton services,
+/// and factory methods for per-screen ViewModels.
 enum AppContainer {
-    static let modelContainer = makeModelContainer()
-    private static let legacyMoodRecordStoreKey = "today.manualRecords"
-    private static let moodRecordStore = SwiftDataMoodRecordStore(container: modelContainer)
-    private static let shutterRecordStore = SwiftDataShutterRecordStore(container: modelContainer)
-    private static let echoItemStore = SwiftDataEchoItemStore(container: modelContainer)
-
-    // MARK: - Sensor Infrastructure
-    private static let sensorDataStore = SensorDataStore(container: modelContainer)
-    private static let placeManager = PlaceManager()
-    private static let phoneInferenceEngine = PhoneInferenceEngine()
-    private static let deviceStateCollector = DeviceStateCollector(store: sensorDataStore)
-    private static let locationCollector = LocationCollector(store: sensorDataStore)
-
-    // MARK: - Echo AI Infrastructure
-    private static let echoAIService = EchoAIService()
-    private static let echoMemoryManager = EchoMemoryManager(container: modelContainer)
-    private static let echoPromptBuilder = EchoPromptBuilder(memoryManager: echoMemoryManager)
-    private static let echoDailySummaryGenerator = EchoDailySummaryGenerator(
-        aiService: echoAIService,
-        memoryManager: echoMemoryManager,
-        promptBuilder: echoPromptBuilder
-    )
-    private static let echoWeeklyProfileUpdater = EchoWeeklyProfileUpdater(
-        aiService: echoAIService,
-        memoryManager: echoMemoryManager,
-        promptBuilder: echoPromptBuilder
-    )
-    private static let echoScheduler = EchoScheduler(
-        dailySummaryGenerator: echoDailySummaryGenerator,
-        weeklyProfileUpdater: echoWeeklyProfileUpdater,
-        memoryManager: echoMemoryManager
-    )
-    private static let echoMessageStore = SwiftDataEchoMessageStore(container: modelContainer)
-
-    // MARK: - View Model Factories
-
-    @MainActor
-    static func makeTodayViewModel() -> TodayViewModel {
-        TodayViewModel(
-            provider: makeTimelineProvider(),
-            recordStore: makeMoodRecordStore(),
-            shutterRecordStore: makeShutterRecordStore(),
-            echoEngine: echoEngine,
-            echoMessageManager: AppContainer.getEchoMessageManager(),
-            modelContainer: modelContainer
-        )
-    }
-
-    // MARK: - Sensor Collectors
-
-    static func availableCollectors() -> [any SensorCollecting] {
-        [
-            MotionCollector(),
-            PedometerCollector(),
-            deviceStateCollector,
-            locationCollector,
-        ]
-    }
-
-    static func getDeviceStateCollector() -> DeviceStateCollector { deviceStateCollector }
-    static func getLocationCollector() -> LocationCollector { locationCollector }
-    static func getSensorDataStore() -> SensorDataStore { sensorDataStore }
-
-    // MARK: - Timeline Provider
-
-    static func makeTimelineProvider() -> any TimelineDataProviding {
-        let environment = ProcessInfo.processInfo.environment
-        if environment["TODAY_USE_MOCK"] == "1" {
-            return MockTimelineDataProvider()
-        }
-
-        #if targetEnvironment(simulator)
-        return MockTimelineDataProvider()
-        #else
-        return PhoneTimelineDataProvider(
-            collectors: availableCollectors(),
-            store: sensorDataStore,
-            inferenceEngine: phoneInferenceEngine,
-            placeManager: placeManager
-        )
-        #endif
-    }
-
-    // MARK: - Store Factories
-
-    static func makeMoodRecordStore() -> any MoodRecordStoring { moodRecordStore }
-    static func makeShutterRecordStore() -> any ShutterRecordStoring { shutterRecordStore }
-    static func makeEchoItemStore() -> any EchoItemStoring { echoItemStore }
-
-    // MARK: - Echo Infrastructure
-
-    @MainActor
-    private static let echoEngine = EchoEngine(
-        echoStore: echoItemStore,
-        shutterRecordStore: shutterRecordStore
-    )
-
-    @MainActor
-    static func makeEchoViewModel() -> EchoViewModel {
-        EchoViewModel(
-            echoEngine: echoEngine,
-            shutterRecordStore: makeShutterRecordStore()
-        )
-    }
-
-    @MainActor
-    static func makeEchoChatViewModel() -> EchoChatViewModel {
-        EchoChatViewModel(
-            aiService: echoAIService,
-            memoryManager: echoMemoryManager,
-            promptBuilder: echoPromptBuilder,
-            container: modelContainer
-        )
-    }
-
-    @MainActor static func getEchoEngine() -> EchoEngine { echoEngine }
-    static func getEchoAIService() -> EchoAIService { echoAIService }
-    static func getEchoMemoryManager() -> EchoMemoryManager { echoMemoryManager }
-    static func getEchoPromptBuilder() -> EchoPromptBuilder { echoPromptBuilder }
-    static func getEchoDailySummaryGenerator() -> EchoDailySummaryGenerator { echoDailySummaryGenerator }
-    static func getEchoWeeklyProfileUpdater() -> EchoWeeklyProfileUpdater { echoWeeklyProfileUpdater }
-    static func getEchoScheduler() -> EchoScheduler { echoScheduler }
-
-    @MainActor
-    static let echoMessageManager: EchoMessageManager = {
-        let manager = EchoMessageManager(store: echoMessageStore, container: modelContainer)
-        echoScheduler.setMessageManager(manager)
-        return manager
-    }()
-
-    @MainActor
-    static func getEchoMessageManager() -> EchoMessageManager { echoMessageManager }
-
-    @MainActor
-    static func makeEchoThreadViewModel(
-        for message: EchoMessageEntity,
-        todayDataSummary: String? = nil
-    ) -> EchoThreadViewModel {
-        EchoThreadViewModel(
-            threadId: message.threadId,
-            sourceData: message.sourceData,
-            messageType: message.messageType,
-            sourceDescription: message.sourceData?.sourceDescription ?? "",
-            aiService: echoAIService,
-            memoryManager: echoMemoryManager,
-            promptBuilder: echoPromptBuilder,
-            container: modelContainer,
-            todayDataSummary: todayDataSummary
-        )
-    }
 
     // MARK: - Model Container
 
-    private static func makeModelContainer() -> ModelContainer {
+    static let modelContainer: ModelContainer = {
+        let schema = Schema([
+            SensorReadingEntity.self,
+            MoodRecordEntity.self,
+            ShutterRecordEntity.self,
+            DayTimelineEntity.self,
+            CustomMoodEntity.self,
+            EchoMessageEntity.self,
+            EchoChatSessionEntity.self,
+            EchoChatMessageEntity.self,
+            UserProfileEntity.self,
+            DailySummaryEntity.self,
+            ConversationMemoryEntity.self,
+        ])
+
+        let config = ModelConfiguration(
+            "Unfold",
+            schema: schema,
+            isStoredInMemoryOnly: false,
+            allowsSave: true
+        )
+
         do {
-            let container = try ModelContainer(
-                for: MoodRecordEntity.self,
-                DayTimelineEntity.self,
-                ShutterRecordEntity.self,
-                EchoItemEntity.self,
-                UserProfileEntity.self,
-                DailySummaryEntity.self,
-                ConversationMemoryEntity.self,
-                EchoChatSessionEntity.self,
-                EchoChatMessageEntity.self,
-                EchoMessageEntity.self,
-                SensorReadingEntity.self,
-                CustomMoodEntity.self
-            )
-            migrateLegacyMoodRecordsIfNeeded(into: container)
+            let container = try ModelContainer(for: schema, configurations: [config])
+            // Seed default custom moods
             let context = ModelContext(container)
             CustomMoodEntity.seedDefaultsIfNeeded(in: context)
             return container
         } catch {
-            fatalError("无法创建 SwiftData 容器：\(error.localizedDescription)")
+            fatalError("Unable to create ModelContainer: \(error.localizedDescription)")
         }
+    }()
+
+    // MARK: - Sensor Infrastructure
+
+    private static let _sensorDataStore = SensorDataStore(container: modelContainer)
+
+    static func getSensorDataStore() -> SensorDataStore {
+        _sensorDataStore
     }
 
-    private static func migrateLegacyMoodRecordsIfNeeded(into container: ModelContainer) {
-        let defaults = UserDefaults.standard
-        guard defaults.data(forKey: legacyMoodRecordStoreKey) != nil else { return }
+    private static let _placeManager = PlaceManager()
 
-        let legacyStore = UserDefaultsMoodRecordStore(defaults: defaults, key: legacyMoodRecordStoreKey)
-        let legacyRecords = legacyStore.loadRecords()
+    static func getPlaceManager() -> PlaceManager {
+        _placeManager
+    }
 
-        guard !legacyRecords.isEmpty else {
-            defaults.removeObject(forKey: legacyMoodRecordStoreKey)
-            return
+    private static let _phoneInferenceEngine = PhoneInferenceEngine()
+
+    // MARK: - Collectors
+
+    private static let _locationCollector = LocationCollector(store: _sensorDataStore)
+    private static let _deviceStateCollector = DeviceStateCollector(store: _sensorDataStore)
+    private static let _motionCollector = MotionCollector()
+    private static let _pedometerCollector = PedometerCollector()
+
+    static func getLocationCollector() -> LocationCollector {
+        _locationCollector
+    }
+
+    static func getDeviceStateCollector() -> DeviceStateCollector {
+        _deviceStateCollector
+    }
+
+    // MARK: - AI Services
+
+    private static let _echoAIService = EchoAIService()
+
+    static func getEchoAIService() -> EchoAIService {
+        _echoAIService
+    }
+
+    private static let _echoMemoryManager = EchoMemoryManager(container: modelContainer)
+
+    static func getEchoMemoryManager() -> EchoMemoryManager {
+        _echoMemoryManager
+    }
+
+    private static let _echoPromptBuilder = EchoPromptBuilder(
+        memoryManager: _echoMemoryManager,
+        timelineContainer: modelContainer
+    )
+
+    static func getEchoPromptBuilder() -> EchoPromptBuilder {
+        _echoPromptBuilder
+    }
+
+    private static let _echoMessageStore = SwiftDataEchoMessageStore(container: modelContainer)
+
+    @MainActor
+    private static var _echoMessageManager: EchoMessageManager?
+
+    @MainActor
+    static func getEchoMessageManager() -> EchoMessageManager {
+        if let existing = _echoMessageManager { return existing }
+        let manager = EchoMessageManager(store: _echoMessageStore, container: modelContainer)
+        _echoMessageManager = manager
+        return manager
+    }
+
+    // MARK: - Echo Scheduler
+
+    private static let _echoDailySummaryGenerator = EchoDailySummaryGenerator(
+        aiService: _echoAIService,
+        memoryManager: _echoMemoryManager,
+        promptBuilder: _echoPromptBuilder
+    )
+
+    private static let _echoWeeklyProfileUpdater = EchoWeeklyProfileUpdater(
+        aiService: _echoAIService,
+        memoryManager: _echoMemoryManager,
+        promptBuilder: _echoPromptBuilder
+    )
+
+    static let echoScheduler = EchoScheduler(
+        dailySummaryGenerator: _echoDailySummaryGenerator,
+        weeklyProfileUpdater: _echoWeeklyProfileUpdater,
+        memoryManager: _echoMemoryManager,
+        aiService: _echoAIService,
+        promptBuilder: _echoPromptBuilder
+    )
+
+    // MARK: - Pattern Detection
+
+    static let patternDetectionEngine = PatternDetectionEngine()
+
+    // MARK: - Timeline Provider
+
+    static func makeTimelineProvider() -> any TimelineDataProviding {
+        #if targetEnvironment(simulator)
+        return MockTimelineDataProvider()
+        #else
+        if ProcessInfo.processInfo.environment["TODAY_USE_MOCK"] == "1" {
+            return MockTimelineDataProvider()
         }
+        return PhoneTimelineDataProvider(
+            collectors: [_locationCollector, _deviceStateCollector, _motionCollector, _pedometerCollector],
+            store: _sensorDataStore,
+            inferenceEngine: _phoneInferenceEngine,
+            placeManager: _placeManager
+        )
+        #endif
+    }
 
-        do {
-            try SwiftDataMoodRecordStore(container: container).saveRecords(legacyRecords)
-            defaults.removeObject(forKey: legacyMoodRecordStoreKey)
-        } catch {
-            assertionFailure("迁移旧版 MoodRecord 数据失败：\(error.localizedDescription)")
-        }
+    // MARK: - Record Stores
+
+    private static let _moodRecordStore = SwiftDataMoodRecordStore(container: modelContainer)
+    private static let _shutterRecordStore = SwiftDataShutterRecordStore(container: modelContainer)
+    private static let _annotationStore = AnnotationStore()
+
+    @MainActor
+    static func makeMoodRecordManager() -> MoodRecordManager {
+        MoodRecordManager(recordStore: _moodRecordStore)
+    }
+
+    @MainActor
+    static func makeShutterManager() -> ShutterManager {
+        ShutterManager(recordStore: _shutterRecordStore)
+    }
+
+    static func makeAnnotationStore() -> AnnotationStore {
+        _annotationStore
+    }
+
+    // MARK: - ViewModel Factories
+
+    @MainActor
+    static func makeTodayViewModel() -> TodayViewModel {
+        TodayViewModel(
+            timelineProvider: makeTimelineProvider(),
+            moodRecordManager: makeMoodRecordManager(),
+            shutterManager: makeShutterManager(),
+            annotationStore: makeAnnotationStore(),
+            echoMessageManager: getEchoMessageManager()
+        )
+    }
+
+    // MARK: - App Lifecycle
+
+    @MainActor
+    static func startSensors() {
+        _locationCollector.startMonitoring()
+        _deviceStateCollector.startMonitoring()
+    }
+
+    @MainActor
+    static func wireEchoScheduler() {
+        echoScheduler.setMessageManager(getEchoMessageManager())
     }
 }
