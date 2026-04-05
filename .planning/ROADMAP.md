@@ -101,7 +101,7 @@ Plans:
 Plans:
 - [x] 05-01-PLAN.md — RED-phase tests for all three Echo conversation wiring gaps
 - [ ] 05-02-PLAN.md — Fix buildThreadSystemPrompt for freeChat + wire todayDataSummary through AppContainer → AppRootScreen
-- [ ] 05-03-PLAN.md — Fix EchoMessageListView free-chat NavigationPath programmatic navigation
+- [x] 05-03-PLAN.md — Fix EchoMessageListView free-chat NavigationPath programmatic navigation
 
 ## Progress
 
@@ -114,4 +114,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 2. Onboarding and First Visible AI | 3/3 | Complete   | 2026-04-04 |
 | 3. Timeline and Recording Polish | 3/4 | In Progress|  |
 | 4. Pattern Recognition and Proactive Push | 3/3 | Complete    | 2026-04-05 |
-| 5. Echo Conversation | 1/3 | In Progress|  |
+| 5. Echo Conversation | 2/3 | In Progress|  |
