@@ -55,9 +55,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### AI Conversation
 
-- [ ] **AIC-01**: User can ask Echo questions about their life data ("我这周运动了几次？")
-- [ ] **AIC-02**: Echo responds with accurate answers based on stored timeline data
-- [ ] **AIC-03**: Echo conversation history persists across sessions
+- [x] **AIC-01**: User can ask Echo questions about their life data ("我这周运动了几次？")
+- [x] **AIC-02**: Echo responds with accurate answers based on stored timeline data
+- [x] **AIC-03**: Echo conversation history persists across sessions
 
 ### Manual Recording
 
@@ -158,6 +158,6 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AIP-01 | Phase 4 | Complete |
 | AIP-02 | Phase 4 | Complete |
 | AIP-03 | Phase 4 | Complete |
-| AIC-01 | Phase 5 | Pending |
-| AIC-02 | Phase 5 | Pending |
-| AIC-03 | Phase 5 | Pending |
+| AIC-01 | Phase 5 | Complete |
+| AIC-02 | Phase 5 | Complete |
+| AIC-03 | Phase 5 | Complete |
