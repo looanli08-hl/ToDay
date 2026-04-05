@@ -85,9 +85,15 @@ final class TodayViewModel: ObservableObject {
     // MARK: - Memo
 
     func saveMemo(_ note: String) {
-        let record = MoodRecord(mood: .calm, note: note)
-        moodRecordManager.startRecord(record)
-        Task { await load() }
+        let record = MoodRecord(
+            mood: .calm,
+            note: note,
+            endedAt: Date(),
+            captureMode: .point
+        )
+        _ = moodRecordManager.startRecord(record)
+        moodRecordManager.finishActiveRecord()
+        Task { await loadTimeline(for: selectedDate) }
     }
 
     func openQuickRecordComposer() {

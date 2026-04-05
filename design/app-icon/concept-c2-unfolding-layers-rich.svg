@@ -1,0 +1,138 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bg3" x1="0.3" y1="0" x2="0.7" y2="1">
+      <stop offset="0%" stop-color="#1A1D22"/>
+      <stop offset="100%" stop-color="#151719"/>
+    </linearGradient>
+    <radialGradient id="warmGlow" cx="0.5" cy="0.7" r="0.45">
+      <stop offset="0%" stop-color="#E8B86D" stop-opacity="0.12"/>
+      <stop offset="50%" stop-color="#D4856A" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#D4856A" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="tealGlow" cx="0.5" cy="0.3" r="0.3">
+      <stop offset="0%" stop-color="#5B9A8B" stop-opacity="0.14"/>
+      <stop offset="100%" stop-color="#5B9A8B" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="centerLight" cx="0.5" cy="0.55" r="0.5">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.03"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="layerGlow">
+      <feGaussianBlur stdDeviation="12" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    <filter id="softBlur">
+      <feGaussianBlur stdDeviation="16"/>
+    </filter>
+    <clipPath id="rc3">
+      <rect width="1024" height="1024" rx="224" ry="224"/>
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#rc3)">
+    <!-- Background -->
+    <rect width="1024" height="1024" fill="url(#bg3)"/>
+
+    <!-- Atmospheric layers -->
+    <rect width="1024" height="1024" fill="url(#warmGlow)"/>
+    <rect width="1024" height="1024" fill="url(#tealGlow)"/>
+    <rect width="1024" height="1024" fill="url(#centerLight)"/>
+
+    <!-- Deep background layer (very faint, widest) -->
+    <path d="M 180 760
+             C 300 680, 430 660, 512 660
+             C 594 660, 724 680, 844 760"
+          fill="none"
+          stroke="#E8B86D"
+          stroke-width="60"
+          stroke-linecap="round"
+          opacity="0.06"
+          filter="url(#softBlur)"/>
+
+    <!-- Layer 1 (bottom, widest) - warm gold with glow -->
+    <path d="M 200 720
+             C 310 650, 440 630, 512 630
+             C 584 630, 714 650, 824 720"
+          fill="none"
+          stroke="#F2C97D"
+          stroke-width="48"
+          stroke-linecap="round"
+          opacity="0.85"
+          filter="url(#layerGlow)"/>
+    <!-- Gold inner highlight -->
+    <path d="M 200 720
+             C 310 650, 440 630, 512 630
+             C 584 630, 714 650, 824 720"
+          fill="none"
+          stroke="#F9DFA0"
+          stroke-width="10"
+          stroke-linecap="round"
+          opacity="0.3"/>
+
+    <!-- Layer 2 (middle) - amber/rose with glow -->
+    <path d="M 270 580
+             C 360 520, 450 500, 512 500
+             C 574 500, 664 520, 754 580"
+          fill="none"
+          stroke="#D4856A"
+          stroke-width="42"
+          stroke-linecap="round"
+          opacity="0.8"
+          filter="url(#layerGlow)"/>
+    <!-- Amber inner highlight -->
+    <path d="M 270 580
+             C 360 520, 450 500, 512 500
+             C 574 500, 664 520, 754 580"
+          fill="none"
+          stroke="#E8A888"
+          stroke-width="8"
+          stroke-linecap="round"
+          opacity="0.3"/>
+
+    <!-- Layer 3 (upper) - transitional rose-teal -->
+    <path d="M 340 455
+             C 400 410, 460 395, 512 395
+             C 564 395, 624 410, 684 455"
+          fill="none"
+          stroke="#8AADA2"
+          stroke-width="36"
+          stroke-linecap="round"
+          opacity="0.75"
+          filter="url(#layerGlow)"/>
+
+    <!-- Layer 4 (top, narrowest) - teal -->
+    <path d="M 400 345
+             C 435 320, 475 310, 512 310
+             C 549 310, 589 320, 624 345"
+          fill="none"
+          stroke="#5B9A8B"
+          stroke-width="30"
+          stroke-linecap="round"
+          opacity="0.9"
+          filter="url(#layerGlow)"/>
+    <!-- Teal inner highlight -->
+    <path d="M 400 345
+             C 435 320, 475 310, 512 310
+             C 549 310, 589 320, 624 345"
+          fill="none"
+          stroke="#7CC1AF"
+          stroke-width="6"
+          stroke-linecap="round"
+          opacity="0.4"/>
+
+    <!-- Crown element - moment dot with rich glow -->
+    <circle cx="512" cy="252" r="28" fill="#5B9A8B"/>
+    <circle cx="512" cy="252" r="44" fill="#5B9A8B" opacity="0.18"/>
+    <circle cx="512" cy="252" r="64" fill="#5B9A8B" opacity="0.07"/>
+    <circle cx="512" cy="252" r="10" fill="#A8DDD0"/>
+
+    <!-- Connecting wisp from crown to top layer -->
+    <line x1="512" y1="280" x2="512" y2="310" stroke="#5B9A8B" stroke-width="4" opacity="0.4"/>
+
+    <!-- Tiny accent dots at layer endpoints -->
+    <circle cx="200" cy="720" r="8" fill="#F2C97D" opacity="0.5"/>
+    <circle cx="824" cy="720" r="8" fill="#F2C97D" opacity="0.5"/>
+    <circle cx="270" cy="580" r="6" fill="#D4856A" opacity="0.4"/>
+    <circle cx="754" cy="580" r="6" fill="#D4856A" opacity="0.4"/>
+  </g>
+</svg>

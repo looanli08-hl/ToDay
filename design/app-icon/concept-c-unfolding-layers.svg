@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bgGrad3" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1E1E20"/>
+      <stop offset="100%" stop-color="#1A1A1C"/>
+    </linearGradient>
+    <clipPath id="roundedClip3">
+      <rect width="1024" height="1024" rx="224" ry="224"/>
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#roundedClip3)">
+    <!-- Background -->
+    <rect width="1024" height="1024" fill="url(#bgGrad3)"/>
+
+    <!-- Subtle warm glow from center-bottom -->
+    <ellipse cx="512" cy="700" rx="350" ry="200" fill="#E8B86D" opacity="0.05"/>
+
+    <!-- Layer 1 (bottom, widest) - warm gold -->
+    <path d="M 240 680
+             C 340 620, 460 600, 512 600
+             C 564 600, 684 620, 784 680"
+          fill="none"
+          stroke="#E8B86D"
+          stroke-width="44"
+          stroke-linecap="round"
+          opacity="0.9"/>
+
+    <!-- Layer 2 (middle) - amber/rose -->
+    <path d="M 300 540
+             C 380 490, 460 475, 512 475
+             C 564 475, 644 490, 724 540"
+          fill="none"
+          stroke="#D4856A"
+          stroke-width="38"
+          stroke-linecap="round"
+          opacity="0.8"/>
+
+    <!-- Layer 3 (top, narrowest) - teal -->
+    <path d="M 370 410
+             C 420 375, 475 362, 512 362
+             C 549 362, 604 375, 654 410"
+          fill="none"
+          stroke="#5B9A8B"
+          stroke-width="32"
+          stroke-linecap="round"
+          opacity="0.9"/>
+
+    <!-- Crown dot - current moment -->
+    <circle cx="512" cy="300" r="16" fill="#5B9A8B"/>
+    <circle cx="512" cy="300" r="28" fill="#5B9A8B" opacity="0.15"/>
+
+    <!-- Very subtle connecting vertical line -->
+    <line x1="512" y1="318" x2="512" y2="362" stroke="#5B9A8B" stroke-width="3" opacity="0.3"/>
+  </g>
+</svg>

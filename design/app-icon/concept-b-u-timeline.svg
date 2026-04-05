@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bgGrad2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1E1E20"/>
+      <stop offset="100%" stop-color="#1A1A1C"/>
+    </linearGradient>
+    <linearGradient id="uGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#E8B86D"/>
+      <stop offset="50%" stop-color="#D4856A"/>
+      <stop offset="100%" stop-color="#5B9A8B"/>
+    </linearGradient>
+    <clipPath id="roundedClip2">
+      <rect width="1024" height="1024" rx="224" ry="224"/>
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#roundedClip2)">
+    <!-- Background -->
+    <rect width="1024" height="1024" fill="url(#bgGrad2)"/>
+
+    <!-- Subtle ambient glow -->
+    <ellipse cx="512" cy="620" rx="300" ry="250" fill="#5B9A8B" opacity="0.04"/>
+
+    <!-- U-shape timeline path - open bottom, like a day's arc -->
+    <path d="M 310 260
+             L 310 580
+             C 310 720, 400 790, 512 790
+             C 624 790, 714 720, 714 580
+             L 714 300"
+          fill="none"
+          stroke="url(#uGrad)"
+          stroke-width="56"
+          stroke-linecap="round"
+          stroke-linejoin="round"/>
+
+    <!-- Starting dot (morning - warm gold) -->
+    <circle cx="310" cy="260" r="20" fill="#E8B86D"/>
+
+    <!-- Ending dot (now - teal) with subtle glow -->
+    <circle cx="714" cy="300" r="24" fill="#5B9A8B"/>
+    <circle cx="714" cy="300" r="40" fill="#5B9A8B" opacity="0.12"/>
+
+    <!-- Subtle time markers along the curve -->
+    <circle cx="310" cy="440" r="6" fill="#E8B86D" opacity="0.4"/>
+    <circle cx="340" cy="640" r="6" fill="#D4856A" opacity="0.4"/>
+    <circle cx="512" cy="755" r="6" fill="#C07070" opacity="0.4"/>
+    <circle cx="684" cy="640" r="6" fill="#7AAA9A" opacity="0.4"/>
+  </g>
+</svg>

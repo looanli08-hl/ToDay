@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1E1E20"/>
+      <stop offset="100%" stop-color="#1A1A1C"/>
+    </linearGradient>
+    <linearGradient id="lineGrad" x1="0.5" y1="1" x2="0.5" y2="0">
+      <stop offset="0%" stop-color="#E8B86D"/>
+      <stop offset="40%" stop-color="#D4856A"/>
+      <stop offset="100%" stop-color="#5B9A8B"/>
+    </linearGradient>
+    <clipPath id="roundedClip">
+      <rect width="1024" height="1024" rx="224" ry="224"/>
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#roundedClip)">
+    <!-- Background -->
+    <rect width="1024" height="1024" fill="url(#bgGrad)"/>
+
+    <!-- Subtle warm glow at bottom -->
+    <ellipse cx="512" cy="900" rx="400" ry="200" fill="#E8B86D" opacity="0.06"/>
+
+    <!-- Flowing scroll line - unfurling from bottom to top -->
+    <path d="M 380 780
+             C 380 680, 420 620, 480 560
+             C 540 500, 560 440, 540 380
+             C 520 320, 480 280, 500 220
+             C 520 160, 580 140, 620 180
+             C 660 220, 640 280, 600 320"
+          fill="none"
+          stroke="url(#lineGrad)"
+          stroke-width="52"
+          stroke-linecap="round"
+          stroke-linejoin="round"/>
+
+    <!-- Small dot at the end - like a current moment -->
+    <circle cx="600" cy="320" r="14" fill="#5B9A8B" opacity="0.8"/>
+
+    <!-- Thinner parallel echo line -->
+    <path d="M 440 780
+             C 440 700, 470 650, 520 600
+             C 570 550, 590 490, 575 440"
+          fill="none"
+          stroke="url(#lineGrad)"
+          stroke-width="20"
+          stroke-linecap="round"
+          opacity="0.3"/>
+  </g>
+</svg>

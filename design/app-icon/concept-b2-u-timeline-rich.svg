@@ -1,0 +1,112 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0.3" y2="1">
+      <stop offset="0%" stop-color="#1C2026"/>
+      <stop offset="60%" stop-color="#181A1E"/>
+      <stop offset="100%" stop-color="#14161A"/>
+    </linearGradient>
+    <linearGradient id="uStroke" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F2C97D"/>
+      <stop offset="35%" stop-color="#E89B6D"/>
+      <stop offset="65%" stop-color="#C07A82"/>
+      <stop offset="100%" stop-color="#5B9A8B"/>
+    </linearGradient>
+    <radialGradient id="glowGold" cx="0.3" cy="0.25" r="0.4">
+      <stop offset="0%" stop-color="#F2C97D" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#F2C97D" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowTeal" cx="0.7" cy="0.3" r="0.35">
+      <stop offset="0%" stop-color="#5B9A8B" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#5B9A8B" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowCenter" cx="0.5" cy="0.75" r="0.35">
+      <stop offset="0%" stop-color="#D4856A" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="#D4856A" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    <filter id="bigGlow">
+      <feGaussianBlur stdDeviation="20"/>
+    </filter>
+    <clipPath id="rc">
+      <rect width="1024" height="1024" rx="224" ry="224"/>
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#rc)">
+    <!-- Layered background -->
+    <rect width="1024" height="1024" fill="url(#bg)"/>
+
+    <!-- Atmospheric glows -->
+    <rect width="1024" height="1024" fill="url(#glowGold)"/>
+    <rect width="1024" height="1024" fill="url(#glowTeal)"/>
+    <rect width="1024" height="1024" fill="url(#glowCenter)"/>
+
+    <!-- Very subtle grid texture hint -->
+    <line x1="512" y1="100" x2="512" y2="924" stroke="#ffffff" stroke-width="0.5" opacity="0.03"/>
+    <line x1="100" y1="512" x2="924" y2="512" stroke="#ffffff" stroke-width="0.5" opacity="0.03"/>
+
+    <!-- Background U echo (large, very faint) -->
+    <path d="M 280 230
+             L 280 570
+             C 280 740, 380 830, 512 830
+             C 644 830, 744 740, 744 570
+             L 744 270"
+          fill="none"
+          stroke="#5B9A8B"
+          stroke-width="80"
+          stroke-linecap="round"
+          opacity="0.04"
+          filter="url(#bigGlow)"/>
+
+    <!-- Main U-shape with glow -->
+    <path d="M 300 250
+             L 300 570
+             C 300 720, 390 800, 512 800
+             C 634 800, 724 720, 724 570
+             L 724 290"
+          fill="none"
+          stroke="url(#uStroke)"
+          stroke-width="54"
+          stroke-linecap="round"
+          filter="url(#softGlow)"/>
+
+    <!-- Inner highlight line (thinner, brighter) -->
+    <path d="M 300 260
+             L 300 570
+             C 300 715, 392 792, 512 792
+             C 632 792, 724 715, 724 570
+             L 724 300"
+          fill="none"
+          stroke="url(#uStroke)"
+          stroke-width="12"
+          stroke-linecap="round"
+          opacity="0.5"/>
+
+    <!-- Time marker dots along the path -->
+    <circle cx="300" cy="400" r="8" fill="#F2C97D" opacity="0.6"/>
+    <circle cx="300" cy="400" r="16" fill="#F2C97D" opacity="0.1"/>
+
+    <circle cx="320" cy="620" r="7" fill="#E89B6D" opacity="0.5"/>
+    <circle cx="320" cy="620" r="14" fill="#E89B6D" opacity="0.08"/>
+
+    <circle cx="512" cy="765" r="7" fill="#C07A82" opacity="0.5"/>
+    <circle cx="512" cy="765" r="14" fill="#C07A82" opacity="0.08"/>
+
+    <circle cx="704" cy="620" r="7" fill="#7AAA9A" opacity="0.5"/>
+    <circle cx="704" cy="620" r="14" fill="#7AAA9A" opacity="0.08"/>
+
+    <!-- Starting dot (morning) -->
+    <circle cx="300" cy="250" r="22" fill="#F2C97D"/>
+    <circle cx="300" cy="250" r="36" fill="#F2C97D" opacity="0.15"/>
+    <circle cx="300" cy="250" r="52" fill="#F2C97D" opacity="0.06"/>
+
+    <!-- Ending dot (now - teal) with pulse glow -->
+    <circle cx="724" cy="290" r="24" fill="#5B9A8B"/>
+    <circle cx="724" cy="290" r="40" fill="#5B9A8B" opacity="0.2"/>
+    <circle cx="724" cy="290" r="60" fill="#5B9A8B" opacity="0.08"/>
+    <circle cx="724" cy="290" r="8" fill="#A0D4C8"/>
+  </g>
+</svg>
