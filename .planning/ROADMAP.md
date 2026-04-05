@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Onboarding and First Visible AI** - Ship permission onboarding that gets Always Location granted, surface AI summary on TodayScreen, handle data gaps gracefully, complete privacy compliance (completed 2026-04-04)
 - [ ] **Phase 3: Timeline and Recording Polish** - Raise the "画卷" timeline to Apple-quality design; validate the complete passive recording pipeline on real devices
 - [x] **Phase 4: Pattern Recognition and Proactive Push** - Detect behavioral patterns across days, surface one meaningful daily notification insight (completed 2026-04-05)
-- [ ] **Phase 5: Echo Conversation** - Enable users to ask Echo natural language questions about their life data
+- [x] **Phase 5: Echo Conversation** - Enable users to ask Echo natural language questions about their life data (completed 2026-04-05)
 
 ## Phase Details
 
@@ -100,7 +100,7 @@ Plans:
 
 Plans:
 - [x] 05-01-PLAN.md — RED-phase tests for all three Echo conversation wiring gaps
-- [ ] 05-02-PLAN.md — Fix buildThreadSystemPrompt for freeChat + wire todayDataSummary through AppContainer → AppRootScreen
+- [x] 05-02-PLAN.md — Fix buildThreadSystemPrompt for freeChat + wire todayDataSummary through AppContainer → AppRootScreen
 - [x] 05-03-PLAN.md — Fix EchoMessageListView free-chat NavigationPath programmatic navigation
 
 ## Progress
@@ -114,4 +114,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 2. Onboarding and First Visible AI | 3/3 | Complete   | 2026-04-04 |
 | 3. Timeline and Recording Polish | 3/4 | In Progress|  |
 | 4. Pattern Recognition and Proactive Push | 3/3 | Complete    | 2026-04-05 |
-| 5. Echo Conversation | 2/3 | In Progress|  |
+| 5. Echo Conversation | 3/3 | Complete   | 2026-04-05 |

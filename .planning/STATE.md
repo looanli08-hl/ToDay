@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: Completed 05-03-PLAN.md
-last_updated: "2026-04-05T03:11:23.898Z"
+status: verifying
+stopped_at: Completed 05-02-PLAN.md
+last_updated: "2026-04-05T03:16:30.019Z"
 last_activity: 2026-04-05
 progress:
   total_phases: 5
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 16
-  completed_plans: 12
+  completed_plans: 13
   percent: 0
 ---
 
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-04-04)
 
 Phase: 05 (Echo Conversation) — EXECUTING
 Plan: 3 of 3
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-04-05
 
 Progress: [░░░░░░░░░░] 0%
@@ -64,6 +64,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 04-pattern-recognition-and-proactive-push P03 | 8min | 2 tasks | 3 files |
 | Phase 05-echo-conversation P01 | 3min | 1 tasks | 6 files |
 | Phase 05-echo-conversation P03 | 3min | 1 tasks | 2 files |
+| Phase 05-echo-conversation P02 | 12min | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -98,6 +99,8 @@ Recent decisions affecting current work:
 - [Phase 05-echo-conversation]: MockAIProvider.lastReceivedMessages captures messages array in respond() — enables system prompt content assertion without a spy
 - [Phase 05-echo-conversation]: NavigationPath stored as @State on EchoMessageListView — no lift to parent needed; list manages its own navigation stack
 - [Phase 05-echo-conversation]: human-verify checkpoint for EchoMessageListView freeChat navigation deferred to TestFlight milestone
+- [Phase 05-echo-conversation]: EchoPromptBuilder gained timelineContainer: ModelContainer? init param — nil defaults to AppContainer.modelContainer singleton; test passes container to avoid singleton coupling
+- [Phase 05-echo-conversation]: freeChat timeline injection at step 5.5 in buildThreadSystemPrompt; requires non-mood InferredEvent entries for eventSummary to be non-empty
 
 ### Pending Todos
 
@@ -111,6 +114,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-05T03:11:23.895Z
-Stopped at: Completed 05-03-PLAN.md
+Last session: 2026-04-05T03:16:30.017Z
+Stopped at: Completed 05-02-PLAN.md
 Resume file: None
