@@ -7,6 +7,8 @@ struct DayScrollView: View {
     var onEventTap: ((InferredEvent) -> Void)?
 
     private let calendar = Calendar.current
+    private let timeColumnWidth: CGFloat = 44
+    private let connectorWidth: CGFloat = 20
 
     /// Groups entries into primary events with inline mood/memo annotations.
     private var groupedEntries: [(event: InferredEvent, memos: [InferredEvent])] {
@@ -17,6 +19,7 @@ struct DayScrollView: View {
         var assignedMoodIDs: Set<UUID> = []
 
         for event in primaryEvents {
+            // Find mood/memo events whose startDate falls within this event's time range
             let inlineMemos = moodEvents.filter { memo in
                 !assignedMoodIDs.contains(memo.id)
                     && memo.startDate >= event.startDate
@@ -40,11 +43,11 @@ struct DayScrollView: View {
 
     var body: some View {
         ZStack {
-            // The gradient IS the hero — the scroll painting
-            TimeGradient.dayPainting
+            // Time-of-day gradient background
+            timeGradient
                 .clipShape(RoundedRectangle(cornerRadius: AppRadius.xl, style: .continuous))
 
-            VStack(spacing: 0) {
+            VStack(spacing: AppSpacing.xxs) {
                 if entries.isEmpty {
                     emptyGapRow
                 } else {
@@ -56,79 +59,77 @@ struct DayScrollView: View {
                 // Current time needle
                 if isToday {
                     currentTimeNeedle
-                        .padding(.top, AppSpacing.sm)
                 }
             }
-            .padding(.vertical, AppSpacing.lg)
+            .padding(.vertical, AppSpacing.md)
         }
+    }
+
+    // MARK: - Time Gradient
+
+    private var timeGradient: some View {
+        LinearGradient(
+            stops: [
+                .init(color: AppColor.timelineNight, location: 0.0),
+                .init(color: AppColor.timelineNight, location: 5.0 / 24.0),
+                .init(color: AppColor.timelineSunrise, location: 7.0 / 24.0),
+                .init(color: AppColor.timelineGold, location: 12.0 / 24.0),
+                .init(color: AppColor.timelineNoon, location: 14.0 / 24.0),
+                .init(color: AppColor.timelineSunset, location: 18.0 / 24.0),
+                .init(color: AppColor.timelineViolet, location: 20.0 / 24.0),
+                .init(color: AppColor.timelineNight, location: 1.0),
+            ],
+            startPoint: .top,
+            endPoint: .bottom
+        )
     }
 
     // MARK: - Event Row
 
     @ViewBuilder
     private func eventRow(_ event: InferredEvent, memos: [InferredEvent], index: Int) -> some View {
-        VStack(alignment: .leading, spacing: 0) {
-            // Breathing space between cards
-            if index > 0 {
-                // Subtle connector line between events
-                HStack(spacing: 0) {
-                    Spacer()
-                        .frame(width: AppSpacing.lg)
-
-                    Rectangle()
-                        .fill(Color.white.opacity(0.3))
-                        .frame(width: 1)
-                        .frame(height: AppSpacing.md)
-
-                    Spacer()
-                }
-                .padding(.vertical, AppSpacing.xxs)
-            }
-
-            // Time label — tiny, floating above the card
-            HStack(spacing: AppSpacing.xxs) {
-                // Event dot
-                Circle()
-                    .fill(eventColor(event))
-                    .frame(width: 6, height: 6)
-
+        HStack(alignment: .top, spacing: 0) {
+            // Time column
+            VStack(alignment: .trailing, spacing: 2) {
                 Text(timeText(event.startDate))
-                    .font(AppFont.micro())
-                    .foregroundStyle(Color.white.opacity(0.7))
-                    .tracking(0.5)
+                    .font(AppFont.small())
+                    .foregroundStyle(AppColor.label.opacity(0.6))
 
                 if event.duration > 60 {
-                    Text("-")
-                        .font(AppFont.micro())
-                        .foregroundStyle(Color.white.opacity(0.4))
-
                     Text(timeText(event.endDate))
-                        .font(AppFont.micro())
-                        .foregroundStyle(Color.white.opacity(0.4))
+                        .font(AppFont.small())
+                        .foregroundStyle(AppColor.label.opacity(0.35))
                 }
             }
-            .padding(.leading, AppSpacing.lg - 3)
-            .padding(.bottom, AppSpacing.xxs)
+            .frame(width: timeColumnWidth, alignment: .trailing)
 
-            // Event card — full width
+            // Connector
+            VStack(spacing: 0) {
+                Circle()
+                    .fill(eventColor(event))
+                    .frame(width: 8, height: 8)
+
+                Rectangle()
+                    .fill(AppColor.label.opacity(0.1))
+                    .frame(width: 1.5)
+                    .frame(maxHeight: .infinity)
+            }
+            .frame(width: connectorWidth)
+
+            // Event card
             if event.kind == .mood {
                 moodRow(event)
-                    .padding(.leading, AppSpacing.lg)
             } else if event.kind == .dataGap {
                 dataGapRow(event)
-                    .padding(.leading, AppSpacing.lg)
             } else {
                 EventCardView(event: event, inlineMemos: memos)
-                    .frame(maxWidth: .infinity)
                     .contentShape(Rectangle())
                     .onTapGesture {
                         onEventTap?(event)
                     }
-                    .padding(.leading, AppSpacing.lg)
-                    .padding(.trailing, AppSpacing.sm)
             }
         }
-        .padding(.horizontal, AppSpacing.sm)
+        .padding(.horizontal, AppSpacing.xs)
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(event.kindBadgeTitle) \(event.resolvedName), \(event.scrollDurationText)")
     }
@@ -139,71 +140,68 @@ struct DayScrollView: View {
         HStack(spacing: AppSpacing.xxs) {
             Circle()
                 .fill(AppColor.mood)
-                .frame(width: 5, height: 5)
+                .frame(width: 7, height: 7)
 
             Text(event.resolvedName)
-                .font(AppFont.memo())
+                .font(AppFont.small())
                 .foregroundStyle(AppColor.mood)
 
             if let note = event.subtitle, !note.isEmpty {
                 Text(note)
-                    .font(AppFont.memo())
+                    .font(AppFont.small())
                     .foregroundStyle(AppColor.labelTertiary)
                     .lineLimit(1)
             }
         }
         .padding(.horizontal, AppSpacing.sm)
-        .padding(.vertical, AppSpacing.xs)
-        .background(.ultraThinMaterial)
-        .background(AppColor.mood.opacity(0.06))
+        .padding(.vertical, AppSpacing.xxs)
+        .background(AppColor.mood.opacity(0.08))
         .clipShape(Capsule())
     }
 
     // MARK: - Data Gap Row
 
     private func dataGapRow(_ event: InferredEvent) -> some View {
-        HStack(spacing: AppSpacing.xxs) {
-            Text("\u{00B7}\u{00B7}\u{00B7}")
+        HStack {
+            Text("这段时间没有记录 \u{00B7} \(event.scrollDurationText)")
                 .font(AppFont.small())
-                .foregroundStyle(Color.white.opacity(0.3))
-
-            Text(event.scrollDurationText)
-                .font(AppFont.micro())
-                .foregroundStyle(Color.white.opacity(0.3))
+                .foregroundStyle(AppColor.labelQuaternary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, AppSpacing.sm)
-        .padding(.vertical, AppSpacing.xs)
     }
 
     // MARK: - Empty Gap Row
 
     private var emptyGapRow: some View {
         VStack(spacing: AppSpacing.md) {
-            Text("the day unfolds...")
-                .font(AppFont.whisper())
-                .foregroundStyle(Color.white.opacity(0.4))
+            Text("还没有事件")
+                .font(AppFont.bodyRegular())
+                .foregroundStyle(AppColor.labelTertiary)
         }
-        .frame(maxWidth: .infinity, minHeight: 160)
+        .frame(maxWidth: .infinity, minHeight: 120)
     }
 
     // MARK: - Current Time Needle
 
     private var currentTimeNeedle: some View {
-        HStack(spacing: AppSpacing.xxs) {
+        HStack(spacing: 0) {
             Spacer()
-                .frame(width: AppSpacing.lg - 3)
+                .frame(width: timeColumnWidth)
 
-            Circle()
-                .fill(AppColor.accent)
-                .frame(width: 6, height: 6)
+            ZStack {
+                Circle()
+                    .fill(AppColor.accent)
+                    .frame(width: 6, height: 6)
+            }
+            .frame(width: connectorWidth)
 
             Rectangle()
-                .fill(AppColor.accent.opacity(0.4))
-                .frame(height: 1)
+                .fill(AppColor.separator)
+                .frame(height: 1.5)
                 .frame(maxWidth: .infinity)
         }
-        .padding(.horizontal, AppSpacing.sm)
+        .padding(.horizontal, AppSpacing.xs)
         .allowsHitTesting(false)
     }
 

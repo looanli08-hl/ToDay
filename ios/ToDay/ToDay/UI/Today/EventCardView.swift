@@ -5,20 +5,18 @@ struct EventCardView: View {
     var inlineMemos: [InferredEvent] = []
 
     var body: some View {
-        HStack(spacing: 0) {
-            // Refined color accent bar — 3pt, the primary type indicator
-            RoundedRectangle(cornerRadius: 1.5, style: .continuous)
+        HStack(spacing: AppSpacing.xs) {
+            // Color accent bar
+            RoundedRectangle(cornerRadius: 2, style: .continuous)
                 .fill(AppColor.color(for: event.kind))
-                .frame(width: 3)
-                .padding(.vertical, AppSpacing.xs)
+                .frame(width: 4)
 
             VStack(alignment: .leading, spacing: AppSpacing.xxs) {
-                // Event name + duration on same line
-                HStack(alignment: .firstTextBaseline) {
-                    Text(event.resolvedName)
-                        .font(AppFont.body())
-                        .foregroundStyle(AppColor.label)
-                        .lineLimit(2)
+                // Kind badge + duration
+                HStack {
+                    Text(event.kindBadgeTitle)
+                        .font(AppFont.smallBold())
+                        .foregroundStyle(AppColor.color(for: event.kind))
 
                     Spacer()
 
@@ -27,39 +25,35 @@ struct EventCardView: View {
                         .foregroundStyle(AppColor.labelTertiary)
                 }
 
-                // Detail line — very small, warm metadata
+                // Event name
+                Text(event.resolvedName)
+                    .font(AppFont.body())
+                    .foregroundStyle(AppColor.label)
+                    .lineLimit(2)
+
+                // Detail line
                 if let detail = detailText {
                     Text(detail)
-                        .font(AppFont.micro())
-                        .foregroundStyle(AppColor.labelQuaternary)
+                        .font(AppFont.small())
+                        .foregroundStyle(AppColor.labelTertiary)
                         .lineLimit(1)
-                        .padding(.top, AppSpacing.xxxs)
                 }
 
-                // Inline mood/memo annotations — handwritten-feeling notes
+                // Inline mood/memo annotations
                 if !inlineMemos.isEmpty {
-                    VStack(alignment: .leading, spacing: AppSpacing.xxs) {
-                        ForEach(inlineMemos) { memo in
-                            inlineMemoView(memo)
-                        }
+                    ForEach(inlineMemos) { memo in
+                        inlineMemoView(memo)
                     }
-                    .padding(.top, AppSpacing.xxs)
                 }
             }
-            .padding(.leading, AppSpacing.sm)
-            .padding(.trailing, AppSpacing.sm)
-            .padding(.vertical, AppSpacing.sm)
         }
+        .padding(AppSpacing.sm)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
-            // Layered material: subtle event-type tint over ultra-thin glass
-            ZStack {
-                Color.white.opacity(0.5)
-                AppColor.cardTint(for: event.kind)
-            }
+            Color(UIColor.secondarySystemGroupedBackground).opacity(0.82)
         )
         .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
         .appShadow(.subtle)
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(event.kindBadgeTitle), \(event.resolvedName)")
@@ -70,26 +64,32 @@ struct EventCardView: View {
 
     private func inlineMemoView(_ memo: InferredEvent) -> some View {
         HStack(spacing: AppSpacing.xxs) {
-            // Subtle serif italic — like a handwritten margin note
+            Circle()
+                .fill(AppColor.mood)
+                .frame(width: 5, height: 5)
+
             if let note = memo.subtitle, !note.isEmpty {
                 Text(note)
-                    .font(AppFont.memo())
-                    .foregroundStyle(AppColor.mood.opacity(0.8))
-                    .lineLimit(2)
+                    .font(AppFont.small())
+                    .foregroundStyle(AppColor.mood)
+                    .lineLimit(1)
             } else {
                 Text(memo.resolvedName)
-                    .font(AppFont.memo())
-                    .foregroundStyle(AppColor.mood.opacity(0.8))
+                    .font(AppFont.small())
+                    .foregroundStyle(AppColor.mood)
                     .lineLimit(1)
             }
 
             Spacer()
 
             Text(memoTimeText(memo.startDate))
-                .font(AppFont.micro())
+                .font(AppFont.small())
                 .foregroundStyle(AppColor.labelQuaternary)
         }
-        .padding(.leading, AppSpacing.xs)
+        .padding(.horizontal, AppSpacing.xs)
+        .padding(.vertical, 3)
+        .background(AppColor.mood.opacity(0.06))
+        .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
     }
 
     private func memoTimeText(_ date: Date) -> String {
