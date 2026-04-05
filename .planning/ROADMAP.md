@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 1: Security and AI Pipeline** - Remove hardcoded API key, migrate to Claude via AIProxy, wire EchoScheduler to app lifecycle so daily summaries generate and persist
 - [x] **Phase 2: Onboarding and First Visible AI** - Ship permission onboarding that gets Always Location granted, surface AI summary on TodayScreen, handle data gaps gracefully, complete privacy compliance (completed 2026-04-04)
 - [ ] **Phase 3: Timeline and Recording Polish** - Raise the "画卷" timeline to Apple-quality design; validate the complete passive recording pipeline on real devices
-- [ ] **Phase 4: Pattern Recognition and Proactive Push** - Detect behavioral patterns across days, surface one meaningful daily notification insight
+- [x] **Phase 4: Pattern Recognition and Proactive Push** - Detect behavioral patterns across days, surface one meaningful daily notification insight (completed 2026-04-05)
 - [ ] **Phase 5: Echo Conversation** - Enable users to ask Echo natural language questions about their life data
 
 ## Phase Details
@@ -86,7 +86,7 @@ Plans:
 Plans:
 - [x] 04-01-PLAN.md — PatternDetectionEngine TDD: DetectedPattern types + streak detection + data-sufficiency guard
 - [x] 04-02-PLAN.md — EchoScheduler.onPatternCheck() + EchoPromptBuilder.buildPatternInsightPrompt + notification scheduling
-- [ ] 04-03-PLAN.md — TodayViewModel.latestPatternInsight + TodayScreen patternInsightSection + AppContainer wiring
+- [x] 04-03-PLAN.md — TodayViewModel.latestPatternInsight + TodayScreen patternInsightSection + AppContainer wiring
 
 ### Phase 5: Echo Conversation
 **Goal**: Users can ask Echo questions about their recorded life and get accurate, specific answers
@@ -108,5 +108,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 1. Security and AI Pipeline | 0/3 | Not started | - |
 | 2. Onboarding and First Visible AI | 3/3 | Complete   | 2026-04-04 |
 | 3. Timeline and Recording Polish | 3/4 | In Progress|  |
-| 4. Pattern Recognition and Proactive Push | 2/3 | In Progress|  |
+| 4. Pattern Recognition and Proactive Push | 3/3 | Complete   | 2026-04-05 |
 | 5. Echo Conversation | 0/TBD | Not started | - |
