@@ -1,12 +1,13 @@
 import Foundation
 import SwiftData
+import UserNotifications
 
 /// Manages auto-generation timing for Echo's background AI tasks.
 ///
 /// Responsibilities:
 /// - Daily summary: trigger when app enters background after configured hour
 /// - Weekly profile: check on app launch if 7+ days since last update
-/// - Smart echo: check if shutter records need AI-powered resurfacing (future)
+/// - Pattern check: detect behavioral patterns and generate proactive push insight
 ///
 /// Does NOT manage the existing `EchoEngine` notification-based echo system —
 /// the two systems run in parallel.
@@ -15,12 +16,17 @@ final class EchoScheduler: @unchecked Sendable {
     private let dailySummaryGenerator: EchoDailySummaryGenerator
     private let weeklyProfileUpdater: EchoWeeklyProfileUpdater
     private let memoryManager: EchoMemoryManager
+    private let aiService: any EchoAIProviding
+    private let promptBuilder: EchoPromptBuilder
+    private let notificationScheduler: any EchoNotificationScheduling
     private var messageManager: EchoMessageManager?
 
     /// UserDefaults key for last daily summary date (stored as "yyyy-MM-dd")
     private static let lastDailySummaryKey = "today.echo.lastDailySummaryDate"
     /// UserDefaults key for daily summary trigger hour
     private static let dailySummaryHourKey = "today.echo.dailySummaryHour"
+    /// UserDefaults key for last pattern insight date (idempotency guard)
+    private static let lastPatternInsightKey = "today.echo.lastPatternInsightDate"
 
     /// Hour after which daily summary can be triggered (0-23). Default = 20 (8 PM).
     var dailySummaryHour: Int {
@@ -39,11 +45,17 @@ final class EchoScheduler: @unchecked Sendable {
     init(
         dailySummaryGenerator: EchoDailySummaryGenerator,
         weeklyProfileUpdater: EchoWeeklyProfileUpdater,
-        memoryManager: EchoMemoryManager
+        memoryManager: EchoMemoryManager,
+        aiService: any EchoAIProviding = EchoAIService(),
+        promptBuilder: EchoPromptBuilder? = nil,
+        notificationScheduler: any EchoNotificationScheduling = SystemNotificationScheduler()
     ) {
         self.dailySummaryGenerator = dailySummaryGenerator
         self.weeklyProfileUpdater = weeklyProfileUpdater
         self.memoryManager = memoryManager
+        self.aiService = aiService
+        self.promptBuilder = promptBuilder ?? EchoPromptBuilder(memoryManager: memoryManager)
+        self.notificationScheduler = notificationScheduler
     }
 
     /// Set the message manager. Called after AppContainer wires everything up
@@ -139,6 +151,8 @@ final class EchoScheduler: @unchecked Sendable {
         } catch {
             print("[EchoScheduler] Daily summary generation failed: \(error)")
         }
+
+        await onPatternCheck()
     }
 
     // MARK: - Timeline Data Loading
@@ -164,6 +178,83 @@ final class EchoScheduler: @unchecked Sendable {
                 return line
             }
             .joined(separator: "\n")
+    }
+
+    // MARK: - Pattern Recognition
+
+    /// Detect a behavioral pattern and generate a proactive push insight.
+    ///
+    /// This method is idempotent: it runs at most once per calendar day, controlled
+    /// by the `lastPatternInsightKey` UserDefaults value. It also skips silently when:
+    /// - Less than 21 days of DailySummaryEntity data exist
+    /// - No detectable pattern is found (streak < 3 days)
+    /// - The AI response contains prescriptive language (tone guard)
+    /// - Notification permission is denied (Echo inbox message is still created)
+    func onPatternCheck() async {
+        let context = ModelContext(AppContainer.modelContainer)
+        let engine = PatternDetectionEngine()
+
+        guard engine.hasSufficientData(context: context) else { return }
+
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        let todayKey = formatter.string(from: Date())
+
+        let lastKey = UserDefaults.standard.string(forKey: Self.lastPatternInsightKey)
+        guard lastKey != todayKey else { return }
+
+        guard let pattern = engine.detectBestPattern(context: context) else { return }
+
+        let prompt = promptBuilder.buildPatternInsightPrompt(pattern)
+        let insightText: String
+        do {
+            insightText = try await aiService.summarize(prompt: prompt)
+        } catch {
+            return
+        }
+
+        // Tone guard — reject prescriptive AI output
+        let prescriptiveKeywords = ["建议", "应该", "需要", "可以考虑", "尝试"]
+        guard !prescriptiveKeywords.contains(where: { insightText.contains($0) }) else { return }
+
+        // Persist as Echo inbox message
+        if let manager = messageManager {
+            let preview = String(insightText.prefix(60))
+            let sourceData = EchoSourceData(
+                type: .dateRange,
+                sourceDescription: "近期\(pattern.streakLength)天行为规律"
+            )
+            await MainActor.run {
+                try? manager.generateMessage(
+                    type: .dailyInsight,
+                    title: "Echo 发现了一个规律",
+                    preview: preview,
+                    sourceDescription: "来自：行为规律分析",
+                    sourceData: sourceData,
+                    initialEchoMessage: insightText
+                )
+            }
+        }
+
+        // Schedule push notification (permission-gated)
+        let notificationID = "echo.pattern.\(todayKey)"
+        let settings = await UNUserNotificationCenter.current().notificationSettings()
+        if settings.authorizationStatus == .authorized || settings.authorizationStatus == .provisional {
+            notificationScheduler.removeNotifications(identifiers: [notificationID])
+            if let triggerDate = Calendar.current.date(
+                bySettingHour: dailySummaryHour, minute: 5, second: 0, of: Date()
+            ) {
+                notificationScheduler.scheduleEchoNotification(
+                    identifier: notificationID,
+                    title: "Echo",
+                    body: insightText,
+                    triggerDate: triggerDate
+                )
+            }
+        }
+
+        UserDefaults.standard.set(todayKey, forKey: Self.lastPatternInsightKey)
     }
 
     // MARK: - Weekly Profile
