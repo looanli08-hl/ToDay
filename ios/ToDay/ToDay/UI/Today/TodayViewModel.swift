@@ -14,6 +14,8 @@ final class TodayViewModel: ObservableObject {
     @Published private(set) var patternInsight: String?
     @Published var showQuickRecord = false
     @Published var selectedEvent: InferredEvent?
+    @Published var selectedDate: Date = Date()
+    @Published var showCalendar = false
 
     // MARK: - Dependencies
 
@@ -23,7 +25,6 @@ final class TodayViewModel: ObservableObject {
     private let annotationStore: AnnotationStore
     private let echoMessageManager: EchoMessageManager?
 
-    private var displayDate: Date = Date()
     private let calendar = Calendar.current
     private var hasLoadedOnce = false
 
@@ -46,19 +47,32 @@ final class TodayViewModel: ObservableObject {
     // MARK: - Data Loading
 
     func load() async {
+        await loadTimeline(for: selectedDate)
+    }
+
+    func refresh() async {
+        await loadTimeline(for: selectedDate)
+    }
+
+    func loadTimeline(for date: Date) async {
         guard !isLoading else { return }
+        selectedDate = date
         isLoading = true
         errorMessage = nil
 
         do {
-            let baseTimeline = try await timelineProvider.loadTimeline(for: displayDate)
-            let mergedTimeline = mergedTimeline(base: baseTimeline)
+            let baseTimeline = try await timelineProvider.loadTimeline(for: date)
+            let mergedTimeline = mergedTimeline(base: baseTimeline, date: date)
             timeline = mergedTimeline
             hasLoadedOnce = true
-            BackgroundTaskManager.updateTodayEventCount(mergedTimeline.entries.count)
 
-            // Load daily insight from Echo messages
-            loadAISummary()
+            if isToday {
+                BackgroundTaskManager.updateTodayEventCount(mergedTimeline.entries.count)
+                loadAISummary()
+            } else {
+                aiSummary = nil
+                patternInsight = nil
+            }
         } catch {
             if !hasLoadedOnce {
                 errorMessage = error.localizedDescription
@@ -66,14 +80,6 @@ final class TodayViewModel: ObservableObject {
         }
 
         isLoading = false
-    }
-
-    func refresh() async {
-        await load()
-    }
-
-    func setDate(_ date: Date) {
-        displayDate = date
     }
 
     // MARK: - Memo
@@ -114,22 +120,40 @@ final class TodayViewModel: ObservableObject {
     }
 
     var currentDate: Date {
-        displayDate
+        selectedDate
     }
 
     var isToday: Bool {
-        calendar.isDateInToday(displayDate)
+        calendar.isDateInToday(selectedDate)
+    }
+
+    // MARK: - Date Navigation
+
+    var recentDateRange: [Date] {
+        (0..<30).compactMap { offset in
+            calendar.date(byAdding: .day, value: -offset, to: calendar.startOfDay(for: Date()))
+        }.reversed()
+    }
+
+    func selectDate(_ date: Date) {
+        Task { await loadTimeline(for: date) }
+    }
+
+    func returnToToday() {
+        let today = Date()
+        showCalendar = false
+        Task { await loadTimeline(for: today) }
     }
 
     // MARK: - Private
 
-    private func mergedTimeline(base: DayTimeline) -> DayTimeline {
-        let moodEvents = moodRecordManager.records(on: displayDate)
+    private func mergedTimeline(base: DayTimeline, date: Date) -> DayTimeline {
+        let moodEvents = moodRecordManager.records(on: date)
             .map { $0.toInferredEvent(referenceDate: Date(), calendar: calendar) }
 
-        let shutterEvents = shutterManager.inferredEvents(on: displayDate)
+        let shutterEvents = shutterManager.inferredEvents(on: date)
 
-        let annotations = annotationStore.annotations(on: displayDate).map(\.asEvent)
+        let annotations = annotationStore.annotations(on: date).map(\.asEvent)
 
         var allEntries = base.entries + moodEvents + shutterEvents + annotations
         allEntries.sort { $0.startDate < $1.startDate }

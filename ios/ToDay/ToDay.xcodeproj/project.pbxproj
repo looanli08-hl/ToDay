@@ -33,7 +33,6 @@
 		42E9331811E33CBD40E88723 /* DayTimelineEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED5E4D5563AC71A0747FEA41 /* DayTimelineEntity.swift */; };
 		4489F5BA8EE15449F8F1C9DE /* SensorCollecting.swift in Sources */ = {isa = PBXBuildFile; fileRef = E55BD79449543E2EDA158B48 /* SensorCollecting.swift */; };
 		456895F66B5C6523BE9D2876 /* EchoAIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4E8F6DA02ABE5F983DFB6F7 /* EchoAIService.swift */; };
-		4ABA811E8B18E6AE44A41570 /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAD1103DFEB16303E6E68D6E /* HistoryView.swift */; };
 		4D23057BD49E8F3BF5B43BF4 /* PhoneTimelineDataProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA0CD7C3B25332C37FAC3859 /* PhoneTimelineDataProviderTests.swift */; };
 		4E0E762B4D92B8C4703F24C0 /* MoodRecordEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 517D081EC92833825D6C1658 /* MoodRecordEntity.swift */; };
 		50D54D3F7E2914EB1CEC9C91 /* SensorTypesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B841AA3458BDB1107651FED3 /* SensorTypesTests.swift */; };
@@ -198,7 +197,6 @@
 		D52F65A4774BB7467BD2DBC1 /* BackgroundTaskManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundTaskManager.swift; sourceTree = "<group>"; };
 		D5E3EC90284C88262A943A15 /* TodayInsightComposerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayInsightComposerTests.swift; sourceTree = "<group>"; };
 		D796A8133E65C0F7E468E8AB /* MoodRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodRecord.swift; sourceTree = "<group>"; };
-		DAD1103DFEB16303E6E68D6E /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
 		DD8682A65FCDD7B5B3365527 /* DeviceStateCollectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceStateCollectorTests.swift; sourceTree = "<group>"; };
 		E0B2EE8138EE16EC7078C00E /* LocationCollector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationCollector.swift; sourceTree = "<group>"; };
 		E3255BECBDB1CE6697C05720 /* ShutterManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShutterManagerTests.swift; sourceTree = "<group>"; };
@@ -268,14 +266,6 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
-		5010E88E8C53B8F6399E3802 /* History */ = {
-			isa = PBXGroup;
-			children = (
-				DAD1103DFEB16303E6E68D6E /* HistoryView.swift */,
-			);
-			path = History;
-			sourceTree = "<group>";
-		};
 		5143A545016C913C3892944F /* Components */ = {
 			isa = PBXGroup;
 			children = (
@@ -326,7 +316,6 @@
 				172D352B93A287AC813F9606 /* RootView.swift */,
 				130826F080B6224CDBDB4D36 /* Theme.swift */,
 				5143A545016C913C3892944F /* Components */,
-				5010E88E8C53B8F6399E3802 /* History */,
 				F78F0779F1A24984EC3C0085 /* Onboarding */,
 				612FB2DB0ABDB477DFC00F7B /* Settings */,
 				E107185F48ED3385A92B5A77 /* Today */,
@@ -583,7 +572,6 @@
 				AB5F6A399EE781C4F3B21BC6 /* EchoWeeklyProfileUpdater.swift in Sources */,
 				DCA2CE7DAA37F9418BF5A054 /* EventCardView.swift in Sources */,
 				E2ED475358AF93D1FE0D1556 /* HealthKitCollector.swift in Sources */,
-				4ABA811E8B18E6AE44A41570 /* HistoryView.swift in Sources */,
 				07613D9D1A30741E236617A6 /* InferredEvent+Display.swift in Sources */,
 				BC27B6044A1FB59CCFBD9B6D /* LocationCollector.swift in Sources */,
 				DE64DC4615173FA2064D2929 /* MockEventInferenceEngine.swift in Sources */,

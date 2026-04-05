@@ -3,68 +3,148 @@ import SwiftUI
 struct TodayScreen: View {
     @ObservedObject var viewModel: TodayViewModel
 
+    private let calendar = Calendar.current
+
     var body: some View {
-        ScrollView(.vertical, showsIndicators: false) {
-            VStack(alignment: .leading, spacing: AppSpacing.lg) {
-                // Date Header
-                dateHeader
+        NavigationStack {
+            ScrollView(.vertical, showsIndicators: false) {
+                VStack(alignment: .leading, spacing: AppSpacing.lg) {
+                    // Date Strip (always visible)
+                    dateStrip
 
-                // Stats Row
-                if !viewModel.stats.isEmpty {
-                    statsRow
+                    // Date Header
+                    dateHeader
+
+                    // Stats Row (always visible when data exists)
+                    if !viewModel.stats.isEmpty {
+                        statsRow
+                    }
+
+                    // AI Summary Card (today only)
+                    if viewModel.isToday, let summary = viewModel.aiSummary {
+                        aiSummaryCard(summary)
+                    }
+
+                    // Loading / Error / Empty / Timeline
+                    if viewModel.isLoading && !viewModel.entries.isEmpty {
+                        timelineSection
+                    } else if viewModel.isLoading {
+                        loadingCard
+                    } else if let error = viewModel.errorMessage {
+                        errorCard(error)
+                    } else if viewModel.entries.isEmpty {
+                        emptyCard
+                    } else {
+                        timelineSection
+                    }
+
+                    // Pattern Insight (today only)
+                    if viewModel.isToday, let insight = viewModel.patternInsight {
+                        patternCard(insight)
+                    }
+
+                    Spacer(minLength: viewModel.isToday ? 100 : AppSpacing.xxl)
                 }
-
-                // AI Summary Card
-                if let summary = viewModel.aiSummary {
-                    aiSummaryCard(summary)
-                }
-
-                // Loading / Error / Empty / Timeline
-                if viewModel.isLoading && !viewModel.entries.isEmpty {
-                    // Background refresh — show existing timeline
-                    timelineSection
-                } else if viewModel.isLoading {
-                    loadingCard
-                } else if let error = viewModel.errorMessage {
-                    errorCard(error)
-                } else if viewModel.entries.isEmpty {
-                    emptyCard
-                } else {
-                    timelineSection
-                }
-
-                // Pattern Insight
-                if let insight = viewModel.patternInsight {
-                    patternCard(insight)
-                }
-
-                Spacer(minLength: 100)
+                .padding(.horizontal, AppSpacing.md)
+                .padding(.top, AppSpacing.md)
             }
-            .padding(.horizontal, AppSpacing.md)
-            .padding(.top, AppSpacing.md)
-        }
-        .background(AppColor.background)
-        .safeAreaInset(edge: .bottom) {
-            bottomActionBar
-        }
-        .sheet(item: $viewModel.selectedEvent) { event in
-            eventDetailSheet(event)
-        }
-        .sheet(isPresented: $viewModel.showQuickRecord) {
-            QuickRecordSheet(
-                isPresented: $viewModel.showQuickRecord,
-                onSave: { note in
-                    viewModel.saveMemo(note)
+            .background(AppColor.background)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        viewModel.showCalendar = true
+                    } label: {
+                        Image(systemName: "calendar")
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundStyle(AppColor.accent)
+                    }
                 }
-            )
-            .presentationDetents([.medium, .large])
-            .presentationDragIndicator(.visible)
+            }
+            .safeAreaInset(edge: .bottom) {
+                if viewModel.isToday {
+                    bottomActionBar
+                }
+            }
+            .sheet(item: $viewModel.selectedEvent) { event in
+                eventDetailSheet(event)
+            }
+            .sheet(isPresented: $viewModel.showQuickRecord) {
+                QuickRecordSheet(
+                    isPresented: $viewModel.showQuickRecord,
+                    onSave: { note in
+                        viewModel.saveMemo(note)
+                    }
+                )
+                .presentationDetents([.medium, .large])
+                .presentationDragIndicator(.visible)
+            }
+            .sheet(isPresented: $viewModel.showCalendar) {
+                calendarSheet
+            }
+            .task {
+                await viewModel.load()
+            }
+            .refreshable {
+                await viewModel.refresh()
+            }
         }
-        .task {
-            await viewModel.load()
+    }
+
+    // MARK: - Date Strip
+
+    private var dateStrip: some View {
+        ScrollViewReader { proxy in
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: AppSpacing.xs) {
+                    ForEach(viewModel.recentDateRange, id: \.self) { date in
+                        dateCell(date)
+                            .id(date)
+                    }
+                }
+                .padding(.horizontal, AppSpacing.xxs)
+            }
+            .onAppear {
+                proxy.scrollTo(
+                    calendar.startOfDay(for: viewModel.selectedDate),
+                    anchor: .center
+                )
+            }
+            .onChange(of: viewModel.selectedDate) { _, newDate in
+                withAnimation {
+                    proxy.scrollTo(
+                        calendar.startOfDay(for: newDate),
+                        anchor: .center
+                    )
+                }
+            }
         }
-        .refreshable {
-            await viewModel.refresh()
+    }
+
+    private func dateCell(_ date: Date) -> some View {
+        let isSelected = calendar.isDate(date, inSameDayAs: viewModel.selectedDate)
+        let isTodayDate = calendar.isDateInToday(date)
+
+        return VStack(spacing: AppSpacing.xxs) {
+            if isTodayDate {
+                Text("今")
+                    .font(AppFont.small())
+                    .foregroundStyle(isSelected ? .white : AppColor.accent)
+            } else {
+                Text("\(calendar.component(.day, from: date))")
+                    .font(AppFont.small())
+                    .foregroundStyle(isSelected ? .white : AppColor.label)
+            }
+        }
+        .frame(width: 40, height: 40)
+        .background(
+            isSelected
+                ? AppColor.accent
+                : AppColor.surface
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .onTapGesture {
+            viewModel.selectDate(date)
         }
     }
 
@@ -72,13 +152,24 @@ struct TodayScreen: View {
 
     private var dateHeader: some View {
         VStack(alignment: .leading, spacing: AppSpacing.xxs) {
-            Text("今日画卷")
+            Text(headerTitle)
                 .heroStyle()
 
             Text(formattedDate)
                 .font(AppFont.small())
                 .foregroundStyle(AppColor.labelTertiary)
                 .tracking(1.4)
+        }
+    }
+
+    private var headerTitle: String {
+        if viewModel.isToday {
+            return "今日画卷"
+        } else {
+            let formatter = DateFormatter()
+            formatter.locale = Locale(identifier: "zh_CN")
+            formatter.dateFormat = "MM月dd日"
+            return formatter.string(from: viewModel.currentDate)
         }
     }
 
@@ -131,11 +222,13 @@ struct TodayScreen: View {
 
     private var timelineSection: some View {
         VStack(alignment: .leading, spacing: AppSpacing.sm) {
-            Text("今日时间轴")
+            Text(viewModel.isToday ? "今日时间轴" : "时间轴")
                 .font(AppFont.heading())
                 .foregroundStyle(AppColor.label)
 
-            Text("从凌晨到夜里，一天的起伏与留白。")
+            Text(viewModel.isToday
+                 ? "从凌晨到夜里，一天的起伏与留白。"
+                 : "这一天的生活画卷。")
                 .font(AppFont.small())
                 .foregroundStyle(AppColor.labelTertiary)
 
@@ -157,7 +250,7 @@ struct TodayScreen: View {
             HStack(spacing: AppSpacing.sm) {
                 ProgressView()
                     .tint(AppColor.accent)
-                Text("正在整理今天的脉络...")
+                Text("正在整理脉络...")
                     .font(AppFont.bodyRegular())
                     .foregroundStyle(AppColor.labelSecondary)
             }
@@ -203,21 +296,25 @@ struct TodayScreen: View {
                     .font(.system(size: 40))
                     .foregroundStyle(AppColor.labelQuaternary)
 
-                Text("等待数据中")
+                Text(viewModel.isToday ? "等待数据中" : "这一天还没有记录")
                     .font(AppFont.body())
                     .foregroundStyle(AppColor.label)
 
-                Text("带着手机出门走走，位置和活动数据会自动填入时间轴。你也可以先用下方的「记录此刻」手动打点。")
+                Text(viewModel.isToday
+                     ? "带着手机出门走走，位置和活动数据会自动填入时间轴。你也可以先用下方的「记录此刻」手动打点。"
+                     : "戴上手表或用快门记录生活碎片")
                     .font(AppFont.bodyRegular())
                     .foregroundStyle(AppColor.labelSecondary)
                     .multilineTextAlignment(.center)
                     .lineSpacing(4)
 
-                Button("刷新") {
-                    Task { await viewModel.refresh() }
+                if viewModel.isToday {
+                    Button("刷新") {
+                        Task { await viewModel.refresh() }
+                    }
+                    .font(AppFont.body())
+                    .foregroundStyle(AppColor.accent)
                 }
-                .font(AppFont.body())
-                .foregroundStyle(AppColor.accent)
             }
             .frame(maxWidth: .infinity)
         }
@@ -287,6 +384,43 @@ struct TodayScreen: View {
             Color(UIColor.systemGroupedBackground).opacity(0.96)
         )
         .appShadow(.elevated)
+    }
+
+    // MARK: - Calendar Sheet
+
+    private var calendarSheet: some View {
+        NavigationStack {
+            DatePicker(
+                "选择日期",
+                selection: $viewModel.selectedDate,
+                in: ...Date(),
+                displayedComponents: .date
+            )
+            .datePickerStyle(.graphical)
+            .tint(AppColor.accent)
+            .padding()
+            .background(AppColor.background)
+            .navigationTitle("选择日期")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("回到今日") {
+                        viewModel.returnToToday()
+                    }
+                    .font(AppFont.bodyRegular())
+                    .foregroundStyle(AppColor.accent)
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("完成") {
+                        viewModel.showCalendar = false
+                        Task { await viewModel.loadTimeline(for: viewModel.selectedDate) }
+                    }
+                    .font(AppFont.body())
+                    .foregroundStyle(AppColor.accent)
+                }
+            }
+        }
+        .presentationDetents([.large])
     }
 
     // MARK: - Event Detail Sheet

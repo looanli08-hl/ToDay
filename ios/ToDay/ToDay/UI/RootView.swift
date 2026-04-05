@@ -2,7 +2,6 @@ import SwiftUI
 
 enum AppTab: Int, CaseIterable {
     case today
-    case history
     case record
     case settings
 }
@@ -30,17 +29,6 @@ struct RootView: View {
                     Label("首页", systemImage: "sun.horizon")
                 }
                 .tag(AppTab.today)
-
-            HistoryView(
-                timelineProvider: AppContainer.makeTimelineProvider(),
-                moodRecordManager: AppContainer.makeMoodRecordManager(),
-                shutterManager: AppContainer.makeShutterManager(),
-                annotationStore: AppContainer.makeAnnotationStore()
-            )
-            .tabItem {
-                Label("回看", systemImage: "clock.arrow.circlepath")
-            }
-            .tag(AppTab.history)
 
             // Center placeholder — intercepted
             Color.clear
