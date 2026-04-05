@@ -2,6 +2,7 @@ import SwiftUI
 
 struct EventCardView: View {
     let event: InferredEvent
+    var inlineMemos: [InferredEvent] = []
 
     var body: some View {
         HStack(spacing: AppSpacing.xs) {
@@ -37,6 +38,13 @@ struct EventCardView: View {
                         .foregroundStyle(AppColor.labelTertiary)
                         .lineLimit(1)
                 }
+
+                // Inline mood/memo annotations
+                if !inlineMemos.isEmpty {
+                    ForEach(inlineMemos) { memo in
+                        inlineMemoView(memo)
+                    }
+                }
             }
         }
         .padding(AppSpacing.sm)
@@ -50,6 +58,45 @@ struct EventCardView: View {
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(event.kindBadgeTitle), \(event.resolvedName)")
         .accessibilityValue(event.scrollDurationText)
+    }
+
+    // MARK: - Inline Memo
+
+    private func inlineMemoView(_ memo: InferredEvent) -> some View {
+        HStack(spacing: AppSpacing.xxs) {
+            Circle()
+                .fill(AppColor.mood)
+                .frame(width: 5, height: 5)
+
+            if let note = memo.subtitle, !note.isEmpty {
+                Text(note)
+                    .font(AppFont.small())
+                    .foregroundStyle(AppColor.mood)
+                    .lineLimit(1)
+            } else {
+                Text(memo.resolvedName)
+                    .font(AppFont.small())
+                    .foregroundStyle(AppColor.mood)
+                    .lineLimit(1)
+            }
+
+            Spacer()
+
+            Text(memoTimeText(memo.startDate))
+                .font(AppFont.small())
+                .foregroundStyle(AppColor.labelQuaternary)
+        }
+        .padding(.horizontal, AppSpacing.xs)
+        .padding(.vertical, 3)
+        .background(AppColor.mood.opacity(0.06))
+        .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
+    }
+
+    private func memoTimeText(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "zh_CN")
+        formatter.dateFormat = "HH:mm"
+        return formatter.string(from: date)
     }
 
     // MARK: - Detail Text

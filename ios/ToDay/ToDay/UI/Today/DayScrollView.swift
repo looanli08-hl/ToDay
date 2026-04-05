@@ -9,8 +9,37 @@ struct DayScrollView: View {
     private let calendar = Calendar.current
     private let timeColumnWidth: CGFloat = 44
     private let connectorWidth: CGFloat = 20
-    private let minRowHeight: CGFloat = 44
-    private let maxRowHeight: CGFloat = 180
+
+    /// Groups entries into primary events with inline mood/memo annotations.
+    private var groupedEntries: [(event: InferredEvent, memos: [InferredEvent])] {
+        let primaryEvents = entries.filter { $0.kind != .mood }
+        let moodEvents = entries.filter { $0.kind == .mood }
+
+        var result: [(event: InferredEvent, memos: [InferredEvent])] = []
+        var assignedMoodIDs: Set<UUID> = []
+
+        for event in primaryEvents {
+            // Find mood/memo events whose startDate falls within this event's time range
+            let inlineMemos = moodEvents.filter { memo in
+                !assignedMoodIDs.contains(memo.id)
+                    && memo.startDate >= event.startDate
+                    && memo.startDate < event.endDate
+            }
+            for memo in inlineMemos {
+                assignedMoodIDs.insert(memo.id)
+            }
+            result.append((event: event, memos: inlineMemos))
+        }
+
+        // Standalone mood events that don't fall within any primary event
+        for mood in moodEvents where !assignedMoodIDs.contains(mood.id) {
+            result.append((event: mood, memos: []))
+        }
+
+        // Sort by startDate to preserve chronological order
+        result.sort { $0.event.startDate < $1.event.startDate }
+        return result
+    }
 
     var body: some View {
         ZStack {
@@ -22,8 +51,8 @@ struct DayScrollView: View {
                 if entries.isEmpty {
                     emptyGapRow
                 } else {
-                    ForEach(Array(entries.enumerated()), id: \.element.id) { index, event in
-                        eventRow(event, index: index)
+                    ForEach(Array(groupedEntries.enumerated()), id: \.element.event.id) { index, group in
+                        eventRow(group.event, memos: group.memos, index: index)
                     }
                 }
 
@@ -58,9 +87,7 @@ struct DayScrollView: View {
     // MARK: - Event Row
 
     @ViewBuilder
-    private func eventRow(_ event: InferredEvent, index: Int) -> some View {
-        let rowHeight = proportionalHeight(for: event)
-
+    private func eventRow(_ event: InferredEvent, memos: [InferredEvent], index: Int) -> some View {
         HStack(alignment: .top, spacing: 0) {
             // Time column
             VStack(alignment: .trailing, spacing: 2) {
@@ -82,12 +109,10 @@ struct DayScrollView: View {
                     .fill(eventColor(event))
                     .frame(width: 8, height: 8)
 
-                if rowHeight > 16 {
-                    Rectangle()
-                        .fill(AppColor.label.opacity(0.1))
-                        .frame(width: 1.5)
-                        .frame(maxHeight: .infinity)
-                }
+                Rectangle()
+                    .fill(AppColor.label.opacity(0.1))
+                    .frame(width: 1.5)
+                    .frame(maxHeight: .infinity)
             }
             .frame(width: connectorWidth)
 
@@ -97,14 +122,13 @@ struct DayScrollView: View {
             } else if event.kind == .dataGap {
                 dataGapRow(event)
             } else {
-                EventCardView(event: event)
+                EventCardView(event: event, inlineMemos: memos)
                     .contentShape(Rectangle())
                     .onTapGesture {
                         onEventTap?(event)
                     }
             }
         }
-        .frame(minHeight: rowHeight, alignment: .top)
         .padding(.horizontal, AppSpacing.xs)
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(event.kindBadgeTitle) \(event.resolvedName), \(event.scrollDurationText)")
@@ -133,7 +157,6 @@ struct DayScrollView: View {
         .padding(.vertical, AppSpacing.xxs)
         .background(AppColor.mood.opacity(0.08))
         .clipShape(Capsule())
-        .frame(minHeight: 38)
     }
 
     // MARK: - Data Gap Row
@@ -183,14 +206,6 @@ struct DayScrollView: View {
     }
 
     // MARK: - Helpers
-
-    private func proportionalHeight(for event: InferredEvent) -> CGFloat {
-        let minutes = event.duration / 60.0
-        if event.kind == .mood { return 38 }
-        if minutes < 5 { return minRowHeight }
-        let scaled = minRowHeight + (minutes / 60.0) * 40.0
-        return min(max(scaled, minRowHeight), maxRowHeight)
-    }
 
     private func timeText(_ date: Date) -> String {
         let formatter = DateFormatter()
