@@ -126,4 +126,90 @@ final class EchoPromptBuilderTests: XCTestCase {
         XCTAssertTrue(prompt.contains("热爱跑步"))
         XCTAssertTrue(prompt.contains("周一：跑步 5 公里"))
     }
+
+    // MARK: - Pattern Insight Prompt
+
+    func testBuildPatternInsightPromptContainsPlaceName() {
+        let pattern = DetectedPattern(
+            kind: .quietTime,
+            placeName: "北大图书馆",
+            timeOfDay: .morning,
+            streakLength: 5,
+            recentDates: ["2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03"]
+        )
+
+        let prompt = builder.buildPatternInsightPrompt(pattern)
+
+        XCTAssertTrue(prompt.contains("北大图书馆"), "Prompt should contain the place name")
+    }
+
+    func testBuildPatternInsightPromptContainsStreakLength() {
+        let pattern = DetectedPattern(
+            kind: .quietTime,
+            placeName: "星巴克",
+            timeOfDay: .afternoon,
+            streakLength: 7,
+            recentDates: []
+        )
+
+        let prompt = builder.buildPatternInsightPrompt(pattern)
+
+        XCTAssertTrue(prompt.contains("7"), "Prompt should contain the streak length")
+    }
+
+    func testBuildPatternInsightPromptContainsMorningLabel() {
+        let pattern = DetectedPattern(
+            kind: .quietTime,
+            placeName: "咖啡馆",
+            timeOfDay: .morning,
+            streakLength: 3,
+            recentDates: []
+        )
+
+        let prompt = builder.buildPatternInsightPrompt(pattern)
+
+        XCTAssertTrue(prompt.contains("早上"), "Prompt should use '早上' for morning")
+    }
+
+    func testBuildPatternInsightPromptContainsAfternoonLabel() {
+        let pattern = DetectedPattern(
+            kind: .quietTime,
+            placeName: "图书馆",
+            timeOfDay: .afternoon,
+            streakLength: 3,
+            recentDates: []
+        )
+
+        let prompt = builder.buildPatternInsightPrompt(pattern)
+
+        XCTAssertTrue(prompt.contains("下午"), "Prompt should use '下午' for afternoon")
+    }
+
+    func testBuildPatternInsightPromptContainsEveningLabel() {
+        let pattern = DetectedPattern(
+            kind: .quietTime,
+            placeName: "健身房",
+            timeOfDay: .evening,
+            streakLength: 4,
+            recentDates: []
+        )
+
+        let prompt = builder.buildPatternInsightPrompt(pattern)
+
+        XCTAssertTrue(prompt.contains("晚上"), "Prompt should use '晚上' for evening")
+    }
+
+    func testBuildPatternInsightPromptContainsAntiPrescriptiveInstruction() {
+        let pattern = DetectedPattern(
+            kind: .quietTime,
+            placeName: "书房",
+            timeOfDay: .evening,
+            streakLength: 5,
+            recentDates: []
+        )
+
+        let prompt = builder.buildPatternInsightPrompt(pattern)
+
+        XCTAssertTrue(prompt.contains("只描述规律，不评价，不建议"), "Prompt must contain the anti-prescriptive instruction")
+    }
 }
