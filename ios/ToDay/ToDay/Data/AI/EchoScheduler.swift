@@ -66,25 +66,14 @@ final class EchoScheduler: @unchecked Sendable {
 
     // MARK: - Daily Summary
 
-    /// Check if daily summary should be generated.
-    /// Returns true if: (1) not already generated today, AND (2) current hour >= configured hour.
+    /// Check if summary should be regenerated.
+    /// Returns true if enough time has passed since last generation (throttle: 30 minutes).
     func shouldGenerateDailySummary() -> Bool {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        let todayKey = formatter.string(from: Date())
+        let lastTimestamp = UserDefaults.standard.double(forKey: Self.lastDailySummaryKey + ".timestamp")
+        guard lastTimestamp > 0 else { return true } // Never generated
 
-        let lastDate = UserDefaults.standard.string(forKey: Self.lastDailySummaryKey)
-        if lastDate == todayKey {
-            return false // Already generated today
-        }
-
-        return true
-    }
-
-    /// Check if current time is past the daily summary trigger hour.
-    func isAfterDailySummaryHour() -> Bool {
-        let hour = Calendar.current.component(.hour, from: Date())
-        return hour >= dailySummaryHour
+        let elapsed = Date().timeIntervalSince1970 - lastTimestamp
+        return elapsed >= 1800 // 30 minutes throttle
     }
 
     /// Called when app enters background. Triggers daily summary if conditions are met.
@@ -98,7 +87,7 @@ final class EchoScheduler: @unchecked Sendable {
         shutterTexts: [String],
         moodNotes: [String]
     ) async {
-        guard shouldGenerateDailySummary() && isAfterDailySummaryHour() else { return }
+        guard shouldGenerateDailySummary() else { return }
 
         // If no summary was passed, try to load from persisted timeline
         let effectiveSummary: String
@@ -120,7 +109,8 @@ final class EchoScheduler: @unchecked Sendable {
                 moodNotes: moodNotes
             )
 
-            // Mark as completed for today
+            // Record generation timestamp (throttle: 30 min)
+            UserDefaults.standard.set(Date().timeIntervalSince1970, forKey: Self.lastDailySummaryKey + ".timestamp")
             UserDefaults.standard.set(todayKey, forKey: Self.lastDailySummaryKey)
 
             // Create a dailyInsight message in the message center

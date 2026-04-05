@@ -244,7 +244,16 @@ final class EchoPromptBuilder: @unchecked Sendable {
     ) -> String {
         var parts: [String] = []
 
-        parts.append("请根据以下数据，生成一段简洁的中文日记摘要（100-150字）。摘要应包含关键活动、地点和值得记住的细节。语气要温暖、观察性的，像在描述朋友的一天。只描述发生了什么，不评判，不建议，不使用「应该」「建议」「需要改善」等措辞。")
+        parts.append("""
+        你是用户最亲近的朋友。根据以下数据，用2-3句话描述他到目前为止的这一天。
+
+        要求：
+        - 像老朋友随口说的，不像AI生成的报告
+        - 不要罗列数据（不说"你步行了30分钟"），而是描述感受和节奏（"下午换了个地方待着，从图书馆转到了咖啡厅"）
+        - 如果数据还很少（比如刚起床），就说短一点，别硬凑
+        - 不评判，不建议，不用"你应该""建议""加油"
+        - 用中文，口语化，50-100字
+        """)
 
         parts.append("【健康与活动数据】\n\(todayDataSummary)")
 
@@ -256,7 +265,7 @@ final class EchoPromptBuilder: @unchecked Sendable {
             parts.append("【心情记录】\n\(moodNotes.joined(separator: "\n"))")
         }
 
-        parts.append("请输出摘要正文，不需要标题或日期。同时在最后一行单独输出情绪趋势关键词（如：平静/积极/低落/混合）。")
+        parts.append("只输出描述正文，不加标题、日期或情绪标签。")
 
         return parts.joined(separator: "\n\n")
     }

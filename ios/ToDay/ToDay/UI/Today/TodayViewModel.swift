@@ -175,6 +175,8 @@ final class TodayViewModel: ObservableObject {
 
     private func loadAISummary() {
         guard let manager = echoMessageManager else { return }
+
+        // Read cached summary first (instant display)
         let messages = manager.allMessages
         if let dailyInsight = messages.first(where: { $0.messageType == .dailyInsight }) {
             aiSummary = dailyInsight.preview
@@ -186,5 +188,36 @@ final class TodayViewModel: ObservableObject {
         }) {
             patternInsight = pattern.preview
         }
+
+        // Trigger background regeneration (30-min throttle in EchoScheduler)
+        let summary = timelineDataSummary
+        let memos = moodRecordManager.records(on: selectedDate).compactMap { record in
+            let note = record.note.trimmingCharacters(in: .whitespacesAndNewlines)
+            return note.isEmpty ? nil : note
+        }
+        Task {
+            let scheduler = AppContainer.getEchoScheduler()
+            await scheduler.onAppBackground(
+                todayDataSummary: summary,
+                shutterTexts: [],
+                moodNotes: memos
+            )
+            // Reload after generation
+            let updated = manager.allMessages
+            if let newInsight = updated.first(where: { $0.messageType == .dailyInsight }) {
+                await MainActor.run {
+                    aiSummary = newInsight.preview
+                }
+            }
+        }
+    }
+
+    /// Formatted timeline data for AI prompts.
+    private var timelineDataSummary: String {
+        guard let timeline else { return "" }
+        let events = timeline.entries.filter { $0.kind != .mood }
+        if events.isEmpty { return "" }
+        return events.map { "\($0.kindBadgeTitle): \($0.resolvedName) (\($0.scrollDurationText))" }
+            .joined(separator: "\n")
     }
 }

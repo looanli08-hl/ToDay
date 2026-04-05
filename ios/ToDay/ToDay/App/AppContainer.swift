@@ -172,6 +172,10 @@ enum AppContainer {
         _annotationStore
     }
 
+    static func getEchoScheduler() -> EchoScheduler {
+        echoScheduler
+    }
+
     // MARK: - ViewModel Factories
 
     @MainActor
