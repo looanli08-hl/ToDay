@@ -15,12 +15,7 @@ struct TodayScreen: View {
                     // Date Header
                     dateHeader
 
-                    // Stats Row
-                    if !viewModel.stats.isEmpty {
-                        statsRow
-                    }
-
-                    // AI Analysis Block (between stats and timeline)
+                    // AI Analysis Block (between header and timeline)
                     if viewModel.aiSummary != nil || viewModel.patternInsight != nil {
                         if let summary = viewModel.aiSummary {
                             aiSummaryCard(summary)
@@ -178,29 +173,6 @@ struct TodayScreen: View {
         formatter.locale = Locale(identifier: "zh_CN")
         formatter.dateFormat = "yyyy · MM · dd EEE"
         return formatter.string(from: viewModel.currentDate)
-    }
-
-    // MARK: - Stats Row
-
-    private var statsRow: some View {
-        HStack(spacing: AppSpacing.xs) {
-            ForEach(viewModel.stats.prefix(4)) { stat in
-                VStack(alignment: .leading, spacing: AppSpacing.xxs) {
-                    Text(stat.value)
-                        .font(.system(size: 23, weight: .semibold, design: .monospaced))
-                        .foregroundStyle(AppColor.label)
-                    Text(stat.title)
-                        .font(AppFont.small())
-                        .foregroundStyle(AppColor.labelTertiary)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.vertical, AppSpacing.md)
-                .padding(.horizontal, AppSpacing.md)
-                .background(AppColor.surface)
-                .clipShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
-                .appShadow(.subtle)
-            }
-        }
     }
 
     // MARK: - AI Summary Card
