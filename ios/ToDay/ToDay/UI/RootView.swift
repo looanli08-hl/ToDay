@@ -1,11 +1,9 @@
 import SwiftUI
-import SwiftData
 
 enum AppTab: Int, CaseIterable {
     case today
     case history
     case record
-    case echo
     case settings
 }
 
@@ -50,17 +48,6 @@ struct RootView: View {
                     Label("记录", systemImage: "plus.circle.fill")
                 }
                 .tag(AppTab.record)
-
-            EchoView(
-                messageManager: AppContainer.getEchoMessageManager(),
-                aiService: AppContainer.getEchoAIService(),
-                promptBuilder: AppContainer.getEchoPromptBuilder(),
-                container: AppContainer.modelContainer
-            )
-            .tabItem {
-                Label("Echo", systemImage: "sparkles")
-            }
-            .tag(AppTab.echo)
 
             SettingsView()
                 .tabItem {

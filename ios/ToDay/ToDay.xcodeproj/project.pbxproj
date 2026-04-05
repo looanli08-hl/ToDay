@@ -29,7 +29,6 @@
 		36266D4161AF2A2824D17B75 /* QuickRecordSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FA08C355B9422FEFC1D950A /* QuickRecordSheet.swift */; };
 		3671BDB36ED0522EB78A2271 /* EchoMemoryEntities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72FA29C77F8847333AECE124 /* EchoMemoryEntities.swift */; };
 		374BB5B8024D43DEEB781C2D /* EchoDailySummaryGeneratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F90D7BD80D380B9E483FF65 /* EchoDailySummaryGeneratorTests.swift */; };
-		3959A2F85A364C5E96B2020A /* EchoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06650C1F2D6C3AC3AA6F7401 /* EchoView.swift */; };
 		3DB938748A08ECE8E68EDB47 /* OnboardingViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B12ADD36D97D353B3D887DD /* OnboardingViewTests.swift */; };
 		42E9331811E33CBD40E88723 /* DayTimelineEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED5E4D5563AC71A0747FEA41 /* DayTimelineEntity.swift */; };
 		4489F5BA8EE15449F8F1C9DE /* SensorCollecting.swift in Sources */ = {isa = PBXBuildFile; fileRef = E55BD79449543E2EDA158B48 /* SensorCollecting.swift */; };
@@ -81,7 +80,6 @@
 		C788B6CCA454A039ECC6BB00 /* CustomMoodEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 133A14B66E9CA697B58313CB /* CustomMoodEntity.swift */; };
 		C8D4B957327922E04DBD7578 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 377615C5249C10E358F73636 /* Preview Assets.xcassets */; };
 		CE56C4D6613B3C81A22038C6 /* SharedDataTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FA8B03857B7C0FBA121B67 /* SharedDataTypes.swift */; };
-		D2AA6F13A487B34A85C5F1CF /* EchoThreadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6D63654F51217C3FA4B30D4 /* EchoThreadView.swift */; };
 		D7DF86B1EC7D5D82B3201C1C /* TimelineDataProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D72C488C5C21014C1FAB59A /* TimelineDataProviding.swift */; };
 		D8510CF5171BA58672763DD4 /* SensorDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44311ECA1B0B67F057B402DF /* SensorDataStore.swift */; };
 		D8F92239DBE3A3F5C42EF18F /* PhoneInferenceEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF36EFDDCA82F9755D1A41B /* PhoneInferenceEngine.swift */; };
@@ -122,7 +120,6 @@
 		037508DDAD551D2D5F74DE83 /* ToDayTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = ToDayTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		039A704E1AD966C5EA2F733B /* MotionCollector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MotionCollector.swift; sourceTree = "<group>"; };
 		05A61345F7366DF2B6CA4DC3 /* EchoMessageEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoMessageEntity.swift; sourceTree = "<group>"; };
-		06650C1F2D6C3AC3AA6F7401 /* EchoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoView.swift; sourceTree = "<group>"; };
 		070F5BF3939F38CE2BA8AF7E /* EchoNotificationScheduling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoNotificationScheduling.swift; sourceTree = "<group>"; };
 		0ADA6FE1B233ABDFF706CA08 /* EchoMessageListNavigationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoMessageListNavigationTests.swift; sourceTree = "<group>"; };
 		0C96E2DCDAC54DA106C2D81A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -200,7 +197,6 @@
 		D5161D7C3300BF68A09C56F8 /* EchoMessageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoMessageManager.swift; sourceTree = "<group>"; };
 		D52F65A4774BB7467BD2DBC1 /* BackgroundTaskManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundTaskManager.swift; sourceTree = "<group>"; };
 		D5E3EC90284C88262A943A15 /* TodayInsightComposerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayInsightComposerTests.swift; sourceTree = "<group>"; };
-		D6D63654F51217C3FA4B30D4 /* EchoThreadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoThreadView.swift; sourceTree = "<group>"; };
 		D796A8133E65C0F7E468E8AB /* MoodRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodRecord.swift; sourceTree = "<group>"; };
 		DAD1103DFEB16303E6E68D6E /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
 		DD8682A65FCDD7B5B3365527 /* DeviceStateCollectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceStateCollectorTests.swift; sourceTree = "<group>"; };
@@ -272,15 +268,6 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
-		478248F291ADF2CA24CAD058 /* Echo */ = {
-			isa = PBXGroup;
-			children = (
-				D6D63654F51217C3FA4B30D4 /* EchoThreadView.swift */,
-				06650C1F2D6C3AC3AA6F7401 /* EchoView.swift */,
-			);
-			path = Echo;
-			sourceTree = "<group>";
-		};
 		5010E88E8C53B8F6399E3802 /* History */ = {
 			isa = PBXGroup;
 			children = (
@@ -339,7 +326,6 @@
 				172D352B93A287AC813F9606 /* RootView.swift */,
 				130826F080B6224CDBDB4D36 /* Theme.swift */,
 				5143A545016C913C3892944F /* Components */,
-				478248F291ADF2CA24CAD058 /* Echo */,
 				5010E88E8C53B8F6399E3802 /* History */,
 				F78F0779F1A24984EC3C0085 /* Onboarding */,
 				612FB2DB0ABDB477DFC00F7B /* Settings */,
@@ -594,8 +580,6 @@
 				B90977F82DF7DAB3E3E9CD90 /* EchoNotificationScheduling.swift in Sources */,
 				1BA8987331616F3D33C462ED /* EchoPromptBuilder.swift in Sources */,
 				06C254044BED71DB5D34587E /* EchoScheduler.swift in Sources */,
-				D2AA6F13A487B34A85C5F1CF /* EchoThreadView.swift in Sources */,
-				3959A2F85A364C5E96B2020A /* EchoView.swift in Sources */,
 				AB5F6A399EE781C4F3B21BC6 /* EchoWeeklyProfileUpdater.swift in Sources */,
 				DCA2CE7DAA37F9418BF5A054 /* EventCardView.swift in Sources */,
 				E2ED475358AF93D1FE0D1556 /* HealthKitCollector.swift in Sources */,
