@@ -20,8 +20,8 @@ struct TodayScreen: View {
                         statsRow
                     }
 
-                    // AI Analysis Block (today only, between stats and timeline)
-                    if viewModel.isToday {
+                    // AI Analysis Block (between stats and timeline)
+                    if viewModel.aiSummary != nil || viewModel.patternInsight != nil {
                         if let summary = viewModel.aiSummary {
                             aiSummaryCard(summary)
                         }
