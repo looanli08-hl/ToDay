@@ -80,7 +80,7 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. App detects repeated cross-day patterns (e.g. "you've been at the library three afternoons in a row") when 3+ weeks of data exist
   2. Pattern insights appear in the today screen when data is sufficient; no insight is shown when data is insufficient rather than showing a placeholder
-  3. App sends at most one push notification per day containing a meaningful behavioral insight (not a generic reminder)
+  3. App sends at most one push notification per day containing a meaningful behavioral insight (not a geographic reminder)
 **Plans**: 3 plans
 
 Plans:
@@ -96,7 +96,12 @@ Plans:
   1. User can type a natural language question ("我这周运动了几次？") and receive an answer grounded in their actual timeline data
   2. Echo's answers are accurate — they reference real stored events, not hallucinated summaries
   3. Conversation history persists across app sessions so users can scroll back through past exchanges
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 05-01-PLAN.md — RED-phase tests for all three Echo conversation wiring gaps
+- [ ] 05-02-PLAN.md — Fix buildThreadSystemPrompt for freeChat + wire todayDataSummary through AppContainer → AppRootScreen
+- [ ] 05-03-PLAN.md — Fix EchoMessageListView free-chat NavigationPath programmatic navigation
 
 ## Progress
 
@@ -109,4 +114,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 2. Onboarding and First Visible AI | 3/3 | Complete   | 2026-04-04 |
 | 3. Timeline and Recording Polish | 3/4 | In Progress|  |
 | 4. Pattern Recognition and Proactive Push | 3/3 | Complete    | 2026-04-05 |
-| 5. Echo Conversation | 0/TBD | Not started | - |
+| 5. Echo Conversation | 0/3 | Not started | - |
