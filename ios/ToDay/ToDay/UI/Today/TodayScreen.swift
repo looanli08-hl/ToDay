@@ -7,43 +7,58 @@ struct TodayScreen: View {
 
     var body: some View {
         NavigationStack {
-            ScrollView(.vertical, showsIndicators: false) {
-                VStack(alignment: .leading, spacing: AppSpacing.lg) {
-                    // Date Strip (always visible)
-                    dateStrip
+            ZStack {
+                // Ambient time-of-day background — the atmosphere layer
+                AppColor.background
+                    .ignoresSafeArea()
 
-                    // Date Header
-                    dateHeader
+                TimeGradient.ambientGradient(for: viewModel.currentDate)
+                    .ignoresSafeArea()
 
-                    // AI Analysis Block (between header and timeline)
-                    if viewModel.aiSummary != nil || viewModel.patternInsight != nil {
+                ScrollView(.vertical, showsIndicators: false) {
+                    VStack(alignment: .leading, spacing: 0) {
+                        // Date Strip
+                        dateStrip
+                            .padding(.top, AppSpacing.md)
+
+                        // Date Header — atmospheric, large serif
+                        dateHeader
+                            .padding(.top, AppSpacing.lg)
+                            .padding(.horizontal, AppSpacing.lg)
+
+                        // AI insight — whispered, not a card
                         if let summary = viewModel.aiSummary {
-                            aiSummaryCard(summary)
+                            echoWhisper(summary)
+                                .padding(.top, AppSpacing.md)
+                                .padding(.horizontal, AppSpacing.lg)
                         }
+
                         if let insight = viewModel.patternInsight {
-                            patternCard(insight)
+                            patternWhisper(insight)
+                                .padding(.top, AppSpacing.sm)
+                                .padding(.horizontal, AppSpacing.lg)
                         }
-                    }
 
-                    // Loading / Error / Empty / Timeline
-                    if viewModel.isLoading && !viewModel.entries.isEmpty {
-                        timelineSection
-                    } else if viewModel.isLoading {
-                        loadingCard
-                    } else if let error = viewModel.errorMessage {
-                        errorCard(error)
-                    } else if viewModel.entries.isEmpty {
-                        emptyCard
-                    } else {
-                        timelineSection
-                    }
+                        // Loading / Error / Empty / Timeline
+                        Group {
+                            if viewModel.isLoading && !viewModel.entries.isEmpty {
+                                timelineCanvas
+                            } else if viewModel.isLoading {
+                                loadingState
+                            } else if let error = viewModel.errorMessage {
+                                errorState(error)
+                            } else if viewModel.entries.isEmpty {
+                                emptyState
+                            } else {
+                                timelineCanvas
+                            }
+                        }
+                        .padding(.top, AppSpacing.lg)
 
-                    Spacer(minLength: viewModel.isToday ? 100 : AppSpacing.xxl)
+                        Spacer(minLength: viewModel.isToday ? 100 : AppSpacing.xxl)
+                    }
                 }
-                .padding(.horizontal, AppSpacing.md)
-                .padding(.top, AppSpacing.md)
             }
-            .background(AppColor.background)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -97,7 +112,7 @@ struct TodayScreen: View {
                             .id(date)
                     }
                 }
-                .padding(.horizontal, AppSpacing.xxs)
+                .padding(.horizontal, AppSpacing.md)
             }
             .onAppear {
                 proxy.scrollTo(
@@ -106,7 +121,7 @@ struct TodayScreen: View {
                 )
             }
             .onChange(of: viewModel.selectedDate) { _, newDate in
-                withAnimation {
+                withAnimation(.spring(duration: 0.3)) {
                     proxy.scrollTo(
                         calendar.startOfDay(for: newDate),
                         anchor: .center
@@ -122,8 +137,8 @@ struct TodayScreen: View {
 
         return VStack(spacing: AppSpacing.xxs) {
             if isTodayDate {
-                Text("今")
-                    .font(AppFont.small())
+                Text("today")
+                    .font(AppFont.micro())
                     .foregroundStyle(isSelected ? .white : AppColor.accent)
             } else {
                 Text("\(calendar.component(.day, from: date))")
@@ -135,7 +150,7 @@ struct TodayScreen: View {
         .background(
             isSelected
                 ? AppColor.accent
-                : AppColor.surface
+                : AppColor.surface.opacity(0.6)
         )
         .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
         .onTapGesture {
@@ -148,22 +163,24 @@ struct TodayScreen: View {
     private var dateHeader: some View {
         VStack(alignment: .leading, spacing: AppSpacing.xxs) {
             Text(headerTitle)
-                .heroStyle()
+                .font(.system(size: 36, weight: .regular, design: .serif))
+                .italic()
+                .foregroundStyle(AppColor.label)
 
             Text(formattedDate)
-                .font(AppFont.small())
-                .foregroundStyle(AppColor.labelTertiary)
-                .tracking(1.4)
+                .font(AppFont.micro())
+                .foregroundStyle(AppColor.labelQuaternary)
+                .tracking(2.0)
         }
     }
 
     private var headerTitle: String {
         if viewModel.isToday {
-            return "今日画卷"
+            return "today"
         } else {
             let formatter = DateFormatter()
             formatter.locale = Locale(identifier: "zh_CN")
-            formatter.dateFormat = "MM月dd日"
+            formatter.dateFormat = "MM\u{6708}dd\u{65E5}"
             return formatter.string(from: viewModel.currentDate)
         }
     }
@@ -171,84 +188,86 @@ struct TodayScreen: View {
     private var formattedDate: String {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "zh_CN")
-        formatter.dateFormat = "yyyy · MM · dd EEE"
+        formatter.dateFormat = "yyyy \u{00B7} MM \u{00B7} dd   EEEE"
         return formatter.string(from: viewModel.currentDate)
     }
 
-    // MARK: - AI Summary Card
+    // MARK: - Echo Whisper (AI Insight)
 
-    private func aiSummaryCard(_ summary: String) -> some View {
-        ContentCard(background: AppColor.echo.opacity(0.08)) {
-            Text("Echo 今日洞察")
-                .font(AppFont.smallBold())
-                .foregroundStyle(AppColor.echo)
+    private func echoWhisper(_ summary: String) -> some View {
+        // No card, no header, no "Echo" label — just the words, whispered
+        Text(summary)
+            .whisperStyle()
+            .lineSpacing(6)
+            .padding(.trailing, AppSpacing.xl)
+    }
 
-            Text(summary)
-                .font(AppFont.bodyRegular())
-                .foregroundStyle(AppColor.label)
+    // MARK: - Pattern Whisper
+
+    private func patternWhisper(_ insight: String) -> some View {
+        HStack(alignment: .top, spacing: AppSpacing.xs) {
+            Rectangle()
+                .fill(AppColor.echo.opacity(0.3))
+                .frame(width: 2)
+
+            Text(insight)
+                .font(AppFont.memo())
+                .foregroundStyle(AppColor.echo.opacity(0.7))
                 .lineSpacing(4)
         }
+        .padding(.trailing, AppSpacing.xl)
     }
 
-    // MARK: - Timeline Section
+    // MARK: - Timeline Canvas
 
-    private var timelineSection: some View {
-        VStack(alignment: .leading, spacing: AppSpacing.sm) {
-            Text(viewModel.isToday ? "今日时间轴" : "时间轴")
-                .font(AppFont.heading())
-                .foregroundStyle(AppColor.label)
-
-            Text(viewModel.isToday
-                 ? "从凌晨到夜里，一天的起伏与留白。"
-                 : "这一天的生活画卷。")
-                .font(AppFont.small())
-                .foregroundStyle(AppColor.labelTertiary)
-
-            DayScrollView(
-                entries: viewModel.entries,
-                date: viewModel.currentDate,
-                isToday: viewModel.isToday,
-                onEventTap: { event in
-                    viewModel.selectedEvent = event
-                }
-            )
-        }
-    }
-
-    // MARK: - Loading Card
-
-    private var loadingCard: some View {
-        ContentCard {
-            HStack(spacing: AppSpacing.sm) {
-                ProgressView()
-                    .tint(AppColor.accent)
-                Text("正在整理脉络...")
-                    .font(AppFont.bodyRegular())
-                    .foregroundStyle(AppColor.labelSecondary)
+    private var timelineCanvas: some View {
+        // No section header, no subtitle — the gradient scroll IS the timeline
+        DayScrollView(
+            entries: viewModel.entries,
+            date: viewModel.currentDate,
+            isToday: viewModel.isToday,
+            onEventTap: { event in
+                viewModel.selectedEvent = event
             }
-        }
+        )
+        .padding(.horizontal, AppSpacing.sm)
     }
 
-    // MARK: - Error Card
+    // MARK: - Loading State
 
-    private func errorCard(_ message: String) -> some View {
-        ContentCard {
-            Text("时间线暂时不可用")
-                .font(AppFont.body())
+    private var loadingState: some View {
+        VStack(spacing: AppSpacing.md) {
+            ProgressView()
+                .tint(AppColor.accent)
+                .scaleEffect(0.8)
+
+            Text("unfolding...")
+                .font(AppFont.whisper())
+                .foregroundStyle(AppColor.labelTertiary)
+        }
+        .frame(maxWidth: .infinity, minHeight: 200)
+    }
+
+    // MARK: - Error State
+
+    private func errorState(_ message: String) -> some View {
+        VStack(alignment: .leading, spacing: AppSpacing.md) {
+            Text("can't unfold right now")
+                .font(AppFont.whisper())
                 .foregroundStyle(AppColor.label)
 
             Text(message)
-                .font(AppFont.small())
+                .font(AppFont.micro())
                 .foregroundStyle(AppColor.labelTertiary)
 
-            HStack(spacing: AppSpacing.sm) {
-                Button("重新整理") {
+            HStack(spacing: AppSpacing.md) {
+                Button("retry") {
                     Task { await viewModel.refresh() }
                 }
-                .font(AppFont.body())
+                .font(AppFont.bodyRegular())
                 .foregroundStyle(AppColor.accent)
 
-                Button("前往设置") {
+                Button("settings") {
                     if let url = URL(string: UIApplication.openSettingsURLString) {
                         UIApplication.shared.open(url)
                     }
@@ -257,54 +276,37 @@ struct TodayScreen: View {
                 .foregroundStyle(AppColor.labelTertiary)
             }
         }
+        .padding(.horizontal, AppSpacing.lg)
     }
 
-    // MARK: - Empty Card
+    // MARK: - Empty State
 
-    private var emptyCard: some View {
-        ContentCard {
-            VStack(spacing: AppSpacing.md) {
-                Image(systemName: "calendar.badge.clock")
-                    .font(.system(size: 40))
+    private var emptyState: some View {
+        VStack(spacing: AppSpacing.lg) {
+            Spacer()
+                .frame(height: AppSpacing.xxl)
+
+            Text(viewModel.isToday ? "the day is unfolding..." : "nothing recorded")
+                .font(AppFont.whisper())
+                .foregroundStyle(AppColor.labelTertiary)
+
+            if viewModel.isToday {
+                Text("carry your phone with you and the timeline fills itself.\nor tap below to leave a note.")
+                    .font(AppFont.micro())
                     .foregroundStyle(AppColor.labelQuaternary)
-
-                Text(viewModel.isToday ? "等待数据中" : "这一天还没有记录")
-                    .font(AppFont.body())
-                    .foregroundStyle(AppColor.label)
-
-                Text(viewModel.isToday
-                     ? "带着手机出门走走，位置和活动数据会自动填入时间轴。你也可以先用下方的「记录此刻」手动打点。"
-                     : "戴上手表或用快门记录生活碎片")
-                    .font(AppFont.bodyRegular())
-                    .foregroundStyle(AppColor.labelSecondary)
                     .multilineTextAlignment(.center)
                     .lineSpacing(4)
+                    .padding(.horizontal, AppSpacing.xl)
 
-                if viewModel.isToday {
-                    Button("刷新") {
-                        Task { await viewModel.refresh() }
-                    }
-                    .font(AppFont.body())
-                    .foregroundStyle(AppColor.accent)
+                Button("refresh") {
+                    Task { await viewModel.refresh() }
                 }
-            }
-            .frame(maxWidth: .infinity)
-        }
-    }
-
-    // MARK: - Pattern Card
-
-    private func patternCard(_ insight: String) -> some View {
-        ContentCard(background: AppColor.surfaceElevated) {
-            Text("Echo 发现了一个规律")
-                .font(AppFont.smallBold())
-                .foregroundStyle(AppColor.echo)
-
-            Text(insight)
                 .font(AppFont.bodyRegular())
-                .foregroundStyle(AppColor.label)
-                .lineSpacing(4)
+                .foregroundStyle(AppColor.accent)
+                .padding(.top, AppSpacing.xs)
+            }
         }
+        .frame(maxWidth: .infinity)
     }
 
     // MARK: - Bottom Action Bar
@@ -315,24 +317,23 @@ struct TodayScreen: View {
                 Button {
                     viewModel.openQuickRecordComposer()
                 } label: {
-                    Text("补一个打点")
-                        .font(AppFont.body())
+                    Text("add a note")
+                        .font(AppFont.bodyRegular())
                         .foregroundStyle(AppColor.label)
                         .frame(maxWidth: .infinity, minHeight: 44)
-                        .background(AppColor.surface)
-                        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-                        .appShadow(.subtle)
+                        .background(.ultraThinMaterial)
+                        .clipShape(RoundedRectangle(cornerRadius: AppRadius.xl, style: .continuous))
                 }
 
                 Button {
                     viewModel.finishActiveRecord()
                 } label: {
-                    Text("结束这段状态")
+                    Text("end session")
                         .font(AppFont.body())
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity, minHeight: 44)
                         .background(AppColor.accent)
-                        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+                        .clipShape(RoundedRectangle(cornerRadius: AppRadius.xl, style: .continuous))
                 }
             } else {
                 Button {
@@ -340,22 +341,20 @@ struct TodayScreen: View {
                 } label: {
                     HStack(spacing: AppSpacing.xs) {
                         Image(systemName: "square.and.pencil")
-                        Text("记录此刻")
+                            .font(.system(size: 14, weight: .medium))
+                        Text("note this moment")
                     }
-                    .font(AppFont.body())
-                    .foregroundStyle(.white)
+                    .font(AppFont.bodyRegular())
+                    .foregroundStyle(AppColor.accent)
                     .frame(maxWidth: .infinity, minHeight: 44)
-                    .background(AppColor.accent)
-                    .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+                    .background(.ultraThinMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: AppRadius.xl, style: .continuous))
                 }
             }
         }
         .padding(.horizontal, AppSpacing.md)
         .padding(.vertical, AppSpacing.sm)
-        .background(
-            Color(UIColor.systemGroupedBackground).opacity(0.96)
-        )
-        .appShadow(.elevated)
+        .background(.ultraThinMaterial)
     }
 
     // MARK: - Calendar Sheet
@@ -363,7 +362,7 @@ struct TodayScreen: View {
     private var calendarSheet: some View {
         NavigationStack {
             DatePicker(
-                "选择日期",
+                "select date",
                 selection: $viewModel.selectedDate,
                 in: ...Date(),
                 displayedComponents: .date
@@ -372,18 +371,18 @@ struct TodayScreen: View {
             .tint(AppColor.accent)
             .padding()
             .background(AppColor.background)
-            .navigationTitle("选择日期")
+            .navigationTitle("select date")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("回到今日") {
+                    Button("today") {
                         viewModel.returnToToday()
                     }
                     .font(AppFont.bodyRegular())
                     .foregroundStyle(AppColor.accent)
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("完成") {
+                    Button("done") {
                         viewModel.showCalendar = false
                         Task { await viewModel.loadTimeline(for: viewModel.selectedDate) }
                     }
@@ -402,11 +401,12 @@ struct TodayScreen: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: AppSpacing.lg) {
-                    // Header
+                    // Header — atmospheric, not a card
                     VStack(alignment: .leading, spacing: AppSpacing.xs) {
-                        Text(event.kindBadgeTitle)
-                            .font(AppFont.smallBold())
-                            .foregroundStyle(AppColor.color(for: event.kind))
+                        // Accent bar
+                        RoundedRectangle(cornerRadius: 1.5, style: .continuous)
+                            .fill(AppColor.color(for: event.kind))
+                            .frame(width: 24, height: 3)
 
                         Text(event.resolvedName)
                             .font(AppFont.heading())
@@ -416,10 +416,7 @@ struct TodayScreen: View {
                             .font(AppFont.small())
                             .foregroundStyle(AppColor.labelTertiary)
                     }
-                    .padding(AppSpacing.md)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(AppColor.color(for: event.kind).opacity(0.08))
-                    .clipShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
+                    .padding(.bottom, AppSpacing.xs)
 
                     // Subtitle / detail
                     if let subtitle = event.subtitle {
@@ -429,25 +426,35 @@ struct TodayScreen: View {
                             .lineSpacing(4)
                     }
 
-                    // Time range
-                    ContentCard {
-                        HStack {
-                            Text("时间")
-                                .font(AppFont.small())
-                                .foregroundStyle(AppColor.labelTertiary)
-                            Spacer()
-                            Text(timeRangeText(event))
-                                .font(AppFont.small())
-                                .foregroundStyle(AppColor.label)
-                        }
+                    // Time range — minimal
+                    VStack(alignment: .leading, spacing: AppSpacing.xxs) {
+                        Text("time")
+                            .font(AppFont.micro())
+                            .foregroundStyle(AppColor.labelQuaternary)
+                            .tracking(1.0)
+
+                        Text(timeRangeText(event))
+                            .font(AppFont.small())
+                            .foregroundStyle(AppColor.label)
                     }
+                    .padding(.top, AppSpacing.sm)
                 }
-                .padding(.horizontal, AppSpacing.md)
-                .padding(.top, AppSpacing.md)
+                .padding(.horizontal, AppSpacing.lg)
+                .padding(.top, AppSpacing.lg)
             }
             .background(AppColor.background)
-            .navigationTitle("片段详情")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        viewModel.selectedEvent = nil
+                    } label: {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundStyle(AppColor.labelTertiary)
+                    }
+                }
+            }
         }
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
@@ -457,6 +464,6 @@ struct TodayScreen: View {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "zh_CN")
         formatter.dateFormat = "HH:mm"
-        return "\(formatter.string(from: event.startDate)) - \(formatter.string(from: event.endDate))"
+        return "\(formatter.string(from: event.startDate)) \u{2013} \(formatter.string(from: event.endDate))"
     }
 }

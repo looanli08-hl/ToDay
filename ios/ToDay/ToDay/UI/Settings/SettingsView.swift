@@ -22,19 +22,17 @@ struct SettingsView: View {
                             .autocorrectionDisabled()
                     }
                 } header: {
-                    Text("AI 设置")
-                        .font(AppFont.small())
-                        .foregroundStyle(AppColor.labelTertiary)
+                    sectionHeader("AI")
                 } footer: {
-                    Text("Echo 使用 DeepSeek API 生成洞察和对话。API Key 仅保存在本地。")
-                        .font(AppFont.small())
+                    Text("Echo uses DeepSeek API for insights. Key stored locally only.")
+                        .font(AppFont.micro())
                         .foregroundStyle(AppColor.labelQuaternary)
                 }
 
                 // Permissions
                 Section {
                     HStack {
-                        Text("位置权限")
+                        Text("Location")
                             .font(AppFont.bodyRegular())
                             .foregroundStyle(AppColor.label)
                         Spacer()
@@ -43,7 +41,7 @@ struct SettingsView: View {
                             .foregroundStyle(AppColor.labelTertiary)
                     }
 
-                    Button("前往系统设置") {
+                    Button("System Settings") {
                         if let url = URL(string: UIApplication.openSettingsURLString) {
                             UIApplication.shared.open(url)
                         }
@@ -51,53 +49,47 @@ struct SettingsView: View {
                     .font(AppFont.bodyRegular())
                     .foregroundStyle(AppColor.accent)
                 } header: {
-                    Text("权限")
-                        .font(AppFont.small())
-                        .foregroundStyle(AppColor.labelTertiary)
+                    sectionHeader("Permissions")
                 }
 
                 // Privacy
                 Section {
-                    Button("隐私政策") {
+                    Button("Privacy Policy") {
                         // TODO: Open privacy policy URL
                     }
                     .font(AppFont.bodyRegular())
                     .foregroundStyle(AppColor.accent)
                 } header: {
-                    Text("隐私")
-                        .font(AppFont.small())
-                        .foregroundStyle(AppColor.labelTertiary)
+                    sectionHeader("Privacy")
                 }
 
                 // Data
                 Section {
-                    Button("清除所有数据") {
-                        // Placeholder — data clearing will be wired in future
+                    Button("Clear All Data") {
+                        // Placeholder
                     }
                     .font(AppFont.bodyRegular())
                     .foregroundStyle(AppColor.mood)
                 } header: {
-                    Text("数据")
-                        .font(AppFont.small())
-                        .foregroundStyle(AppColor.labelTertiary)
+                    sectionHeader("Data")
                 }
 
                 // Version
                 Section {
                     HStack {
-                        Text("版本")
+                        Text("Version")
                             .font(AppFont.bodyRegular())
                             .foregroundStyle(AppColor.label)
                         Spacer()
                         Text("Unfold v1.0.0")
-                            .font(AppFont.small())
-                            .foregroundStyle(AppColor.labelTertiary)
+                            .font(AppFont.micro())
+                            .foregroundStyle(AppColor.labelQuaternary)
                     }
                 }
             }
             .scrollContentBackground(.hidden)
             .background(AppColor.background)
-            .navigationTitle("设置")
+            .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.large)
             .onAppear {
                 updateLocationStatus()
@@ -105,21 +97,32 @@ struct SettingsView: View {
         }
     }
 
+    // MARK: - Section Header
+
+    private func sectionHeader(_ title: String) -> some View {
+        Text(title.lowercased())
+            .font(AppFont.micro())
+            .foregroundStyle(AppColor.labelTertiary)
+            .tracking(1.5)
+    }
+
+    // MARK: - Helpers
+
     private func updateLocationStatus() {
         let status = CLLocationManager().authorizationStatus
         switch status {
         case .authorizedAlways:
-            locationStatus = "始终"
+            locationStatus = "Always"
         case .authorizedWhenInUse:
-            locationStatus = "使用时"
+            locationStatus = "When In Use"
         case .denied:
-            locationStatus = "已拒绝"
+            locationStatus = "Denied"
         case .restricted:
-            locationStatus = "受限"
+            locationStatus = "Restricted"
         case .notDetermined:
-            locationStatus = "未设置"
+            locationStatus = "Not Set"
         @unknown default:
-            locationStatus = "未知"
+            locationStatus = "Unknown"
         }
     }
 }

@@ -27,7 +27,7 @@ struct RootView: View {
             TabView(selection: recordTabBinding) {
                 TodayScreen(viewModel: AppContainer.makeTodayViewModel())
                     .tabItem {
-                        Label("首页", systemImage: "sun.horizon")
+                        Label("Today", systemImage: "sun.horizon")
                     }
                     .tag(AppTab.today)
 
@@ -40,13 +40,13 @@ struct RootView: View {
 
                 SettingsView()
                     .tabItem {
-                        Label("设置", systemImage: "gearshape")
+                        Label("Settings", systemImage: "gearshape")
                     }
                     .tag(AppTab.settings)
             }
             .tint(AppColor.accent)
 
-            // Orange gradient "+" button sitting inside the tab bar
+            // Floating "+" button — glassmorphic, with warm shadow
             centerRecordButton
                 .frame(maxWidth: .infinity)
                 .padding(.bottom, 2)
@@ -87,12 +87,12 @@ struct RootView: View {
                 )
                 .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                 .shadow(
-                    color: Color(red: 0.95, green: 0.45, blue: 0.35).opacity(0.3),
-                    radius: 6,
-                    y: 2
+                    color: Color(red: 0.95, green: 0.45, blue: 0.35).opacity(0.25),
+                    radius: 8,
+                    y: 3
                 )
         }
-        .accessibilityLabel("快速记录")
+        .accessibilityLabel("Quick record")
     }
 
     /// Intercepts selection of the record tab to open the sheet instead.
