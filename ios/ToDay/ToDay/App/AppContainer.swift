@@ -52,6 +52,7 @@ enum AppContainer {
             spendingRecordStore: makeSpendingRecordStore(),
             screenTimeRecordStore: makeScreenTimeRecordStore(),
             echoEngine: echoEngine,
+            echoMessageManager: AppContainer.getEchoMessageManager(),
             phoneConnectivityManager: phoneConnectivityManager,
             modelContainer: modelContainer
         )

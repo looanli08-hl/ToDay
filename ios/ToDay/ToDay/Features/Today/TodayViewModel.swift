@@ -20,6 +20,7 @@ final class TodayViewModel: ObservableObject {
     @Published var showSpendingInput = false
     @Published var showScreenTimeInput = false
     @Published private(set) var aiDailySummary: DailySummaryEntity?
+    @Published private(set) var latestPatternInsight: EchoMessageEntity?
 
     // MARK: - Managers
 
@@ -30,6 +31,7 @@ final class TodayViewModel: ObservableObject {
     private let annotationStore: AnnotationStore
     private let echoEngine: EchoEngine?
     private let insightComposer: TodayInsightComposer
+    private var echoMessageManager: EchoMessageManager?
     #if os(iOS)
     private let watchSync: WatchSyncHelper
     #endif
@@ -60,6 +62,7 @@ final class TodayViewModel: ObservableObject {
         screenTimeRecordStore: (any ScreenTimeRecordStoring)? = nil,
         insightComposer: TodayInsightComposer = TodayInsightComposer(),
         echoEngine: EchoEngine? = nil,
+        echoMessageManager: EchoMessageManager? = nil,
         phoneConnectivityManager: PhoneConnectivityManager? = nil,
         modelContainer: ModelContainer,
         calendar: Calendar = .current
@@ -77,6 +80,7 @@ final class TodayViewModel: ObservableObject {
         self.screenTimeStore = screenTimeRecordStore ?? InMemoryScreenTimeRecordStore()
         self.annotationStore = AnnotationStore(calendar: calendar)
         self.echoEngine = echoEngine
+        self.echoMessageManager = echoMessageManager
         #if os(iOS)
         self.watchSync = WatchSyncHelper(connectivityManager: phoneConnectivityManager, calendar: calendar)
         #endif
@@ -123,6 +127,14 @@ final class TodayViewModel: ObservableObject {
     private func loadAIDailySummary() {
         let dateKey = Self.dateKeyFormatter.string(from: Date())
         aiDailySummary = echoMemoryManager.loadSummary(forDateKey: dateKey)
+        loadLatestPatternInsight()
+    }
+
+    private func loadLatestPatternInsight() {
+        guard let manager = echoMessageManager else { return }
+        latestPatternInsight = manager.allMessages.first(where: {
+            $0.type == EchoMessageType.dailyInsight.rawValue
+        })
     }
 
     // MARK: - Mood Records
@@ -396,6 +408,7 @@ final class TodayViewModel: ObservableObject {
 
     private func refreshDerivedState(referenceDate: Date) {
         let recordsForDay = recordManager.records(on: referenceDate)
+        loadLatestPatternInsight()
 
         historyDigests = insightComposer.buildHistoryDigests(
             from: recordManager.records,
