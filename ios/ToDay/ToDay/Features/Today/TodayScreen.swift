@@ -36,6 +36,7 @@ struct TodayScreen: View {
                             signatureSection(timeline)
                             scrollCanvasSection(timeline)
                             aiDailySummarySection
+                            patternInsightSection
                         }
                     }
 
@@ -318,6 +319,38 @@ struct TodayScreen: View {
                 }
             }
         }
+    }
+
+    @ViewBuilder
+    private var patternInsightSection: some View {
+        if let insight = viewModel.latestPatternInsight {
+            ContentCard {
+                EyebrowLabel("Echo 发现了规律")
+
+                Text(insight.title)
+                    .font(.system(size: 19, weight: .regular, design: .serif))
+                    .italic()
+                    .foregroundStyle(.primary)
+
+                Text(insight.preview)
+                    .font(.system(size: 15))
+                    .foregroundStyle(Color(UIColor.secondaryLabel))
+                    .lineSpacing(5)
+
+                HStack {
+                    Image(systemName: "repeat.circle")
+                        .font(.system(size: 11, weight: .medium))
+                    Text("近期规律")
+                        .font(.system(size: 12, weight: .medium))
+                }
+                .foregroundStyle(AppColor.echo)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 5)
+                .background(AppColor.echo.opacity(0.1))
+                .clipShape(Capsule())
+            }
+        }
+        // When latestPatternInsight is nil: render nothing (no placeholder, per AIP-02)
     }
 
     @ViewBuilder
