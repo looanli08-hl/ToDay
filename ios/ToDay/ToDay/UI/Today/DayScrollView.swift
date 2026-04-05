@@ -110,23 +110,22 @@ struct DayScrollView: View {
             .padding(.leading, AppSpacing.lg - 3)
             .padding(.bottom, AppSpacing.xxs)
 
-            // Event card
-            HStack(spacing: 0) {
-                // Thin connector from dot
-                Spacer()
-                    .frame(width: AppSpacing.lg)
-
-                if event.kind == .mood {
-                    moodRow(event)
-                } else if event.kind == .dataGap {
-                    dataGapRow(event)
-                } else {
-                    EventCardView(event: event, inlineMemos: memos)
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            onEventTap?(event)
-                        }
-                }
+            // Event card — full width
+            if event.kind == .mood {
+                moodRow(event)
+                    .padding(.leading, AppSpacing.lg)
+            } else if event.kind == .dataGap {
+                dataGapRow(event)
+                    .padding(.leading, AppSpacing.lg)
+            } else {
+                EventCardView(event: event, inlineMemos: memos)
+                    .frame(maxWidth: .infinity)
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        onEventTap?(event)
+                    }
+                    .padding(.leading, AppSpacing.lg)
+                    .padding(.trailing, AppSpacing.sm)
             }
         }
         .padding(.horizontal, AppSpacing.sm)
