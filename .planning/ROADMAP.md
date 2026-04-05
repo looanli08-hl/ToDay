@@ -84,7 +84,7 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 04-01-PLAN.md — PatternDetectionEngine TDD: DetectedPattern types + streak detection + data-sufficiency guard
+- [x] 04-01-PLAN.md — PatternDetectionEngine TDD: DetectedPattern types + streak detection + data-sufficiency guard
 - [ ] 04-02-PLAN.md — EchoScheduler.onPatternCheck() + EchoPromptBuilder.buildPatternInsightPrompt + notification scheduling
 - [ ] 04-03-PLAN.md — TodayViewModel.latestPatternInsight + TodayScreen patternInsightSection + AppContainer wiring
 
@@ -108,5 +108,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 1. Security and AI Pipeline | 0/3 | Not started | - |
 | 2. Onboarding and First Visible AI | 3/3 | Complete   | 2026-04-04 |
 | 3. Timeline and Recording Polish | 3/4 | In Progress|  |
-| 4. Pattern Recognition and Proactive Push | 0/3 | Not started | - |
+| 4. Pattern Recognition and Proactive Push | 1/3 | In Progress|  |
 | 5. Echo Conversation | 0/TBD | Not started | - |

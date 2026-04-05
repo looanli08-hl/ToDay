@@ -49,8 +49,8 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### AI Pattern Recognition
 
-- [ ] **AIP-01**: App detects repeated behavioral patterns across days (e.g. "连续3天下午都在图书馆")
-- [ ] **AIP-02**: Patterns are surfaced as insights in the today screen when sufficient data exists (3+ weeks)
+- [x] **AIP-01**: App detects repeated behavioral patterns across days (e.g. "连续3天下午都在图书馆")
+- [x] **AIP-02**: Patterns are surfaced as insights in the today screen when sufficient data exists (3+ weeks)
 - [ ] **AIP-03**: App sends one daily push notification with a meaningful AI insight (max 1/day)
 
 ### AI Conversation
@@ -155,8 +155,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | MAN-01 | Phase 3 | Complete |
 | MAN-02 | Phase 3 | Complete |
 | MAN-03 | Phase 3 | Complete |
-| AIP-01 | Phase 4 | Pending |
-| AIP-02 | Phase 4 | Pending |
+| AIP-01 | Phase 4 | Complete |
+| AIP-02 | Phase 4 | Complete |
 | AIP-03 | Phase 4 | Pending |
 | AIC-01 | Phase 5 | Pending |
 | AIC-02 | Phase 5 | Pending |
