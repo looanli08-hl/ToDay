@@ -1,9 +1,9 @@
-name: ToDay
+name: Unfold
 options:
   minimumXcodeGenVersion: 2.45.0
 settings:
   base:
-    PRODUCT_NAME: ToDay
+    PRODUCT_NAME: Unfold
     PRODUCT_BUNDLE_IDENTIFIER: com.looanli.today
     DEVELOPMENT_TEAM: G89F57S8M3
     CODE_SIGN_STYLE: Automatic
@@ -66,7 +66,7 @@ targets:
     dependencies:
       - target: ToDay
 schemes:
-  ToDay:
+  Unfold:
     build:
       targets:
         ToDay: all
