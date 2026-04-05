@@ -10,9 +10,10 @@ struct EchoMessageListView: View {
     @State private var renamingMessage: EchoMessageEntity?
     @State private var renameText = ""
     @State private var showRenameAlert = false
+    @State private var navigationPath = NavigationPath()
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $navigationPath) {
             ScrollView {
                 LazyVStack(spacing: AppSpacing.sm) {
                     if messageManager.allMessages.isEmpty {
@@ -108,8 +109,8 @@ struct EchoMessageListView: View {
 
     private var freeChatButton: some View {
         Button {
-            if let _ = try? messageManager.createFreeChatMessage() {
-                // The NavigationLink will handle navigation via the message list refresh
+            if let entity = try? messageManager.createFreeChatMessage() {
+                navigationPath.append(entity.id)
             }
         } label: {
             HStack(spacing: AppSpacing.xs) {
