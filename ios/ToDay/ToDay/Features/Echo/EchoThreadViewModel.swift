@@ -22,6 +22,7 @@ final class EchoThreadViewModel: ObservableObject {
     private let memoryManager: EchoMemoryManager
     private let promptBuilder: EchoPromptBuilder
     private let container: ModelContainer
+    private let todayDataSummary: String?
 
     // MARK: - Internal
 
@@ -35,7 +36,8 @@ final class EchoThreadViewModel: ObservableObject {
         aiService: any EchoAIProviding,
         memoryManager: EchoMemoryManager,
         promptBuilder: EchoPromptBuilder,
-        container: ModelContainer
+        container: ModelContainer,
+        todayDataSummary: String? = nil
     ) {
         self.threadId = threadId
         self.sourceData = sourceData
@@ -45,6 +47,7 @@ final class EchoThreadViewModel: ObservableObject {
         self.memoryManager = memoryManager
         self.promptBuilder = promptBuilder
         self.container = container
+        self.todayDataSummary = todayDataSummary
     }
 
     // MARK: - Load Thread
@@ -89,6 +92,7 @@ final class EchoThreadViewModel: ObservableObject {
                 sourceData: sourceData,
                 sourceDescription: sourceDescription,
                 messageType: messageType,
+                todayDataSummary: todayDataSummary,
                 conversationHistory: recentMessages
             )
 

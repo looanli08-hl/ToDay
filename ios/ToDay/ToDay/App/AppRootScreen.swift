@@ -49,7 +49,10 @@ struct AppRootScreen: View {
                     EchoMessageListView(
                         messageManager: echoMessageManager,
                         threadViewModelFactory: { message in
-                            AppContainer.makeEchoThreadViewModel(for: message)
+                            AppContainer.makeEchoThreadViewModel(
+                                for: message,
+                                todayDataSummary: todayViewModel.timelineDataSummary
+                            )
                         }
                     )
                     .tabItem {

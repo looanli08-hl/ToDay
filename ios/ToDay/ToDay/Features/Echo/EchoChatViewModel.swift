@@ -11,6 +11,8 @@ final class EchoChatViewModel: ObservableObject {
     @Published var mirrorPortrait: String?
     @Published var showMirrorSheet = false
     @Published var errorMessage: String?
+    /// Today's live timeline data injected by parent view. Set via .onChange or direct assignment.
+    var todayDataSummary: String? = nil
     @Published var isTemporaryMode = false {
         didSet {
             if isTemporaryMode {
@@ -126,7 +128,7 @@ final class EchoChatViewModel: ObservableObject {
             let messages = promptBuilder.buildMessages(
                 userInput: trimmed,
                 personality: personality,
-                todayDataSummary: nil,
+                todayDataSummary: todayDataSummary,
                 conversationHistory: history
             )
 

@@ -177,4 +177,37 @@ final class EchoChatViewModelTests: XCTestCase {
         XCTAssertEqual(vm.displayMessages.count, 1)
         XCTAssertNotNil(vm.errorMessage)
     }
+
+    // MARK: - todayDataSummary wiring (AIC-02)
+
+    /// GREEN: when todayDataSummary is set on EchoChatViewModel, sendMessage must pass it
+    /// through to the AI provider via buildMessages(todayDataSummary:).
+    ///
+    /// Mechanism: MockAIProvider.lastReceivedMessages captures the full messages array.
+    /// The system message assembled by buildMessages includes 【今日数据】 when
+    /// todayDataSummary is non-nil. The assertion checks that the summary text appears
+    /// in the captured system message content.
+    @MainActor
+    func testSendMessagePassesTodayDataSummaryToPrompt() async {
+        let vm = EchoChatViewModel(
+            aiService: mockAI,
+            memoryManager: memoryManager,
+            promptBuilder: promptBuilder,
+            container: container
+        )
+        mockAI.respondResult = "好的，我知道了。"
+
+        // Set the live timeline summary on the VM
+        vm.todayDataSummary = "步行 30 分钟，今日步数 8500"
+
+        await vm.sendMessage("我今天走了多少步？")
+
+        // The system message in lastReceivedMessages must contain the todayDataSummary text.
+        let systemMessage = mockAI.lastReceivedMessages?.first { $0.role == .system }
+        XCTAssertNotNil(systemMessage, "AI provider must receive a system message")
+        XCTAssertTrue(
+            systemMessage?.content.contains("步行 30 分钟") ?? false,
+            "System message must contain todayDataSummary content"
+        )
+    }
 }

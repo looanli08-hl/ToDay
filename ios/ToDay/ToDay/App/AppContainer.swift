@@ -183,7 +183,10 @@ enum AppContainer {
     }
 
     @MainActor
-    static func makeEchoThreadViewModel(for message: EchoMessageEntity) -> EchoThreadViewModel {
+    static func makeEchoThreadViewModel(
+        for message: EchoMessageEntity,
+        todayDataSummary: String? = nil
+    ) -> EchoThreadViewModel {
         EchoThreadViewModel(
             threadId: message.threadId,
             sourceData: message.sourceData,
@@ -192,7 +195,8 @@ enum AppContainer {
             aiService: echoAIService,
             memoryManager: echoMemoryManager,
             promptBuilder: echoPromptBuilder,
-            container: modelContainer
+            container: modelContainer,
+            todayDataSummary: todayDataSummary
         )
     }
 
