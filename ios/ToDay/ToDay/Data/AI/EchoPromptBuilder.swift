@@ -11,9 +11,13 @@ import SwiftData
 final class EchoPromptBuilder: @unchecked Sendable {
 
     private let memoryManager: EchoMemoryManager
+    /// Override container for timeline queries. Nil means use AppContainer.modelContainer.
+    /// Inject a test container in unit tests to avoid the singleton.
+    private let timelineContainer: ModelContainer?
 
-    init(memoryManager: EchoMemoryManager) {
+    init(memoryManager: EchoMemoryManager, timelineContainer: ModelContainer? = nil) {
         self.memoryManager = memoryManager
+        self.timelineContainer = timelineContainer
     }
 
     // MARK: - Chat Message Assembly
@@ -53,6 +57,7 @@ final class EchoPromptBuilder: @unchecked Sendable {
         sourceData: EchoSourceData?,
         sourceDescription: String,
         messageType: EchoMessageType,
+        todayDataSummary: String? = nil,
         conversationHistory: [EchoChatMessage] = []
     ) -> [EchoChatMessage] {
         var messages: [EchoChatMessage] = []
@@ -62,7 +67,8 @@ final class EchoPromptBuilder: @unchecked Sendable {
             personality: personality,
             sourceData: sourceData,
             sourceDescription: sourceDescription,
-            messageType: messageType
+            messageType: messageType,
+            todayDataSummary: todayDataSummary
         )
         messages.append(EchoChatMessage(role: .system, content: systemContent))
 
@@ -80,7 +86,8 @@ final class EchoPromptBuilder: @unchecked Sendable {
         personality: EchoPersonality,
         sourceData: EchoSourceData?,
         sourceDescription: String,
-        messageType: EchoMessageType
+        messageType: EchoMessageType,
+        todayDataSummary: String? = nil
     ) -> String {
         var parts: [String] = []
 
@@ -127,10 +134,23 @@ final class EchoPromptBuilder: @unchecked Sendable {
             parts.append("【近期动态】\n\(summaryTexts.joined(separator: "\n"))")
         }
 
+        // 5.5. Historical timeline context — injected for freeChat threads (per AIC-02)
+        if messageType == .freeChat {
+            let timelineHistory = loadRecentTimelineSummaries(days: 7)
+            if !timelineHistory.isEmpty {
+                parts.append("【近期生活时间线】\n\(timelineHistory)")
+            }
+        }
+
         // 6. Conversation Memory (Layer 4)
         if let memory = memoryManager.loadConversationMemory(),
            !memory.memorySummary.isEmpty {
             parts.append("【对话记忆】\n\(memory.memorySummary)")
+        }
+
+        // Today's live data (if provided by caller)
+        if let todayData = todayDataSummary, !todayData.isEmpty {
+            parts.append("【今日数据】\n\(todayData)")
         }
 
         return parts.joined(separator: "\n\n")
@@ -183,8 +203,9 @@ final class EchoPromptBuilder: @unchecked Sendable {
     // MARK: - Historical Timeline Loading
 
     /// Load recent days' timeline summaries from SwiftData persistence.
+    /// Uses timelineContainer if set (for unit tests), otherwise falls back to AppContainer.modelContainer.
     private func loadRecentTimelineSummaries(days: Int) -> String {
-        let context = ModelContext(AppContainer.modelContainer)
+        let context = ModelContext(timelineContainer ?? AppContainer.modelContainer)
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
 

@@ -13,12 +13,15 @@ final class EchoPromptBuilderTests: XCTestCase {
         let schema = Schema([
             UserProfileEntity.self,
             DailySummaryEntity.self,
-            ConversationMemoryEntity.self
+            ConversationMemoryEntity.self,
+            DayTimelineEntity.self
         ])
         let config = ModelConfiguration(isStoredInMemoryOnly: true)
         container = try! ModelContainer(for: schema, configurations: [config])
         memoryManager = EchoMemoryManager(container: container)
-        builder = EchoPromptBuilder(memoryManager: memoryManager)
+        // Pass the test container as timelineContainer so loadRecentTimelineSummaries
+        // reads from our in-memory store instead of AppContainer.modelContainer singleton.
+        builder = EchoPromptBuilder(memoryManager: memoryManager, timelineContainer: container)
     }
 
     func testBuildSystemPromptIncludesPersonality() {
@@ -211,5 +214,73 @@ final class EchoPromptBuilderTests: XCTestCase {
         let prompt = builder.buildPatternInsightPrompt(pattern)
 
         XCTAssertTrue(prompt.contains("只描述规律，不评价，不建议"), "Prompt must contain the anti-prescriptive instruction")
+    }
+
+    // MARK: - Thread Message Tests (AIC-02)
+
+    /// GREEN: buildThreadMessages for .freeChat must include 【近期生活时间线】 in system prompt
+    /// when DayTimelineEntity records exist.
+    ///
+    /// The builder is initialized with timelineContainer = container (test container),
+    /// so loadRecentTimelineSummaries reads from the in-memory store, not the singleton.
+    @MainActor
+    func testBuildThreadMessagesForFreeChatIncludesTimeline() {
+        // Seed a DayTimelineEntity with a non-mood entry (required for eventSummary to be non-empty)
+        let calendar = Calendar.current
+        let yesterday = calendar.date(byAdding: .day, value: -1, to: calendar.startOfDay(for: Date()))!
+        let walkEntry = InferredEvent(
+            kind: .activeWalk,
+            startDate: yesterday,
+            endDate: yesterday.addingTimeInterval(1800),
+            confidence: .high,
+            displayName: "图书馆步行"
+        )
+        let mockTimeline = DayTimeline(
+            date: yesterday,
+            summary: "昨天步行 30 分钟，去了图书馆",
+            source: .mock,
+            stats: [],
+            entries: [walkEntry]
+        )
+        let entity = DayTimelineEntity(timeline: mockTimeline)
+        let context = ModelContext(container)
+        context.insert(entity)
+        try? context.save()
+
+        let messages = builder.buildThreadMessages(
+            userInput: "我上周去哪了",
+            personality: .gentle,
+            sourceData: nil,
+            sourceDescription: "",
+            messageType: .freeChat
+        )
+
+        let systemMessage = messages.first { $0.role == .system }
+        XCTAssertNotNil(systemMessage, "System message must be present")
+        XCTAssertTrue(
+            systemMessage?.content.contains("近期生活时间线") ?? false,
+            "freeChat system prompt must contain 【近期生活时间线】 section"
+        )
+    }
+
+    /// GREEN: non-freeChat threads must NOT include timeline context.
+    ///
+    /// Daily insight threads carry their own sourceData — no timeline injection needed.
+    @MainActor
+    func testBuildThreadMessagesForNonFreeChatExcludesTimeline() {
+        let messages = builder.buildThreadMessages(
+            userInput: "给我多说一点",
+            personality: .gentle,
+            sourceData: nil,
+            sourceDescription: "今日洞察",
+            messageType: .dailyInsight
+        )
+
+        let systemMessage = messages.first { $0.role == .system }
+        XCTAssertNotNil(systemMessage, "System message must be present")
+        XCTAssertFalse(
+            systemMessage?.content.contains("近期生活时间线") ?? true,
+            "Non-freeChat system prompt must NOT contain 【近期生活时间线】 section"
+        )
     }
 }

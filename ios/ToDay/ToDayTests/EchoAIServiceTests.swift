@@ -13,9 +13,12 @@ final class MockAIProvider: EchoAIProviding, @unchecked Sendable {
     private(set) var respondCallCount = 0
     private(set) var summarizeCallCount = 0
     private(set) var profileCallCount = 0
+    /// Captures the messages array passed to respond() — enables system prompt content assertion.
+    private(set) var lastReceivedMessages: [EchoChatMessage]?
 
     func respond(messages: [EchoChatMessage]) async throws -> String {
         respondCallCount += 1
+        lastReceivedMessages = messages
         if shouldFail { throw EchoAIError.invalidResponse }
         return respondResult
     }
