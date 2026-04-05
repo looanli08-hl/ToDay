@@ -62,7 +62,7 @@ struct EventCardView: View {
                 parts.append(name)
             }
             if let weather = metrics.weather {
-                parts.append("\(weather.symbolName) \(Int(weather.temperature))\u{00B0}")
+                parts.append("\(Int(weather.temperature))\u{00B0}C \(weather.condition.label)")
             }
             if let steps = metrics.stepCount, steps > 0 {
                 parts.append("\(steps) 步")

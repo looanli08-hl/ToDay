@@ -18,7 +18,7 @@ struct DayScrollView: View {
             timeGradient
                 .clipShape(RoundedRectangle(cornerRadius: AppRadius.xl, style: .continuous))
 
-            VStack(spacing: 0) {
+            VStack(spacing: AppSpacing.xxs) {
                 if entries.isEmpty {
                     emptyGapRow
                 } else {

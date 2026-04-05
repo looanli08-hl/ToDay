@@ -158,6 +158,19 @@ enum WeatherCondition: String, Codable, Sendable {
     case wind
     case thunderstorm
     case unknown
+
+    var label: String {
+        switch self {
+        case .clear: return "晴"
+        case .cloudy: return "多云"
+        case .rain: return "雨"
+        case .snow: return "雪"
+        case .fog: return "雾"
+        case .wind: return "大风"
+        case .thunderstorm: return "雷暴"
+        case .unknown: return ""
+        }
+    }
 }
 
 struct CoordinateValue: Sendable, Codable, Hashable {

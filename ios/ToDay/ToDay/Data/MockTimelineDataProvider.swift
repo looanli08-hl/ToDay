@@ -20,54 +20,6 @@ struct MockTimelineDataProvider: TimelineDataProviding {
 
         var entries = try await eventInferenceEngine.inferEvents(from: rawData, on: date)
 
-        // 快门记录
-        entries.append(InferredEvent(
-            kind: .shutter,
-            startDate: time(10, 15),
-            endDate: time(10, 15),
-            confidence: .high,
-            displayName: "路上看到一只猫，很可爱",
-            subtitle: "text"
-        ))
-
-        entries.append(InferredEvent(
-            kind: .shutter,
-            startDate: time(16, 0),
-            endDate: time(16, 0),
-            confidence: .high,
-            displayName: "突然想到一个产品创意...",
-            subtitle: "voice"
-        ))
-
-        // 消费记录
-        entries.append(InferredEvent(
-            kind: .spending,
-            startDate: time(12, 20),
-            endDate: time(12, 20),
-            confidence: .high,
-            displayName: "餐饮 ¥35",
-            subtitle: "午餐便当"
-        ))
-
-        entries.append(InferredEvent(
-            kind: .spending,
-            startDate: time(18, 30),
-            endDate: time(18, 30),
-            confidence: .high,
-            displayName: "餐饮 ¥68",
-            subtitle: "晚餐"
-        ))
-
-        // 屏幕时间
-        entries.append(InferredEvent(
-            kind: .screenTime,
-            startDate: time(13, 0),
-            endDate: time(15, 30),
-            confidence: .medium,
-            displayName: "屏幕时间 2h 30m",
-            subtitle: "主要使用：Xcode、Safari"
-        ))
-
         entries.sort { $0.startDate < $1.startDate }
 
         return DayTimeline(
@@ -307,10 +259,7 @@ struct MockTimelineDataProvider: TimelineDataProviding {
             TimelineStat(
                 title: "站立",
                 value: "\(activitySummary.standHours)/\(activitySummary.standGoal) 小时"
-            ),
-            TimelineStat(title: "屏幕时间", value: "3h 15m"),
-            TimelineStat(title: "消费", value: "¥103"),
-            TimelineStat(title: "快门", value: "2 条")
+            )
         ]
     }
 

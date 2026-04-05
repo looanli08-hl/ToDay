@@ -23,27 +23,46 @@ struct RootView: View {
 
     @MainActor
     private var mainTabView: some View {
-        TabView(selection: tabBinding) {
-            TodayScreen(viewModel: AppContainer.makeTodayViewModel())
-                .tabItem {
-                    Label("首页", systemImage: "sun.horizon")
-                }
-                .tag(AppTab.today)
+        ZStack(alignment: .bottom) {
+            TabView(selection: $selectedTab) {
+                TodayScreen(viewModel: AppContainer.makeTodayViewModel())
+                    .tabItem {
+                        Label("首页", systemImage: "sun.horizon")
+                    }
+                    .tag(AppTab.today)
 
-            // Center placeholder — intercepted
-            Color.clear
-                .tabItem {
-                    Label("记录", systemImage: "plus.circle.fill")
-                }
-                .tag(AppTab.record)
+                // Hidden placeholder to keep tab indices balanced
+                Color.clear
+                    .tabItem {
+                        Label("", systemImage: "")
+                    }
+                    .tag(AppTab.record)
 
-            SettingsView()
-                .tabItem {
-                    Label("设置", systemImage: "gearshape")
-                }
-                .tag(AppTab.settings)
+                SettingsView()
+                    .tabItem {
+                        Label("设置", systemImage: "gearshape")
+                    }
+                    .tag(AppTab.settings)
+            }
+            .tint(AppColor.accent)
+
+            // Floating center "+" button overlaying the tab bar
+            Button {
+                showQuickRecord = true
+            } label: {
+                Image(systemName: "plus")
+                    .font(.system(size: 22, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .frame(width: 48, height: 48)
+                    .background(
+                        Circle()
+                            .fill(AppColor.accent)
+                    )
+                    .shadow(color: AppColor.accent.opacity(0.3), radius: 8, y: 4)
+            }
+            .offset(y: -22)
+            .accessibilityLabel("快速记录")
         }
-        .tint(AppColor.accent)
         .sheet(isPresented: $showQuickRecord) {
             QuickRecordSheet(
                 isPresented: $showQuickRecord,
@@ -58,18 +77,4 @@ struct RootView: View {
         }
     }
 
-    // MARK: - Tab Binding (intercept center + button)
-
-    private var tabBinding: Binding<AppTab> {
-        Binding<AppTab>(
-            get: { selectedTab },
-            set: { newTab in
-                if newTab == .record {
-                    showQuickRecord = true
-                } else {
-                    selectedTab = newTab
-                }
-            }
-        )
-    }
 }
