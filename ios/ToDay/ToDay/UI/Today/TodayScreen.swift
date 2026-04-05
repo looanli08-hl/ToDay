@@ -15,14 +15,19 @@ struct TodayScreen: View {
                     // Date Header
                     dateHeader
 
-                    // Stats Row (always visible when data exists)
+                    // Stats Row
                     if !viewModel.stats.isEmpty {
                         statsRow
                     }
 
-                    // AI Summary Card (today only)
-                    if viewModel.isToday, let summary = viewModel.aiSummary {
-                        aiSummaryCard(summary)
+                    // AI Analysis Block (today only, between stats and timeline)
+                    if viewModel.isToday {
+                        if let summary = viewModel.aiSummary {
+                            aiSummaryCard(summary)
+                        }
+                        if let insight = viewModel.patternInsight {
+                            patternCard(insight)
+                        }
                     }
 
                     // Loading / Error / Empty / Timeline
@@ -36,11 +41,6 @@ struct TodayScreen: View {
                         emptyCard
                     } else {
                         timelineSection
-                    }
-
-                    // Pattern Insight (today only)
-                    if viewModel.isToday, let insight = viewModel.patternInsight {
-                        patternCard(insight)
                     }
 
                     Spacer(minLength: viewModel.isToday ? 100 : AppSpacing.xxl)
