@@ -299,8 +299,7 @@ struct HistoryScreen: View {
     // MARK: - Insight Section
 
     private func insightSection(for timeline: DayTimeline) -> some View {
-        let vm = DashboardViewModel(timeline: timeline)
-        return VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 10) {
             Text("今日洞察")
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(AppColor.labelTertiary)
@@ -318,7 +317,7 @@ struct HistoryScreen: View {
                         .foregroundStyle(AppColor.label)
                 }
 
-                Text(vm.insightText)
+                Text(insightText(for: timeline))
                     .font(.system(size: 15))
                     .foregroundStyle(AppColor.labelSecondary)
                     .lineSpacing(6)
@@ -330,6 +329,31 @@ struct HistoryScreen: View {
             .appShadow(.subtle)
         }
         .padding(.horizontal, 20)
+    }
+
+    private func insightText(for timeline: DayTimeline) -> String {
+        let eventCount = timeline.entries.count
+        let activeMinutes = Int(timeline.entries.reduce(0.0) { total, event in
+            switch event.kind {
+            case .workout, .activeWalk, .commute:
+                return total + event.duration / 60
+            default:
+                return total
+            }
+        })
+        let sleepHrs = sleepHours(in: timeline)
+
+        var parts: [String] = []
+        if eventCount > 0 {
+            parts.append("今天共记录了 \(eventCount) 个时刻")
+        }
+        if activeMinutes > 0 {
+            parts.append("活动时间约 \(activeMinutes) 分钟")
+        }
+        if sleepHrs > 0 {
+            parts.append(String(format: "睡眠约 %.1f 小时", sleepHrs))
+        }
+        return parts.isEmpty ? "今天还没有记录" : parts.joined(separator: "，") + "。"
     }
 
     private var selectedDateFormatted: String {

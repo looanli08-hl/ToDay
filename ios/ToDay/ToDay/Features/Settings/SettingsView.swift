@@ -1,69 +1,23 @@
 import CoreLocation
-import FamilyControls
 import HealthKit
 import Photos
 import SwiftData
 import SwiftUI
 import UIKit
-import WatchConnectivity
 
 struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
     @ObservedObject var echoViewModel: EchoViewModel
-    @ObservedObject private var connectivityManager = PhoneConnectivityManager.shared
-    @ObservedObject private var authManager = SupabaseAuthManager.shared
-    @State private var healthStatus: HKAuthorizationStatus = .notDetermined
     @State private var locationStatus: CLAuthorizationStatus = .notDetermined
-    @State private var photoStatus: PHAuthorizationStatus = .notDetermined
     @State private var showClearConfirmation = false
     @State private var showClearSuccess = false
-    @State private var showAuthSheet = false
 
-    private let healthStore = HKHealthStore()
     private let locationManager = CLLocationManager()
     private let annotationStorageKey = "today.eventAnnotations"
 
     var body: some View {
         NavigationStack {
             List {
-                // MARK: - 设备与同步
-                Section {
-                    HStack {
-                        Text("手表连接")
-                        Spacer()
-                        Text(watchStatusText)
-                            .foregroundStyle(watchStatusColor)
-                    }
-                } header: {
-                    Text("设备与同步")
-                }
-
-                // MARK: - 云同步
-                Section {
-                    if authManager.isAuthenticated {
-                        HStack {
-                            Text("账户")
-                            Spacer()
-                            Text(authManager.userEmail ?? "")
-                                .foregroundStyle(.secondary)
-                        }
-                        Button("退出登录") {
-                            Task {
-                                try? await authManager.signOut()
-                            }
-                        }
-                        .foregroundStyle(.red)
-                    } else {
-                        Button("登录以同步数据") {
-                            showAuthSheet = true
-                        }
-                    }
-                } header: {
-                    Text("云同步")
-                } footer: {
-                    Text("登录后，你的数据会自动同步到云端，可在 Web Dashboard 查看。")
-                }
-
                 // MARK: - 智能记录
                 Section {
                     Toggle("智能记录", isOn: Binding(
@@ -75,7 +29,7 @@ struct SettingsView: View {
                 } header: {
                     Text("智能记录")
                 } footer: {
-                    Text("开启后，ToDay 会在后台自动感知你的运动、位置和作息，生成每日时间线。推荐开启。")
+                    Text("开启后，Unfold 会在后台自动感知你的运动、位置和作息，生成每日时间线。推荐开启。")
                 }
 
                 // MARK: - Echo 回响
@@ -89,11 +43,6 @@ struct SettingsView: View {
                         Text("低").tag(EchoFrequency.low)
                         Text("关闭").tag(EchoFrequency.off)
                     }
-
-                    Toggle("关怀推送", isOn: Binding(
-                        get: { echoViewModel.careNudgesEnabled },
-                        set: { echoViewModel.careNudgesEnabled = $0 }
-                    ))
                 } header: {
                     Text("Echo 回响")
                 }
@@ -121,18 +70,6 @@ struct SettingsView: View {
                 // MARK: - 数据权限
                 Section {
                     Button {
-                        UIApplication.shared.open(URL(string: "x-apple-health://")!)
-                    } label: {
-                        HStack {
-                            Text("健康数据")
-                                .foregroundStyle(.primary)
-                            Spacer()
-                            Text(healthStatusText)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-
-                    Button {
                         UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
                     } label: {
                         HStack {
@@ -140,36 +77,6 @@ struct SettingsView: View {
                                 .foregroundStyle(.primary)
                             Spacer()
                             Text(locationStatusText)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-
-                    Button {
-                        UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
-                    } label: {
-                        HStack {
-                            Text("照片权限")
-                                .foregroundStyle(.primary)
-                            Spacer()
-                            Text(photoStatusText)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-
-                    Button {
-                        Task {
-                            do {
-                                try await AuthorizationCenter.shared.requestAuthorization(for: .individual)
-                            } catch {
-                                print("Screen Time authorization failed: \(error)")
-                            }
-                        }
-                    } label: {
-                        HStack {
-                            Text("屏幕时间")
-                                .foregroundStyle(.primary)
-                            Spacer()
-                            Text(screenTimeAuthStatus)
                                 .foregroundStyle(.secondary)
                         }
                     }
@@ -260,9 +167,6 @@ struct SettingsView: View {
             .scrollContentBackground(.hidden)
             .background(AppColor.background)
             .navigationTitle("设置")
-            .sheet(isPresented: $showAuthSheet) {
-                SupabaseAuthView()
-            }
             .confirmationDialog(
                 "确认清除？",
                 isPresented: $showClearConfirmation,
@@ -316,33 +220,6 @@ struct SettingsView: View {
         return "\(shortVersion) (\(buildVersion))"
     }
 
-    private var watchStatusText: String {
-        if !WCSession.isSupported() { return "不支持" }
-        if !connectivityManager.isWatchPaired { return "未配对" }
-        if !connectivityManager.isWatchAppInstalled { return "未安装 App" }
-        if connectivityManager.isWatchReachable { return "已连接" }
-        return "已配对"
-    }
-
-    private var watchStatusColor: Color {
-        if connectivityManager.isWatchReachable { return .green }
-        if connectivityManager.isWatchPaired && connectivityManager.isWatchAppInstalled { return .secondary }
-        return .orange
-    }
-
-    private var healthStatusText: String {
-        switch healthStatus {
-        case .sharingAuthorized:
-            return "已授权"
-        case .sharingDenied:
-            return "未授权"
-        case .notDetermined:
-            return "未授权"
-        @unknown default:
-            return "未知"
-        }
-    }
-
     private var locationStatusText: String {
         switch locationStatus {
         case .authorizedAlways:
@@ -360,37 +237,10 @@ struct SettingsView: View {
         }
     }
 
-    private var photoStatusText: String {
-        switch photoStatus {
-        case .authorized:
-            return "已授权"
-        case .limited:
-            return "已选择部分照片"
-        case .denied:
-            return "已拒绝"
-        case .restricted:
-            return "受限"
-        case .notDetermined:
-            return "未授权"
-        @unknown default:
-            return "未知"
-        }
-    }
-
-    private var screenTimeAuthStatus: String {
-        return AuthorizationCenter.shared.authorizationStatus == .approved ? "已授权" : "未授权"
-    }
-
     // MARK: - Actions
 
     private func refreshStatuses() {
-        if let heartRateType = HKQuantityType.quantityType(forIdentifier: .heartRate) {
-            healthStatus = healthStore.authorizationStatus(for: heartRateType)
-        } else {
-            healthStatus = .notDetermined
-        }
         locationStatus = locationManager.authorizationStatus
-        photoStatus = PHPhotoLibrary.authorizationStatus(for: .readWrite)
     }
 
     @MainActor

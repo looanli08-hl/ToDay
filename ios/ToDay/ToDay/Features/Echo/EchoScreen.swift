@@ -9,7 +9,7 @@ struct EchoScreen: View {
                 if viewModel.isLoading {
                     ProgressView()
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else if viewModel.todayEchoes.isEmpty && viewModel.careNudges.isEmpty && viewModel.historyEchoes.isEmpty {
+                } else if viewModel.todayEchoes.isEmpty && viewModel.historyEchoes.isEmpty {
                     emptyState
                 } else {
                     List {
@@ -45,19 +45,6 @@ struct EchoScreen: View {
                                     Text("\(viewModel.todayEchoes.count)")
                                         .foregroundStyle(.secondary)
                                 }
-                            }
-                        }
-
-                        // Care nudges section
-                        if !viewModel.careNudges.isEmpty {
-                            Section {
-                                ForEach(viewModel.careNudges) { nudge in
-                                    CareNudgeCardView(nudge: nudge)
-                                        .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
-                                        .listRowSeparator(.hidden)
-                                }
-                            } header: {
-                                Text("关怀")
                             }
                         }
 

@@ -6,7 +6,6 @@ final class EchoViewModel: ObservableObject {
     // MARK: - Published State
 
     @Published private(set) var todayEchoes: [EchoItem] = []
-    @Published private(set) var careNudges: [CareNudge] = []
     @Published private(set) var historyEchoes: [EchoItem] = []
     @Published private(set) var isLoading = false
     @Published var selectedEchoItem: EchoItem?
@@ -14,23 +13,17 @@ final class EchoViewModel: ObservableObject {
     // MARK: - Dependencies
 
     private let echoEngine: EchoEngine
-    private let careNudgeEngine: CareNudgeEngine
     private let shutterRecordStore: any ShutterRecordStoring
-    private let screenTimeStore: any ScreenTimeRecordStoring
 
     // Store a reference to load shutter records for display
     private var shutterRecordCache: [UUID: ShutterRecord] = [:]
 
     init(
         echoEngine: EchoEngine,
-        careNudgeEngine: CareNudgeEngine = CareNudgeEngine(),
-        shutterRecordStore: any ShutterRecordStoring,
-        screenTimeStore: any ScreenTimeRecordStoring
+        shutterRecordStore: any ShutterRecordStoring
     ) {
         self.echoEngine = echoEngine
-        self.careNudgeEngine = careNudgeEngine
         self.shutterRecordStore = shutterRecordStore
-        self.screenTimeStore = screenTimeStore
     }
 
     // MARK: - Loading
@@ -47,21 +40,6 @@ final class EchoViewModel: ObservableObject {
         // Cache shutter records for display
         let allRecords = shutterRecordStore.loadAll()
         shutterRecordCache = Dictionary(uniqueKeysWithValues: allRecords.map { ($0.id, $0) })
-
-        // Compute care nudges if enabled
-        if echoEngine.careNudgesEnabled {
-            let dateKey = Self.dateKeyFormatter.string(from: Date())
-            let screenTimeRecord = screenTimeStore.loadForDateKey(dateKey)
-            let screenTimeHours = screenTimeRecord.map { $0.totalScreenTime / 3600.0 }
-
-            careNudges = careNudgeEngine.evaluate(
-                recentTimelines: recentTimelines,
-                shutterRecords: allRecords,
-                screenTimeHours: screenTimeHours
-            )
-        } else {
-            careNudges = []
-        }
 
         isLoading = false
     }
@@ -101,14 +79,6 @@ final class EchoViewModel: ObservableObject {
         }
     }
 
-    var careNudgesEnabled: Bool {
-        get { echoEngine.careNudgesEnabled }
-        set {
-            echoEngine.careNudgesEnabled = newValue
-            objectWillChange.send()
-        }
-    }
-
     var globalFrequency: EchoFrequency? {
         get { echoEngine.globalFrequency }
         set {
@@ -116,12 +86,4 @@ final class EchoViewModel: ObservableObject {
             objectWillChange.send()
         }
     }
-
-    // MARK: - Formatters
-
-    private static let dateKeyFormatter: DateFormatter = {
-        let f = DateFormatter()
-        f.dateFormat = "yyyy-MM-dd"
-        return f
-    }()
 }

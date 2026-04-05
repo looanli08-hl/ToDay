@@ -67,14 +67,6 @@ struct TodayScreen: View {
                     viewModel.startMoodRecord(record)
                 }
             }
-            .sheet(isPresented: $viewModel.showScreenTimeInput) {
-                ScreenTimeInputView(
-                    dateKey: viewModel.currentDateKey(),
-                    existingRecord: viewModel.existingScreenTimeRecord()
-                ) { record in
-                    viewModel.saveScreenTimeRecord(record)
-                }
-            }
             .sheet(item: $selectedEvent) { event in
                 EventDetailView(event: event) {
                     selectedEvent = nil
@@ -175,32 +167,13 @@ struct TodayScreen: View {
     }
 
     private var overviewSection: some View {
-        VStack(alignment: .leading, spacing: AppSpacing.xs) {
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: AppSpacing.xs) {
-                    ForEach(overviewStats) { stat in
-                        OverviewStatCard(stat: stat)
-                    }
-                }
-                .padding(.vertical, 2)
-            }
-
+        ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: AppSpacing.xs) {
-                Button {
-                    viewModel.showScreenTimeInput = true
-                } label: {
-                    Label("屏幕时间", systemImage: "iphone.gen3")
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundStyle(TodayTheme.blue)
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 10)
-                        .background(TodayTheme.blueSoft)
-                        .clipShape(Capsule())
+                ForEach(overviewStats) { stat in
+                    OverviewStatCard(stat: stat)
                 }
-                .buttonStyle(.plain)
-
-                Spacer()
             }
+            .padding(.vertical, 2)
         }
     }
 
@@ -625,7 +598,6 @@ private let previewModelContainer: ModelContainer = {
         for: MoodRecordEntity.self,
         DayTimelineEntity.self,
         ShutterRecordEntity.self,
-        SpendingRecordEntity.self,
         configurations: configuration
     )
 }()

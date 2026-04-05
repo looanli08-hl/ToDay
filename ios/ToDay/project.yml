@@ -15,10 +15,6 @@ settings:
     INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
     INFOPLIST_KEY_UILaunchScreen_Generation: YES
     TARGETED_DEVICE_FAMILY: 1
-packages:
-  Supabase:
-    url: https://github.com/supabase/supabase-swift
-    from: "2.0.0"
 targets:
   ToDay:
     type: application
@@ -26,16 +22,12 @@ targets:
     deploymentTarget: "17.0"
     sources:
       - path: ToDay
-    dependencies:
-      - package: Supabase
-        product: Supabase
     entitlements:
       path: ToDay/ToDay.entitlements
       properties:
         com.apple.developer.healthkit: true
         com.apple.security.application-groups:
           - group.com.looanli.today
-        # com.apple.developer.family-controls: true  # Re-enable after Distribution entitlement approved
     info:
       path: ToDay/Info.plist
       properties:
@@ -49,14 +41,14 @@ targets:
         DEVELOPMENT_ASSET_PATHS: "\"ToDay/Preview Content\""
         ENABLE_PREVIEWS: YES
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.lifestyle
-        INFOPLIST_KEY_NSHealthShareUsageDescription: ToDay 读取你的运动、心率和睡眠数据，用来生成每日生活画卷。所有数据仅存储在本地。
+        INFOPLIST_KEY_NSHealthShareUsageDescription: "Unfold reads your motion, heart rate and sleep data to generate your daily life timeline. All data is stored locally."
         INFOPLIST_KEY_NSLocationWhenInUseUsageDescription: "Unfold uses your location to record places you visit and build your daily life timeline. Without location access, the timeline cannot be generated."
-        INFOPLIST_KEY_NSPhotoLibraryUsageDescription: ToDay 读取你当天拍摄的照片，将它们匹配到画卷中对应的事件。照片不会上传。
-        INFOPLIST_KEY_NSCameraUsageDescription: ToDay 使用相机拍摄照片和视频，快速记录生活碎片。媒体文件仅存储在本地。
-        INFOPLIST_KEY_NSMicrophoneUsageDescription: ToDay 使用麦克风录制语音备忘，帮你用最少的操作捕捉灵感。录音仅存储在本地。
-        INFOPLIST_KEY_NSSpeechRecognitionUsageDescription: ToDay 使用语音识别将你的录音转为文字，方便在时间线上快速浏览。识别在设备上完成。
+        INFOPLIST_KEY_NSPhotoLibraryUsageDescription: "Unfold reads photos taken today and matches them to events on your timeline. Photos are never uploaded."
+        INFOPLIST_KEY_NSCameraUsageDescription: "Unfold uses the camera to capture photos and videos to quickly record moments. Media files are stored locally only."
+        INFOPLIST_KEY_NSMicrophoneUsageDescription: "Unfold uses the microphone to record voice memos, helping you capture ideas with minimal effort. Recordings are stored locally only."
+        INFOPLIST_KEY_NSSpeechRecognitionUsageDescription: "Unfold uses speech recognition to transcribe your recordings into text for easy browsing on the timeline. Recognition happens on-device."
         ITSAppUsesNonExemptEncryption: false
-        INFOPLIST_KEY_NSHealthUpdateUsageDescription: ToDay 不会写入任何健康数据，此权限仅用于满足系统要求。
+        INFOPLIST_KEY_NSHealthUpdateUsageDescription: "Unfold does not write any health data. This permission is only required to satisfy system requirements."
         INFOPLIST_KEY_NSMotionUsageDescription: "Unfold uses motion activity to detect whether you are walking, running, or commuting, making your daily timeline more accurate and complete."
         INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription: "Unfold passively records your location visits throughout the day to build your life timeline automatically, even when the app is closed. Always authorization is required for background recording."
         INFOPLIST_KEY_UISupportedInterfaceOrientations: "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
@@ -73,31 +65,6 @@ targets:
         GENERATE_INFOPLIST_FILE: YES
     dependencies:
       - target: ToDay
-  ToDayScreenTimeReport:
-    type: app-extension
-    platform: iOS
-    deploymentTarget: "17.0"
-    sources:
-      - path: ToDayScreenTimeReport
-    info:
-      path: ToDayScreenTimeReport/Info.plist
-    settings:
-      base:
-        PRODUCT_NAME: ToDayScreenTimeReport
-        PRODUCT_BUNDLE_IDENTIFIER: com.looanli.today.screentimereport
-        DEVELOPMENT_TEAM: G89F57S8M3
-        CODE_SIGN_STYLE: Automatic
-        SWIFT_VERSION: 5.0
-    entitlements:
-      path: ToDayScreenTimeReport/ToDayScreenTimeReport.entitlements
-      properties:
-        com.apple.security.application-groups:
-          - group.com.looanli.today
-        com.apple.developer.family-controls: true
-    dependencies:
-      - sdk: DeviceActivity.framework
-      - sdk: FamilyControls.framework
-      - sdk: ManagedSettings.framework
 schemes:
   ToDay:
     build:

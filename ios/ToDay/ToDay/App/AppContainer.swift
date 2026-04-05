@@ -1,24 +1,20 @@
 import Foundation
-import HealthKit
 import SwiftData
-#if os(iOS)
-import WatchConnectivity
-#endif
 
 enum AppContainer {
     static let modelContainer = makeModelContainer()
     private static let legacyMoodRecordStoreKey = "today.manualRecords"
     private static let moodRecordStore = SwiftDataMoodRecordStore(container: modelContainer)
     private static let shutterRecordStore = SwiftDataShutterRecordStore(container: modelContainer)
-    private static let spendingRecordStore = SwiftDataSpendingRecordStore(container: modelContainer)
-    private static let screenTimeRecordStore = SwiftDataScreenTimeRecordStore(container: modelContainer)
     private static let echoItemStore = SwiftDataEchoItemStore(container: modelContainer)
+
     // MARK: - Sensor Infrastructure
     private static let sensorDataStore = SensorDataStore(container: modelContainer)
     private static let placeManager = PlaceManager()
     private static let phoneInferenceEngine = PhoneInferenceEngine()
     private static let deviceStateCollector = DeviceStateCollector(store: sensorDataStore)
     private static let locationCollector = LocationCollector(store: sensorDataStore)
+
     // MARK: - Echo AI Infrastructure
     private static let echoAIService = EchoAIService()
     private static let echoMemoryManager = EchoMemoryManager(container: modelContainer)
@@ -39,44 +35,37 @@ enum AppContainer {
         memoryManager: echoMemoryManager
     )
     private static let echoMessageStore = SwiftDataEchoMessageStore(container: modelContainer)
-#if os(iOS)
-    static let phoneConnectivityManager = makePhoneConnectivityManager()
-#endif
+
+    // MARK: - View Model Factories
 
     @MainActor
     static func makeTodayViewModel() -> TodayViewModel {
-        let viewModel = TodayViewModel(
+        TodayViewModel(
             provider: makeTimelineProvider(),
             recordStore: makeMoodRecordStore(),
             shutterRecordStore: makeShutterRecordStore(),
-            spendingRecordStore: makeSpendingRecordStore(),
-            screenTimeRecordStore: makeScreenTimeRecordStore(),
             echoEngine: echoEngine,
             echoMessageManager: AppContainer.getEchoMessageManager(),
-            phoneConnectivityManager: phoneConnectivityManager,
             modelContainer: modelContainer
         )
-        phoneConnectivityManager.bind(todayViewModel: viewModel)
-        return viewModel
     }
 
+    // MARK: - Sensor Collectors
+
     static func availableCollectors() -> [any SensorCollecting] {
-        var collectors: [any SensorCollecting] = [
+        [
             MotionCollector(),
             PedometerCollector(),
             deviceStateCollector,
             locationCollector,
         ]
-        let hkCollector = HealthKitCollector()
-        if hkCollector.isAvailable {
-            collectors.append(hkCollector)
-        }
-        return collectors
     }
 
     static func getDeviceStateCollector() -> DeviceStateCollector { deviceStateCollector }
     static func getLocationCollector() -> LocationCollector { locationCollector }
     static func getSensorDataStore() -> SensorDataStore { sensorDataStore }
+
+    // MARK: - Timeline Provider
 
     static func makeTimelineProvider() -> any TimelineDataProviding {
         let environment = ProcessInfo.processInfo.environment
@@ -96,25 +85,13 @@ enum AppContainer {
         #endif
     }
 
-    static func makeMoodRecordStore() -> any MoodRecordStoring {
-        moodRecordStore
-    }
+    // MARK: - Store Factories
 
-    static func makeShutterRecordStore() -> any ShutterRecordStoring {
-        shutterRecordStore
-    }
+    static func makeMoodRecordStore() -> any MoodRecordStoring { moodRecordStore }
+    static func makeShutterRecordStore() -> any ShutterRecordStoring { shutterRecordStore }
+    static func makeEchoItemStore() -> any EchoItemStoring { echoItemStore }
 
-    static func makeSpendingRecordStore() -> any SpendingRecordStoring {
-        spendingRecordStore
-    }
-
-    static func makeScreenTimeRecordStore() -> any ScreenTimeRecordStoring {
-        screenTimeRecordStore
-    }
-
-    static func makeEchoItemStore() -> any EchoItemStoring {
-        echoItemStore
-    }
+    // MARK: - Echo Infrastructure
 
     @MainActor
     private static let echoEngine = EchoEngine(
@@ -126,8 +103,7 @@ enum AppContainer {
     static func makeEchoViewModel() -> EchoViewModel {
         EchoViewModel(
             echoEngine: echoEngine,
-            shutterRecordStore: makeShutterRecordStore(),
-            screenTimeStore: makeScreenTimeRecordStore()
+            shutterRecordStore: makeShutterRecordStore()
         )
     }
 
@@ -141,34 +117,13 @@ enum AppContainer {
         )
     }
 
-    @MainActor
-    static func getEchoEngine() -> EchoEngine {
-        echoEngine
-    }
-
-    static func getEchoAIService() -> EchoAIService {
-        echoAIService
-    }
-
-    static func getEchoMemoryManager() -> EchoMemoryManager {
-        echoMemoryManager
-    }
-
-    static func getEchoPromptBuilder() -> EchoPromptBuilder {
-        echoPromptBuilder
-    }
-
-    static func getEchoDailySummaryGenerator() -> EchoDailySummaryGenerator {
-        echoDailySummaryGenerator
-    }
-
-    static func getEchoWeeklyProfileUpdater() -> EchoWeeklyProfileUpdater {
-        echoWeeklyProfileUpdater
-    }
-
-    static func getEchoScheduler() -> EchoScheduler {
-        echoScheduler
-    }
+    @MainActor static func getEchoEngine() -> EchoEngine { echoEngine }
+    static func getEchoAIService() -> EchoAIService { echoAIService }
+    static func getEchoMemoryManager() -> EchoMemoryManager { echoMemoryManager }
+    static func getEchoPromptBuilder() -> EchoPromptBuilder { echoPromptBuilder }
+    static func getEchoDailySummaryGenerator() -> EchoDailySummaryGenerator { echoDailySummaryGenerator }
+    static func getEchoWeeklyProfileUpdater() -> EchoWeeklyProfileUpdater { echoWeeklyProfileUpdater }
+    static func getEchoScheduler() -> EchoScheduler { echoScheduler }
 
     @MainActor
     static let echoMessageManager: EchoMessageManager = {
@@ -178,9 +133,7 @@ enum AppContainer {
     }()
 
     @MainActor
-    static func getEchoMessageManager() -> EchoMessageManager {
-        echoMessageManager
-    }
+    static func getEchoMessageManager() -> EchoMessageManager { echoMessageManager }
 
     @MainActor
     static func makeEchoThreadViewModel(
@@ -200,14 +153,14 @@ enum AppContainer {
         )
     }
 
+    // MARK: - Model Container
+
     private static func makeModelContainer() -> ModelContainer {
         do {
             let container = try ModelContainer(
                 for: MoodRecordEntity.self,
                 DayTimelineEntity.self,
                 ShutterRecordEntity.self,
-                SpendingRecordEntity.self,
-                ScreenTimeRecordEntity.self,
                 EchoItemEntity.self,
                 UserProfileEntity.self,
                 DailySummaryEntity.self,
@@ -223,7 +176,7 @@ enum AppContainer {
             CustomMoodEntity.seedDefaultsIfNeeded(in: context)
             return container
         } catch {
-            fatalError("无法创建 MoodRecord SwiftData 容器：\(error.localizedDescription)")
+            fatalError("无法创建 SwiftData 容器：\(error.localizedDescription)")
         }
     }
 
@@ -246,12 +199,4 @@ enum AppContainer {
             assertionFailure("迁移旧版 MoodRecord 数据失败：\(error.localizedDescription)")
         }
     }
-
-#if os(iOS)
-    private static func makePhoneConnectivityManager() -> PhoneConnectivityManager {
-        let manager = PhoneConnectivityManager.shared
-        manager.configure(recordStore: moodRecordStore)
-        return manager
-    }
-#endif
 }
